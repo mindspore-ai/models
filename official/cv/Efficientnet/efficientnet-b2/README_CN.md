@@ -1,7 +1,7 @@
 # 目录
 
 - [目录](#目录)
-- [EfficientNet-B2描述](#EfficientNet-B2描述)
+- [EfficientNet-B2描述](#efficientnet-b2描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [环境要求](#环境要求)
@@ -14,10 +14,14 @@
     - [评估过程](#评估过程)
         - [启动](#启动-1)
         - [结果](#结果-1)
+    - [ONNX推理](#onnx推理)
+        - [导出ONNX](#导出onnx)
+        - [在GPU执行ONNX推理](#在gpu执行onnx推理)
+    - [执行推理](#执行推理)
 - [模型说明](#模型说明)
     - [训练性能](#训练性能)
 - [随机情况的描述](#随机情况的描述)
-- [ModelZoo 主页](#modelzoo-主页)
+- [ModelZoo](#modelzoo)
 
 <!-- /TOC -->
 
@@ -185,9 +189,13 @@ python export.py --checkpoint_path [CHECKPOINT_FILE_PATH] --file_name [OUTPUT_FI
 bash scripts/run_infer_onnx.sh [ONNX_PATH] [DATA_PATH] [DEVICE_TARGET]
 ```
 
-## 在310执行推理
+## 执行推理
 
 **推理前需参照 [MindSpore C++推理部署指南](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README_CN.md) 进行环境变量设置。**
+
+```bash
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
+```
 
 # 模型说明
 

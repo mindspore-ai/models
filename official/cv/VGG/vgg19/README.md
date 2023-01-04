@@ -1,24 +1,37 @@
 # Contents
 
-- [VGG Description](#vgg-description)
-- [Model Architecture](#model-architecture)
-- [Dataset](#dataset)
-- [Environment Requirements](#environment-requirements)
-- [Quick Start](#quick-start)
-- [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Parameter configuration](#parameter-configuration)
-    - [Training Process](#training-process)
-        - [Training](#training)
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
-- [Model Description](#model-description)
-    - [Performance](#performance)
-        - [Training Performance](#training-performance)
-        - [Evaluation Performance](#evaluation-performance)
-- [Description of Random Situation](#description-of-random-situation)
-- [ModelZoo Homepage](#modelzoo-homepage)
+- [Contents](#contents)
+    - [VGG Description](#vgg-description)
+    - [Model Architecture](#model-architecture)
+    - [Dataset](#dataset)
+        - [Dataset used: CIFAR-10](#dataset-used-cifar-10)
+        - [Dataset used: ImageNet2012](#dataset-used-imagenet2012)
+            - [Dataset organize way](#dataset-organize-way)
+    - [Features](#features)
+    - [Environment Requirements](#environment-requirements)
+    - [Quick Start](#quick-start)
+    - [Script Description](#script-description)
+        - [Script and Sample Code](#script-and-sample-code)
+        - [Script Parameters](#script-parameters)
+            - [Training](#training)
+            - [Evaluation](#evaluation)
+        - [Parameter configuration](#parameter-configuration)
+        - [Training Process](#training-process)
+            - [Training](#training-1)
+                - [Run vgg19 on Ascend](#run-vgg19-on-ascend)
+                - [Run vgg19 on GPU](#run-vgg19-on-gpu)
+        - [Evaluation Process](#evaluation-process)
+            - [Evaluation](#evaluation-1)
+    - [Inference Process](#inference-process)
+        - [Export MindIR](#export-mindir)
+        - [Infer](#infer)
+        - [result](#result)
+    - [Model Description](#model-description)
+        - [Performance](#performance)
+            - [Training Performance](#training-performance)
+            - [Evaluation Performance](#evaluation-performance)
+    - [Description of Random Situation](#description-of-random-situation)
+    - [ModelZoo Homepage](#modelzoo-homepage)
 
 ## [VGG Description](#contents)
 
@@ -497,10 +510,14 @@ python export.py --config_path [YMAL_CONFIG_PATH] --ckpt_file [CKPT_PATH] --file
 The ckpt_file parameter is required,
 `FILE_FORMAT` should be in ["AIR", "MINDIR"]
 
-### Infer on Ascend310
+### Infer
 
 Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
 Current batch_Size for imagenet2012 dataset can only be set to 1.
+
+```bash
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
+```
 
 - `DATASET_NAME` can choose from ['cifar10', 'imagenet2012'].
 - `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n', if you choose y, the cifar10 dataset will be processed in bin format, the imagenet2012 dataset will generate label json file.  

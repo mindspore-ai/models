@@ -20,7 +20,7 @@
     - [NFS数据集的训练过程](#nfs数据集的训练过程)
     - [推理过程](#推理过程)
         - [导出MindIR](#导出mindir)
-        - [在Ascend310执行推理](#在ascend310执行推理)
+        - [执行推理](#执行推理)
         - [结果](#结果-2)
 - [模型描述](#模型描述)
     - [性能](#性能)
@@ -381,14 +381,13 @@ python export.py --platform [PLATFORM] --ckpt_file [CKPT_PATH] --file_format [EX
 参数ckpt_file为必填项，
 `EXPORT_FORMAT` 可选 ["AIR", "MINDIR"].
 
-### 在Ascend310执行推理
+### 执行推理
 
 在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用mindir模型执行推理的示例。
 目前仅支持batch_size为1的推理。
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_PATH] [DVPP] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [LABEL_PATH] [DVPP] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `LABEL_PATH` label.txt存放的路径，写一个py脚本对数据集下的类别名进行排序，对类别下的文件名和类别排序值做映射，例如[文件名:排序值]，将映射结果写到labe.txt文件中。

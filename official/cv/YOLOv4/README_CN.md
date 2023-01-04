@@ -664,7 +664,7 @@ overall performance
 
 ### 转换
 
-如果您想推断Ascend 310上的网络，则应将模型转换为MINDIR：
+如果您想执行推理，则应将模型转换为MINDIR：
 
 ```python
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
@@ -683,8 +683,8 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 当前批处理大小只能设置为1。 精度计算过程需要70G+内存空间。
 
 ```shell
-# Ascend 310推理
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID] [ANN_FILE]
+# 执行推理
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID] [ANN_FILE]
 ```
 
 `DEVICE_ID`是可选参数，默认值为0。

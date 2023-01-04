@@ -16,10 +16,10 @@
         - [分布式训练](#分布式训练)
     - [评估过程](#评估过程)
         - [评估](#评估)
-    - [导出mindir模型](#导出mindir模型)
+    - [导出mindir，onnx模型](#导出mindironnx模型)
     - [推理过程](#推理过程)
-        - [用法](#用法-2)
-        - [结果](#结果-2)
+        - [用法](#用法)
+        - [结果](#结果)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -423,8 +423,8 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 目前仅可处理batch_Size为1，由于使用了DVPP硬件进行图片处理，因此图片必须满足JPEG编码格式，否则将会报错。比如coco2014数据集中的COCO_val2014_000000320612.jpg需要删除。
 
 ```shell
-# Ascend310 推理
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
+# 执行推理
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 ```
 
 `DEVICE_ID` 可选，默认值为 0。DATA_PATH为推理数据所在的路径，ANNO_PATH为数据注解文件，为json文件，如instances_val2014.json。
@@ -438,7 +438,7 @@ DATA_PATH为推理数据所在的路径，路径下应包含数据注解文件�
 
 ### 结果
 
-Ascend310 推理结果保存在当前路径，可在acc.log中看到最终精度结果。
+推理结果保存在当前路径，可在acc.log中看到最终精度结果。
 
 ```eval log
 # acc.log

@@ -225,13 +225,12 @@ python export.py --pretrained [CKPT_FILE] --swin_config [CONFIG_PATH] --device_t
 
 在进行推理之前我们需要先导出模型。mindir可以在任意环境上导出，air模型只能在昇腾910环境上导出。onnx可以在CPU/GPU/Ascend环境下导出。以下展示了使用mindir模型执行推理的示例。
 
-- 在昇腾310上使用ImageNet-1k数据集进行推理
+- 使用ImageNet-1k数据集进行推理
 
   推理的结果保存在scripts目录下，在acc.log日志文件中可以找到类似以下的结果。
 
   ```shell
-  # Ascend310 inference
-  bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [DEVICE_ID]
+  bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [DEVICE_TYPE] [DEVICE_ID]
   Total data: 50000, top1 accuracy: 81.02%
   ```
 

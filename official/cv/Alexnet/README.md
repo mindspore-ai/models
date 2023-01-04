@@ -16,7 +16,7 @@
             - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
-        - [Infer on Ascend310](#infer-on-ascend310)
+        - [Infer](#infer)
         - [Result](#result)
     - [Model Description](#model-description)
         - [Performance](#performance)
@@ -366,7 +366,7 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --file_name
 The ckpt_file parameter is required,
 `FILE_FORMAT` should be in ["AIR", "MINDIR"]
 
-### [Infer on Ascend310](#contents)
+### [Infer](#contents)
 
 **Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
@@ -374,14 +374,14 @@ Before performing inference, the mindir file must be exported by `export.py` scr
 Current batch_Size for imagenet2012 dataset can only be set to 1.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `MINDIR_PATH` specifies path of used "MINDIR" OR "AIR" model.
 - `DATASET_NAME` specifies datasets used to infer. value can be chosen between 'cifar10' and 'imagenet2012', defaulted is 'cifar10'
 - `DATASET_PATH` specifies path of cifar10 datasets
 - `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n', if you choose y, the cifar10 dataset will be processed in bin format, the imagenet2012 dataset will generate label json file.
+- `DEVICE_TYPE` can choose from [Ascend, GPU, CPU].
 - `DEVICE_ID` is optional, default value is 0.
 
 ### [Result](#contents)

@@ -19,6 +19,7 @@
     - [选项及参数](#选项及参数)
         - [选项](#选项)
         - [参数](#参数)
+        - [schema\_file](#schema_file)
     - [训练过程](#训练过程)
         - [用法](#用法)
             - [Ascend处理器上运行](#ascend处理器上运行)
@@ -26,11 +27,15 @@
             - [Ascend处理器上运行](#ascend处理器上运行-1)
     - [评估过程](#评估过程)
         - [用法](#用法-1)
-            - [Ascend处理器上运行后评估cola数据集](#ascend处理器上运行后评估cola数据集)
+            - [Ascend处理器上运行后评估tnews数据集](#ascend处理器上运行后评估tnews数据集)
+            - [CPU处理器上运行后评估tnews数据集](#cpu处理器上运行后评估tnews数据集)
             - [Ascend处理器上运行后评估cluener数据集](#ascend处理器上运行后评估cluener数据集)
+            - [CPU处理器上运行后评估cluener数据集](#cpu处理器上运行后评估cluener数据集)
             - [Ascend处理器上运行后评估chineseNer数据集](#ascend处理器上运行后评估chinesener数据集)
+            - [CPU处理器上运行后评估chineseNer数据集](#cpu处理器上运行后评估chinesener数据集)
             - [Ascend处理器上运行后评估msra数据集](#ascend处理器上运行后评估msra数据集)
             - [Ascend处理器上运行后评估squad v1.1数据集](#ascend处理器上运行后评估squad-v11数据集)
+            - [CPU处理器上运行后评估squad v1.1数据集](#cpu处理器上运行后评估squad-v11数据集)
     - [导出mindir模型](#导出mindir模型)
     - [推理过程](#推理过程)
         - [用法](#用法-2)
@@ -971,14 +976,11 @@ python export.py --config_path [/path/*.yaml] --export_ckpt_file [CKPT_PATH] --e
 在执行推理之前，需要通过export.py导出mindir文件。输入数据文件为bin格式。
 
 ```shell
-
-# Ascend310 推理
-
-bash run_infer_310.sh [MINDIR_PATH] [LABEL_PATH] [DATA_FILE_PATH] [DATASET_FORMAT] [SCHEMA_PATH] [TASK] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [LABEL_PATH] [DATA_FILE_PATH] [DATASET_FORMAT] [SCHEMA_PATH] [TASK] [VOCAB_FILE_PATH] [EVAL_JSON_PATH] NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 `NEED_PREPROCESS` 为必选项, 在[y|n]中取值，表示数据是否预处理为bin格式。
-`TASK` 为必选项, 在 [ner|ner_crf|classifier]中取值。
+`TASK` 为必选项, 在 [ner|ner_crf|classifier|squad]中取值。
 `DEVICE_ID` 可选，默认值为 0。
 
 ### 结果

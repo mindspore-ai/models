@@ -1,7 +1,7 @@
 ﻿# 目录
 
 - [目录](#目录)
-- [Wide&Deep概述](#Wide&Deep概述)
+- [Wide\&Deep概述](#widedeep概述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [环境要求](#环境要求)
@@ -20,10 +20,9 @@
         - [分布式训练](#分布式训练)
         - [参数服务器](#参数服务器)
     - [评估过程](#评估过程)
-    - [Evaluation Process](#evaluation-process)
     - [推理过程](#推理过程)
         - [导出MindIR](#导出mindir)
-        - [在Ascend310执行推理](#在ascend310执行推理)
+        - [执行推理](#执行推理)
         - [result](#result)
 - [模型描述](#模型描述)
     - [性能](#性能)
@@ -422,13 +421,12 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --device_target
 参数ckpt_file为必填项，
 `FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
 
-### 在Ascend310执行推理
+### 执行推理
 
 在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
 
 ```shell
-# Ascend310 推理
-bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DATA_TYPE] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [DATA_TYPE] [NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `DATA_TYPE` 表示数据类型, 取值范围为 ['tfrecord', 'mindrecord', 'hd5']。

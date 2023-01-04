@@ -1,12 +1,12 @@
 # 目录
 
 - [目录](#目录)
-- [EfficientNet-B1描述](#EfficientNet-B1描述)
+- [EfficientNet-B1描述](#efficientnet-b1描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [环境要求](#环境要求)
 - [脚本说明](#脚本说明)
-    - [脚本和示例代码](#脚本和示例代码)
+    - [脚本和样例代码](#脚本和样例代码)
     - [脚本参数](#脚本参数)
     - [训练过程](#训练过程)
         - [启动](#启动)
@@ -14,14 +14,16 @@
     - [评估过程](#评估过程)
         - [启动](#启动-1)
         - [结果](#结果-1)
-    - [推理过程](#推理过程)
-        - [导出MINDIR](#导出MINDIR)
-        - [在Ascend310执行推理](#在Ascend310执行推理)
-        - [结果](#结果-2)
+- [推理过程](#推理过程)
+    - [导出MINDIR](#导出mindir)
+    - [执行推理](#执行推理)
+    - [导出ONNX](#导出onnx)
+    - [在GPU执行ONNX推理](#在gpu执行onnx推理)
+    - [结果](#结果-2)
 - [模型说明](#模型说明)
     - [训练性能](#训练性能)
 - [随机情况的描述](#随机情况的描述)
-- [ModelZoo 主页](#modelzoo-主页)
+- [ModelZoo](#modelzoo)
 
 <!-- /TOC -->
 
@@ -205,13 +207,12 @@ epoch: [ 5/350], epoch time: 236639.009, steps: 625, per step time: 378.622, avg
 python export.py --checkpoint_path [CHECKPOINT_FILE_PATH] --file_name [OUTPUT_FILE_NAME] --width 240 --height 240 --file_format MINDIR
 ```
 
-## 在Ascend310执行推理
+## 执行推理
 
 在执行推理前，mindir文件必须通过 `export.py` 脚本导出。以下展示了使用mindir模型执行推理的示例。
 
 ```bash
-# Ascend310 inference
-bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+bash scripts/run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 ## 导出ONNX

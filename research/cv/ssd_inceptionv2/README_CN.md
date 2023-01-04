@@ -15,11 +15,11 @@
         - [Ascend上训练](#ascend上训练)
     - [评估过程](#评估过程)
         - [Ascend处理器环境评估](#ascend处理器环境评估)
-        - [性能](#性能)
     - [导出过程](#导出过程)
         - [导出](#导出)
     - [推理过程](#推理过程)
         - [推理](#推理)
+        - [性能](#性能)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
 
@@ -268,8 +268,7 @@ python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 在还行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP]  [ANNO_FILE]  [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [ANNO_FILE] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 推理结果被保存到了当前目录，可以在acc.log中获得类似下面的结果。

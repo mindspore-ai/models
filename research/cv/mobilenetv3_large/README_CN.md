@@ -14,10 +14,11 @@
     - [评估过程](#评估过程)
         - [启动](#启动-1)
         - [结果](#结果-1)
+    - [执行推理](#执行推理)
 - [模型说明](#模型说明)
     - [训练性能](#训练性能)
 - [随机情况的描述](#随机情况的描述)
-- [ModelZoo 主页](#modelzoo-主页)
+- [ModelZoo](#modelzoo)
 
 <!-- /TOC -->
 
@@ -154,9 +155,13 @@ epoch 5: epoch time: 150594.088, per step time: 141.138, avg loss: 3.607
 metric:  {'Loss': 6.346325377444248, 'Top1-Acc': 0.744024024024024, 'Top5-Acc': 0.916956956956957}
 ```
 
-## 310推理
+## 执行推理
 
 **推理前需参照 [MindSpore C++推理部署指南](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README_CN.md) 进行环境变量设置。**
+
+```bash
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [DEVICE_TYPE] [DEVICE_ID]
+```
 
 # 模型说明
 

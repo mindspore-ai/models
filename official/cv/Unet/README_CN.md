@@ -495,8 +495,7 @@ python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_
 在执行推理前，MINDIR文件必须通过export.py文件导出。
 
 ```shell
-# Ascend310 推理
-bash run_infer_310.sh [NETWORK] [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_cpp.sh [NETWORK] [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 `NETWORK` 目前支持的网络为unet及unet++，对应的配置文件分别为`unet_simple_config.yaml`及`unet_nested_cell_config.yaml`。

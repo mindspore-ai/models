@@ -1,14 +1,21 @@
 # Contents
 
-- [Face Recognition Description](#Face-Recognition-description)
+- [Contents](#contents)
+- [Face Recognition Description](#face-recognition-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
 - [Script Description](#script-description)
     - [Script and Sample Code](#script-and-sample-code)
     - [Running Example](#running-example)
+        - [Train](#train)
+        - [Evaluation](#evaluation)
+        - [Convert model](#convert-model)
+        - [Inference](#inference)
 - [Model Description](#model-description)
     - [Performance](#performance)
+        - [Training Performance](#training-performance)
+        - [Evaluation Performance](#evaluation-performance)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 # [Face Recognition Description](#contents)
@@ -392,14 +399,14 @@ sh run_export.sh 1 0 ./0-1_1.ckpt
 
 ```bash
 cd ./scripts
-sh run_infer_310.sh [MINDIR_PATH] [USE_DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 for example:
 
 ```bash
 cd ./scripts
-sh run_infer_310.sh ../facerecognition.mindir 0
+bash run_infer_cpp.sh ../facerecognition.mindir Ascend 0
 ```
 
 You will get the result as following in "./scripts/acc.log" if 'dis_dataset' ranges from folder '68680' to '68725':

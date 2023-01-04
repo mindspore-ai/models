@@ -17,7 +17,7 @@
         - [Evaluation on GPU](#evaluation-on-gpu)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
-        - [Infer on Ascend310](#infer-on-ascend310)
+        - [Infer](#infer)
         - [result](#result)
 - [Model Description](#model-description)
     - [Performance](#performance)
@@ -300,14 +300,13 @@ Export on ModelArts (If you want to run in modelarts, please check the official 
 # (5) Create your job.
 ```
 
-### Infer on Ascend310
+### Infer
 
 Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
 Current batch_size can only be set to 1.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `DVPP` is mandatory, and must choose from ["DVPP", "CPU"], it's case-insensitive. SSD_ghostnet only support CPU mode. Note that the image shape of ssd_ghostnet inference is [300, 300], The DVPP hardware restricts width 16-alignment and height even-alignment. Therefore, the network needs to use the CPU operator to process images.

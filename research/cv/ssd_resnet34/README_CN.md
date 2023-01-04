@@ -15,13 +15,16 @@
         - [Ascend上训练](#ascend上训练)
     - [评估过程](#评估过程)
         - [Ascend处理器环境评估](#ascend处理器环境评估)
-        - [性能](#性能)
-    - [导出过程](#导出过程)
-        - [导出](#导出)
     - [推理过程](#推理过程)
-        - [推理](#推理)
-- [随机情况说明](#随机情况说明)
-- [ModelZoo主页](#modelzoo主页)
+        - [导出MindIR](#导出mindir)
+        - [执行推理](#执行推理)
+        - [结果](#结果)
+    - [模型描述](#模型描述)
+        - [性能](#性能)
+            - [训练性能](#训练性能)
+            - [推理性能](#推理性能)
+    - [随机情况说明](#随机情况说明)
+    - [ModelZoo主页](#modelzoo主页)
 
 <!-- /TOC -->
 
@@ -266,14 +269,13 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 参数ckpt_file为必填项，
 `EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
 
-### 在Ascend310执行推理
+### 执行推理
 
 在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
 目前仅支持batch_Size为1的推理。精度计算过程需要70G+的内存，否则进程将会因为超出内存被系统终止。
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [ANNO_FILE] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [ANNO_FILE] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `DVPP` 为必填项，需要在["DVPP", "CPU"]选择，大小写均可。需要注意的是ssd_vgg16执行推理的图片尺寸为[300, 300]，由于DVPP硬件限制宽为16整除，高为2整除，因此，这个网络需要通过CPU算子对图像进行前处理。

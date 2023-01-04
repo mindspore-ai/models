@@ -13,13 +13,17 @@
         - [Script Parameters](#script-parameters)
         - [Training Process](#training-process)
             - [Training on Ascend](#training-on-ascend)
+            - [Transfer Training](#transfer-training)
         - [Evaluation Process](#evaluation-process)
             - [Evaluation on Ascend](#evaluation-on-ascend)
-            - [Performance](#performance)
-        - [Export Process](#Export-process)
-            - [Export](#Export)
-        - [Inference Process](#Inference-process)
-            - [Inference](#Inference)
+    - [Inference Process](#inference-process)
+        - [Export MindIR](#export-mindir)
+        - [Infer](#infer)
+        - [result](#result)
+    - [Model Description](#model-description)
+        - [Performance](#performance)
+            - [Train Performance](#train-performance)
+            - [Inference Performance](#inference-performance)
     - [Description of Random Situation](#description-of-random-situation)
     - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -312,14 +316,13 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 The ckpt_file parameter is required,
 `EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
 
-### Infer on Ascend310
+### Infer
 
 Before performing inference, the mindir file must bu exported by `export.py` script. We only provide an example of inference using MINDIR model.
 Current batch_Size can only be set to 1. The precision calculation process needs about 70G+ memory space, otherwise the process will be killed for execeeding memory limits.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [ANNO_FILE] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [ANNO_FILE] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `DVPP` is mandatory, and must choose from ["DVPP", "CPU"], it's case-insensitive. Note that the image shape of ssd_vgg16 inference is [300, 300], The DVPP hardware restricts width 16-alignment and height even-alignment. Therefore, the network needs to use the CPU operator to process images.

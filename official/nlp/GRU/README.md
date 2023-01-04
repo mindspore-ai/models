@@ -461,8 +461,7 @@ python export.py --device_target="GPU" --file_format="ONNX" --ckpt_file [CKPT_PA
 Before performing inference, the mindir file must be exported by export.py. Input files must be in bin format.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'.

@@ -1,5 +1,6 @@
 # Contents
 
+- [Contents](#contents)
 - [CycleGAN Description](#cyclegan-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
@@ -7,16 +8,16 @@
 - [Script Description](#script-description)
     - [Script and Sample Code](#script-and-sample-code)
     - [Script Parameters](#script-parameters)
-    - [Training](#training-process)
-    - [Evaluation](#evaluation-process)
+    - [Training](#training)
+    - [Evaluation](#evaluation)
     - [ONNX evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
-        - [Infer on Ascend310](#infer-on-ascend)
+        - [Infer](#infer)
         - [Result](#result)
 - [Model Description](#model-description)
     - [Performance](#performance)
-        - [Training Performance](#evaluation-performance)
+        - [Training Performance](#training-performance)
         - [Evaluation Performance](#evaluation-performance)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -190,24 +191,24 @@ python eval_onnx.py --platform [PLATFORM] --dataroot [DATA_PATH] --export_file_n
 python export.py --G_A_ckpt [CKPT_PATH_A] --G_B_ckpt [CKPT_PATH_A] --export_batch_size 1 --export_file_name [FILE_NAME] --export_file_format [FILE_FORMAT]
 ```
 
-### [Infer on Ascend310](#contents)
+### [Infer](#contents)
 
 Before performing inference, the mindir file must be exported by `export.py`.Current batch_Size can only be set to 1.
 
 ```shell
-# Ascend310 inference
-bash ./scripts/run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATA_MODE] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [DATASET_MODE] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
 ```
 
-- `DATA_PATH` is mandatory, and must specify original data path.
-- `DATA_MODE` is the translation direction of CycleGAN, it's value is 'AtoB' or 'BtoA'.
+- `DATASET_PATH` is mandatory, and must specify original data path.
+- `DATASET_MODE` is the translation direction of CycleGAN, it's value is 'AtoB' or 'BtoA'.
 - `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'.
+- `DEVICE_TARGET` can choose from [Ascend, GPU, CPU].
 - `DEVICE_ID` is optional, default value is 0.
 
 for example, on Ascend:
 
 ```bash
-bash ./scripts/run_infer_310.sh ./310_infer/CycleGAN_AtoB.mindir ./data/horse2zebra AtoB y Ascend 0
+bash ./scripts/run_infer_cpp.sh ./cpp_infer/CycleGAN_AtoB.mindir ./data/horse2zebra AtoB y Ascend 0
 ```
 
 ### [Result](#contents)

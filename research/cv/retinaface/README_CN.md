@@ -24,9 +24,9 @@
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
-            - [WIDERFACE上的retinaface](#WIDERFACE上的retinaface)
+            - [WIDERFACE上的retinaface](#widerface上的retinaface)
         - [推理性能](#推理性能)
-            - [WIDERFACE上的retinaface](#WIDERFACE上的retinaface)
+            - [WIDERFACE上的retinaface](#widerface上的retinaface-1)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
 
@@ -393,13 +393,12 @@ RetinaFace可以使用ResNet50或MobileNet0.25骨干提取图像特征进行检�
 
 在进行推理之前我们需要先导出模型。mindir可以在任意环境上导出，air模型只能在昇腾910环境上导出。以下展示了使用mindir模型执行推理的示例。
 
-- 在昇腾310上使用WIDER FACE数据集进行推理（使用ResNet50作为backbone）
+- 使用WIDER FACE数据集进行推理（使用ResNet50作为backbone）
 
   执行推理的命令如下所示，其中'MINDIR_PATH'是mindir文件路径；'DATASET_PATH'是使用的推理数据集所在路径，如'/home/dataset/widerface/val/'；'DEVICE_ID'可选，默认值为0。
 
   ```shell
-  # Ascend310 inference
-  bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
+  bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_TYPE] [DEVICE_ID]
   ```
 
   推理的精度结果保存在scripts目录下，在acc.log日志文件中可以找到类似以下的分类准确率结果。推理的性能结果保存在scripts/time_Result目录下，在test_perform_static.txt文件中可以找到类似以下的性能结果。

@@ -20,18 +20,18 @@
         - [分布式训练](#分布式训练)
     - [评估过程](#评估过程)
         - [评估](#评估)
-     - [导出过程](#导出过程)
+    - [导出过程](#导出过程)
         - [导出](#导出)
     - [推理过程](#推理过程)
         - [推理](#推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
-            - [120万张图像上的GoogleNet](#120万张图像上的vit)
+            - [imagenet 120万张图像上的Vit](#imagenet-120万张图像上的vit)
         - [推理性能](#推理性能)
-            - [120万张图像上的GoogleNet](#120万张图像上的vit)
+            - [120万张图像上的Vit](#120万张图像上的vit)
     - [使用流程](#使用流程)
-        - [推理](#推理)
+        - [推理](#推理-1)
         - [继续训练预训练模型](#继续训练预训练模型)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
@@ -390,16 +390,15 @@ python export.py --config_path=[CONFIG_PATH]
 
 在还行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
 
-- 在昇腾310上使用ImageNet数据集进行推理
+- 使用ImageNet数据集进行推理
 
   在执行下面的命令之前，我们需要先修改配置文件。修改的项包括batch_size和val_data_path。
 
   推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
 
   ```bash
-  # Ascend310 inference
   cd scripts;
-  bash run_infer_310.sh [MINDIR_PATH] [NET_TYPE] [DATASET] [DATA_PATH] [DEVICE_ID]
+  bash run_infer_cpp.sh [MINDIR_PATH] [NET_TYPE] [DATASET] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
   Total data: 50000, top1 accuracy: 0.74084, top5 accuracy: 0.91026
   ```
 

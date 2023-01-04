@@ -308,8 +308,7 @@ Export on ModelArts (If you want to run in modelarts, please check the official 
 Before performing inference, the mindir file must be exported by export.py. Currently, only batchsize 1 is supported.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DEVICE_TARGET] [DATA_PATH] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DEVICE_TARGET] [DATA_PATH] [DEVICE_ID]
 ```
 
 `DEVICE_TARGET` specifies device target of MindIR, should be in ['Ascend', 'GPU', 'CPU'].

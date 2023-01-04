@@ -21,24 +21,37 @@
             - [GPU处理器环境运行](#gpu处理器环境运行)
             - [运行参数服务器模式训练](#运行参数服务器模式训练)
             - [训练时推理](#训练时推理)
-        - [结果](#结果)
-    - [评估过程](#评估过程)
+    - [迁移训练过程](#迁移训练过程)
+        - [迁移数据集处理](#迁移数据集处理)
+        - [迁移训练Ckpt获取](#迁移训练ckpt获取)
         - [用法](#用法-1)
+        - [结果](#结果)
+    - [迁移训练推理过程](#迁移训练推理过程)
+        - [用法](#用法-2)
+    - [续训过程](#续训过程)
+        - [用法](#用法-3)
             - [Ascend处理器环境运行](#ascend处理器环境运行-1)
-            - [GPU处理器环境运行](#gpu处理器环境运行-1)
         - [结果](#结果-1)
+    - [评估过程](#评估过程)
+        - [用法](#用法-4)
+            - [Ascend处理器环境运行](#ascend处理器环境运行-2)
+            - [GPU处理器环境运行](#gpu处理器环境运行-1)
+        - [结果](#结果-2)
     - [推理过程](#推理过程)
         - [导出MindIR](#导出mindir)
-        - [onnx模型导出与推理](#onnx的导出与推理)
-        - [在Ascend310执行推理](#在ascend310执行推理)
-        - [结果](#结果-2)
+        - [ONNX的导出与推理](#onnx的导出与推理)
+        - [执行推理](#执行推理)
+        - [结果](#结果-3)
 - [应用MindSpore Golden Stick模型压缩算法](#应用mindspore-golden-stick模型压缩算法)
     - [训练过程](#训练过程-1)
         - [GPU处理器环境运行](#gpu处理器环境运行-2)
-    - [续训过程](#续训过程-1)
+        - [Ascend处理器环境运行](#ascend处理器环境运行-3)
     - [评估过程](#评估过程-1)
         - [GPU处理器环境运行](#gpu处理器环境运行-3)
-        - [结果](#结果-3)
+        - [Ascend处理器环境运行](#ascend处理器环境运行-4)
+        - [结果](#结果-4)
+            - [GPU结果](#gpu结果)
+            - [Ascend结果](#ascend结果)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -47,10 +60,13 @@
             - [CIFAR-10上的ResNet50](#cifar-10上的resnet50)
             - [ImageNet2012上的ResNet50](#imagenet2012上的resnet50)
             - [ImageNet2012上的ResNet34](#imagenet2012上的resnet34)
+            - [flower\_photos上的ResNet34](#flower_photos上的resnet34)
             - [ImageNet2012上的ResNet101](#imagenet2012上的resnet101)
+            - [ImageNet2012上的ResNet152](#imagenet2012上的resnet152)
             - [ImageNet2012上的SE-ResNet50](#imagenet2012上的se-resnet50)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
+- [FAQ](#faq)
 
 <!-- /TOC -->
 
@@ -790,14 +806,13 @@ ModelArts导出mindir
 
 - onnx推理结果将存放在 eval_onnx.log 中
 
-### 在Ascend310执行推理
+### 执行推理
 
 在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
 目前仅支持batch_Size为1的推理。
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [NET_TYPE] [DATASET] [DATA_PATH] [CONFIG_PATH] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [NET_TYPE] [DATASET] [DATA_PATH] [CONFIG_PATH] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `NET_TYPE` 选择范围：[resnet18, resnet34, se-resnet50, resnet50, resnet101, resnet152]。

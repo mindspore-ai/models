@@ -1,7 +1,7 @@
 # Contents
 
 - [Contents](#contents)
-- [YOLOv5 Description](#YOLOv5-description)
+- [YOLOv5 Description](#yolov5-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Quick Start](#quick-start)
@@ -11,18 +11,20 @@
     - [Training Process](#training-process)
         - [Training](#training)
         - [Distributed Training](#distributed-training)
+    - [Evaluation Process](#evaluation-process)
+        - [Evaluation](#evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
-        - [Infer on Ascend310](#infer-on-ascend310)
+        - [Infer](#infer)
         - [result](#result)
         - [Export ONNX](#export-onnx)
         - [Run ONNX evaluation](#run-onnx-evaluation)
-        - [result](#result)
+        - [result](#result-1)
 - [Model Description](#model-description)
-- [Performance](#performance)  
-    - [Evaluation Performance](#evaluation-performance)
-    - [Inference Performance](#inference-performance)
-    - [Transfer Learning](#transfer-learning)
+    - [Performance](#performance)
+        - [Evaluation Performance](#evaluation-performance)
+        - [Inference Performance](#inference-performance)
+        - [Transfer Learning](#transfer-learning)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -308,14 +310,13 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 The ckpt_file parameter is required,
 `file_format` should be in ["AIR", "MINDIR"]
 
-### Infer on Ascend310
+### Infer
 
 Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
 Current batch_Size can only be set to 1.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DVPP] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DVPP] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `DVPP` is mandatory, and must choose from ["DVPP", "CPU"], it's case-insensitive. The DVPP hardware restricts width 16-alignment and height even-alignment. Therefore, the network needs to use the CPU operator to process images.

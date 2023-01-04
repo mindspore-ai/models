@@ -1,6 +1,6 @@
 # Mobilenet_V1
 
-- [Mobilenet_V1](#mobilenet_v1)
+- [Mobilenet\_V1](#mobilenet_v1)
     - [MobileNetV1 Description](#mobilenetv1-description)
     - [Model architecture](#model-architecture)
     - [Dataset](#dataset)
@@ -17,6 +17,10 @@
         - [Usage](#usage-1)
         - [Launch](#launch-1)
         - [Result](#result-1)
+    - [Inference Process](#inference-process)
+        - [Export MindIR](#export-mindir)
+        - [Infer](#infer)
+        - [Result](#result-2)
     - [Model description](#model-description)
         - [Performance](#performance)
             - [Training Performance](#training-performance)
@@ -237,6 +241,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 
 You can start training using python or shell scripts. The usage of shell scripts as follows:
 
+```bash
 - Ascend: bash run_distribute_train.sh [cifar10|imagenet2012] [RANK_TABLE_FILE] [DATASET_PATH] [PRETRAINED_CKPT_PATH] (optional)
   # example: bash run_distribute_train.sh cifar10 /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/cifar10/cifar-10-batches-bin/
   # example: bash run_distribute_train.sh imagenet2012 /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/ImageNet_Original/
@@ -244,6 +249,7 @@ You can start training using python or shell scripts. The usage of shell scripts
 - CPU: bash run_train_CPU.sh [cifar10|imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH] (optional)
 - GPU(single device)：bash run_standalone_train_gpu.sh [cifar10|imagenet2012] [DATASET_PATH]  [DEVICE_ID][PRETRAINED_CKPT_PATH](optional)
 - GPU(distribute training): bash run_distribute_train_gpu.sh [cifar10|imagenet2012] [CONFIG_PATH] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
+```
 
 For distributed training with Ascend, a hccl configuration file with JSON format needs to be created in advance.
 
@@ -298,11 +304,15 @@ Epoch time: 320744.265, per step time: 256.390
 
 You can start training using python or shell scripts.If the train method is train or fine tune, should not input the `[CHECKPOINT_PATH]` The usage of shell scripts as follows:
 
+```bash
 - Ascend: bash run_eval.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID]
-  # example: bash run_eval.sh cifar10 /home/DataSet/cifar10/cifar-10-verify-bin/ /home/model/mobilenetv1/ckpt/cifar10/mobilenetv1-90_1562.ckpt 0
-  # example: bash run_eval.sh imagenet2012 /home/DataSet/ImageNet_Original/ /home/model/mobilenetv1/ckpt/imagenet2012/mobilenetv1-90_625.ckpt 0
+
+# example: bash run_eval.sh cifar10 /home/DataSet/cifar10/cifar-10-verify-bin/ /home/model/mobilenetv1/ckpt/cifar10/mobilenetv1-90_1562.ckpt 0
+
+# example: bash run_eval.sh imagenet2012 /home/DataSet/ImageNet_Original/ /home/model/mobilenetv1/ckpt/imagenet2012/mobilenetv1-90_625.ckpt 0
 
 - CPU: bash run_eval_CPU.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
+```
 
 ### Launch
 
@@ -350,14 +360,13 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 The ckpt_file parameter is required,
 `EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
 
-### Infer on Ascend310
+### Infer
 
 Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
 Current batch_Size for imagenet2012 dataset can only be set to 1.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `MINDIR_PATH` specifies path of used "MINDIR" OR "AIR" model.

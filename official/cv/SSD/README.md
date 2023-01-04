@@ -21,8 +21,14 @@
             - [Evaluation on GPU](#evaluation-on-gpu)
             - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
-        - [Infer on Ascend310](#infer-on-ascend310)
-        - [ONNX Infer](#ONNX Infer)
+        - [Infer](#infer)
+            - [Export MindIR](#export-mindir)
+            - [Infer](#infer-1)
+            - [result](#result)
+        - [ONNX Infer](#onnx-infer)
+            - [Export ONNX](#export-onnx)
+            - [Infer](#infer-2)
+            - [Result](#result-1)
     - [Model Description](#model-description)
         - [Performance](#performance)
     - [Description of Random Situation](#description-of-random-situation)
@@ -508,7 +514,7 @@ mAP: 0.2244936111705981
 
 ## Inference Process
 
-### Infer on Ascend310
+### Infer
 
 #### [Export MindIR](#contents)
 
@@ -558,8 +564,7 @@ Before performing inference, the mindir file must be exported by `export.py` scr
 Current batch size can only be set to 1. The precision calculation process needs about 70G+ memory space, otherwise the process will be killed for execeeding memory limits.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [CONFIG_PATH] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [CONFIG_PATH] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `DVPP` is mandatory, and must choose from ["DVPP", "CPU"], it's case-insensitive. Note that the image shape of ssd_vgg16 inference is [300, 300], The DVPP hardware restricts width 16-alignment and height even-alignment. Therefore, the network needs to use the CPU operator to process images.
