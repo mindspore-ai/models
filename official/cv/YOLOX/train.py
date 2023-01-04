@@ -15,9 +15,9 @@
 """ Train entrance module """
 import os
 import shutil
+import copy
 import time
 import datetime
-import argparse
 
 import mindspore
 from mindspore import DynamicLossScaleManager
@@ -36,39 +36,38 @@ from src.initializer import default_recurisive_init
 from src.logger import get_logger
 from src.network_blocks import use_syc_bn
 from src.util import get_specified, get_param_groups, YOLOXCB, get_lr, load_weights, EvalCallback, DetectionEngine, \
-    ResumeCallback, EvalWrapper, NoAugCallBack
+    ResumeCallback, EvalWrapper
 from src.yolox import YOLOLossCell, TrainOneStepWithEMA, DetectionBlock
 from src.yolox_dataset import create_yolox_dataset
 
 set_seed(888)
 
 
-def set_default():
+def set_default(cfg):
     """ set default """
-    if config.enable_modelarts:
-        config.data_root = os.path.join(config.data_dir, 'coco2017/train2017')
-        config.annFile = os.path.join(config.data_dir, 'coco2017/annotations')
-        outputs_dir = os.path.join(config.outputs_dir, config.ckpt_path)
+    if cfg.enable_modelarts:
+        cfg.data_root = os.path.join(cfg.data_dir, 'coco2017/train2017')
+        cfg.annFile = os.path.join(cfg.data_dir, 'coco2017/annotations')
+        cfg.save_ckpt_dir = os.path.join(os.getcwd(), cfg.ckpt_dir)
     else:
-        config.data_root = os.path.join(config.data_dir, 'train2017')
-        config.annFile = os.path.join(config.data_dir, 'annotations/instances_train2017.json')
-        outputs_dir = os.getcwd()
-        if config.resume_yolox:
-            base_dir = os.path.abspath(config.resume_yolox)
-            config.save_ckpt_dir = os.path.dirname(base_dir)
+        cfg.data_root = os.path.join(cfg.data_dir, 'train2017')
+        cfg.annFile = os.path.join(cfg.data_dir, 'annotations/instances_train2017.json')
+        if cfg.resume_yolox:
+            base_dir = os.path.abspath(cfg.resume_yolox)
+            cfg.save_ckpt_dir = os.path.dirname(base_dir)
         else:
-            config.save_ckpt_dir = os.path.join(config.ckpt_dir, config.backbone)
-    if not os.path.exists(config.save_ckpt_dir):
-        os.makedirs(config.save_ckpt_dir)
-
+            cfg.save_ckpt_dir = os.path.join(cfg.ckpt_dir, cfg.backbone)
+    if not os.path.exists(cfg.save_ckpt_dir):
+        os.makedirs(cfg.save_ckpt_dir)
 
     # logger
-    config.outputs_dir = os.path.join(outputs_dir, datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
-    config.max_epoch = config.aug_epochs + config.no_aug_epochs
-    config.train_aug_epochs = config.aug_epochs
-    config.train_no_aug_epochs = config.no_aug_epochs
-    config.logger = get_logger(config.outputs_dir, config.rank)
-    config.logger.save_args(config)
+    rank = int(os.getenv('RANK_ID', '0'))
+    cfg.log_dir = os.path.join(cfg.save_ckpt_dir, 'log', 'rank_%s' % rank)
+    cfg.max_epoch = cfg.aug_epochs + cfg.no_aug_epochs
+    cfg.train_aug_epochs = cfg.aug_epochs
+    cfg.train_no_aug_epochs = cfg.no_aug_epochs
+    cfg.logger = get_logger(cfg.log_dir, rank)
+    return cfg
 
 
 def set_graph_kernel_context():
@@ -80,45 +79,39 @@ def set_graph_kernel_context():
                                                "--enable_expand_ops=Conv2D")
 
 
-def network_init():
+def network_init(cfg):
     """ Network init """
     device_id = int(os.getenv('DEVICE_ID', '0'))
     context.set_context(mode=context.GRAPH_MODE,
-                        device_target=config.device_target, save_graphs=config.save_graphs, device_id=device_id,
+                        device_target=cfg.device_target, save_graphs=cfg.save_graphs, device_id=device_id,
                         save_graphs_path="ir_path", max_call_depth=2000)
     set_graph_kernel_context()
 
-    profiler = None
-    if config.need_profiler:
-        profiling_dir = os.path.join(config.outputs_dir,
+    cfg.profiler = None
+    if cfg.need_profiler:
+        profiling_dir = os.path.join(cfg.log_dir,
                                      datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
-        profiler = Profiler(output_path=profiling_dir, is_detail=True, is_show_op_path=True)
+        cfg.profiler = Profiler(output_path=profiling_dir, is_detail=True, is_show_op_path=True)
 
     # init distributed
-    if not config.use_syc_bn:
-        config.use_syc_bn = False
-    if config.is_distributed:
+    if not cfg.use_syc_bn:
+        cfg.use_syc_bn = False
+    if cfg.is_distributed:
         init()
-        config.rank = get_rank()
-        config.group_size = get_group_size()
+        cfg.rank = get_rank()
+        cfg.group_size = get_group_size()
         context.reset_auto_parallel_context()
         context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
-                                          device_num=config.group_size)
+                                          device_num=cfg.group_size)
 
     # select for master rank save ckpt or all rank save, compatible for model parallel
-    if config.is_save_on_master:
-        config.rank_save_ckpt_flag = 0
-        if config.rank == 0:
-            config.rank_save_ckpt_flag = 1
+    if cfg.is_save_on_master:
+        cfg.rank_save_ckpt_flag = 0
+        if cfg.rank == 0:
+            cfg.rank_save_ckpt_flag = 1
     else:
-        config.rank_save_ckpt_flag = 1
-
-    # logger
-    config.outputs_dir = os.path.join(config.outputs_dir,
-                                      datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
-    config.logger = get_logger(config.outputs_dir, config.rank)
-    config.logger.save_args(config)
-    return profiler
+        cfg.rank_save_ckpt_flag = 1
+    return cfg
 
 
 def parallel_init(args):
@@ -131,13 +124,13 @@ def parallel_init(args):
     context.set_auto_parallel_context(parallel_mode=parallel_mode, gradients_mean=True, device_num=degree)
 
 
-def modelarts_pre_process():
+def modelarts_pre_process(cfg):
     '''modelarts pre process function.'''
 
     def unzip(zip_file, save_dir):
         import zipfile
         s_time = time.time()
-        if not os.path.exists(os.path.join(save_dir, config.modelarts_dataset_unzip_name)):
+        if not os.path.exists(os.path.join(save_dir, cfg.modelarts_dataset_unzip_name)):
             zip_isexist = zipfile.is_zipfile(zip_file)
             if zip_isexist:
                 fz = zipfile.ZipFile(zip_file, 'r')
@@ -159,9 +152,9 @@ def modelarts_pre_process():
         else:
             print("Zip has been extracted.")
 
-    if config.need_modelarts_dataset_unzip:
-        zip_file_1 = os.path.join(config.data_path, config.modelarts_dataset_unzip_name + ".zip")
-        save_dir_1 = os.path.join(config.data_path)
+    if cfg.need_modelarts_dataset_unzip:
+        zip_file_1 = os.path.join(cfg.data_path, cfg.modelarts_dataset_unzip_name + ".zip")
+        save_dir_1 = os.path.join(cfg.data_path)
 
         sync_lock = "/tmp/unzip_sync.lock"
 
@@ -183,36 +176,26 @@ def modelarts_pre_process():
 
         print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
 
-    config.ckpt_path = os.path.join(config.output_path, config.ckpt_dir)
+    cfg.ckpt_path = os.path.join(cfg.output_path, cfg.ckpt_dir)
+    return cfg
 
 
-def parser_init():
-    parser = argparse.ArgumentParser(description='Yolox train.')
-    parser.add_argument('--data_url', required=False, default=None, help='Location of data.')
-    parser.add_argument('--train_url', required=False, default=None, help='Location of training outputs.')
-    parser.add_argument('--backbone', required=False, default="yolox_darknet53")
-    parser.add_argument('--min_lr_ratio', required=False, default=0.05)
-    parser.add_argument('--data_aug', required=False, default=True)
-    return parser
-
-
-def get_val_dataset():
-    val_root = os.path.join(config.data_dir, 'val2017')
-    ann_file = os.path.join(config.data_dir, 'annotations/instances_val2017.json')
-    ds_test = create_yolox_dataset(val_root, ann_file, is_training=False, batch_size=config.per_batch_size,
-                                   device_num=config.group_size,
-                                   rank=config.rank)
-    config.logger.info("Finish loading the val dataset!")
+def get_val_dataset(cfg):
+    val_root = os.path.join(cfg.data_dir, 'val2017')
+    ann_file = os.path.join(cfg.data_dir, 'annotations/instances_val2017.json')
+    ds_test = create_yolox_dataset(val_root, ann_file, is_training=False, batch_size=cfg.per_batch_size,
+                                   device_num=cfg.group_size,
+                                   rank=cfg.rank)
+    cfg.logger.info("Finish loading the val dataset!")
     return ds_test
 
 
 def get_optimizer(cfg, network, lr):
     if cfg.opt == "SGD":
-        from mindspore.nn import SGD
-        # SGD grouping parameters is currently not supported
+        # nn.SGD grouping parameters with weight_decay is currently not supported
         params = get_param_groups(network, cfg.weight_decay, use_group_params=False)
-        opt = SGD(params=params, learning_rate=Tensor(lr), momentum=config.momentum, weight_decay=config.weight_decay,
-                  nesterov=True)
+        opt = MySgdOptimizer(params=params, learning_rate=Tensor(lr), momentum=cfg.momentum,
+                             weight_decay=cfg.weight_decay, nesterov=True)
         cfg.logger.info("Use SGD Optimizer")
     else:
         from mindspore.nn import Momentum
@@ -248,154 +231,168 @@ class MySgdOptimizer(mindspore.nn.SGD):
         return self._original_construct(new_grads)
 
 
-def set_resume_config():
-    if not os.path.isfile(config.resume_yolox):
+def set_resume_config(cfg):
+    if not os.path.isfile(cfg.resume_yolox):
         raise TypeError('resume_yolox should be checkpoint path')
-    resume_param = load_checkpoint(config.resume_yolox,
+    resume_param = load_checkpoint(cfg.resume_yolox,
                                    filter_prefix=['learning_rate', 'global_step', 'best_result', 'best_epoch'])
-    ckpt_name = os.path.basename(config.resume_yolox)
+    ckpt_name = os.path.basename(cfg.resume_yolox)
     resume_epoch = ckpt_name.split('-')[1].split('_')[0]
-    config.start_epoch = int(resume_epoch)
-    config.train_aug_epochs = max(config.aug_epochs - config.start_epoch, 0)
-    return resume_param, resume_epoch
+    cfg.start_epoch = int(resume_epoch)
+    cfg.train_aug_epochs = max(cfg.aug_epochs - cfg.start_epoch, 0)
+    return resume_param, resume_epoch, cfg
 
 
-def set_no_aug():
-    config.use_l1 = True
-    config.run_eval = True
-    config.eval_interval = 1
-    config.ckpt_interval = 1
-    config.start_epoch = max(config.aug_epochs, config.start_epoch)
-    config.train_no_aug_epochs = max(config.max_epoch - config.start_epoch, 0)
+def set_no_aug(cfg):
+    cfg.use_l1 = True
+    cfg.run_eval = True
+    cfg.eval_interval = 1
+    cfg.ckpt_interval = 1
+    cfg.start_epoch = max(cfg.aug_epochs, cfg.start_epoch)
+    cfg.train_no_aug_epochs = max(cfg.max_epoch - cfg.start_epoch, 0)
+    return cfg
 
 
-def set_modelarts_config():
-    if config.enable_modelarts:
+def set_modelarts_config(cfg):
+    if cfg.enable_modelarts:
         import moxing as mox
-        local_data_url = os.path.join(config.data_path, str(config.rank))
-        local_annFile = os.path.join(config.data_path, str(config.rank))
-        mox.file.copy_parallel(config.data_root, local_data_url)
-        config.data_dir = os.path.join(config.data_path, 'coco2017')
-        mox.file.copy_parallel(config.annFile, local_annFile)
-        config.annFile = os.path.join(local_data_url, 'instances_train2017.json')
+        local_data_url = os.path.join(cfg.data_path, str(cfg.rank))
+        local_annFile = os.path.join(config.data_path, str(cfg.rank))
+        mox.file.copy_parallel(cfg.data_root, local_data_url)
+        cfg.data_dir = os.path.join(cfg.data_path, 'coco2017')
+        mox.file.copy_parallel(cfg.annFile, local_annFile)
+        cfg.annFile = os.path.join(local_data_url, 'instances_train2017.json')
+        return cfg
+    return cfg
 
 
-def set_callback(ds=None, backbone=None, lr=None, train_url=None):
+def set_callback(cfg, ds=None, backbone='yolofpn'):
     cb = []
-    if config.rank_save_ckpt_flag:
-        if config.use_summary:
-            specified = {'collect_input_data': False, 'histogram_regular': '|'.join(get_specified())}
-            cb.append(SummaryCollector(summary_dir="./summary_dir", collect_freq=10, collect_specified_data=specified))
-        ckpt_config = CheckpointConfig(save_checkpoint_steps=config.steps_per_epoch * config.ckpt_interval,
-                                       keep_checkpoint_max=config.ckpt_max_num)
+    if cfg.rank_save_ckpt_flag:
+        ckpt_config = CheckpointConfig(save_checkpoint_steps=cfg.steps_per_epoch * cfg.ckpt_interval,
+                                       keep_checkpoint_max=cfg.ckpt_max_num)
         cb.append(
-            ModelCheckpoint(config=ckpt_config, directory=config.save_ckpt_dir, prefix='{}'.format(config.backbone)))
-    if config.resume_yolox or config.start_epoch:
-        cb.append(ResumeCallback(config.start_epoch))
+            ModelCheckpoint(config=ckpt_config, directory=cfg.save_ckpt_dir, prefix='{}'.format(cfg.backbone)))
+    if cfg.resume_yolox or cfg.start_epoch:
+        cb.append(ResumeCallback(cfg.start_epoch))
 
-    if lr is not None:
-        cb.append(YOLOXCB(config, lr=lr, is_modelart=config.enable_modelarts, per_print_times=config.log_interval,
-                          train_url=train_url))
-    if config.run_eval and backbone is not None and ds is not None:
-        test_network = DetectionBlock(config, backbone=backbone)
+    if cfg.run_eval and ds is not None:
+        test_network = DetectionBlock(cfg, backbone=backbone)
         save_prefix = None
         if config.eval_parallel:
-            save_prefix = config.eval_parallel_dir
+            save_prefix = cfg.eval_parallel_dir
             if os.path.exists(save_prefix):
                 shutil.rmtree(save_prefix, ignore_errors=True)
         detection_engine = DetectionEngine(config)
         eval_wrapper = EvalWrapper(
-            config=config,
+            config=cfg,
             dataset=ds,
             network=test_network,
             detection_engine=detection_engine,
             save_prefix=save_prefix
         )
         cb.append(EvalCallback(config, eval_wrapper))
-    return cb
+    return cb, cfg
 
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
-def run_train():
+def run_train(cfg):
     """ Launch Train process """
-    parser = parser_init()
-    args_opt, _ = parser.parse_known_args()
-    set_default()
-    set_modelarts_config()
+    cfg = set_default(cfg)
+    cfg = set_modelarts_config(cfg)
 
-    profiler = network_init()
-    parallel_init(config)
-    if config.backbone == "yolox_darknet53":
+    cfg = network_init(cfg)
+    parallel_init(cfg)
+    if cfg.backbone == "yolox_darknet53":
         backbone = "yolofpn"
-    elif config.backbone == 'yolox_x':
+    elif cfg.backbone == 'yolox_x':
         backbone = "yolopafpn"
     else:
         raise ValueError('backbone only support [yolox_darknet53, yolox_x]')
-    base_network = DetectionBlock(config, backbone=backbone)
+    base_network = DetectionBlock(cfg, backbone=backbone)
 
     # syc bn only support distributed training in graph mode
-    if config.use_syc_bn and config.is_distributed and context.get_context('mode') == context.GRAPH_MODE:
-        config.logger.info("Using Synchronized batch norm layer...")
+    if cfg.use_syc_bn and cfg.is_distributed and context.get_context('mode') == context.GRAPH_MODE:
+        cfg.logger.info("Using Synchronized batch norm layer...")
         use_syc_bn(base_network)
     default_recurisive_init(base_network)
-    config.logger.info("Network weights have been initialized...")
-    if config.pretrained:
-        base_network = load_weights(base_network, config.pretrained, pretrained=True)
-        config.logger.info('pretrained is: %s' % config.pretrained)
-    config.logger.info('Training backbone is: %s' % config.backbone)
-    config.logger.info('Finish getting network...')
+    cfg.logger.info("Network weights have been initialized...")
+    if cfg.pretrained:
+        base_network = load_weights(base_network, cfg.pretrained, pretrained=True)
+        cfg.logger.info('pretrained is: %s' % cfg.pretrained)
+    cfg.logger.info('Training backbone is: %s' % cfg.backbone)
+    cfg.logger.info('Finish getting network...')
 
-    if config.resume_yolox:
-        resume_param, resume_epoch = set_resume_config()
-        config.logger.info('resume train from epoch: %s data_aug: %s' % (resume_epoch, config.data_aug))
-    network = YOLOLossCell(base_network, config)
-    config.eval_parallel = config.run_eval and config.is_distributed and config.eval_parallel
+    if cfg.resume_yolox:
+        resume_param, resume_epoch, cfg = set_resume_config(cfg)
+        config.logger.info('resume train from epoch: %s' % resume_epoch)
+    network = YOLOLossCell(base_network, cfg)
+    cfg.eval_parallel = cfg.run_eval and cfg.is_distributed and cfg.eval_parallel
 
-    ds_augs = create_yolox_dataset(image_dir=config.data_root, anno_path=config.annFile,
-                                   batch_size=config.per_batch_size, device_num=config.group_size, rank=config.rank,
+    ds_augs = create_yolox_dataset(image_dir=cfg.data_root, anno_path=cfg.annFile,
+                                   batch_size=cfg.per_batch_size, device_num=cfg.group_size, rank=cfg.rank,
                                    data_aug=True)
-    ds_no_augs = create_yolox_dataset(image_dir=config.data_root, anno_path=config.annFile,
-                                      batch_size=config.per_batch_size, device_num=config.group_size, rank=config.rank,
+    ds_no_augs = create_yolox_dataset(image_dir=cfg.data_root, anno_path=cfg.annFile,
+                                      batch_size=cfg.per_batch_size, device_num=cfg.group_size, rank=cfg.rank,
                                       data_aug=False)
-    ds_test = get_val_dataset()
-    config.logger.info('Finish loading training dataset! batch size:%s' % config.per_batch_size)
-    config.steps_per_epoch = ds_augs.get_dataset_size()
-    config.logger.info('%s steps for one epoch.' % config.steps_per_epoch)
+    ds_test = get_val_dataset(cfg)
+    cfg.logger.info('Finish loading training dataset! batch size:%s' % cfg.per_batch_size)
+    cfg.steps_per_epoch = ds_augs.get_dataset_size()
+    cfg.logger.info('%s steps for one epoch.' % cfg.steps_per_epoch)
 
-    lr = get_lr(config)
-    config.logger.info("Learning rate scheduler:%s, base_lr:%s, min lr ratio:%s" % (config.lr_scheduler, config.lr,
-                                                                                    config.min_lr_ratio))
+    lr = get_lr(cfg)
+    cfg.logger.info(
+        "Learning rate scheduler:%s, base_lr:%s, min lr ratio:%s" % (cfg.lr_scheduler, cfg.lr, cfg.min_lr_ratio))
     opt = get_optimizer(config, network, lr)
     loss_scale_manager = DynamicLossScaleManager(init_loss_scale=2 ** 22)
     update_cell = loss_scale_manager.get_update_cell()
-    network_ema = TrainOneStepWithEMA(network, opt, update_cell, ema=config.use_ema, decay=0.9998).set_train()
-    if config.resume_yolox:
+    network_ema = TrainOneStepWithEMA(network, opt, update_cell, ema=cfg.use_ema, decay=0.9998).set_train()
+
+    if cfg.resume_yolox:
         load_param_into_net(network_ema, resume_param)
-    config.logger.info("use ema model: %s" % config.use_ema)
+    cfg.logger.info("use ema model: %s" % cfg.use_ema)
     model = Model(network_ema)
-
+    cb_default = list()
+    if cfg.rank_save_ckpt_flag:
+        if cfg.use_summary:
+            specified = {'collect_input_data': False, 'histogram_regular': '|'.join(get_specified())}
+            cb_default.append(
+                SummaryCollector(summary_dir="./summary_dir", collect_freq=10, collect_specified_data=specified))
+    yolo_cb = YOLOXCB(cfg, lr=lr, is_modelart=cfg.enable_modelarts, per_print_times=cfg.log_interval,
+                      train_url=cfg.train_url)
     if config.need_profiler:
-        model.train(3, ds, callbacks=cb, dataset_sink_mode=True, sink_size=config.log_interval)
-        profiler.analyse()
+        model.train(3, ds_augs, callbacks=cb_default, dataset_sink_mode=cfg.dataset_sink_mode,
+                    sink_size=config.log_interval)
+        cfg.profiler.analyse()
     else:
-        if config.train_aug_epochs:
-            config.logger.info("Aug train epoch number:%s" % config.train_aug_epochs)
-            config.logger.info("Aug train steps number:%s" % (config.train_aug_epochs * config.steps_per_epoch))
-            config.logger.info("==================Start Training=========================")
-            cb_augs = set_callback(ds=ds_test, backbone=backbone, lr=lr, train_url=args_opt.train_url)
-            model.train(config.train_aug_epochs, ds_augs, callbacks=cb_augs, dataset_sink_mode=False, sink_size=-1)
+        if cfg.train_aug_epochs:
+            cfg.logger.save_args(cfg)
+            cfg.logger.info("Aug train epoch number:%s" % cfg.train_aug_epochs)
+            cfg.logger.info("Aug train steps number:%s" % (cfg.train_aug_epochs * cfg.steps_per_epoch))
+            cfg.logger.info("==================Start Training=========================")
+            cb_augs, cfg = set_callback(cfg, ds=ds_test, backbone=backbone)
+            cb_augs = cb_augs + cb_default + [yolo_cb]
+            model.train(cfg.train_aug_epochs, ds_augs, callbacks=cb_augs, dataset_sink_mode=cfg.dataset_sink_mode,
+                        sink_size=-1)
 
-        # train no augs use l1 loss
-        set_no_aug()
-        if config.train_no_aug_epochs:
-            config.logger.info("No Aug train epoch number:%s" % config.train_no_aug_epochs)
-            config.logger.info("No Aug train steps number:%s" % (config.train_no_aug_epochs * config.steps_per_epoch))
-            config.logger.info("==================Start Training=========================")
-            cb_no_augs = set_callback(ds=ds_test, backbone=backbone, lr=lr, train_url=args_opt.train_url)
-            cb_no_augs.append(NoAugCallBack(config.use_l1))
-            model.train(config.no_aug_epochs, ds_no_augs, callbacks=cb_no_augs, dataset_sink_mode=False, sink_size=-1)
-    config.logger.info("==================Training END======================")
+        # use l1 and run eval train no augs
+        cfg = set_no_aug(cfg)
+        if cfg.train_no_aug_epochs:
+            cfg.logger.save_args(cfg)
+            cfg.logger.info("No Aug train epoch number:%s" % cfg.train_no_aug_epochs)
+            cfg.logger.info("No Aug train steps number:%s" % (cfg.train_no_aug_epochs * cfg.steps_per_epoch))
+            cfg.logger.info("==================Start Training=========================")
+            cb_no_augs, cfg = set_callback(cfg, ds=ds_test, backbone=backbone)
+            cb_no_augs = cb_no_augs + cb_default + [yolo_cb]
+
+            network_ema_no_augs = copy.copy(network_ema)
+            network_ema_no_augs.network.use_l1 = cfg.use_l1
+            model_no_augs = Model(network_ema_no_augs)
+
+            model_no_augs.train(cfg.no_aug_epochs, ds_no_augs, callbacks=cb_no_augs,
+                                dataset_sink_mode=cfg.dataset_sink_mode, sink_size=-1)
+            cfg.logger.info("==================Training END======================")
 
 
 if __name__ == "__main__":
-    run_train()
+    run_train(config)

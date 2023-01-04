@@ -467,7 +467,6 @@ class TrainOneStepWithEMA(nn.TrainOneStepWithLossScaleCell):
         scaling_sens = self.scale_sense
 
         status, scaling_sens = self.start_overflow_check(loss, scaling_sens)
-
         scaling_sens_filled = C.ones_like(loss) * F.cast(scaling_sens, F.dtype(loss))
         grads = self.grad(self.network, weights)(*inputs, scaling_sens_filled)
         grads = self.hyper_map(F.partial(grad_scale, scaling_sens), grads)

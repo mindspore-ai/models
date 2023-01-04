@@ -1,9 +1,6 @@
 backbone: "yolox_darknet53" #option for backbone
-data_aug: True
 # path for local
 device_target: "Ascend"
-# /home/work/user-job-dir/outputs/model/
-outputs_dir: "./"
 # ======================================================
 # Train option
 save_graphs: False
@@ -16,6 +13,7 @@ pretrained: ''  # use abspath
 resume_yolox: ''
 use_summary: False
 use_ema: True
+dataset_sink_mode: True
 start_epoch: 0
 
 # data aug
@@ -89,3 +87,7 @@ result_path: ''
 # export option
 file_format: 'MINDIR'
 export_bs: 1
+
+# predict
+img_path: ''
+save_img_path: ''
