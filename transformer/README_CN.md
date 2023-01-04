@@ -56,7 +56,7 @@ Transformer具体包括六个编码模块和六个解码模块。每个编码模
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 ## 快速入门
 
@@ -342,7 +342,7 @@ Parameters for learning rate:
 
     ``` bash
     paste train.tok.clean.bpe.32000.en train.tok.clean.bpe.32000.de > train.all
-    python create_data.py --input_file train.all --vocab_file vocab.bpe.32000 --output_file /path/ende-l128-mindrecord --max_seq_length 128
+    python create_dynamic_data.py --input_file train.all --vocab_file vocab.bpe.32000 --output_file /path/train-dynamicshape-mindrecord --max_seq_length 128
     ```
 
 - 将原数据转化为MindRecord数据格式进行评估：
@@ -351,7 +351,7 @@ Parameters for learning rate:
 
     ``` bash
     paste newstest2014.tok.bpe.32000.en newstest2014.tok.bpe.32000.de > test.all
-    python create_data.py --input_file test.all --vocab_file vocab.bpe.32000 --output_file /path/newstest2014-l128-mindrecord --num_splits 1 --max_seq_length 128 --clip_to_max_len True
+    python create_dynamic_data.py --input_file test.all --vocab_file vocab.bpe.32000 --output_file /path/test-dynamicshape-mindrecord --num_splits 1 --max_seq_length 128 --clip_to_max_len True
     ```
 
 ### 训练过程
@@ -372,8 +372,6 @@ Parameters for learning rate:
     # GPU environment
     bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [EPOCH_SIZE] [DATA_PATH] [CONFIG_PATH]
     ```
-
-**注意**：由于网络输入中有不同句长的数据，所以数据下沉模式不可使用。
 
 ### 评估过程
 
@@ -435,8 +433,8 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CONFIG_PATH]
 | 参数                        | Ascend                           | GPU                             |
 | -------------------------- | -------------------------------- | --------------------------------|
 | 资源                        | Ascend 910；系统 Euler2.8         | GPU(Tesla V100 SXM2)            |
-| 上传日期                    | 2021-07-05                        | 2021-12-21                      |
-| MindSpore版本               | 1.3.0                            | 1.5.0                           |
+| 上传日期                    | 2022-12-31                        | 2022-12-31                      |
+| MindSpore版本               | 2.0.0                            | 2.0.0                           |
 | 数据集                      | WMT英-德翻译数据集                  | WMT英-德翻译数据集                |
 | 训练参数                     | epoch=52, batch_size=96          | epoch=52, batch_size=32         |
 | 优化器                      | Adam                              | Adam                            |
@@ -454,7 +452,7 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CONFIG_PATH]
 | ------------------- | --------------------------- | ----------------------------|
 |资源| Ascend 910；系统 Euler2.8  |                GPU(Tesla V100 SXM2)         |
 | 上传日期       | 2021-07-05 |              2021-12-21                        |
-| MindSpore版本   | 1.3.0                  |        1.5.0                      |
+| MindSpore版本   | 2.0.0                  |        2.0.0                      |
 | 数据集             | WMT newstest2014            | WMT newstest2014            |
 | batch_size          | 1                           | 1                           |
 | 输出             | BLEU score                  | BLEU score                  |
@@ -481,3 +479,7 @@ train.py已经设置了一些种子，避免数据集轮换和权重初始化的
 - **Q: 为什么我最后的checkpoint的精度不好？**
 
   **A**： 因为我们需要使用一个第三方的perl脚本来进行验证，所以我们没办法在训练的时候就获取最优checkpoint。你可以尝试对最后的多个checkpoint进行验证，从中获取最好的一个。
+
+- **Q: 为什么报错类似＂For 'Add', x.shape and y.shape need to broadcast.＂，Shape不匹配的问题？**
+
+  **A**: 因为已有的配置参数是根据readme中提供的数据集配置的，用户更换数据集后，需要根据参数定义重新配置相关参数．

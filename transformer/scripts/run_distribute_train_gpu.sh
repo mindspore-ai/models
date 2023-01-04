@@ -33,10 +33,10 @@ if [ $FILE_LIMIT -lt 2048 ] ; then
 ulimit -n 2048;
 fi
 
-export RANK_SIZE=$1
-export CONFIG_PATH=$4
+RANK_SIZE=$1
 EPOCH_SIZE=$2
 DATA_PATH=$3
+CONFIG_PATH=$4
 echo $RANK_SIZE
 
 mpirun -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
@@ -52,7 +52,6 @@ mpirun -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
     --checkpoint_path="" \
     --save_checkpoint_steps=2500 \
     --save_checkpoint_num=30 \
-    --enable_dynamic_mode="true" \
     --data_path=$DATA_PATH > log.txt 2>&1 &
 
 if [ $FILE_LIMIT -lt 2048 ] ; then

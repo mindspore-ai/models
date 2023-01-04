@@ -33,7 +33,6 @@ from mindspore.common import set_seed
 from src.transformer_for_train import TransformerTrainOneStepCell, TransformerNetworkWithLoss, \
                                       TransformerTrainOneStepWithLossScaleCell, \
                                       TransformerTrainAccumulationAllReducePostWithLossScaleCell
-from src.dataset import create_transformer_dataset
 from src.dataset import create_transformer_dynamic_dataset
 from src.lr_schedule import create_dynamic_lr
 from src.model_utils.config import config
@@ -118,10 +117,17 @@ def run_transformer_train():
         ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
     else:
         ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target)
+
+    if ms.get_context("mode") == ms.PYNATIVE_MODE:
+        config.enable_dynamic_mode = "false"
+    else:
+        config.enable_dynamic_mode = "true"
+
     ms.set_context(reserve_class_name_in_scope=False)
 
     # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
-    ms.set_context(mempool_block_size="31GB")
+    if ms.get_context("mode") == ms.PYNATIVE_MODE:
+        ms.set_context(mempool_block_size="31GB")
 
     if config.device_target == "GPU":
         # Enable graph kernel
@@ -132,6 +138,7 @@ def run_transformer_train():
         if config.device_target == "Ascend":
             device_num = config.device_num
             D.init('hccl')
+            config.device_id = get_device_id()
         else:
             D.init('nccl')
             device_num = D.get_group_size()
@@ -147,18 +154,10 @@ def run_transformer_train():
         rank_id = 0
         save_ckpt_path = os.path.join(config.save_checkpoint_path, 'ckpt_0/')
 
-    if config.enable_dynamic_mode == "true":
-        dataset = create_transformer_dynamic_dataset(dataset_path=config.data_path,
-                                                     rank_size=device_num,
-                                                     rank_id=rank_id,
-                                                     do_shuffle=config.do_shuffle)
-    else:
-        dataset = create_transformer_dataset(rank_size=device_num,
-                                             rank_id=rank_id,
-                                             do_shuffle=config.do_shuffle,
-                                             dataset_path=config.data_path,
-                                             bucket_boundaries=config.bucket_boundaries,
-                                             device_target=config.device_target)
+    dataset = create_transformer_dynamic_dataset(dataset_path=config.data_path,
+                                                 rank_size=device_num,
+                                                 rank_id=rank_id,
+                                                 do_shuffle=config.do_shuffle)
 
     netwithloss = TransformerNetworkWithLoss(config, True)
 
@@ -206,8 +205,11 @@ def run_transformer_train():
             netwithgrads = TransformerTrainOneStepWithLossScaleCell(netwithloss, optimizer=optimizer,
                                                                     scale_update_cell=update_cell)
             if config.enable_dynamic_mode == "true":
+                data_col_int64 = Tensor(shape=[config.batch_size, None], dtype=ms.int64)
                 data_col = Tensor(shape=[config.batch_size, None], dtype=ms.float32)
-                netwithgrads.set_inputs(data_col, data_col, data_col, data_col, data_col, data_col, data_col)
+                netwithgrads.set_inputs(data_col_int64, data_col_int64, data_col_int64,
+                                        data_col_int64, data_col_int64, data_col_int64,
+                                        data_col)
     else:
         netwithgrads = TransformerTrainOneStepCell(netwithloss, optimizer=optimizer)
 

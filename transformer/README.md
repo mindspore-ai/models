@@ -55,7 +55,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
 ## [Quick Start](#contents)
 
@@ -508,3 +508,7 @@ Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some com
 
   **A**: At the end stage of training, the model accuracy usually drifts irregularly. Because we have to use a third-party perl scripts for evaluation, we can't find the best checkpoint as soon as the training process finished.
   You can try to evaluate the last several checkpoints to find the best one.
+
+- **Q: Why the shape match error such as "For 'Add', x.shape and y.shape need to broadcast." occurs?**
+
+  **A**: because all of the parameters is supported by the dataset in readme. if users use new datasets, please modify parameters in the same time.

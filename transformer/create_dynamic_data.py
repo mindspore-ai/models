@@ -130,7 +130,7 @@ def read_data_from_file(tokenizer, input_files, all_data):
 
 def config_data(tokenizer, all_data, all_batches):
     """
-    config text data.
+    config mindrecord data.
     """
     index = config.batch_size - 1
     max_length = all_data[index][2]
@@ -197,7 +197,7 @@ def write_data(all_batches):
     output_file_name = ""
     data_schema = {"batch_data": {"type": "int64", "shape": [-1]},
                    "batch_shape": {"type": "int64", "shape": [-1]},}
-    output_file_name = config.output_file + "/database"
+    output_file_name = config.output_file
     writer = FileWriter(output_file_name, 1)
     writer.add_schema(data_schema, "transformer")
     for batch_info in all_batches:
