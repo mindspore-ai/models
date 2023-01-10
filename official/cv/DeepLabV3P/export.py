@@ -59,6 +59,5 @@ if __name__ == '__main__':
 
     # load the parameter into net
     load_param_into_net(network, param_dict)
-    input_data = Tensor(np.ones([8, 3, 513, 513]).astype(np.float32))
-    #if deeplabv3+s8，batchsize=8，if s16，batchsize为16
+    input_data = Tensor(np.ones([1, 3, 513, 513]).astype(np.float32))
     export(network, input_data, file_name=args.filename, file_format='MINDIR')
