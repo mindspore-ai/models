@@ -1,0 +1,7 @@
+imageio==2.9.0
+scikit-image==0.16.2
+mindspore
+opencv-python==4.5.5
+future
+lmdb
+thop
