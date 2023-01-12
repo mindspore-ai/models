@@ -31,7 +31,13 @@ from mindspore.parallel import set_algo_parameters
 from mindspore.parallel._cost_model_context import _set_multi_subgraphs
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_distributed_checkpoint
-from mindspore.nn.transformer.transformer import TransformerOpParallelConfig
+try:
+    from mindformers.modules.transformer import TransformerOpParallelConfig
+except ImportError as e:
+    print("Import `mindformers.modules.transformer` ERROR, expect mindformers to be installed. "
+          "Please refer to the page https://gitee.com/mindspore/mindformers.git to install the mindformers.")
+    print("Now exit the program.")
+    exit(1)
 
 from src.tokenization_jieba import JIEBATokenizer
 from src.generate import get_scores
@@ -126,7 +132,7 @@ def load_model(args_opt):
     pangu_alpha = PanguAlphaModel(config)
     if args_opt.eval_task:
         from src.pangu_alpha import PanGUAlphaLossWithPrompt
-        from mindspore.nn.transformer import CrossEntropyLoss
+        from mindformers.common import CrossEntropyLoss
         loss = CrossEntropyLoss()
         eval_net = PanGUAlphaLossWithPrompt(config, pangu_alpha, loss)
     else:

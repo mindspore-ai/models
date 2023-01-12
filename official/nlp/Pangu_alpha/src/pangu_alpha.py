@@ -23,10 +23,10 @@ from mindspore import Tensor, Parameter
 from mindspore.ops import operations as P
 from mindspore.ops import functional as F
 from mindspore.nn import Cell
-from mindspore.nn.transformer.transformer import VocabEmbedding, TransformerEncoder, TransformerEncoderLayer, \
-    AttentionMask
-from mindspore.nn.transformer import MoEConfig
-from mindspore.nn.transformer.layers import _LayerNorm
+
+from mindformers.modules.transformer import VocabEmbedding, TransformerEncoder, TransformerEncoderLayer, \
+    AttentionMask, MoEConfig
+from mindformers.modules.layers import LayerNorm
 
 
 class EmbeddingLayer(nn.Cell):
@@ -231,7 +231,7 @@ class PanguAlpha_Model(Cell):
         self.is_pipeline = config.parallel_config.pipeline_stage > 1
         self.embedding = EmbeddingLayer(config)
         self.config = config
-        self.layernorm = _LayerNorm((config.hidden_size,)).to_float(mstype.float32)
+        self.layernorm = LayerNorm((config.hidden_size,)).to_float(mstype.float32)
         if config.parallel_config.pipeline_stage > 1:
             self.layernorm.set_comm_fusion(2)
         else:
