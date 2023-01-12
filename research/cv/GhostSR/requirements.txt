@@ -1,0 +1,7 @@
+# onnxruntime-gpu
+pillow~=9.3.0
+numpy~=1.19.5
+pyyaml~=5.1
+matplotlib~=3.5.1
+torch~=1.5.1
+mmcv~=1.7.0
