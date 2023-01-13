@@ -460,6 +460,7 @@ class EvalWrapper:
         self.device_num = config.group_size
         self.input_shape = Tensor(tuple(config.test_img_shape), ms.float32)
         self.engine = engine
+        self.eval_parallel = config.eval_parallel
         if config.eval_parallel:
             self.reduce = AllReduce()
 
@@ -492,5 +493,6 @@ class EvalWrapper:
         self.logger.info('Calculating mAP...')
         self.engine.do_nms_for_results()
         self.engine.write_result(cur_epoch=cur_epoch, cur_step=cur_step)
-        self.synchronize()  # Synchronize to avoid read incomplete results
+        if self.eval_parallel:
+            self.synchronize()  # Synchronize to avoid read incomplete results
         return self.engine.get_eval_result()
