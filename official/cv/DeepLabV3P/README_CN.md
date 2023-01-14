@@ -3,7 +3,7 @@
 <!-- TOC -->
 
 - [目录](#目录)
-- [DeepLabV3+描述](#deeplabv3+描述)
+- [DeepLabV3+描述](#deeplabv3描述)
     - [描述](#描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
@@ -17,11 +17,14 @@
     - [训练过程](#训练过程)
         - [用法](#用法)
             - [Ascend处理器环境运行](#ascend处理器环境运行)
+            - [ModelArts环境运行](#modelarts环境运行)
             - [GPU处理器环境运行](#gpu处理器环境运行)
         - [结果](#结果)
+            - [Ascend处理器环境运行](#ascend处理器环境运行-1)
+            - [ModelArts环境运行](#modelarts环境运行-1)
     - [评估过程](#评估过程)
         - [用法](#用法-1)
-            - [Ascend处理器环境运行](#ascend处理器环境运行-1)
+            - [Ascend处理器环境运行](#ascend处理器环境运行-2)
             - [GPU处理器环境运行](#gpu处理器环境运行-1)
         - [结果](#结果-1)
             - [训练准确率](#训练准确率)
@@ -32,6 +35,7 @@
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
+            - [Running ONNX evaluation](#running-onnx-evaluation)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
 
@@ -602,8 +606,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 ### 用法
 
 ```shell
-# Ascend310 推理
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 `MINDIR_PATH` mindir模型的路径
@@ -613,6 +616,8 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_
 `DATA_ROOT` Pascal VOC数据集和语义边界数据集的根目录
 
 `DATA_LIST` 数据清单voc_val_lst.txt的路径，该清单由get_dataset_list.py可得
+
+`DEVICE_TYPE` 可以为Ascend, GPU, 或CPU。
 
 `DEVICE_ID` 可选，默认值为 0
 

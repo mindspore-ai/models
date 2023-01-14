@@ -11,25 +11,25 @@
         - [Script Parameters](#script-parameters)
     - [Training Process](#training-process)
         - [Training](#training)
-            - [Training on Ascend](#training-on-ascend)
             - [Training on GPU](#training-on-gpu)
+            - [Training on Ascend](#training-on-ascend)
             - [Training on CPU](#training-on-cpu)
         - [Distributed Training](#distributed-training)
+            - [Distributed training on GPU(8P)](#distributed-training-on-gpu8p)
             - [Distributed training on Ascend](#distributed-training-on-ascend)
-            - [Distributed training on GPU](#distributed-training-on-gpu)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
-            - [Evaluating on Ascend](#evaluating-on-ascend)
             - [Evaluating on GPU](#evaluating-on-gpu)
+            - [Evaluating on Ascend](#evaluating-on-ascend)
             - [Evaluating on CPU](#evaluating-on-cpu)
         - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
-        - [Infer on Ascend310](#infer-on-ascend310)
+        - [Infer](#infer)
         - [result](#result)
     - [Model Description](#model-description)
         - [Performance](#performance)
-            - [Evaluation Performance](#evaluation-performance)
+            - [Training Performance](#training-performance)
             - [Inference Performance](#inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
     - [ModelZoo Homepage](#modelzoo-homepage)
@@ -425,13 +425,12 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 The ckpt_file parameter is required,
 `file_format` should be in ["AIR", "MINDIR"]
 
-### Infer on Ascend310
+### Infer
 
 Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'.

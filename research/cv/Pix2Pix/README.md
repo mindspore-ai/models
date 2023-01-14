@@ -1,18 +1,23 @@
 # Contents
 
-- [Pix2Pix Description](#Pix2Pix-description)
+- [Contents](#contents)
+- [Pix2Pix Description](#pix2pix-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
+    - [Dependences](#dependences)
 - [Script Description](#script-description)
     - [Script and Sample Code](#script-and-sample-code)
     - [Script Parameters](#script-parameters)
-    - [Training](#training-process)
-    - [Evaluation](#evaluation-process)
-    - [Prediction Process](#prediction-process)
+    - [Training](#training)
+    - [Evaluation](#evaluation)
+    - [Infer](#infer)
+    - [Onnx export](#onnx-export)
+    - [Onnx infer](#onnx-infer)
 - [Model Description](#model-description)
-    - [Performance](#performance)  
-        - [Training Performance](#evaluation-performance)
+    - [Performance](#performance)
+        - [Training Performance on single device](#training-performance-on-single-device)
+        - [Distributed Training Performance](#distributed-training-performance)
         - [Evaluation Performance](#evaluation-performance)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -225,15 +230,13 @@ bash scripts/run_eval.sh [DEVICE_TARGET] [DEVICE_ID] [VAL_DATA_DIR] [CKPT_PATH]
 
 **Note:**: Before training and evaluating, create folders like "./results/...". Then you will get the results as following in "./results/predict".
 
-## [310 infer](#contents)
+## [Infer](#contents)
 
 **Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
 ```shell
-bash scripts/run_infer_310.sh [The path of the MINDIR for 310 infer] [The path of the dataset for 310 infer] y Ascend 0
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
 ```
-
-**Note:**: Before executing 310 infer, create the MINDIR/AIR model using "python export.py --ckpt [The path of the CKPT for exporting] --train_data_dir [The path of the training dataset]".
 
 ## [Onnx export](#contents)
 

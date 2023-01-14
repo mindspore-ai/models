@@ -1,21 +1,31 @@
 # DeepText
 
-- [DeepText Description](#DeepText-description)
-- [Model Architecture](#model-architecture)
+- [DeepText](#deeptext)
+- [DeepText Description](#deeptext-description)
+- [Model architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Features](#features)
-    - [Mixed Precision](#mixed-precision)
 - [Environment Requirements](#environment-requirements)
-- [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Training Process](#training-process)
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+- [Script description](#script-description)
+    - [Script and sample code](#script-and-sample-code)
+    - [Training process](#training-process)
+        - [Usage](#usage)
+        - [Launch](#launch)
+        - [Result](#result)
+    - [Eval process](#eval-process)
+        - [Usage](#usage-1)
+        - [Launch](#launch-1)
+        - [Result](#result-1)
+    - [Model Export](#model-export)
+    - [Inference Process](#inference-process)
+        - [Usage](#usage-2)
+        - [result](#result-2)
         - [ONNX Evaluation](#onnx-evaluation)
-- [Model Description](#model-description)
-    - [Performance](#performance)  
-        - [Training Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
+- [Model description](#model-description)
+    - [Performance](#performance)
+        - [Training Performance](#training-performance)
+            - [Inference Performance](#inference-performance)
+            - [Training performance results](#training-performance-results)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -329,8 +339,7 @@ python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 Before performing inference, the air file must bu exported by export script on the Ascend910 environment.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_PATH] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [LABEL_PATH] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 ### result

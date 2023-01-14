@@ -31,6 +31,7 @@
         - [评估性能](#评估性能)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
+    - [FAQ](#faq)
 
 <!-- /TOC -->
 
@@ -660,8 +661,7 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file_local [CKPT_PATH] --dev
 在推理之前需要在昇腾910环境上完成模型的导出。目前推理只支持batch_size=1。推理过程需要占用大约600G的硬盘空间来保存推理的结果。
 
 ```shell
-# Ascend310 推理
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 ### 结果

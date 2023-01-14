@@ -297,14 +297,14 @@ python export.py  --format [EXPORT_FORMAT] --checkpoint_path [CKPT_PATH]
 
 **推理前需参照 [MindSpore C++推理部署指南](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README_CN.md) 进行环境变量设置。**
 
-在昇腾310上进行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
+在进行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
 
 ```bash
-# 昇腾310推理
-bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+bash run_infer_cpp.sh [MODEL_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 `DEVICE_ID` 可选，默认值为 0。
+`DEVICE_TYPE` 可以为Ascend, GPU, 或CPU。
 
 # 模型描述
 

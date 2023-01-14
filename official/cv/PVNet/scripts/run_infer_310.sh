@@ -14,8 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 3 || $# -gt 4 ]]; then 
-  echo "Usage: sh run_infer_310.sh [MODEL_PATH] [DATA_PATH] [CLS_NAME] [DEVICE_ID]
+if [[ $# -lt 4 || $# -gt 5 ]]; then 
+  echo "Usage: sh run_infer_cpp.sh [MODEL_PATH] [DATA_PATH] [CLS_NAME] [DEVICE_TYPE] [DEVICE_ID]
+  DEVICE_TYPE can choose from [Ascend, GPU, CPU]
   DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
   exit 1
 fi
@@ -44,9 +45,9 @@ model=$(get_real_path $1)
 data_path=$(get_real_path $2)
 cls_name=$3
 
-if [ $# == 4 ]; then
-    device_id=$4
-elif [ $# == 3 ]; then
+if [ $# == 5 ]; then
+    device_id=$5
+elif [ $# == 4 ]; then
     if [ -z $device_id ]; then
         device_id=0
     else
@@ -59,9 +60,25 @@ echo data_path: $data_path
 echo cls_name: $cls_name
 echo device_id: $device_id
 
+if [ $4 == 'Ascend' ] || [ $4 == 'GPU' ] || [ $4 == 'CPU' ]; then
+  device_type=$4
+else
+  echo "DEVICE_TYPE can choose from [Ascend, GPU, CPU]"
+  exit 1
+fi
+echo "device type: "$device_type
+
+if [ $MS_LITE_HOME ]; then
+  RUNTIME_HOME=$MS_LITE_HOME/runtime
+  TOOLS_HOME=$MS_LITE_HOME/tools
+  RUNTIME_LIBS=$RUNTIME_HOME/lib:$RUNTIME_HOME/third_party/glog/:$RUNTIME_HOME/third_party/libjpeg-turbo/lib
+  export LD_LIBRARY_PATH=$RUNTIME_LIBS:$TOOLS_HOME/converter/lib:$LD_LIBRARY_PATH
+  echo "Insert LD_LIBRARY_PATH the MindSpore Lite runtime libs path: $RUNTIME_LIBS $TOOLS_HOME/converter/lib"
+fi
+
 function compile_app()
 {
-    pushd ascend310_infer
+    pushd cpp_infer
     if [ -f "Makefile" ]; then
         make clean
     fi
@@ -84,7 +101,7 @@ function infer()
     fi
     mkdir -p time_Result
     mkdir result_Files
-    ascend310_infer/out/main --model_path=$model --dataset_path=$data_path --device_id=$device_id &> infer.log
+    cpp_infer/out/main --device_type=$device_type --model_path=$model --dataset_path=$data_path --device_id=$device_id &> infer.log
 
     if [ $? -ne 0 ]; then
         echo "execute inference failed"

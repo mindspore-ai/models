@@ -1,5 +1,6 @@
 # Contents
 
+- [Contents](#contents)
 - [MaskRCNN Description](#maskrcnn-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
@@ -16,12 +17,12 @@
         - [Training Result](#training-result)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
-        - [Evaluation Result](#evaluation-result)
-    - [Export Process](#Export-process)
-        - [Export](#Export)
-    - [Inference Process](#Inference-process)
-        - [Inference](#Inference)
-        - [Inference Result](#Inference-result)
+        - [Evaluation result](#evaluation-result)
+    - [Export Process](#export-process)
+        - [Export](#export)
+    - [Inference Process](#inference-process)
+        - [Inference](#inference)
+        - [Inference result](#inference-result)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
@@ -655,8 +656,7 @@ Before performing inference, we need to export model first. Air model can only b
 Current batch_ Size can only be set to 1. The inference process needs about 600G hard disk space to save the reasoning results.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 ### [Inference result](#content)

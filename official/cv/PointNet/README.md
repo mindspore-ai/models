@@ -1,28 +1,27 @@
 # Contents
 
 - [Contents](#contents)
-- [PointNet Description](#pointnet2-description)
+- [PointNet Description](#pointnet-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
 - [Quick Start](#quick-start)
 - [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-        - [Training](#training)
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
-        - [ONNX Evaluation](#evaluation)
-    - [310 Inference Process](#310-infer-process)
-        - [Export MindIR](#evaluation)
-        - [Export ONNX](#evaluation)
-        - [310 Infer](#evaluation)
-        - [Result](#evaluation)
+- [Script and Sample Code](#script-and-sample-code)
+- [Script Parameters](#script-parameters)
+- [Training Process](#training-process)
+    - [Training](#training)
+- [Evaluation Process](#evaluation-process)
+    - [Evaluation](#evaluation)
+    - [ONNX Evaluation](#onnx-evaluation)
+- [Inference Process](#inference-process)
+    - [Export MindIR/ONNX](#export-mindironnx)
+    - [Infer](#infer)
+    - [Result](#result)
 - [Model Description](#model-description)
     - [Performance](#performance)
-        - [Training Performance](#training-performance)
-        - [Inference Performance](#inference-performance)
+    - [Training Performance](#training-performance)
+    - [Inference Performance](#inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -243,7 +242,7 @@ Before running the command below, please check the checkpoint path used for eval
   'mIOU for class Chair: 0.869'
   ```
 
-# [310 Inference Process](#310-infer-process)
+# [Inference Process](#infer-process)
 
 ## [Export MindIR/ONNX](#evaluation)
 
@@ -255,14 +254,14 @@ FILE_FORMAT should be one of ['AIR','MINDIR','ONNX'].
 
 The MindIR/ONNX model will be exported to './mindir/pointnet.mindir'/'./mindir/pointnet.onnx'
 
-## [310 Infer](#evaluation)
+## [Infer](#evaluation)
 
-before inferring in 310, the mindir model should be exported first. Then run the code below to infer:
+before inferring, the mindir model should be exported first. Then run the code below to infer:
 
 ```bash
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_PATH] [DVPP] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [DEVICE_TYPE] [DEVICE_ID]
 # example:
-bash run_infer_310.sh ./mindir/pointnet.mindir ../shapenetcore_partanno_segmentation_benchmark_v0 [LABEL_PATH] N 2
+bash run_infer_cpp.sh ./mindir/pointnet.mindir ../shapenetcore_partanno_segmentation_benchmark_v0 N Ascend 0
 ```
 
 Here, DVPP should be 'N'!

@@ -27,7 +27,7 @@ shape_ious = []
 file_list = []
 file_list1 = glob.glob(args.result_path+'/*')
 for i in range(len(file_list1)):
-    file_list.append(args.result_path+'/shapenet_data_bs1_%03d'%i+'.bin')
+    file_list.append(args.result_path+'/shapenet_data_bs1_%03d'%i+'_0.bin')
 for i, file_name in enumerate(file_list):
     print("calaccuracy of ", file_name)
     data = np.fromfile(file_name, dtype=np.float32)

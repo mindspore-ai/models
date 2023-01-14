@@ -1,24 +1,43 @@
 # Contents
 
+- [Contents](#contents)
 - [FasterRcnn Description](#fasterrcnn-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
 - [Quick Start](#quick-start)
-- [Run in docker](#Run-in-docker)
+    - [Run on Ascend](#run-on-ascend)
+    - [Run on GPU](#run-on-gpu)
+    - [Run on CPU](#run-on-cpu)
+    - [Run in docker](#run-in-docker)
 - [Script Description](#script-description)
     - [Script and Sample Code](#script-and-sample-code)
     - [Training Process](#training-process)
-        - [Training Usage](#usage)
-        - [Training Result](#result)
+        - [Usage](#usage)
+            - [on Ascend](#on-ascend)
+            - [on GPU](#on-gpu)
+            - [on CPU](#on-cpu)
+        - [Result](#result)
     - [Evaluation Process](#evaluation-process)
-        - [Evaluation Usage](#usage)
-        - [Evaluation Result](#result)
+        - [Usage](#usage-1)
+            - [on Ascend](#on-ascend-1)
+            - [on GPU](#on-gpu-1)
+            - [on CPU](#on-cpu-1)
+        - [Result](#result-1)
+    - [Model Export](#model-export)
+    - [Inference Process](#inference-process)
+        - [Usage](#usage-2)
+        - [result](#result-2)
         - [ONNX Evaluation](#onnx-evaluation)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
+            - [ResNet-50 backbone](#resnet-50-backbone)
+            - [ResNet-101 backbone](#resnet-101-backbone)
         - [Inference Performance](#inference-performance)
+            - [ResNet-50 backbone](#resnet-50-backbone-1)
+            - [ResNet-101 backbone](#resnet-101-backbone-1)
+            - [ResNet-152 backbone](#resnet-152-backbone)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 # FasterRcnn Description
@@ -535,8 +554,7 @@ Before performing inference, the model file must be exported by export script on
 The following example only supports mindir inference with batch_size=1.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [KEEP_RATIO](optional) [DEVICE_ID](optional)
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_TYPE] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [KEEP_RATIO](optional) [DEVICE_ID](optional)
 ```
 
 - `IMAGE_WIDTH` is optional, default value is 1024.

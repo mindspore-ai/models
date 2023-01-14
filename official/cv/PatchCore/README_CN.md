@@ -3,7 +3,7 @@
 <!-- TOC -->
 
 - [目录](#目录)
-- [PatchCore描述](#PatchCore描述)
+- [PatchCore描述](#patchcore描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [特性](#特性)
@@ -25,11 +25,11 @@
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [训练性能](#训练性能)
-            - [MVTec-AD上训练PatchCore](#MVTec-AD上训练PatchCore)
+            - [MVTec-AD上训练PatchCore](#mvtec-ad上训练patchcore)
         - [评估性能](#评估性能)
-            - [MVTec-AD上评估PatchCore](#MVTec-AD上评估PatchCore)
-        - [推理性能](#评估性能)
-            - [MVTec-AD上推理PatchCore](#MVTec-AD上推理PatchCore)
+            - [MVTec-AD上评估PatchCore](#mvtec-ad上评估patchcore)
+        - [推理性能](#推理性能)
+            - [MVTec-AD上推理PatchCore](#mvtec-ad上推理patchcore)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
 
@@ -233,7 +233,7 @@ python export.py --device_id 0 --ckpt_file ../pretrain/PatchCore_pretrain.ckpt
 
 在运行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。
 
-- 在昇腾310上使用MVTec AD数据集进行推理
+- 使用MVTec AD数据集进行推理
 
   执行推理的命令如下所示, 其中``MINDIR_PATH``是mindir文件路径；
 
@@ -246,9 +246,8 @@ python export.py --device_id 0 --ckpt_file ../pretrain/PatchCore_pretrain.ckpt
   ``CATEGORY``表示数据类型，可取：bottle, cable, capsule, carpet, grid, hazelnut, leather, metal_nut, pill, screw, tile, toothbrush, transistor, wood, zipper.  
 
   ```shell
-  # Ascend310 inference
-  bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CATEGORY]
-  # 例：bash run_infer_310.sh ./PathCore.mindir ../data/ y 0 toothbrush
+  bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [CATEGORY] [DEVICE_TYPE] [DEVICE_ID]
+  # 例：bash run_infer_cpp.sh ./PathCore.mindir ../data/ y toothbrush Ascend 0
   ```
 
   推理的精度结果保存在acc_[CATEGORY].log日志文件中。

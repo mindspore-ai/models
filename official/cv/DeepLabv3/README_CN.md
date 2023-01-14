@@ -822,10 +822,10 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 目前仅可处理batch_Size为1。
 
 ```shell
-# Ascend310 推理
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
+`DEVICE_TYPE` 可以为Ascend, GPU, 或CPU。
 `DEVICE_ID` 可选，默认值为 0。
 
 ### 结果

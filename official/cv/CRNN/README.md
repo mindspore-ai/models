@@ -22,14 +22,14 @@
         - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
-        - [Infer on Ascend310](#infer-on-ascend310)
+        - [Infer](#infer)
         - [result](#result)
     - [Model Description](#model-description)
         - [Performance](#performance)
             - [Training Performance](#training-performance)
             - [Evaluation Performance](#evaluation-performance)
     - [Description of Random Situation](#description-of-random-situation)
-    - [Description of MindSpore Version](#description-of-mindspore-version)
+- [Description of MindSpore Version](#description-of-mindspore-version)
     - [ModelZoo Homepage](#modelzoo-homepage)
 
 ## [CRNN Description](#contents)
@@ -396,7 +396,7 @@ The ckpt_file parameter is required,
   # The output path of the model "Output file path" and the log path of the model "Job log path"  。
   ```
 
-### Infer on Ascend310
+### Infer
 
 **Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
@@ -404,14 +404,14 @@ Before performing inference, the mindir file must bu exported by export script o
 Current batch_Size can only be set to 1. The inference result will be just the network outputs, which will be save in binary file. The accuracy is calculated by `src/metric.`.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE_PATH] [DATASET] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE_PATH] [DATASET] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 `MINDIR_PATH` is the MINDIR model exported by export.py
 `DATA_PATH` is the path of dataset. If the data has to be converted, passing the path to the converted data.
 `ANN_FILE_PATH` is the path of annotation file. For converted data, the annotation file is exported by convert scripts.
 `DATASET` is the name of dataset, which should be in ["synth", "svt", "iiit5k", "ic03", "ic13"]
+`DEVICE_TYPE` can choose from [Ascend, GPU, CPU].
 `DEVICE_ID` is optional, default value is 0.
 
 ### result

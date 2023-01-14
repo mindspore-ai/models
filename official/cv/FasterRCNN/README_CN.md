@@ -6,15 +6,28 @@
 - [数据集](#数据集)
 - [环境要求](#环境要求)
 - [快速入门](#快速入门)
-- [在docker上运行](#在docker上运行)
+    - [在Ascend上运行](#在ascend上运行)
+    - [在GPU上运行](#在gpu上运行)
+    - [在CPU上运行](#在cpu上运行)
+    - [在docker上运行](#在docker上运行)
 - [脚本说明](#脚本说明)
     - [脚本及样例代码](#脚本及样例代码)
     - [训练过程](#训练过程)
         - [用法](#用法)
+            - [在Ascend上运行](#在ascend上运行-1)
+            - [在GPU上运行](#在gpu上运行-1)
+            - [在CPU上运行](#在cpu上运行-1)
         - [结果](#结果)
     - [评估过程](#评估过程)
         - [用法](#用法-1)
+            - [在Ascend上运行](#在ascend上运行-2)
+            - [在GPU上运行](#在gpu上运行-2)
+            - [在CPU上运行](#在cpu上运行-2)
         - [结果](#结果-1)
+    - [模型导出](#模型导出)
+    - [推理过程](#推理过程)
+        - [使用方法](#使用方法)
+        - [结果](#结果-2)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [训练性能](#训练性能)
@@ -572,8 +585,7 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --device_ta
 在推理之前需要在昇腾910环境上完成模型的导出。以下示例仅支持batch_size=1的mindir推理。
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [KEEP_RATIO](optional) [DEVICE_ID](optional)
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_TYPE] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [KEEP_RATIO](optional) [DEVICE_ID](optional)
 ```
 
 - `IMAGE_WIDTH` 可选，默认值为1024。

@@ -632,11 +632,11 @@ export:
 
 2. 执行以下命令
 
-    ```bash
-    bash run_infer_310.sh [MINDIR_PATH]
-    # [MINDIR_PATH]：上个步骤yaml配置文件中的导出模型文件路径
-    # example: bash run_infer_310.sh ../shm_export.mindir
-    ```
+```bash
+bash run_infer_cpp.sh [MINDIR_PATH] [DEVICE_TYPE] [DEVICE_ID]
+# [MINDIR_PATH]：上个步骤yaml配置文件中的导出模型文件路径
+# example: bash run_infer_cpp.sh ../shm_export.mindir Ascend 0
+```
 
 3. 输出
 

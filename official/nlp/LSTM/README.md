@@ -19,6 +19,7 @@
     - [Export MindIR](#export-mindir)
     - [Inference Process](#inference-process)
         - [Usage](#usage)
+        - [ONNX Model Eval](#onnx-model-eval)
             - [result](#result)
 - [Model Description](#model-description)
     - [Performance](#performance)
@@ -433,8 +434,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 Before performing inference, the mindir file must be exported by export.py. Input files must be in bin format.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
 ```
 
 `DEVICE_TARGET` must choose from ['GPU', 'CPU', 'Ascend']
