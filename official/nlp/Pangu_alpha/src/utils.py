@@ -606,3 +606,22 @@ def download_data(src_data_url, tgt_data_path, rank):
     # stop
     while not os.path.exists("%s/install.txt" % (EXEC_PATH)):
         time.sleep(1)
+
+
+class TimePoint:
+    """A helper function for recording the time spend."""
+    def __init__(self):
+        self.start_time = None
+        self.end_time = None
+
+    def set_start(self):
+        """Set the start time point"""
+        self.start_time = time.time()
+
+    def set_end(self):
+        """Set the end time point"""
+        self.end_time = time.time()
+
+    def get_spend_time(self):
+        """Get the time spend between end and start"""
+        return self.end_time - self.start_time

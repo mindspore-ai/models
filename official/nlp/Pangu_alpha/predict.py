@@ -37,7 +37,7 @@ from src.tokenization_jieba import JIEBATokenizer
 from src.generate import get_scores
 from src.pangu_alpha import EvalNet, PanguAlphaModel
 from src.pangu_alpha_config import set_parse, PanguAlphaConfig
-from src.utils import get_args
+from src.utils import get_args, TimePoint
 
 from tasks import load_metric, load_dataset
 
@@ -216,11 +216,15 @@ def run_eval(model_predict, config, args_opt):
     examples = load_dataset(args_opt.eval_task, split='validation', tokenizer=tokenizer,
                             data_url=args_opt.eval_data_url)
     # Tokenize input sentence to ids
+    point = TimePoint()
+    point.set_start()
     for item in tqdm(examples, total=len(examples)):
         output_ids = get_scores(model_predict, item, tokenizer, pad_length=config.seq_length)
         # Call inference
         item['predict'] = output_ids
-    print("Prediction done.")
+    point.set_end()
+    # This log cannot be deleted, as the CI monitor this print.
+    print(f"Prediction done. Total cost time is {point.get_spend_time()}")
     return examples
 
 
@@ -241,6 +245,8 @@ def run_eval_on_server(args_opt):
                             split='validation', tokenizer=tokenizer)
     url = get_query_client(args_opt)
     # Tokenize input sentence to ids
+    point = TimePoint()
+    point.set_start()
     for _, item in tqdm(enumerate(examples), total=len(examples)):
         # Call inference
         send_data = json.dumps({"instances": [{"input_sentence": item['input_str'],
@@ -250,7 +256,9 @@ def run_eval_on_server(args_opt):
         result = json.loads(result.text)
         output_samples = result['instances'][0]['output_sentence']
         item['predict'] = output_samples
-    print("Prediction done.")
+    point.set_end()
+    # This log cannot be deleted, as the CI monitor this print.
+    print(f"Prediction done. Total cost time is {point.get_spend_time()}")
     return examples
 
 

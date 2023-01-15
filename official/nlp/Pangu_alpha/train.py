@@ -150,7 +150,8 @@ def run_train(args_opt):
         download_data(src_data_url=args_opt.data_url, tgt_data_path=cache_url, rank=rank)
         download_data(src_data_url=args_opt.eval_data_url, tgt_data_path=eval_cache_url, rank=rank)
     # Set model property
-    model_parallel_num = args_opt.op_level_model_parallel_num
+    # in case when the model parallel is smaller than the device num, the model_parallel_num will be zero.
+    model_parallel_num = min(args_opt.op_level_model_parallel_num, device_num)
     data_parallel_num = int(device_num / model_parallel_num)
     batch_size = args_opt.per_batch_size * data_parallel_num if context.get_auto_parallel_context(
         "parallel_mode") != ParallelMode.DATA_PARALLEL else args_opt.per_batch_size
