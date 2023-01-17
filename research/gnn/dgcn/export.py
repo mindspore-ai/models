@@ -63,5 +63,5 @@ if __name__ == "__main__":
     load_param_into_net(dgcn_net, param_dict)
     export(dgcn_net, diffusions, ppmi, features, file_name=args.file_name, file_format=args.file_format)
     print("==========================================")
-    print(args.file_name + ".mindir exported successfully!")
+    print(args.file_name + "." + args.file_format.lower() + " exported successfully!")
     print("==========================================")
