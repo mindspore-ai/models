@@ -231,19 +231,19 @@ def _preprocess_true_boxes(true_boxes, anchors, in_shape, num_classes, max_boxes
     gt_box0 = np.reshape(y_true[0][..., 0:4], [-1, 4])
     # gt_box [boxes, [x,y,w,h]]
     gt_box0 = gt_box0[mask0 == 1]
-    if not gt_box0:
+    if gt_box0.shape[0] == 0:
         gt_box0 = np.zeros(shape=[1, 4], dtype=np.float32)
 
     mask1 = np.reshape(y_true[1][..., 4:5], [-1])
     gt_box1 = np.reshape(y_true[1][..., 0:4], [-1, 4])
     gt_box1 = gt_box1[mask1 == 1]
-    if not gt_box1:
+    if gt_box1.shape[0] == 0:
         gt_box1 = np.zeros(shape=[1, 4], dtype=np.float32)
 
     mask2 = np.reshape(y_true[2][..., 4:5], [-1])
     gt_box2 = np.reshape(y_true[2][..., 0:4], [-1, 4])
     gt_box2 = gt_box2[mask2 == 1]
-    if not gt_box2:
+    if gt_box2.shape[0] == 0:
         gt_box2 = np.zeros(shape=[1, 4], dtype=np.float32)
     return y_true[0], y_true[1], y_true[2], gt_box0, gt_box1, gt_box2
 
