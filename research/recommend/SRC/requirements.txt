@@ -1,0 +1,5 @@
+numpy~=1.23.5
+longling~=1.3.36
+tqdm~=4.64.1
+scikit-learn~=1.1.3
+elasticsearch~=8.2.0
