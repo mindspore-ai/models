@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 4 ]
+if [ $# != 5 ]
 then 
-    echo "Usage: sh run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]"
+    echo "Usage: sh run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET] [DEVICE_ID]"
 exit 1
 fi
 
@@ -51,7 +51,8 @@ DEVICE_TARGET="${4:-Ascend}"
 ulimit -u unlimited
 export DEVICE_NUM=1
 export RANK_SIZE=$DEVICE_NUM
-export DEVICE_ID=0
+export DEVICE_ID=$5
+export CUDA_VISIBLE_DEVICES=$5
 export RANK_ID=0
 
 if [ -d "eval" ];

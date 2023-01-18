@@ -110,8 +110,8 @@ Note that you can run the scripts based on the dataset mentioned in original pap
     # example: bash run_distribute_train.sh ~/hccl_8p.json /home/DataSet/cocodataset/
 
     # standalone training
-    bash run_standalone_train.sh [DATA_PATH] [PRETRAINED_CKPT(optional)]
-    # example: bash run_standalone_train.sh /home/DataSet/cocodataset/
+    bash run_standalone_train.sh [DATA_PATH] [DEVICE_ID] [PRETRAINED_PATH](optional)
+    # example: bash run_standalone_train.sh /home/DataSet/cocodataset/ 0
 
     On CPU:
 
@@ -135,14 +135,14 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 
     ```bash
     # Evaluation on Ascend
-    bash run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
-    # example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-5_7393.ckpt /home/DataSet/cocodataset/ "Ascend"
+    bash run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET] [DEVICE_ID]
+    # example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-5_7393.ckpt /home/DataSet/cocodataset/ "Ascend" 0
 
     # Evaluation on CPU
     bash run_eval_cpu.sh [ANN_FILE] [CHECKPOINT_PATH]
 
     # Evaluation on GPU
-    bash run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
+    bash run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET] [DEVICE_ID]
     ```
 
     Note:
@@ -363,8 +363,8 @@ Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH] [PRETRAINED_CK
 # example: bash run_distribute_train.sh ~/hccl_8p.json /home/DataSet/cocodataset/
 
 # standalone training
-Usage: bash run_standalone_train.sh [DATA_PATH] [PRETRAINED_CKPT(optional)]
-# example: bash run_standalone_train.sh /home/DataSet/cocodataset/
+Usage: bash run_standalone_train.sh [DATA_PATH] [DEVICE_ID] [PRETRAINED_PATH](optional)
+# example: bash run_standalone_train.sh /home/DataSet/cocodataset/ 0
 
 On CPU:
 
@@ -529,8 +529,8 @@ Usage: bash run_distribute_train_gpu.sh [DATA_PATH] [PRETRAINED_PATH] (optional)
 
     ```bash
     # standalone training
-    bash run_standalone_train.sh [DATA_PATH] [PRETRAINED_CKPT(optional)]
-    # example: bash run_standalone_train.sh /home/DataSet/cocodataset/
+    bash run_standalone_train.sh [DATA_PATH] [DEVICE_ID] [PRETRAINED_PATH](optional)
+    # example: bash run_standalone_train.sh /home/DataSet/cocodataset/ 0
     ```
 
 - Run `run_standalone_train_cpu.sh` for non-distributed training of maskrcnn_mobilenetv1 model on CPU.
@@ -584,8 +584,8 @@ Training result will be stored in the example path, whose folder name begins wit
 
     ```bash
     # infer
-    bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
-    # example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-5_7393.ckpt /home/DataSet/cocodataset/ "Ascend"
+    bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET] [DEVICE_ID]
+    # example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-5_7393.ckpt /home/DataSet/cocodataset/ "Ascend" 0
     ```
 
 > As for the COCO2017 dataset, VALIDATION_ANN_FILE_JSON is refer to the annotations/instances_val2017.json in the dataset directory.  
@@ -595,8 +595,8 @@ Training result will be stored in the example path, whose folder name begins wit
 
     ```bash
     # infer
-    bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
-    # example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-12_7393.ckpt /home/DataSet/cocodataset/ "GPU"
+    bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET] [DEVICE_ID]
+    # example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-12_7393.ckpt /home/DataSet/cocodataset/ "GPU" 0
     ```
 
 ### [Evaluation result](#content)
