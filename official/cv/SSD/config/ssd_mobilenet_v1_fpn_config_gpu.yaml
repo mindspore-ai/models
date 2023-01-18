@@ -59,7 +59,7 @@ mode_sink: "sink"
 device_id: 0
 device_num: 1
 epoch_size: 500
-batch_size: 16
+batch_size: 32
 loss_scale: 1024
 pre_trained: ""
 pre_trained_epoch_size: 0
