@@ -89,7 +89,7 @@ def main():
     export(net, repos, reneg,
            file_name=args.file_name, file_format=args.file_format)
     print("==========================================")
-    print(args.file_name + ".mindir exported successfully!")
+    print(args.file_name + "." + args.file_format.lower() + " exported successfully!")
     print("==========================================")
 
 
