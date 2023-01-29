@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 1 ] && [ $# != 2 ]
+if [ $# != 2 ] && [ $# != 3 ]
 then 
-    echo "Usage: sh run_standalone_train.sh [DATA_PATH] [PRETRAINED_PATH](optional)"
+    echo "Usage: sh run_standalone_train.sh [DATA_PATH] [DEVICE_ID] [PRETRAINED_PATH](optional)"
     exit 1
 fi
 
@@ -29,7 +29,7 @@ get_real_path(){
 }
 
 PATH1=$(get_real_path $1)
-PATH2=$2
+PATH2=$3
 echo $PATH1
 
 if [ $# == 2 ]
@@ -39,7 +39,7 @@ fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=0
+export DEVICE_ID=$2
 export RANK_ID=0
 export RANK_SIZE=1
 
