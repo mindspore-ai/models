@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """hub config."""
-from src.res2net import res2net50, res2net101, se_res2net50, res2net18
+from src.res2net import res2net50, res2net101, se_res2net50, res2net18, res2net152
 
 def create_network(name, *args, **kwargs):
     """create_network about res2net"""
@@ -25,4 +25,6 @@ def create_network(name, *args, **kwargs):
         return res2net101(*args, **kwargs)
     if name == 'se_res2net50':
         return se_res2net50(*args, **kwargs)
+    if name == 'res2net152':
+        return res2net152(*args, **kwargs)
     raise NotImplementedError(f"{name} is not implemented in the repo")
