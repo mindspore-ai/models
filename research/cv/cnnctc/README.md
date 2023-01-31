@@ -493,7 +493,7 @@ accuracy:  0.8427
 | Speed                      | 1pc: 250 ms/step;  8pcs: 260 ms/step                          |
 | Total time                 | 1pc: 15 hours;  8pcs: 1.92 hours                          |
 | Parameters (M)             | 177                                                         |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/cv/cnnctc> |
 
 | Parameters                 | CNNCTC                                                   |
 | -------------------------- | ----------------------------------------------------------- |
@@ -508,21 +508,21 @@ accuracy:  0.8427
 | Speed                      | 1pc: 1180 ms/step;  8pcs: 1180 ms/step                          |
 | Total time                 | 1pc: 62.9 hours;  8pcs: 8.67 hours                          |
 | Parameters (M)             | 177                                                         |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/cv/cnnctc> |
 
 ### Evaluation Performance
 
-| Parameters          | CNNCTC                   |
-| ------------------- | --------------------------- |
-| Model Version       | V1                |
-| Resource            |  Ascend 910; OS Euler2.8                   |
-| Uploaded Date       | 09/28/2020 (month/day/year) |
-| MindSpore Version   | 1.0.0                       |
-| Dataset             | IIIT5K    |
-| batch_size          | 192                         |
-| outputs             | Accuracy                 |
-| Accuracy            |  85%  |
-| Model for inference | 675M (.ckpt file)         |
+| Parameters          | Ascend                      | GPU                         |
+| ------------------- | --------------------------- | --------------------------- |
+| Model Version       | V1                          | V1                          |
+| Resource            | Ascend 910; OS Euler2.8     | GPU(Tesla V100-PCIE)        |
+| Uploaded Date       | 09/28/2020 (month/day/year) | 07/06/2021 (month/day/year) |
+| MindSpore Version   | 1.0.0                       | 1.0.0                       |
+| Dataset             | IIIT5K                      | IIIT5K                      |
+| batch_size          | 192                         | 192                         |
+| outputs             | Accuracy                    | Accuracy                    |
+| Accuracy            | 85%                         | 85%                         |
+| Model for inference | 675M (.ckpt file)           | 675M (.ckpt file)           |
 
 ### Inference Performance
 

@@ -438,34 +438,34 @@ accuracy:  0.8427
 
 ### 训练性能
 
-| 参数 | CNNCTC |
-| -------------------------- | ----------------------------------------------------------- |
-| 模型版本 | V1 |
-| 资源 | Ascend 910；CPU 2.60GHz，192核；内存：755G |
-| 上传日期 | 2020-09-28 |
-| MindSpore版本 | 1.0.0 |
-| 数据集 | MJSynth、SynthText |
-| 训练参数 | epoch=3, batch_size=192 |
-| 优化器 | RMSProp |
-| 损失函数 | CTCLoss |
-| 速度 | 1卡：300毫秒/步；8卡：310毫秒/步 |
-| 总时间 | 1卡：18小时；8卡：2.3小时 |
-| 参数(M) | 177 |
-| 脚本 | <https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P> |
+| 参数 | Ascend | GPU |
+| ------------ | ------------- | ---------- |
+| 模型版本 | V1 | V1 |
+| 资源 | Ascend 910；CPU 2.60GHz，192核；内存：755G | GPU(Tesla V100-PCIE); CPU 2.60 GHz, 26 cores; Memory 790G; OS linux-gnu |
+| 上传日期 | 2020-09-28 | 07/06/2021 (month/day/year) |
+| MindSpore版本 | 1.0.0 | 1.0.0 |
+| 数据集 | MJSynth、SynthText | MJSynth、SynthText |
+| 训练参数 | epoch=3, batch_size=192 | epoch=3, batch_size=192 |
+| 优化器 | RMSProp |  RMSProp |
+| 损失函数 | CTCLoss | CTCLoss |
+| 速度 | 1卡：300毫秒/步；8卡：310毫秒/步 | 1pc: 毫秒/步;  8pcs: 1180 毫秒/步 |
+| 总时间 | 1卡：18小时；8卡：2.3小时 | 1pc: 62.9 hours;  8pcs: 8.67 hours |
+| 参数(M) | 177 | 177 |
+| 脚本 | <https://gitee.com/mindspore/models/tree/master/research/cv/cnnctc> | <https://gitee.com/mindspore/models/tree/master/research/cv/cnnctc> |
 
 ### 评估性能
 
-| 参数 | CNNCTC |
-| ------------------- | --------------------------- |
-| 模型版本 | V1 |
-| 资源 | Ascend 910 |
-| 上传日期 | 2020-09-28 |
-| MindSpore版本 | 1.0.0 |
-| 数据集 | IIIT5K |
-| batch_size | 192 |
-| 输出 |准确率 |
-| 准确率 | 85% |
-| 推理模型 | 675M（.ckpt文件） |
+| 参数 | Ascend | GPU |
+| ------------------- | --------------------------- | ----------------- |
+| 模型版本 | V1 | V1 |
+| 资源 | Ascend 910 | GPU |
+| 上传日期 | 2020-09-28 | 07/06/2021 |
+| MindSpore版本 | 1.0.0 | 1.0.0 |
+| 数据集 | IIIT5K | IIIT5K |
+| batch_size | 192 | 192 |
+| 输出 |准确率 | 准确率 |
+| 准确率 | 85% | 85% |
+| 推理模型 | 675M（.ckpt文件） | 675M（.ckpt文件） |
 
 ### 推理性能
 
