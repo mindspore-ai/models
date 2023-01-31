@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 2 ] && [ $# != 3 ]
+if [ $# != 3 ]
 then
-    echo "Usage: bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [LOG_NAME](optional)"
+    echo "Usage: bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [PLATFORM]"
 exit 1
 fi
 
@@ -28,13 +28,20 @@ get_real_path(){
 }
 
 CONFIG_PATH=$(get_real_path $1)
-LOG_NAME="standalone_train"
-if [ $# == 3 ]
+export DEVICE_ID=$2
+
+if [ -d "train" ];
 then
-    LOG_NAME=$3
+    rm -rf ./train
 fi
-BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
-cd $BASE_PATH/..
-python train.py --config_path=$CONFIG_PATH --device_id=$2 --output_dir=$LOG_NAME > $LOG_NAME.txt 2>&1 &
-echo "training..."
-echo "log at ${LOG_NAME}.txt, you can use [tail -f ${LOG_NAME}.txt] to get log."
+
+mkdir ./train
+cp ../*.py ./train
+cp -r ../src ./train
+cp -r ../config ./train
+cp -r ../pretrained ./train
+cd ./train || exit
+env > env.log
+
+echo "start training for device $DEVICE_ID"
+python train.py --config_path=$CONFIG_PATH --device_id=$2 --device_target=$3 >log.txt 2>&1 &

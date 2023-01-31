@@ -43,8 +43,10 @@ def init_env(cfg):
         cfg.rank_id = 0
 
     if cfg.device_num > 1:
+        if cfg.device_target == 'Ascend':
+            ms.set_context(device_id=cfg.device_id)
+
         init()
-        print("run distribute!", flush=True)
         group_size = get_group_size()
         if cfg.device_num != group_size:
             raise ValueError(f"the setting device_num: {cfg.device_num} not equal to the real group_size: {group_size}")
@@ -58,7 +60,6 @@ def init_env(cfg):
             ms.set_context(device_id=cfg.device_id)
         cfg.device_num = 1
         cfg.rank_id = 0
-        print("run standalone!", flush=True)
 
 
 def cpu_affinity(rank_id, device_num):

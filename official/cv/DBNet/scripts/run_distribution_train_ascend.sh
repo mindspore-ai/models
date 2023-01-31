@@ -13,10 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
 if [ $# != 3 ]
 then
-    echo "Usage: bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]"
+    echo "Usage: bash run_distribution_train.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]"
 exit 1
 fi
 
@@ -28,20 +27,33 @@ get_real_path(){
     fi
 }
 
-CONFIG_PATH=$(get_real_path $1)
-CKPT_PATH=$(get_real_path $2)
+CONFIG_PATH=$(get_real_path $3)
 
-if [ -d "eval" ];
+if [ ! -f $CONFIG_PATH ]
 then
-    rm -rf ./eval
+    echo "error: CONFIG_PATH=$CONFIG_PATH is not a file"
+exit 1
 fi
 
-mkdir ./eval
-cp ../*.py ./eval
-cp -r ../src ./eval
-cp -r ../config ./eval
-cd ./eval || exit
-env > env.log
+export RANK_SIZE=$2
+export DEVICE_NUM=$2
+export RANK_TABLE_FILE=$1
 
-echo "start inferring for device $DEVICE_ID"
-python eval.py --config_path=$CONFIG_PATH --ckpt_path=$CKPT_PATH --device_id=$3 > log.txt 2>&1 &
+for((i=0; i<${DEVICE_NUM}; i++))
+do
+    export DEVICE_ID=$i
+    export RANK_ID=$i
+    rm -rf ./train_parallel$i
+    mkdir ./train_parallel$i
+    cp ../*.py ./train_parallel$i
+    cp -r ../src ./train_parallel$i
+    cp -r ../config ./train_parallel$i
+    cp -r ../pretrained ./train_parallel$i
+    cd ./train_parallel$i || exit
+    echo "start training for rank $RANK_ID, device $DEVICE_ID"
+    python train.py \
+        --config_path=$CONFIG_PATH \
+        --device_num=$DEVICE_NUM \
+        --device_id=$DEVICE_ID > log.txt 2>&1 &
+    cd ..
+done

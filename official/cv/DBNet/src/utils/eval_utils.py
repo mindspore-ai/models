@@ -41,7 +41,7 @@ class WithEval:
         start = time.time()
         img = ms.Tensor(batch['img'])
         preds = self.model(img)
-        boxes, scores = self.post_process(preds)
+        boxes, scores = self.post_process({'binary': preds})
         cur_time = time.time() - start
         raw_metric = self.metric.validate_measure(batch, (boxes, scores))
 
@@ -153,7 +153,6 @@ class Evaluate310:
         for i in x:
             shape.append(int(i))
         return tuple(shape)
-
 
     def get_batch(self):
         polys_dir = os.path.join(self.gt_path, "eval_polys_bin")

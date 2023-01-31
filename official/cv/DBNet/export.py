@@ -35,8 +35,7 @@ def export():
     ms.load_checkpoint(config.ckpt_path, eval_net)
     eval_net.set_train(False)
     inp = ms.ops.ones((1, 3, *config.eval.eval_size), ms.float32)
-    file_name = os.path.join(config.output_dir,
-                             config.net + '_' + config.backbone.initializer)
+    file_name = config.net + '_' + config.backbone.initializer
     ms.export(eval_net, inp, file_name=file_name, file_format='MINDIR')
     print("MINDIR saved at", file_name+".mindir")
 

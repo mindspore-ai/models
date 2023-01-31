@@ -43,6 +43,7 @@ def solve_polys(polys):
 
 class RandomCropData:
     """Random crop class, include many crop relevant functions."""
+
     def __init__(self, max_tries=10, min_crop_side_ratio=0.1, crop_size=(640, 640)):
         self.size = crop_size
         self.min_crop_side_ratio = min_crop_side_ratio
@@ -233,19 +234,16 @@ class RandomAugment:
         if max(h, w) > 1280:
             scale = 1280.0 / max(h, w)
             img = cv2.resize(img, dsize=None, fx=scale, fy=scale)
-        h, w = img.shape[0:2]
 
         # Get scale randomly.
         random_scale = np.array([0.5, 1.0, 2.0, 3.0])
         scale = np.random.choice(random_scale)
-        # If less than short_side, scale will be clipped to min_scale.
-        if min(h, w) * scale <= short_side:
-            scale = (short_side + 10) * 1.0 / min(h, w)
+
         # Rescale img.
         img = cv2.resize(img, dsize=None, fx=scale, fy=scale)
         # Rescale polys: (N, 8) -> (N, 4, 2)
-        new_polys = (polys_scale * ([img.shape[1], img.shape[0]] * max_points)) \
-                    .reshape((polys.shape[0], polys.shape[1] // 2, 2))
+        new_polys = (polys_scale * ([img.shape[1], img.shape[0]] * max_points)).reshape(
+            (polys.shape[0], polys.shape[1] // 2, 2))
 
         return img, new_polys
 
