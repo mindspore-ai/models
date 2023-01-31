@@ -14,9 +14,9 @@
         - [Evaluation Process](#evaluation-process)
             - [Evaluation](#evaluation)
     - [Inference Process](#inference-process)
-        - [Generate input data for network：](#generate-input-data-for-network)
+        - [Generate input data for network](#generate-input-data-for-network)
         - [Export MindIR](#export-mindir)
-        - [Infer on Ascend310](#infer-on-ascend310)
+        - [Inference](#inference)
         - [Result](#result)
     - [Model Description](#model-description)
         - [Performance](#performance)
@@ -211,7 +211,7 @@ python export.py --ckpt_file='./checkpoint/ms-4_37721.ckpt'  --out_file=lpcnet -
 
 The ckpt_file parameter is required
 
-### [Infer on Ascend310](#contents)
+### [Inference](#contents)
 
 **Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
@@ -219,12 +219,13 @@ Before performing inference, the mindir file must be exported by `export.py` scr
 
 ```bash
 # Enter script dir, run run_infer_310.sh script
-bash run_infer_310.sh [ENCODER_PATH] [DECODER_PATH] [DATA_PATH] [DEVICE_ID] (optional)
+bash run_infer_cpp.sh [ENCODER_PATH] [DECODER_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID] (optional)
 ```
 
 - `ENCODER_PATH` Absolute path of \*_enc mindir
 - `DECODER_PATH` Absolute path of \*_dec mindir
 - `DATA_PATH` Absolute path of input data（Under this path, there should be one \*.f32 file extracted using run_process_eval_data.sh）
+- `DEVICE_TYPE` Device type can be chosen from [Ascend, GPU, CPU]
 - `DEVICE_ID` Device id where the code will be run
 
 ### Result

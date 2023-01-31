@@ -3,21 +3,32 @@
 
 <!-- TOC -->
 
-- [CTPN Description](#CTPN-description)
-- [Model Architecture](#model-architecture)
+- [CTPN](#ctpn)
+- [CTPN Description](#ctpn-description)
+- [Model architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Features](#features)
-    - [Mixed Precision](#mixed-precision)
 - [Environment Requirements](#environment-requirements)
-- [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Training Process](#training-process)
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
-- [Model Description](#model-description)
-    - [Performance](#performance)  
-        - [Training Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
+- [Script description](#script-description)
+    - [Script and sample code](#script-and-sample-code)
+    - [Training process](#training-process)
+        - [Dataset](#dataset-1)
+        - [Usage](#usage)
+        - [Launch](#launch)
+        - [Result](#result)
+    - [Eval process](#eval-process)
+        - [Usage](#usage-1)
+        - [Evaluation while training](#evaluation-while-training)
+        - [Result](#result-1)
+    - [Model Export](#model-export)
+    - [Inference process](#inference-process)
+        - [Usage](#usage-2)
+        - [Result](#result-2)
+- [Model description](#model-description)
+    - [Performance](#performance)
+        - [Training Performance](#training-performance)
+            - [Inference Performance](#inference-performance)
+            - [Training performance results](#training-performance-results)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -426,8 +437,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_format [EXPORT_FORMAT]
 Before performing inference, the air file must bu exported by export script on the Ascend910 environment.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MODEL_PATH] [DATA_PATH] [ANN_FILE_PATH] [DEVICE_ID]
+bash run_infer_cpp.sh [MODEL_PATH] [DATA_PATH] [LABEL_PATH] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 After inference, you can get a archive file named submit.zip.To evalulate it, you can use the scripts provided by the ICDAR2013 network, you can download the Deteval scripts from the [link](https://rrc.cvc.uab.es/?com=downloads&action=download&ch=2&f=aHR0cHM6Ly9ycmMuY3ZjLnVhYi5lcy9zdGFuZGFsb25lcy9zY3JpcHRfdGVzdF9jaDJfdDFfZTItMTU3Nzk4MzA2Ny56aXA=)

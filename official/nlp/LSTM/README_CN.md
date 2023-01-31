@@ -17,9 +17,10 @@
     - [准备数据集](#准备数据集)
     - [训练过程](#训练过程)
     - [评估过程](#评估过程)
-    - [导出mindir模型](#导出mindir模型)
+    - [导出模型](#导出模型)
     - [推理过程](#推理过程)
         - [用法](#用法)
+        - [ONNX模型评估](#onnx模型评估)
         - [结果](#结果)
 - [模型描述](#模型描述)
     - [性能](#性能)
@@ -435,8 +436,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 在执行推理之前，需要通过export.py导出mindir文件。输入文件为bin格式。
 
 ```shell
-# Ascend310 推理
-bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
 ```
 
 - `DEVICE_TARGET` 可选值范围为：['GPU', 'CPU', 'Ascend']

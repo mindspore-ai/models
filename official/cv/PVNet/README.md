@@ -1,7 +1,7 @@
 # Contents <!-- TOC -->
 
-- [Contents](#contents)
-- [PvNet Description](#pvnet-description)
+- [Contents](#contents-)
+- [PVNet Description](#pvnet-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Features](#features)
@@ -11,9 +11,7 @@
 - [Script Description](#script-description)
     - [Script and Sample Code](#script-and-sample-code)
     - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-        - [Training](#training)
-        - [Distributed Training](#distributed-training)
+        - [Training Process](#training-process)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
     - [Export Process](#export-process)
@@ -23,9 +21,11 @@
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
-            - [PvNet on LINEMOD](#pvnet-on-linemod)
+            - [PVNet on LINEMOD](#pvnet-on-linemod)
+            - [](#)
         - [Inference Performance](#inference-performance)
-            - [PvNet on LINEMOD](#pvnet-on-linemod)
+            - [PVNet on LINEMOD](#pvnet-on-linemod-1)
+    - [Performance Description](#performance-description)
 - [Random Seed Description](#random-seed-description)
 - [ModelZoo Home Page](#modelzoo-home-page)
 
@@ -326,9 +326,9 @@ Export the model before inference. AIR models can be exported only in the Ascend
   The inference results are saved in the **scripts** directory. You can find results similar to the following in the **postprocess.log** file:
 
   ```shell
-  # Ascend310 inference
-  bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [CLS_NAME] [DEVICE_ID]
-  # example:bash scripts/run_infer_310.sh ./can.mindir ./LINEMOD/can/JPEGImages/ can 0
+  # Run inference
+  bash scripts/run_infer_cpp.sh [MODEL_PATH] [DATA_PATH] [CLS_NAME] [DEVICE_TYPE] [DEVICE_ID]
+  # example:bash scripts/run_infer_cpp.sh ./can.mindir ./LINEMOD/can/JPEGImages/ can Ascend 0
   Processing object:can, 2D projection error:0.9960629921259843, ADD:0.8622047244094488
   ```
 

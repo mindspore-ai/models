@@ -21,7 +21,7 @@
         - [评估过程](#评估过程)
     - [推理过程](#推理过程)
         - [导出MindIR](#导出mindir)
-        - [在Ascend310执行推理](#在ascend310执行推理)
+        - [执行推理](#执行推理)
         - [结果](#结果)
     - [模型描述](#模型描述)
         - [性能](#性能)
@@ -412,17 +412,17 @@ python export.py --model_file [CKPT_PATH] --file_name [FILE_NAME] --file_format 
 参数ckpt_file为必填项，
 `EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
 
-### 在Ascend310执行推理
+### 执行推理
 
 在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
 
 ```shell
-# Ascend310 推理
-bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CONFIG_PATH]
+bash run_infer_cpp.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID] [CONFIG_PATH]
 ```
 
 - `NEED_PREPROCESS` 表示是否需要对数据集进行预处理, 取值为'y' 或者 'n'。
 - `DEVICE_ID` 可选，默认值为0。
+- `CONFIG_PATH` 可选, 默认为`../default_config_large.yaml`
 
 ### 结果
 

@@ -21,12 +21,12 @@
         - [Result](#result)
     - [Evaluation Process](#evaluation-process)
         - [Usage](#usage-1)
-            - [Ascend Runs](#ascend-runs-1)
-            - [GPU Runs](#gpu-runs-1)
+            - [Ascend](#ascend)
+            - [GPU](#gpu)
         - [Result](#result-1)
     - [Reasoning](#reasoning)
         - [Export MindIR](#export-mindir)
-        - [Perform Inference on Ascend310](#perform-inference-on-ascend310)
+        - [Perform Inference](#perform-inference)
         - [Result](#result-2)
 - [Model Description](#model-description)
     - [Performance](#performance)
@@ -457,18 +457,19 @@ python export.py --device_id [DEVICE_ID] --checkpoint_file [CKPT_PATH] --file_na
 
 Where **TARGET_DEVICE** GPU or Ascend
 
-### Perform Inference on Ascend310
+### Perform Inference
 
 Before performing inference, the `export.py` script must be passed to this mindir file.
 The following shows an example of performing inference using the mindir model.
 Currently only inference with batchsize of 1 is supported for the Cityscapes dataset.
 
 ```bash
-bash scripts/ascend310_inference.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+bash scripts/run_cpp_infer.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `MINDIR_PATH` The storage path of the mindir file
 - `DATA_PATH` The storage path of the original dataset of Cityscapes
+- `DEVICE_TYPE` can choose from [Ascend, GPU, CPU]
 - `DEVICE_ID` card number
 
 The script is divided into three steps:

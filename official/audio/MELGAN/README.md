@@ -25,10 +25,7 @@
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
-    - [How to use](#how-to-use)
-        - [Inference](#inference)
-        - [Continue Training on the Pretrained Model](#continue-training-on-the-pretrained-model)
+        - [Inference Performance](#inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -298,11 +295,11 @@ python export.py  --format [EXPORT_FORMAT] --checkpoint_path [CKPT_PATH]
 Before performing inference, the mindir file must be exported by export.py. Currently, only batchsize 1 is supported.
 
 ```bash
-# Ascend310 inference
-bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+bash run_infer_cpp.sh [MODEL_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 `DEVICE_ID` is optional, default value is 0.
+`DEVICE_TYPE` can choose from [Ascend, GPU, CPU]
 
 # [Model Description](#contents)
 

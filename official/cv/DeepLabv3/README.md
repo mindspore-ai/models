@@ -855,10 +855,10 @@ Before performing inference, the air file must bu exported by export script on t
 Current batch_Size can only be set to 1. The precision calculation process needs about 70G+ memory space.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
+`DEVICE_TYPE` can choose from [Ascend, GPU, CPU].
 `DEVICE_ID` is optional, default value is 0.
 
 ### result

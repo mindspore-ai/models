@@ -32,6 +32,7 @@
         - [Inference Performance](#inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
+    - [FAQ](#faq)
 
 # [MaskRCNN Description](#contents)
 
@@ -713,8 +714,7 @@ Before performing inference, the air file must bu exported by export script on t
 Current batch_ Size can only be set to 1. The inference process needs about 600G hard disk space to save the reasoning results.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 ### result

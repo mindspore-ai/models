@@ -2,11 +2,11 @@
 
 <!-- TOC -->
 
-- [Content](#content)
-- [PatchCore Description](#patchcore-description)
+- [PatchCore](#patchcore)
+- [PatchCore description](#patchcore-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
-- [Characteristics](#characteristic)
+- [Characteristics](#characteristics)
     - [Mixed precision](#mixed-precision)
 - [Requirements](#requirements)
 - [Quick Start](#quick-start)
@@ -14,10 +14,10 @@
     - [Scripts and sample code](#scripts-and-sample-code)
     - [Script parameters](#script-parameters)
     - [Training process](#training-process)
-        - [Download pretrained weights](#pretrained-weights)
+        - [Download pretrained weights](#download-pretrained-weights)
         - [Training](#training)
-    - [Evaluation process](#evaluation)
-        - [Evaluate](#evaluate)
+    - [Evaluation process](#evaluation-process)
+        - [Evaluation](#evaluation)
     - [Export process](#export-process)
         - [Export](#export)
     - [Inference process](#inference-process)
@@ -25,11 +25,11 @@
 - [Model description](#model-description)
     - [Performance](#performance)
         - [Training performance](#training-performance)
-            - [Training PatchCore on MVTec-AD](#mvtec-ad-patchcore-training)
-        - [Evaluation performance](#evaluating-performance)
-            - [Evaluating PatchCore on MVTec-AD](#mvtec-ad-patchcore-evaluating)
+            - [Training PatchCore on MVTec-AD](#training-patchcore-on-mvtec-ad)
+        - [Evaluation performance](#evaluation-performance)
+            - [Evaluating PatchCore on MVTec-AD](#evaluating-patchcore-on-mvtec-ad)
         - [Inference performance](#inference-performance)
-            - [Inference PatchCore on MVTec-AD](#mvtec-ad-patchcore-inference)
+            - [Inference PatchCore on MVTec-AD](#inference-patchcore-on-mvtec-ad)
 - [Random description](#random-description)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -319,7 +319,7 @@ python export.py --device_id 0 --ckpt_file ../pretrain/PatchCore_pretrain.ckpt
 
 Before running inference we need to export the model. Air models can only be exported on the Ascend 910 environment, mindir can be exported on any environment.
 
-- Inference on MVTec AD dataset using Ascend 310
+- Inference on MVTec AD dataset
 
   The command to perform inference is as follows, where ``MINDIR_PATH`` is the mindir file path;
 
@@ -331,10 +331,8 @@ Before running inference we need to export the model. Air models can only be exp
 
   ``CATEGORY`` Indicates the data type, desirable: bottle, cable, capsule, carpet, grid, hazelnut, leather, metal_nut, pill, screw, tile, toothbrush, transistor, wood, zipper.
 
-  ```text
-  # Ascend310 inference
-  bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CATEGORY]
-  # example：bash run_infer_310.sh ./PathCore.mindir ../data/ y 0 toothbrush
+  ```bash
+  bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [CATEGORY] [DEVICE_TYPE] [DEVICE_ID]
   ```
 
   The inference accuracy results are saved in the acc_[CATEGORY].log log file.

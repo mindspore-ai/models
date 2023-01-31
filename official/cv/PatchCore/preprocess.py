@@ -85,7 +85,7 @@ def createDatasetJson(dataset_path, category, data_transforms, gt_transforms):
 
 def createDataset(dataset_path, category):
     """createDataset"""
-    mean = cfg.mean_dft
+    mean = [0.485, 0.456, 0.406] # mean should be positive
     std = cfg.std_dft
 
     data_transforms = Compose([

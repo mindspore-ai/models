@@ -1,6 +1,6 @@
 # 目录 <!-- TOC -->
 
-- [目录](#目录)
+- [目录](#目录-)
 - [PvNet描述](#pvnet描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
@@ -11,9 +11,7 @@
 - [脚本说明](#脚本说明)
     - [脚本及样例代码](#脚本及样例代码)
     - [脚本参数](#脚本参数)
-    - [训练过程](#训练过程)
-        - [训练](#训练)
-        - [分布式训练](#分布式训练)
+        - [训练过程](#训练过程)
     - [评估过程](#评估过程)
         - [评估](#评估)
     - [导出过程](#导出过程)
@@ -23,9 +21,11 @@
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
-            - [LINEMOD上的PvNet](#LINEMOD上的pvnet)
+            - [LINEMOD上的PVNet](#linemod上的pvnet)
+            - [](#)
         - [推理性能](#推理性能)
-            - [LINEMOD上的PvNet](#LINEMOD上的pvnet)
+            - [LINEMOD上的PvNet](#linemod上的pvnet-1)
+    - [性能说明](#性能说明)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
 
@@ -319,16 +319,16 @@ python export.py
 
 在进行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
 
-- 在昇腾310上使用LINEMOD数据集进行推理
+- 使用LINEMOD数据集进行推理
 
   在执行下面的命令之前，我们需要先修改配置文件。修改的项包括cls_name,eval_dataset和result_path。
 
   推理的结果保存在scripts目录下，在postprocess.log日志文件中可以找到类似以下的结果。
 
   ```shell
-  # Ascend310 inference
-  bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [CLS_NAME] [DEVICE_ID]
-  # example:bash scripts/run_infer_310.sh ./can.mindir ./LINEMOD/can/JPEGImages/ can 0
+  # Run inference
+  bash scripts/run_infer_cpp.sh [MODEL_PATH] [DATA_PATH] [CLS_NAME] [DEVICE_TYPE] [DEVICE_ID]
+  # example:bash scripts/run_infer_cpp.sh ./can.mindir ./LINEMOD/can/JPEGImages/ can Ascend 0
   Processing object:can, 2D projection error:0.9960629921259843, ADD:0.8622047244094488
   ```
 

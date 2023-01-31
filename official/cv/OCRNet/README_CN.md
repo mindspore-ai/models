@@ -24,7 +24,7 @@
         - [结果](#结果-1)
     - [推理过程](#推理过程)
         - [导出MindIR](#导出mindir)
-        - [在Ascend310执行推理](#在ascend310执行推理)
+        - [执行推理](#执行推理)
         - [结果](#结果-2)
 - [模型描述](#模型描述)
     - [性能](#性能)
@@ -393,16 +393,17 @@ Total number of images:  500
 python export.py --device_id [DEVICE_ID] --checkpoint_file [CKPT_PATH] --file_name [FILE_NAME] --file_format MINDIR --device_target Ascend
 ```
 
-### 在Ascend310执行推理
+### 执行推理
 
 在执行推理之前，必须先通过`export.py`脚本到本mindir文件。以下展示了使用mindir模型执行推理的示例。目前只支持Cityscapes数据集batchsize为1的推理。
 
 ```bash
-bash scripts/ascend310_inference.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+bash scripts/run_cpp_infer.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `MINDIR_PATH` mindir文件的存储路径
 - `DATA_PATH` Cityscapes原始数据集的存储路径
+- `DEVICE_TYPE` 可以为Ascend, GPU, 或CPU。
 - `DEVICE_ID` 卡号
 
 脚本内部分为三步：

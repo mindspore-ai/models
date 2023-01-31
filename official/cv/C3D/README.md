@@ -12,19 +12,23 @@
     - [Training Process](#training-process)
         - [Training](#training)
             - [Training on Ascend](#training-on-ascend)
+            - [Training on GPU](#training-on-gpu)
         - [Distributed Training](#distributed-training)
             - [Distributed training on Ascend](#distributed-training-on-ascend)
+            - [Distributed training on GPU](#distributed-training-on-gpu)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
-            - [Evaluating on Ascend](#training-on-ascend)
+            - [Evaluating on Ascend](#evaluating-on-ascend)
+            - [Evaluating on GPU](#evaluating-on-gpu)
+            - [Evaluating on GPU(Onnx)](#evaluating-on-gpuonnx)
     - [Inference Process](#inference-process)
-        - [Export MindIR](#export-mindir)
-        - [Infer on Ascend310](#infer-on-ascend310)
+        - [Export AIR, MINDIR, ONNX](#export-air-mindir-onnx)
+        - [Infer](#infer)
         - [result](#result)
     - [Model Description](#model-description)
         - [Performance](#performance)
             - [Evaluation Performance](#evaluation-performance)
-    - [Description of Random Situation](#description-of-random-situation)
+- [Description of Random Situation](#description-of-random-situation)
     - [ModelZoo Homepage](#modelzoo-homepage)
 
 ## [C3D Description](#contents)
@@ -763,19 +767,19 @@ python export.py --ckpt_file [CKPT_PATH] --mindir_file_name [FILE_NAME] --file_f
 - `NUM_CLASSES` Number of total classes in the dataset, 51 for HMDB51 and 101 for UCF101.
 - `BATCH_SIZE` Since currently mindir does not support dynamic shapes, this network only supports inference with batch_size of 1, for ONNX export, set BATCH_SIZE = 1.
 
-### Infer on Ascend310
+### Infer
 
 **Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
 Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATASET] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET] [NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `DATASET` must be 'HMDB51' or 'UCF101'.
 - `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'.
+- `DEVICE_TYPE` can choose from [Ascend, GPU, CPU].
 - `DEVICE_ID` is optional, default value is 0.
 
 ### result
