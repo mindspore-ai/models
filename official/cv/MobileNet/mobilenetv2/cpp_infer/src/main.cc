@@ -84,8 +84,9 @@ int main(int argc, char **argv) {
       Execute composeDecode({decode, resize});
       auto imgDvpp = std::make_shared<MSTensor>();
       composeDecode(ReadFileToTensor(all_files[i]), imgDvpp.get());
-      inputs.emplace_back(imgDvpp->Name(), imgDvpp->DataType(), imgDvpp->Shape(), imgDvpp->Data().get(),
-                          imgDvpp->DataSize());
+      std::vector<MSTensor> model_inputs = model.GetInputs();
+      inputs.emplace_back(model_inputs[0].Name(), model_inputs[0].DataType(), model_inputs[0].Shape(),
+                          imgDvpp->Data().get(), imgDvpp->DataSize());
     } else {
       std::shared_ptr<TensorTransform> decode(new Decode());
       std::shared_ptr<TensorTransform> hwc2chw(new HWC2CHW());
