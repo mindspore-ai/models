@@ -13,16 +13,21 @@
 # limitations under the License.
 # ============================================================================
 """hub config."""
-from src.resnet import resnet50, resnet101, se_resnet50, resnet18
+from src.resnet import resnet50, resnet101, se_resnet50, resnet18, resnet152, \
+resnet34
 
 def create_network(name, *args, **kwargs):
     """create_network about resnet"""
     if name == 'resnet18':
         return resnet18(*args, **kwargs)
+    if name == 'resnet34':
+        return resnet34(*args, **kwargs)
     if name == 'resnet50':
         return resnet50(*args, **kwargs)
     if name == 'resnet101':
         return resnet101(*args, **kwargs)
     if name == 'se_resnet50':
         return se_resnet50(*args, **kwargs)
+    if name == 'resnet152':
+        return resnet152(*args, **kwargs)
     raise NotImplementedError(f"{name} is not implemented in the repo")
