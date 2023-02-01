@@ -63,7 +63,7 @@ run_ascend() {
   cd ./eval || exit
   env >env.log
   echo "start evaluation for device $DEVICE_ID"
-  python eval.py --eval_dataset=$DATASET_NAME --eval_dataset_path=$1 --checkpoint_path=$2 --device_target=Ascend> log.txt 2>&1 &
+  python eval.py --eval_dataset=$DATASET_NAME --eval_dataset_path=$PATH1 --checkpoint_path=$PATH2 --device_target=Ascend> log.txt 2>&1 &
   cd ..
 }
 
@@ -78,8 +78,8 @@ run_gpu() {
   cd ./eval || exit
   env >env.log
   python eval.py --eval_dataset=$DATASET_NAME \
-                 --eval_dataset_path=$1 \
-                 --checkpoint_path=$2 \
+                 --eval_dataset_path=$PATH1 \
+                 --checkpoint_path=$PATH2 \
                  --device_target=GPU > log.txt 2>&1 &
   cd ..
 }

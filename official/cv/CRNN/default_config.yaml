@@ -1,4 +1,4 @@
-# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unlesee you know exactly what you are doing)
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
 enable_modelarts: False
 # url for modelarts
 data_url: ""
@@ -24,7 +24,7 @@ train_dataset: "synth"
 max_text_length: 23
 image_width: 100
 image_height: 32
-batch_size: 64
+batch_size: 16
 epoch_size: 10
 hidden_size: 256
 learning_rate: 0.02
@@ -48,6 +48,8 @@ eval_all_saved_ckpts: False
 save_best_ckpt: True
 eval_start_epoch: 5
 eval_interval: 1
+resume_ckpt: ""
+train_start_epoch: 0
 
 # ======================================================================================
 # Eval options
@@ -95,3 +97,5 @@ checkpoint_path: "checkpoint file path, default is None"
 ann_file: "ann file."
 result_path: "image file path."
 dataset: "choices=['ic03', 'ic13', 'svt', 'iiit5k']"
+resume_ckpt: "a checkpoint file"
+

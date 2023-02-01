@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 4 ] && [ $# != 3 ]; then
-  echo "Usage: bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [DEVICE_ID] [PLATFORM](optional)"
+if [[ $# -lt 3 || $# -gt 5 ]]; then
+  echo "Usage: bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [DEVICE_ID] [PLATFORM](optional) [RESUME_CKPT](optional for resume)"
   exit 1
 fi
 
@@ -41,6 +41,15 @@ if [ ! -d $PATH1 ]; then
   exit 1
 fi
 
+if [ $# == 5 ]; then
+  RESUME_CKPT=$(get_real_path $5)
+  if [ ! -f $RESUME_CKPT ]; then
+    echo "error: RESUME_CKPT=$RESUME_CKPT is not a file"
+    exit 1
+  fi
+  echo $RESUME_CKPT
+fi
+
 run_ascend() {
   ulimit -u unlimited
   export DEVICE_NUM=1
@@ -49,13 +58,15 @@ run_ascend() {
 
   echo "start training for device $DEVICE_ID"
   env >env.log
-  python train.py --train_dataset=$DATASET_NAME --train_dataset_path=$1 --device_target=Ascend > log.txt 2>&1 &
+  python train.py --train_dataset=$DATASET_NAME --train_dataset_path=$PATH1 --device_target=Ascend \
+                  --resume_ckpt=$RESUME_CKPT > log.txt 2>&1 &
   cd ..
 }
 
 run_gpu() {
   env >env.log
-  python train.py --train_dataset=$DATASET_NAME --train_dataset_path=$1 --device_target=GPU  > log.txt 2>&1 &
+  python train.py --train_dataset=$DATASET_NAME --train_dataset_path=$PATH1 --device_target=GPU \
+                  --resume_ckpt=$RESUME_CKPT > log.txt 2>&1 &
   cd ..
 }
 
