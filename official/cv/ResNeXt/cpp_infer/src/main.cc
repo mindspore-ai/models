@@ -80,8 +80,9 @@ int main(int argc, char **argv) {
       auto imgDvpp = std::make_shared<MSTensor>();
       SingleOp(ReadFileToTensor(all_files[i][j]), imgDvpp.get());
 
-      inputs.emplace_back(imgDvpp->Name(), imgDvpp->DataType(), imgDvpp->Shape(), imgDvpp->Data().get(),
-                          imgDvpp->DataSize());
+      std::vector<MSTensor> model_inputs = model.GetInputs();
+      inputs.emplace_back(model_inputs[0].Name(), model_inputs[0].DataType(), model_inputs[0].Shape(),
+                          imgDvpp->Data().get(), imgDvpp->DataSize());
       gettimeofday(&start, nullptr);
       ret = model.Predict(inputs, &outputs);
       gettimeofday(&end, nullptr);
