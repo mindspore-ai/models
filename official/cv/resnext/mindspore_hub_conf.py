@@ -16,7 +16,8 @@
 from src.image_classification import get_network
 
 def create_network(name, *args, **kwargs):
-    if name != "renext50":
-        raise NotImplementedError(f"{name} is not implemented in the repo")
-    net = get_network(*args, **kwargs)
-    return net
+    if name == "resnext50":
+        return get_network("resnext50", *args, **kwargs)
+    if name == "resnext101":
+        return get_network("resnext101", *args, **kwargs)
+    raise NotImplementedError(f"{name} is not implemented in the repo")
