@@ -214,7 +214,7 @@ mv wn_concept2vec.txt nell_concept2vec.txt data/KB_embeddings
 
   ```bash
   cd data
-  wget https://bert-models.bj.bcebos.com/cased_L-24_H-1024_A-16.tar.gz --no-check-certificate
+  wget https://storage.googleapis.com/bert_models/2018_10_18/cased_L-24_H-1024_A-16.zip --no-check-certificate
   tar xvf cased_L-24_H-1024_A-16.tar.gz
   ```
 

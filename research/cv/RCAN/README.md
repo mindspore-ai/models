@@ -42,7 +42,7 @@
 - 数据集大小：约7.12GB，共900张图像
  - 训练集：800张图像
  - 测试集：100张图像
-- 基准数据集可下载如下：[Set5](http://people.rennes.inria.fr/Aline.Roumy/results/SR_BMVC12.html)、[Set14](https://deepai.org/dataset/set14-super-resolution)、[B100](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/bsds/)、[Urban100](http://vllab.ucmerced.edu/wlai24/LapSRN/)。
+- 基准数据集可下载如下：[Set5](http://people.rennes.inria.fr/Aline.Roumy/results/SR_BMVC12.html)、[Set14](https://deepai.org/dataset/set14-super-resolution)、[B100](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/bsds/)、[Urban100](https://github.com/jbhuang0604/SelfExSR)。
 - 数据格式：png文件
  - 注：数据将在src/data/DIV2K.py中处理。
  - 注：dir_data中需要指定数据集所在位置的上一层目录。
