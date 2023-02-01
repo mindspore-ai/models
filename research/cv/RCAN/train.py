@@ -48,7 +48,6 @@ def train():
         mox.file.copy_parallel(src_url=args.data_url, dst_url=local_data_url)
 
     train_dataset = DIV2K(args, name=args.data_train, train=True, benchmark=False)
-    train_dataset.set_scale(args.task_id)
     train_de_dataset = ds.GeneratorDataset(train_dataset, ["LR", "HR"], num_shards=device_num,
                                            shard_id=rank_id, shuffle=True)
     train_de_dataset = train_de_dataset.batch(args.batch_size, drop_remainder=True)
