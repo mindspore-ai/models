@@ -654,7 +654,7 @@ mAP: 0.3510553464069668
 | 评价指标     | IoU=0.50: 21.5%                                              |
 | 推理模型大小 | 88M(.ckpt file)                                              |
 | 参数文件     | ssd_mobilenet_v1_300_config_gpu.yaml                         |
-| 脚本链接     | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| 脚本链接     | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
 
 # 随机情况说明
 

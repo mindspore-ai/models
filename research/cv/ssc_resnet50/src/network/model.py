@@ -326,7 +326,6 @@ class ModelWithLossCellDis(nn.Cell):
         return index_add
 
     def compute_unsupervised_cross_entropy(self, probs, outputs):
-        # mask <https://www.mindspore.cn/docs/zh-CN/master/note/api_mapping/pytorch_diff/ArgMaxWithValue.html>
         _, scores = self.arg_max_value(probs)
         scores_com_thr = (scores >= self.thr)
         mask = self.cast(scores_com_thr, mindspore.float32)

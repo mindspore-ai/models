@@ -523,7 +523,7 @@ python xml2coco.py
 
 **迁移学习训练过程**
 
-从[Mindspore Hub](https://gitee.com/mindspore/models/tree/master/official/cv/yolov4#)下载预训练的ckpt，然后在finetune_cpu_default_config.yaml设置预训练模型的ckpt
+从[Mindspore Hub](https://www.mindspore.cn/resources/hub)下载预训练的ckpt，然后在finetune_cpu_default_config.yaml设置预训练模型的ckpt
 
 ```text
 pretrained_backbone=ckpt/cspdarknet53_ascend_v120_imagenet2012_official_cv_bs64_top1acc7854_top5acc9428.ckpt
@@ -675,7 +675,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 
 ## [推理过程](#目录)
 
-**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+**推理前需参照 [MindSpore C++推理部署指南](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) 进行环境变量设置。**
 
 ### 用法
 

@@ -68,8 +68,7 @@ PointRCNN 3D对象检测器以自下而上的方式从原始点云直接生成�
 │
 ```
 
-其中,ImgaeSets下的文件可以在[frustum-pointnet](https://gitee.com/mindspore/models/tree/master/research/cv/frustum-pointnet)的代码仓库中找到
-<https://gitee.com/mindspore/models/tree/master/research/cv/frustum-pointnet/kitti/image_sets>
+其中,ImgaeSets下的文件可以在[image_sets](https://github.com/charlesq34/frustum-pointnets/tree/master/kitti/image_sets)下载。
 
 # 环境要求
 
