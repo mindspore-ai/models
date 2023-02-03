@@ -23,7 +23,8 @@ include_directories(${MINDSPORE_PATH})
 include_directories(${MINDSPORE_PATH}/include)
 
 set(TOP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../..)
-include_directories(${TOP_DIR}/utils/cpp_infer/example)  # common_inc in top dir
+include_directories(${TOP_DIR}/utils/cpp_infer/example/)  # common_inc in top dir
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)  # common_inc in local dir
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../)  # common_inc in local dir
 include_directories(../third_party/src)
 
