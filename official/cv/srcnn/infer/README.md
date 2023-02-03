@@ -89,7 +89,7 @@ cd Srcnn_for_MindSpore_{version}_code/infer && dos2unix `find .`
 unzip ../../Srcnnt_for_MindSpore_{version}_model.zip
 ```
 
-4. 下载数据集Set5,下载链接Set5download url: http://vllab.ucmerced.edu/wlai24/LapSRN/results/SR_testing_datasets.zip
+4. 下载数据集Set5,下载链接Set5download url: https://gitee.com/a1085728420/srcnn-dataset
 
 ### 模型转换
 

@@ -47,7 +47,7 @@ The projection matrices for heads and tails are calculated from the head-relatio
 
 - [Paper TransE](https://proceedings.neurips.cc/paper/2013/file/1cecc7a77928ca8133fa24680a88d2f9-Paper.pdf)
   Translating Embeddings for Modeling Multi-relational Data（2013)
-- [Paper TransH](https://persagen.com/files/misc/wang2014knowledge.pdf)
+- [Paper TransH](http://pdfs.semanticscholar.org/2a3f/862199883ceff5e3c74126f0c80770653e05.pdf)
   Knowledge Graph Embedding by Translating on Hyperplanes（2014)
 - [Paper TransR (download)](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwicz7i6hvfzAhVEmYsKHR8qClYQFnoECAQQAQ&url=https%3A%2F%2Fwww.aaai.org%2Focs%2Findex.php%2FAAAI%2FAAAI15%2Fpaper%2Fdownload%2F9571%2F9523&usg=AOvVaw07cpMPMew9IF8Yn5iZDvCu)
   Learning Entity and Relation Embeddings for Knowledge Graph Completion（2015

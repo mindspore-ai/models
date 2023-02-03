@@ -59,9 +59,9 @@ SRCNN首先使用双三次(bicubic)插值将低分辨率图像放大成目标尺
 - 验证集
     - Set5: 5 images
     - Set14: 14 images
-        - Set5 & Set14 download url: [http://vllab.ucmerced.edu/wlai24/LapSRN/results/SR_testing_datasets.zip](https://gitee.com/link?target=http%3A%2F%2Fvllab.ucmerced.edu%2Fwlai24%2FLapSRN%2Fresults%2FSR_testing_datasets.zip)
+        - Set5 & Set14 download url: [https://gitee.com/a1085728420/srcnn-dataset](https://gitee.com/a1085728420/srcnn-dataset)
     - BSDS200: 200 images
-        - BSDS200 download url: [http://vllab.ucmerced.edu/wlai24/LapSRN/results/SR_training_datasets.zip](https://gitee.com/link?target=http%3A%2F%2Fvllab.ucmerced.edu%2Fwlai24%2FLapSRN%2Fresults%2FSR_training_datasets.zip)
+        - BSDS200 download url: [https://gitee.com/a1085728420/srcnn-dataset](https://gitee.com/a1085728420/srcnn-dataset)
 
 - 数据格式：RGB
 
