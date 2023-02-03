@@ -16,17 +16,17 @@ import os
 import argparse
 import datetime
 
-from mindspore.context import ParallelMode
-from mindspore.nn.optim.adam import Adam
+import mindspore as ms
+import mindspore.communication as comm
 from mindspore import Tensor, Model
 from mindspore import context
-import mindspore as ms
-from mindspore.train.loss_scale_manager import FixedLossScaleManager
-from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.common import set_seed
+from mindspore.context import ParallelMode
+from mindspore.nn.optim.adam import Adam
 from mindspore.profiler.profiling import Profiler
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, LossMonitor, TimeMonitor
+from mindspore.train.loss_scale_manager import FixedLossScaleManager
+from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 from src.util import AverageMeter, get_param_groups
 from src.east import EAST, EastWithLossCell
@@ -175,33 +175,16 @@ parser.add_argument(
     help='Trainning in modelArts or not, 1 for yes, 0 for no. Default: 0')
 
 args, _ = parser.parse_known_args()
-
+args.device_id = int(os.getenv("DEVICE_ID", "0"))
 args.rank = args.device_id
 
-# init distributed
+ms.set_context(mode=ms.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
 if args.is_distributed:
-    if args.device_target == "Ascend":
-        init("hccl")
-    else:
-        init("nccl")
-    args.group_size = get_group_size()
-    args.rank = get_rank()
-
-context.set_context(
-    mode=context.GRAPH_MODE,
-    device_target=args.device_target,
-    save_graphs=False,
-    device_id=args.rank,
-    enable_graph_kernel=True)
-
-# select for master rank save ckpt or all rank save, compatible for model
-# parallel
-args.rank_save_ckpt_flag = 0
-if args.is_save_on_master:
-    if args.rank == 0:
-        args.rank_save_ckpt_flag = 1
-else:
-    args.rank_save_ckpt_flag = 1
+    comm.init()
+    args.rank = comm.get_rank()
+    args.group_size = comm.get_group_size()
+    ms.set_auto_parallel_context(parallel_mode=ms.ParallelMode.DATA_PARALLEL, gradients_mean=True,
+                                 device_num=args.group_size)
 
 if args.is_modelArts:
     import moxing as mox
