@@ -51,4 +51,5 @@ fi
 python ./train.py  \
     --train_dataset_path=$TRAIN_DATA_DIR \
     --eval_dataset_path=$EVAL_DATA_DIR \
+    --device_id=$DEVICE_ID \
     --run_distribute=False > log.txt 2>&1 &
