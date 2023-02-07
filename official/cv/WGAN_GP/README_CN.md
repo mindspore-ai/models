@@ -113,7 +113,7 @@ WGAN-GP网络包含两部分，生成器网络和判别器网络。判别器网�
   'experiment': None, # 保存模型和生成图片的路径，若不指定，则使用默认路径
 
   # eval_config
-  'ckpt_file': None, # 训练时保存的生成器的权重文件.ckpt的路径，必须指定
+  'ckpt_file_path': None, # 训练时保存的生成器的权重文件.ckpt的路径，必须指定
   'output_dir': None, # 生成图片的输出路径，必须指定
   ```
 
@@ -145,7 +145,7 @@ WGAN-GP网络包含两部分，生成器网络和判别器网络。判别器网�
 
 - 在Ascend环境下评估
 
-  在运行以下命令之前，请检查用于推理的检查点和json文件路径，并设置输出图片的路径。
+  在运行以下命令之前，请检查用于推理的检查点和json文件路径，并设置输出图片的路径。 CKPT_FILE_PATH为WGAN-GP训练得到的检查点文件路径参数，OUTPUT_DIR为用户自定义的生成图片路径。
 
   ```bash
   bash run_eval.sh [DEVICE_ID] [CKPT_FILE_PATH] [OUTPUT_DIR]

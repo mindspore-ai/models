@@ -115,7 +115,7 @@ You can configure training parameters, evaluation parameters, and model export p
   'experiment': None, # Path for saving the model and generating the image. If this parameter is not specified, the default path is used.
 
   # eval_config
-  'ckpt_file': None, # Path for the generator weight file .ckpt saved during training, which must be specified.
+  'ckpt_file_path': None, # Path for the generator weight file .ckpt saved during training, which must be specified.
   'output_dir': None, # Output path for the generated image, which must be specified.
   ```
 
@@ -147,7 +147,7 @@ For details about configuration, see the `args.py`.
 
 - Evaluation on Ascend AI Processors
 
-  Before running the following command, check the checkpoint and JSON file path used for inference and set the path for the output images.
+  Before running the following command, check the checkpoint and JSON file path used for inference and set the path for the output images. CKPT_FILE_PATH is the path of trained WGAN-GP checkpoint file. OUTPUT_DIR is user-defined path for generated images.
 
   ```bash
   bash run_eval.sh [DEVICE_ID] [CKPT_FILE_PATH] [OUTPUT_DIR]
