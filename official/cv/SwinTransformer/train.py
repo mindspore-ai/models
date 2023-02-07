@@ -37,7 +37,8 @@ def main():
         1: context.PYNATIVE_MODE
     }
     context.set_context(mode=mode[args.graph_mode], device_target=args.device_target)
-    context.set_context(enable_graph_kernel=True)
+    if args.device_target == "GPU":
+        context.set_context(enable_graph_kernel=True)
     if args.device_target == "Ascend":
         context.set_context(enable_auto_mixed_precision=True)
     rank = set_device(args)
