@@ -47,7 +47,6 @@ def _grad_div(val, grad):
     ret = mul(grad, scale)
     return ret
 
-
 class TrainOneStepCellWithGradClip(Cell):
     """
     Network training package class.

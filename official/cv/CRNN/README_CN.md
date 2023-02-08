@@ -81,13 +81,13 @@ CRNN使用vgg16结构进行特征提取，附加两层双向LSTM，最后使用C
 
         ```shell
         # Ascend分布式训练示例
-        $ bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] Ascend [RANK_TABLE_FILE]
+        $ bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] Ascend [RANK_TABLE_FILE] [RESUME_CKPT]
 
         # Ascend评估示例
-        $ bash scripts/run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] Ascend
+        $ bash scripts/run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID] Ascend
 
         # Ascend单机训练示例
-        $ bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] Ascend
+        $ bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [DEVICE_ID] Ascend [RESUME_CKPT]
 
         # Ascend 310离线推理
         $ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE_PATH] [DATASET] [DEVICE_ID]
@@ -98,7 +98,7 @@ CRNN使用vgg16结构进行特征提取，附加两层双向LSTM，最后使用C
 
         ```shell
         # GPU分布式训练示例
-        $ bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] GPU
+        $ bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] GPU [RESUME_CKPT]
 
         # GPU评估示例
         $ bash scripts/run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] GPU
@@ -111,7 +111,7 @@ CRNN使用vgg16结构进行特征提取，附加两层双向LSTM，最后使用C
 
         ```shell
         # CPU单机训练示例
-        $ bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH]
+        $ bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH] [RESUME_CKPT]
 
         # CPU评估示例
         $ bash scripts/run_eval_cpu.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH]
@@ -189,13 +189,13 @@ crnn
 
 ```shell
 # Ascend或GPU分布式训练
-用法：bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM] [RANK_TABLE_FILE](if Ascend)
+用法：bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM] [RANK_TABLE_FILE](if Ascend) [RESUME_CKPT](optional for resume)
 
 # Ascend或GPU单机训练
-用法：bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM]
+用法：bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM] [RESUME_CKPT](optional for resume)
 
 # CPU单机训练
-用法：bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH]
+用法：bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH] [RESUME_CKPT](optional for resume)
 ```
 
 #### 参数配置
@@ -244,13 +244,13 @@ crnn
 - 运行`run_standalone_train.sh`进行CRNN模型的非分布式训练，目前支持Ascend和GPU。
 
     ``` bash
-    bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM](optional)
+    bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM](optional) [RESUME_CKPT](optional for resume)
     ```
 
 - 或者在CPU中运行`run_standalone_train_cpu.sh`进行CRNN模型的非分布式训练。
 
     ``` bash
-    bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH]
+    bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH] [RESUME_CKPT](optional for resume)
     ```
 
 #### [分布式训练](#目录)
@@ -258,7 +258,7 @@ crnn
 - 在Ascend或GPU上运行`run_distribute_train.sh`进行CRNN模型的分布式训练
 
     ``` bash
-    bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM] [RANK_TABLE_FILE](if Ascend)
+    bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM] [RANK_TABLE_FILE](if Ascend) [RESUME_CKPT](optional for resume)
     ```
 
     检查`train_parallel0/log.txt`，将得到以下输出：
@@ -321,6 +321,10 @@ crnn
     # （7）开始模型推理
     ```
 
+#### [断点续训练](#目录)
+
+- 如果想使用断点续训练功能，运行训练脚本时，[RESUME_CKPT]参数指定对应的checkpoint文件即可。
+
 ## [评估过程](#目录)
 
 ### [评估](#目录)
@@ -328,7 +332,7 @@ crnn
 - 运行`run_eval.sh`进行评估。
 
     ``` bash
-    bash scripts/run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] [PLATFORM](optional)
+    bash scripts/run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID] [PLATFORM](optional)
 
     bash scripts/run_eval_cpu.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH]
     ```
@@ -460,6 +464,18 @@ result CRNNAccuracy is: 0.806666666666
 | 输出            | ACC                        | ACC                        | ACC                        | ACC                        |
 | 准确率           | 80.8%                       | 79.7%                       | 81.92%                      | 80.2%                       |
 | 推理模型| 83M (.ckpt)           | 83M (.ckpt)           | 96M (.ckpt)           | 96M (.ckpt)           |
+
+| 参数         | IC13        |
+| ------------------- |-------------|
+| 模型版本      | V1.0        |
+| 资源           | Ascend 910  |
+| 上传日期      | 02/08/2023  |
+| MindSpore版本  | 2.0.0       |
+| 数据集            | SYNTH       |
+| batch_size          | 16          |
+| 输出            | ACC         |
+| 准确率           | 92.9%       |
+| 推理模型| 110.5M (.ckpt) |
 
 ## [随机情况说明](#目录)
 

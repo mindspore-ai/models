@@ -126,7 +126,7 @@ def create_dataset(name, dataset_path, batch_size=1, num_shards=1, shard_id=0, i
     elif name == 'ic03':
         dataset = IC03Dataset(dataset_path, "annotation.txt", config, True, 3)
     elif name == 'ic13':
-        dataset = IC13Dataset(dataset_path, "Challenge2_Test_Task3_GT.txt", config)
+        dataset = IC13Dataset(dataset_path, "gt.txt", config)
     elif name == 'svt':
         dataset = SVTDataset(dataset_path, config)
     elif name == 'iiit5k':

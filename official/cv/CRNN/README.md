@@ -81,13 +81,13 @@ We provide `convert_ic03.py`, `convert_iiit5k.py`, `convert_svt.py` as exmples f
 
         ```shell
         # distribute training example in Ascend
-        $ bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] Ascend [RANK_TABLE_FILE]
+        $ bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] Ascend [RANK_TABLE_FILE] [RESUME_CKPT]
 
         # evaluation example in Ascend
         $ bash scripts/run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID] Ascend
 
         # standalone training example in Ascend
-        $ bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [DEVICE_ID] Ascend
+        $ bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [DEVICE_ID] Ascend [RESUME_CKPT]
 
         # offline inference on Ascend310
         $ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE_PATH] [DATASET] [DEVICE_ID]
@@ -98,7 +98,7 @@ We provide `convert_ic03.py`, `convert_iiit5k.py`, `convert_svt.py` as exmples f
 
         ```shell
         # distribute training example in GPU
-        $ bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] GPU
+        $ bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] GPU [RESUME_CKPT]
 
         # evaluation example in GPU
         $ bash scripts/run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID] GPU
@@ -111,7 +111,7 @@ We provide `convert_ic03.py`, `convert_iiit5k.py`, `convert_svt.py` as exmples f
 
         ```shell
         # standalone training example in CPU
-        $ bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH]
+        $ bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH] [RESUME_CKPT]
 
         # evaluation example in CPU
         $ bash scripts/run_eval_cpu.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH]
@@ -189,13 +189,13 @@ crnn
 
 ```shell
 # distributed training in Ascend or GPU
-Usage: bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM] [RANK_TABLE_FILE](if Ascend)
+Usage: bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM] [RANK_TABLE_FILE](if Ascend) [RESUME_CKPT](optional for resume)
 
 # standalone training in Ascend or GPU
-Usage: bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [DEVICE_ID] [PLATFORM]
+Usage: bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [DEVICE_ID] [PLATFORM] [RESUME_CKPT](optional for resume)
 
 # standalone training in CPU
-Usage: bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH]
+Usage: bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH] [RESUME_CKPT](optional for resume)
 ```
 
 #### Parameters Configuration
@@ -244,13 +244,13 @@ Parameters for both training and evaluation can be set in default_config.yaml.
 - Run `run_standalone_train.sh` for non-distributed training of CRNN model, support Ascend and GPU now.
 
     ``` bash
-    bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [DEVICE_ID] [PLATFORM](optional)
+    bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [DEVICE_ID] [PLATFORM](optional) [RESUME_CKPT](optional for resume)
     ```
 
 - Or run `run_standalone_train_cpu.sh` for non-distributed training of CRNN model in CPU.
 
     ``` bash
-    bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH]
+    bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH] [RESUME_CKPT](optional for resume)
     ```
 
 #### [Distributed Training](#contents)
@@ -258,7 +258,7 @@ Parameters for both training and evaluation can be set in default_config.yaml.
 - Run `run_distribute_train.sh` for distributed training of CRNN model on Ascend or GPU
 
     ``` bash
-    bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM] [RANK_TABLE_FILE](if Ascend)
+    bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM] [RANK_TABLE_FILE](if Ascend) [RESUME_CKPT](optional for resume)
     ```
 
     Check the `train_parallel0/log.txt` and you will get outputs as following:
@@ -320,6 +320,10 @@ Parameters for both training and evaluation can be set in default_config.yaml.
     # The output path of the model "Output file path" and the log path of the model "Job log path"  。
     # (7) Start model inference。
     ```
+
+#### [Resume Training](#contents)
+
+- If you want to use the resume training function, you only need the checkpoint file added to [RESUME_CKPT] parameter.
 
 ## [Evaluation Process](#contents)
 
@@ -460,6 +464,18 @@ result CRNNAccuracy is: 0.806666666666
 | outputs             | ACC                         | ACC                         | ACC                         | ACC                         |
 | Accuracy            | 80.8%                       | 79.7%                       | 81.92%                      | 80.2%                       |
 | Model for inference | 83M (.ckpt file)            | 83M (.ckpt file)            | 96M (.ckpt file)            | 96M (.ckpt file)            |
+
+| Parameters          | IC13                        |
+| ------------------- |-----------------------------|
+| Model Version       | V1.0                        |
+| Resource            | Ascend 910                  |
+| Uploaded Date       | 02/08/2023 (month/day/year) |
+| MindSpore Version   | 2.0.0                       |
+| Dataset             | SYNTH                       |
+| batch_size          | 16                          |
+| outputs             | ACC                         |
+| Accuracy            | 92.9%                       |
+| Model for inference | 110.5M (.ckpt file)         |
 
 ## [Description of Random Situation](#contents)
 

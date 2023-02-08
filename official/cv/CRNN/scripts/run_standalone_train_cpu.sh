@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]; then
-  echo "Usage: bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH]"
+if [[ $# -lt 2 || $# -gt 3 ]]; then
+  echo "Usage: bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH] [RESUME_CKPT](optional for resume)"
   exit 1
 fi
 
@@ -38,6 +38,16 @@ fi
 if [ -d "train" ]; then
     rm -rf ./train
 fi
+
+if [ $# == 3 ]; then
+  RESUME_CKPT=$(get_real_path $3)
+  if [ ! -f $RESUME_CKPT ]; then
+    echo "error: RESUME_CKPT=$RESUME_CKPT is not a file"
+    exit 1
+  fi
+  echo $RESUME_CKPT
+fi
+
 WORKDIR=./train_cpu
 rm -rf $WORKDIR
 mkdir $WORKDIR
@@ -50,5 +60,6 @@ env >env.log
 python train.py --train_dataset=$DATASET_NAME \
                 --train_dataset_path=$PATH1 \
                 --device_target=CPU \
-                --model_version="V2" > log.txt 2>&1 &
+                --model_version="V2" \
+                --resume_ckpt=$RESUME_CKPT > log.txt 2>&1 &
 cd ..

@@ -22,6 +22,8 @@ from mindspore.context import ParallelMode
 from mindspore.nn.wrap import WithLossCell
 from mindspore.train.callback import TimeMonitor, LossMonitor, CheckpointConfig, ModelCheckpoint
 from mindspore.communication.management import init, get_group_size, get_rank
+from mindspore.train.serialization import load_param_into_net, load_checkpoint
+
 from src.loss import CTCLoss
 from src.dataset import create_dataset
 from src.crnn import crnn
@@ -31,6 +33,8 @@ from src.eval_callback import EvalCallBack
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.config import config
 from src.model_utils.device_adapter import get_rank_id, get_device_num, get_device_id
+from src.model_utils.callback import ResumeCallback
+from src.model_utils.lr_scheduler import cosine_decay_lr_with_start_step
 
 set_seed(1)
 
@@ -47,7 +51,6 @@ def apply_eval(eval_param):
 
 def modelarts_pre_process():
     pass
-
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train():
@@ -78,6 +81,10 @@ def train():
         device_num = 1
         rank = 0
 
+    if config.resume_ckpt:
+        resume_param = load_checkpoint(config.resume_ckpt, filter_prefix=['learning_rate', 'global_step'])
+        config.train_start_epoch = int(resume_param.get('epoch_num', 0).asnumpy().item())
+        print("train_start_epoch:", config.train_start_epoch)
     max_text_length = config.max_text_length
     # create dataset
     dataset = create_dataset(name=config.train_dataset, dataset_path=config.train_dataset_path,
@@ -87,20 +94,23 @@ def train():
     print("step_size:", step_size)
     # define lr
     lr_init = config.learning_rate
-    lr = nn.dynamic_lr.cosine_decay_lr(0.0, lr_init, config.epoch_size * step_size, step_size, config.epoch_size)
+    lr = cosine_decay_lr_with_start_step(0.0, lr_init, config.epoch_size * step_size, step_size,
+                                         config.epoch_size, config.train_start_epoch * step_size)
     loss = CTCLoss(max_sequence_length=config.num_step,
                    max_label_length=max_text_length,
                    batch_size=config.batch_size)
     net = crnn(config, full_precision=config.device_target != 'Ascend')
     opt = nn.SGD(params=net.trainable_params(), learning_rate=lr, momentum=config.momentum, nesterov=config.nesterov)
-
     net_with_loss = WithLossCell(net, loss)
     net_with_grads = TrainOneStepCellWithGradClip(net_with_loss, opt).set_train()
+    if config.resume_ckpt:
+        load_param_into_net(net_with_grads, resume_param)
     # define model
     model = Model(net_with_grads)
     # define callbacks
     callbacks = [LossMonitor(per_print_times=config.per_print_time),
-                 TimeMonitor(data_size=step_size)]
+                 TimeMonitor(data_size=step_size),
+                 ResumeCallback(start_epoch=config.train_start_epoch)]
     save_ckpt_path = os.path.join(config.save_checkpoint_path, 'ckpt_' + str(rank) + '/')
     if config.run_eval and rank == 0:
         if config.train_eval_dataset_path is None or (not os.path.isdir(config.train_eval_dataset_path)):
@@ -118,11 +128,13 @@ def train():
                                eval_all_saved_ckpts=config.eval_all_saved_ckpts, metrics_name="acc")
         callbacks += [eval_cb]
     if config.save_checkpoint and rank == 0:
+        ckpt_append_info = [{'epoch_num': 0}]
         config_ck = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_steps,
-                                     keep_checkpoint_max=config.keep_checkpoint_max)
+                                     keep_checkpoint_max=config.keep_checkpoint_max, append_info=ckpt_append_info)
         ckpt_cb = ModelCheckpoint(prefix="crnn", directory=save_ckpt_path, config=config_ck)
         callbacks.append(ckpt_cb)
-    model.train(config.epoch_size, dataset, callbacks=callbacks, dataset_sink_mode=config.device_target == 'Ascend')
+    model.train(config.epoch_size - config.train_start_epoch, dataset, callbacks=callbacks,
+                dataset_sink_mode=config.device_target == 'Ascend')
 
 
 if __name__ == '__main__':

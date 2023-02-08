@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 4 ] && [ $# != 3 ] && [ $# != 6 ] && [ $# != 5 ]; then
-  echo "Usage: sh run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM] [RANK_TABLE_FILE](if Ascend)"
+if [[ $# -lt 3 || $# -gt 5 ]]; then
+  echo "Usage: sh run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM] [RANK_TABLE_FILE](if Ascend) [RESUME_CKPT](optional for resume)"
   exit 1
 fi
 
@@ -39,6 +39,14 @@ if [ ! -d $PATH2 ]; then
   exit 1
 fi
 
+if [ $# == 5 ]; then
+  RESUME_CKPT=$(get_real_path $5)
+  if [ ! -f $RESUME_CKPT ]; then
+    echo "error: RESUME_CKPT=$RESUME_CKPT is not a file"
+    exit 1
+  fi
+  echo $RESUME_CKPT
+fi
 
 if [ "GPU" == $PLATFORM ]; then
   if [ -d "train" ]; then
@@ -54,7 +62,8 @@ if [ "GPU" == $PLATFORM ]; then
   echo "start distributed training with $DEVICE_NUM GPUs."
   env >env.log
   mpirun --allow-run-as-root -n $DEVICE_NUM --output-filename log_output --merge-stderr-to-stdout \
-    python train.py --train_dataset=$DATASET_NAME --train_dataset_path=$PATH2 --device_target=GPU --run_distribute=True > log.txt 2>&1 &
+    python train.py --train_dataset=$DATASET_NAME --train_dataset_path=$PATH2 --device_target=GPU \
+                    --run_distribute=True --resume_ckpt=$RESUME_CKPT > log.txt 2>&1 &
   cd ..
 elif [ "Ascend" == $PLATFORM ]; then
   PATH1=$(get_real_path $4)
@@ -77,7 +86,8 @@ elif [ "Ascend" == $PLATFORM ]; then
     cd ./train_parallel$i || exit
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     env >env.log
-    python train.py --train_dataset_path=$PATH2 --run_distribute=True --train_dataset=$DATASET_NAME > log.txt 2>&1 &
+    python train.py --train_dataset_path=$PATH2 --run_distribute=True --train_dataset=$DATASET_NAME \
+                    --resume_ckpt=$RESUME_CKPT > log.txt 2>&1 &
     cd ..
   done
 else
