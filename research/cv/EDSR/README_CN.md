@@ -275,7 +275,7 @@ EDSR是由多个优化后的residual blocks串联而成，相比原始版本的r
   keep_checkpoint_max: "最多保存多少个ckpt， defalue: 60"
   save_epoch_frq: "每隔多少epoch保存ckpt一次， defalue: 100"
   ckpt_save_dir: "保存的本地相对路径，根目录是output_path， defalue: ./ckpt/"
-  epoch_size: "训练多少个epoch， defalue: 6000"
+  epoch_size: "训练多少个epoch， defalue: 1000"
 
   eval_epoch_frq: "训练时每隔多少epoch执行一次验证，defalue: 20"
   self_ensemble: "验证时执行self_ensemble，仅在eval.py中使用， defalue: True"
