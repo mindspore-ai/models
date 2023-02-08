@@ -19,7 +19,7 @@ import cv2
 import numpy as np
 
 import mindspore.dataset as de
-from mindspore.communication.management import init, get_rank, get_group_size
+from mindspore.communication.management import get_rank, get_group_size
 
 from .augmemtation import preproc
 from .utils import bbox_encode
@@ -118,9 +118,8 @@ def create_dataset(data_dir, cfg, batch_size=32, repeat_num=1, shuffle=True, mul
     if cfg['name'] == 'ResNet50':
         device_num, rank_id = _get_rank_info()
     elif cfg['name'] == 'MobileNet025':
-        init("nccl")
-        rank_id = get_rank()
-        device_num = get_group_size()
+        rank_id = int(os.environ.get("RANK_ID", "0"))
+        device_num = int(os.environ.get("RANK_SIZE", "1"))
     if device_num == 1:
         de_dataset = de.GeneratorDataset(dataset, ["image", "annotation"],
                                          shuffle=shuffle,
