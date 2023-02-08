@@ -135,7 +135,8 @@ def train_with_mobilenet(cfg):
     if context.get_context("device_target") == "GPU":
         # Enable graph kernel
         context.set_context(enable_graph_kernel=True, graph_kernel_flags="--enable_parallel_fusion")
-    if cfg['ngpu'] > 1:
+    rank_size = int(os.environ.get("RANK_SIZE", "1"))
+    if rank_size > 1:
         init("nccl")
         context.set_auto_parallel_context(device_num=get_group_size(), parallel_mode=ParallelMode.DATA_PARALLEL,
                                           gradients_mean=True)
