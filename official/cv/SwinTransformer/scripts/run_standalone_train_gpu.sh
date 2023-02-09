@@ -29,7 +29,6 @@ cd ./train_gpu_alone || exit
 env > env.log
 
 python -u ../train.py \
-    --device_id=$DEVICE_ID \
     --device_target="GPU" \
     --swin_config=$CONFIG_PATH > log.txt 2>&1 &
 cd ../
