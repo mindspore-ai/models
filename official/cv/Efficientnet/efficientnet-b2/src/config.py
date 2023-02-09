@@ -20,7 +20,7 @@ from easydict import EasyDict as ed
 # config for efficientnet, imagenet2012.
 config_ascend = ed({
     "class_num": 1000,
-    "batch_size": 256,
+    "batch_size": 128,
     "loss_scale": 1024,
     "momentum": 0.9,
     "weight_decay": 1e-5,
