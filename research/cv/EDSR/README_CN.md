@@ -97,7 +97,7 @@ EDSR是由多个优化后的residual blocks串联而成，相比原始版本的r
 
 ## 混合精度
 
-采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html?highlight=%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
+采用[混合精度](https://mindspore.cn/tutorials/experts/zh-CN/r1.9/others/mixed_precision.html?highlight=%E6%B7%B7%E5%90%88%E7%B2%BE%E5%BA%A6)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
 以FP16算子为例，如果输入数据类型为FP32，MindSpore后台会自动降低精度来处理数据。用户可打开INFO日志，搜索“reduce precision”查看精度降低的算子。
 
 # 环境要求
@@ -275,7 +275,7 @@ EDSR是由多个优化后的residual blocks串联而成，相比原始版本的r
   keep_checkpoint_max: "最多保存多少个ckpt， defalue: 60"
   save_epoch_frq: "每隔多少epoch保存ckpt一次， defalue: 100"
   ckpt_save_dir: "保存的本地相对路径，根目录是output_path， defalue: ./ckpt/"
-  epoch_size: "训练多少个epoch， defalue: 6000"
+  epoch_size: "训练多少个epoch， defalue: 1000"
 
   eval_epoch_frq: "训练时每隔多少epoch执行一次验证，defalue: 20"
   self_ensemble: "验证时执行self_ensemble，仅在eval.py中使用， defalue: True"
