@@ -46,6 +46,9 @@ do
                 --run_distribute=$DISTRIBUTE \
                 --device_num=$RANK_SIZE \
                 --device_id=$DEVICE_ID \
+                --lr=2e-4 \
+                --epochs=300 \
+                --batch_size=256 \
                 --device_target="Ascend" > log.txt 2>&1 &
         fi
         cd ../
