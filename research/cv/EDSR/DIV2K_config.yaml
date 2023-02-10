@@ -16,7 +16,7 @@ loss_scale: 1000.0 # for ['O2', 'O3', 'auto']
 keep_checkpoint_max: 60
 save_epoch_frq: 100
 ckpt_save_dir: "./ckpt/"
-epoch_size: 6000
+epoch_size: 1000
 
 # eval options
 eval_epoch_frq: 20
@@ -88,7 +88,7 @@ loss_scale: "loss scale will be used except 'O0', default: 1000.0"
 keep_checkpoint_max: "max number of checkpoints to be saved,  defalue: 60"
 save_epoch_frq: "frequency to save checkpoint, defalue: 100"
 ckpt_save_dir: "the relative path to save checkpoint, root path is 'output_path', defalue: ./ckpt/"
-epoch_size: "the number of training epochs,  defalue: 6000"
+epoch_size: "the number of training epochs,  defalue: 1000"
 
 # eval options
 eval_epoch_frq: "frequency to evaluate model, defalue: 20"
