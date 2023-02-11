@@ -194,7 +194,7 @@ if __name__ == '__main__':
         init()
         context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
     else:
-        context.set_context(device_id=device_id)
+        context.set_context(device_id=device_id, mode=context.GRAPH_MODE)
 
     # define net
     net = mobilenet_v3_large(num_classes=config.num_classes)
