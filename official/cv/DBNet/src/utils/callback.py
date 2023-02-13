@@ -26,6 +26,15 @@ from .metric import AverageMeter
 from .eval_utils import WithEval
 
 
+class ResumeCallback(Callback):
+    def __init__(self, start_epoch_num=0):
+        super(ResumeCallback, self).__init__()
+        self.start_epoch_num = start_epoch_num
+
+    def on_train_epoch_begin(self, run_context):
+        run_context.original_args().cur_epoch_num += self.start_epoch_num
+
+
 class DBNetMonitor(Callback):
     """
     Monitor the result of DBNet.
@@ -41,7 +50,7 @@ class DBNetMonitor(Callback):
         ValueError: If per_print_times is not an integer or less than zero.
     """
 
-    def __init__(self, config, train_net, per_print_times=1):
+    def __init__(self, config, train_net, lr, per_print_times=1):
         super(DBNetMonitor, self).__init__()
         if not isinstance(per_print_times, int) or per_print_times < 0:
             raise ValueError("The argument 'per_print_times' must be int and >= 0, "
@@ -49,11 +58,12 @@ class DBNetMonitor(Callback):
         self._per_print_times = per_print_times
         self._last_print_time = 0
         self.config = config
-
+        self.lr = lr
         self.loss_avg = AverageMeter()
         self.rank_id = config.rank_id
         self.run_eval = config.run_eval
-        self.eval_iter = config.eval_iter
+        self.eval_interval = config.eval_interval
+        self.save_ckpt_dir = config.save_ckpt_dir
         if self.run_eval:
             config.backbone.pretrained = False
             eval_net = get_dbnet(config.net, config, isTrain=False)
@@ -63,12 +73,17 @@ class DBNetMonitor(Callback):
             self.max_f = 0.0
         self.train_net = train_net
         self.epoch_start_time = time.time()
-        self.checkout_path = config.output_dir
-        if not os.path.isdir(self.checkout_path) and self.config.rank_id == 0:
-            os.makedirs(self.checkout_path, exist_ok=True)
-        else:
-            print("WARNING: The checkpoint path is already exist. The saved checkpoint file may be overwritten.",
-                  flush=True)
+        self.step_start_time = time.time()
+        self.cur_steps = 0
+
+    def load_parameter(self):
+        param_dict = dict()
+        for name, param in self.train_net.parameters_and_names():
+            param_dict[name] = param
+        ms.load_param_into_net(self.eval_net.model, param_dict)
+
+    def on_train_step_begin(self, run_context):
+        self.step_start_time = time.time()
 
     def on_train_step_end(self, run_context):
         """
@@ -79,15 +94,15 @@ class DBNetMonitor(Callback):
         """
         cb_params = run_context.original_args()
         loss = cb_params.net_outputs
-
+        cur_epoch = cb_params.cur_epoch_num
         if cb_params.net_outputs is not None:
             if isinstance(loss, tuple):
                 if loss[1]:
-                    print("==========overflow!==========", flush=True)
+                    self.config.logger.info("==========overflow!==========")
                 loss = loss[0]
             loss = loss.asnumpy()
         else:
-            print("custom loss callback class loss is None.", flush=True)
+            self.config.logger.info("custom loss callback class loss is None.")
             return
 
         cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
@@ -97,14 +112,15 @@ class DBNetMonitor(Callback):
         self.loss_avg.update(loss)
 
         if isinstance(loss, float) and (np.isnan(loss) or np.isinf(loss)):
-            raise ValueError("epoch: {} step: {}. Invalid loss, terminating training.".format(
-                cb_params.cur_epoch_num, cur_step_in_epoch))
+            raise ValueError(
+                "epoch: {} step: {}. Invalid loss, terminating training.".format(cur_epoch, cur_step_in_epoch))
         if self._per_print_times != 0 and (cb_params.cur_step_num - self._last_print_time) >= self._per_print_times:
             self._last_print_time = cb_params.cur_step_num
-            loss_log = "[%s] rank%d epoch: %d step: %2d, loss is %.6f" % \
-                       (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())), self.config.rank_id,
-                        cb_params.cur_epoch_num, cur_step_in_epoch, np.mean(self.loss_avg.avg))
-            print(loss_log, flush=True)
+            loss_log = "epoch: [%s/%s] step: [%s/%s], loss: %.6f, lr: %.6f, per step time: %.3f ms" % (
+                cur_epoch, self.config.train.total_epochs, cur_step_in_epoch, self.config.steps_per_epoch,
+                np.mean(self.loss_avg.avg), self.lr[self.cur_steps], (time.time() - self.step_start_time) * 1000)
+            self.config.logger.info(loss_log)
+        self.cur_steps += 1
 
     def on_train_epoch_begin(self, run_context):
         """
@@ -122,33 +138,27 @@ class DBNetMonitor(Callback):
             run_context (RunContext): Include some information of the model.
         """
         cb_params = run_context.original_args()
+        loss = cb_params.net_outputs
         cur_epoch = cb_params.cur_epoch_num
-        epoch_time = (time.time() - self.epoch_start_time) * 1000
-        time_log = "[%s] rank%d epoch: %d cast %2f ms, per tep time: %2f ms" % \
-                   (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())), self.config.rank_id,
-                    cur_epoch, epoch_time, epoch_time / cb_params.batch_num)
-        print(time_log, flush=True)
-        train_net = self.train_net
-        if self.run_eval and cur_epoch % self.eval_iter == 0:
-            ms.save_checkpoint(train_net,
-                               os.path.join(self.checkout_path, f"cur_epoch_rank{self.config.rank_id}.ckpt"))
-            ms.load_checkpoint(os.path.join(self.checkout_path, f"cur_epoch_rank{self.config.rank_id}.ckpt"),
-                               self.eval_net.model)
-
+        epoch_time = (time.time() - self.epoch_start_time)
+        loss_log = "epoch: [%s/%s], loss: %.6f, epoch time: %.3f s, per step time: %.3f ms" % (
+            cur_epoch, self.config.train.total_epochs, loss[0].asnumpy(), epoch_time,
+            epoch_time * 1000 / self.config.steps_per_epoch)
+        self.config.logger.info(loss_log)
+        if self.run_eval and cur_epoch % self.eval_interval == 0:
+            self.load_parameter()
             self.eval_net.model.set_train(False)
             metrics, fps = self.eval_net.eval(self.val_dataset, show_imgs=self.config.eval.show_images)
 
             cur_f = metrics['fmeasure'].avg
-            print(f"\nrank{self.config.rank_id} current epoch is {cur_epoch}\n"
-                  f"FPS: {fps}\n"
-                  f"Recall: {metrics['recall'].avg}\n"
-                  f"Precision: {metrics['precision'].avg}\n"
-                  f"Fmeasure: {metrics['fmeasure'].avg}\n", flush=True)
-            if cur_f >= self.max_f:
-                print(f"update best ckpt at epoch {cur_epoch}, best fmeasure is {cur_f}\n", flush=True)
+            self.config.logger.info('current epoch is: %s \n FPS: %s \n Recall: %s \n Precision: %s \n Fmeasure: %s' % (
+                cur_epoch, fps, metrics['recall'].avg, metrics['precision'].avg, metrics['fmeasure'].avg))
+            if cur_f >= self.max_f and self.rank_id == 0:
+                self.config.logger.info('update best ckpt at epoch: %s, best fmeasure is: %s' % (cur_epoch, cur_f))
                 ms.save_checkpoint(self.eval_net.model,
-                                   os.path.join(self.checkout_path, f"best_rank{self.config.rank_id}.ckpt"))
+                                   os.path.join(self.save_ckpt_dir, f"best_rank{self.config.rank_id}.ckpt"))
                 self.max_f = cur_f
 
     def on_train_end(self, run_context):
-        print(f"rank{self.config.rank_id} best fmeasure is {self.max_f}", flush=True)
+        if self.rank_id == 0:
+            self.config.logger.info('best fmeasure is: %s' % self.max_f)

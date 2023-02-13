@@ -18,16 +18,16 @@ import sys
 
 import mindspore as ms
 from mindspore import nn
-
+from mindspore.train.callback import CheckpointConfig, ModelCheckpoint
 import src.modules.loss as loss
 from src.modules.model import get_dbnet, WithLossCell
-from src.utils.callback import DBNetMonitor
+from src.utils.callback import DBNetMonitor, ResumeCallback
 from src.utils.learning_rate import warmup_polydecay
 from src.utils.env import init_env
+from src.utils.logger import get_logger
 from src.datasets.load import create_dataset
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
-
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -46,16 +46,29 @@ def init_group_params(net, weight_decay):
     return group_params
 
 
+def set_default():
+    config.output_dir = os.path.join(config.output_dir, config.net, config.backbone.initializer)
+    config.save_ckpt_dir = os.path.join(config.output_dir, 'ckpt')
+    config.log_dir = os.path.join(config.output_dir, 'log')
+
+
 @moxing_wrapper()
 def train():
+    set_default()
     init_env(config)
+    config.logger = get_logger(config.log_dir, config.rank_id)
     train_dataset, steps_pre_epoch = create_dataset(config, True)
+    config.steps_per_epoch = steps_pre_epoch
 
-    ## Model
+    # Model
     net = get_dbnet(config.net, config, isTrain=True)
     if config.train.pretrained_ckpt:
         ms.load_checkpoint(net, config.train.pretrained_ckpt)
-        print("load pretrained checkpoint:", config.train.pretrained_ckpt)
+        config.logger.info("load pretrained checkpoint: %s", config.train.pretrained_ckpt)
+
+    if config.train.resume_ckpt:
+        resume_param = ms.load_checkpoint(config.train.resume_ckpt, filter_prefix=['learning_rate', 'global_step'])
+        config.train.start_epoch_num = int(resume_param.get('epoch_num', ms.Tensor(0, ms.int32)).asnumpy().item())
 
     lr = ms.Tensor(warmup_polydecay(base_lr=config.optimizer.lr.base_lr,
                                     target_lr=config.optimizer.lr.target_lr,
@@ -64,17 +77,17 @@ def train():
                                     start_epoch=config.train.start_epoch_num,
                                     steps_pre_epoch=steps_pre_epoch,
                                     factor=config.optimizer.lr.factor))
-    if config.optimizer.type == "sgd":
-        print("Use Momentum")
+    if config.optimizer.type == "momentum":
+        config.logger.info("Use Momentum")
         opt = nn.Momentum(params=init_group_params(net, config.optimizer.weight_decay),
                           learning_rate=lr,
                           momentum=config.optimizer.momentum)
     elif config.optimizer.type == "adam":
         if hasattr(nn.Adam, "use_amsgrad"):
-            print("Use amsgrad Adam")
+            config.logger.info("Use amsgrad Adam")
             opt = nn.Adam(net.trainable_params(), learning_rate=lr, use_amsgrad=True)
         else:
-            print("Use Adam")
+            config.logger.info("Use Adam")
             opt = nn.Adam(net.trainable_params(), learning_rate=lr)
     else:
         raise ValueError(f"Not support optimizer: {config.optimizer.type}")
@@ -89,11 +102,25 @@ def train():
     train_net = nn.TrainOneStepWithLossScaleCell(net_with_loss,
                                                  optimizer=opt,
                                                  scale_sense=nn.FixedLossScaleUpdateCell(1024.))
+
+    cb_default = list()
+    if config.rank_id == 0:
+        ckpt_append_info = [{'epoch_num': 0}]
+        ckpt_config = CheckpointConfig(save_checkpoint_steps=steps_pre_epoch,
+                                       keep_checkpoint_max=config.train.max_checkpoints, append_info=ckpt_append_info)
+        cb_default.append(ModelCheckpoint(config=ckpt_config, directory=config.save_ckpt_dir,
+                                          prefix=config.net + '-' + config.backbone.initializer))
+    if config.train.resume_ckpt:
+        ms.load_param_into_net(train_net, resume_param)
+        cb_default.append(ResumeCallback(config.train.start_epoch_num))
+        config.logger.info("Resume train from epoch: %s", config.train.start_epoch_num)
+    cb_default.append(DBNetMonitor(config, train_net, lr.asnumpy()))
     model = ms.Model(train_net)
-    model.train(config.train.total_epochs - config.train.start_epoch_num, train_dataset,
-                callbacks=[DBNetMonitor(config, train_net=train_net)],
+    config.logger.save_args(config)
+    model.train(config.train.total_epochs - config.train.start_epoch_num, train_dataset, callbacks=cb_default,
                 dataset_sink_mode=config.train.dataset_sink_mode)
+    config.logger.info("Train has completed.")
+
 
 if __name__ == '__main__':
     train()
-    print("Train has completed.")

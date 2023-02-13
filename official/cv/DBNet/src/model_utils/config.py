@@ -18,13 +18,15 @@
 import os
 import ast
 import argparse
-from pprint import pprint, pformat
+from pprint import pformat
 import yaml
+
 
 class Config:
     """
     Configuration namespace. Convert dictionary to members.
     """
+
     def __init__(self, cfg_dict):
         for k, v in cfg_dict.items():
             if isinstance(v, (list, tuple)):
@@ -89,7 +91,6 @@ def parse_yaml(yaml_path):
                 cfg, cfg_helper, cfg_choices = cfgs
             else:
                 raise ValueError("At most 3 docs (config, description for help, choices) are supported in config yaml")
-            print(cfg_helper)
         except:
             raise ValueError("Failed to parse yaml")
     return cfg, cfg_helper, cfg_choices
@@ -109,21 +110,38 @@ def merge(args, cfg):
     return cfg
 
 
+def over_cfg(default_cfg, cur_cfg):
+    assert isinstance(default_cfg, dict) and isinstance(cur_cfg, dict)
+    for key, _ in cur_cfg.items():
+        if not isinstance(cur_cfg[key], dict):
+            default_cfg[key] = cur_cfg[key]
+        else:
+            default_cfg[key] = over_cfg(default_cfg[key], cur_cfg[key])
+
+    return default_cfg
+
+
 def get_config():
     """
     Get Config according to the yaml file and cli arguments.
     """
     parser = argparse.ArgumentParser(description="default name", add_help=False)
     current_dir = os.path.dirname(os.path.abspath(__file__))
+    parser.add_argument("--base_config_path", type=str,
+                        default=os.path.join(current_dir, "../../config//config_base.yaml"), help="Config file path")
     parser.add_argument("--config_path", type=str,
-                        default=os.path.join(current_dir, "../../config/dbnet/config_resnet18_1p.yaml"),
+                        default=os.path.join(current_dir, "../../config/dbnet++/config_resnet50_8p.yaml"),
                         help="Config file path")
     path_args, _ = parser.parse_known_args()
-    default, helper, choices = parse_yaml(path_args.config_path)
-    args = parse_cli_to_yaml(parser=parser, cfg=default, helper=helper, choices=choices, cfg_path=path_args.config_path)
-    final_config = merge(args, default)
-    pprint(final_config)
+    default, helper, choices = parse_yaml(path_args.base_config_path)
+    cur_default, _, _ = parse_yaml(path_args.config_path)
+    final_default = over_cfg(default, cur_default)
+
+    args = parse_cli_to_yaml(parser=parser, cfg=final_default, helper=helper, choices=choices,
+                             cfg_path=path_args.base_config_path)
+    final_config = merge(args, final_default)
     print("Please check the above information for the configurations", flush=True)
     return Config(final_config)
+
 
 config = get_config()

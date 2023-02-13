@@ -91,6 +91,7 @@ def resize(img, polys=None, denominator=32, isTrain=True):
 
 class IC15DataLoader():
     """IC15 DataLoader"""
+
     def __init__(self, config, isTrain=True):
         self.RGB_MEAN = np.array([122.67891434, 116.66876762, 104.00698793])
         self.config = config
@@ -102,33 +103,12 @@ class IC15DataLoader():
                                        config.train.shrink_ratio)
         self.mb = MakeBorderMap(config.train.shrink_ratio,
                                 config.train.thresh_min, config.train.thresh_max)
+        self.img_dir = config.train.img_dir if isTrain else config.eval.img_dir
+        self.gt_dir = config.train.gt_dir if isTrain else config.eval.gt_dir
 
-        if isTrain:
-            img_paths = glob.glob(os.path.join(config.train.img_dir,
-                                               '*' + config.train.img_format))
-        else:
-            img_paths = glob.glob(os.path.join(config.eval.img_dir,
-                                               '*' + config.eval.img_format))
-
-        if self.isTrain:
-            img_dir = config.train.gt_dir
-            if config.dataset.is_icdar2015:
-                gt_paths = [os.path.join(img_dir, img_path.split('/')[-1].split('.')[0] + '.jpg.txt')
-                            for img_path in img_paths]
-            else:
-                gt_paths = [os.path.join(img_dir, img_path.split('/')[-1].split('.')[0] + '.txt')
-                            for img_path in img_paths]
-        else:
-            img_dir = config.eval.gt_dir
-            if config.dataset.is_icdar2015:
-                gt_paths = [os.path.join(img_dir, 'gt_' + img_path.split('/')[-1].split('.')[0] + '.txt')
-                            for img_path in img_paths]
-            else:
-                gt_paths = [os.path.join(img_dir, img_path.split('/')[-1].split('.')[0] + '.txt')
-                            for img_path in img_paths]
-
-        self.img_paths = img_paths
-        self.gt_paths = gt_paths
+        self.img_paths = glob.glob(os.path.join(self.img_dir, '*' + str(config.train.img_format)))
+        self.gt_paths = [os.path.join(self.gt_dir, 'gt_' + img_path.split('/')[-1].split('.')[0] + '.txt') for img_path
+                         in self.img_paths]
 
     def __len__(self):
         return len(self.img_paths)
@@ -164,10 +144,10 @@ class IC15DataLoader():
         # Show Images
         if self.config.dataset.is_show:
             cv2.imwrite('./images/img.jpg', img)
-            cv2.imwrite('./images/gt.jpg', gt[0]*255)
-            cv2.imwrite('./images/gt_mask.jpg', gt_mask*255)
-            cv2.imwrite('./images/thresh_map.jpg', thresh_map*255)
-            cv2.imwrite('./images/thresh_mask.jpg', thresh_mask*255)
+            cv2.imwrite('./images/gt.jpg', gt[0] * 255)
+            cv2.imwrite('./images/gt_mask.jpg', gt_mask * 255)
+            cv2.imwrite('./images/thresh_map.jpg', thresh_map * 255)
+            cv2.imwrite('./images/thresh_mask.jpg', thresh_mask * 255)
 
         # Random Colorize
         if self.isTrain and self.config.train.is_transform:

@@ -72,19 +72,19 @@ GPU v100 PCIE 32G 8卡；系统： Ubuntu 18.04；内存：502 G；x86 72核 CPU
 单卡训练：
 
 ```shell
-bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [LOG_NAME](optional)
+bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [PLATFORM]
 ```
 
 多卡训练：
 
 ```shell
-bash run_distribution_train.sh [DEVICE_NUM] [CONFIG_PATH] [LOG_NAME](optional)
+bash run_distribution_train_ascend.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
 ```
 
 推理评估：
 
 ```shell
-bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID] [LOG_NAME](optional)
+bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
 ```
 
 如需修改device或者其他配置，请对应修改配置文件里的对应项。
@@ -94,26 +94,30 @@ bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID] [LOG_NAME](optional)
 ### 单卡训练
 
 ```shell
-bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [LOG_NAME](optional)
+bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [PLATFORM]
 # CONFIG_PATH：配置文件路径，默认使用Ascend，如需修改请在config文件里修改 device_target
 # DEVICE_ID：执行训练使用的卡号
-# LOG_NAME: 保存日志和输出文件夹的名字，默认是standalone_train
+# PLATFORM: Ascend/GPU/CPU
 ```
 
-执行上述命令将在后台运行，您可以通过[LOG_NAME].txt文件查看结果。
+执行上述命令将在后台运行，您可以通过train/log.txt文件查看结果。
 
-训练结束后，您可在[LOG_NAME]对应路径下找到checkpoint文件。
+训练结束后，您可在outputs对应路径下找到checkpoint文件。
 
 ### 分布式训练
 
 ```shell
-bash run_distribution_train.sh [DEVICE_NUM] [CONFIG_PATH] [LOG_NAME](optional)
+bash run_distribution_train.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
+# RANK_TABLE_FILE: 构建分布式环境json文件
 # DEVICE_NUM：执行训练使用的卡数
 # CONFIG_PATH：配置文件路径，默认使用Ascend，如需修改请在config文件里修改 device_target
-# LOG_NAME: 保存日志和输出文件夹的名字，默认是distribution_train
 ```
 
-执行上述命令将在后台运行，您可以通过[LOG_NAME].txt文件查看结果。
+执行上述命令将在后台运行，您可以通过train_parallel0/log.txt文件查看结果。
+
+## 断点训练
+
+如果想使用断点训练功能，只需要在config文件resume_ckpt加入需要继续训练的ckpt路径训练即可。
 
 ### ModelArts 上训练
 
@@ -130,13 +134,12 @@ bash run_distribution_train.sh [DEVICE_NUM] [CONFIG_PATH] [LOG_NAME](optional)
 ### 推理评估
 
 ```shell
-bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID] [LOG_NAME](optional)
+bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
 # CONFIG_PATH：配置文件路径，默认使用Ascend，如需修改请在config文件里修改 device_target
 # DEVICE_ID：执行推理使用的卡号
-# LOG_NAME: 保存日志和输出文件夹的名字，默认是eval
 ```
 
-执行上述python命令将在后台运行，您可以通过[LOG_NAME].txt文件查看结果。
+执行上述python命令将在后台运行，您可以通过eval/log.txt文件查看结果。
 
 ## 离线推理
 
@@ -146,7 +149,7 @@ bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID] [LOG_NAME](optional)
 python export.py --config_path=[CONFIG_PATH] --ckpt_path=[CKPT_PATH]
 ```
 
-将在配置文件里`output_dir`对应路径下找到对应MINDIR文件。
+将在当前路径下找到对应MINDIR文件。
 
 ### 310推理
 

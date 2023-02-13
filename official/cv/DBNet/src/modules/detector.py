@@ -156,17 +156,15 @@ class SegDetector(nn.Cell):
         # this is the pred module, not binarization module;
         # We do not correct the name due to the trained model.
         binary = self.binarize(fuse)
-
-        pred = {}
-        pred['binary'] = binary
-
         if self.adaptive and self.training:
+            pred = dict()
+            pred['binary'] = binary
             thresh = self.thresh(fuse)
-
             pred['thresh'] = thresh
             pred['thresh_binary'] = self.step_function(binary, thresh)
+            return pred
 
-        return pred
+        return binary
 
     def step_function(self, x, y):
         """Get the binary graph through binary and threshold."""

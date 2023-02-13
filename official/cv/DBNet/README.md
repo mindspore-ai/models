@@ -70,19 +70,19 @@ GPU v100 PCIE 32G 8 devices; Operating system: Ubuntu 18.04; Memory: 502 G; x86 
 Run standalone:
 
 ```shell
-bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [LOG_NAME](optional)
+bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [PLATFORM]
 ```
 
 Run distribution:
 
 ```shell
-bash run_distribution_train.sh [DEVICE_NUM] [CONFIG_PATH] [LOG_NAME](optional)
+bash run_distribution_train_ascend.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
 ```
 
 Evaluation:
 
 ```shell
-bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID] [LOG_NAME](optional)
+bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
 ```
 
 If you need to modify the device or other configurations, please modify the corresponding items in the configuration file.
@@ -92,26 +92,30 @@ If you need to modify the device or other configurations, please modify the corr
 ### Run standalone train
 
 ```shell
-bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [LOG_NAME](optional)
-# CONFIG_PATH: The configuration file path, device target default is Ascend. If you need to modify it, please modify the device in the config file.
-# DEVICE_ID: Device id used for training
-# LOG_NAME: The name of the saved log and output folder. The default is standalone_train
+bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [PLATFORM]
+# CONFIG_PATH：The configuration file path is Ascend by default. If you need to modify it, please modify the device_target
+# DEVICE_ID：Card number used for training
+# PLATFORM: Ascend/GPU/CPU
 ```
 
-Executing the above command will run in the background. You can view the results through the [LOG_NAME].txt file
+Executing the above command will run in the background. You can view the results through the train/log.txt file
 
-After the training, you can find the checkpoint file in [LOG_NAME].
+After the training, you can find the checkpoint file in outputs.
 
 ### Run distribution train
 
 ```shell
-bash run_distribution_train.sh [DEVICE_NUM] [CONFIG_PATH] [LOG_NAME](optional)
-# DEVICE_NUM: Device number used for training.
-# CONFIG_PATH: The configuration file path, device target default is Ascend. If you need to modify it, please modify the device in the config file.
-# LOG_NAME: The name of the saved log and output folder. The default is distribution_train
+bash run_distribution_train.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
+# RANK_TABLE_FILE: Build a distributed environment json file
+# DEVICE_NUM：Number of cards used for training
+# CONFIG_PATH：The configuration file path is Ascend by default. If you need to modify it, please modify the device_target
 ```
 
 Executing the above command will run in the background. You can view the results through the [LOG_NAME].txt file.
+
+## resume train
+
+If you want to use the resume training function, you only need to resume in the config file_ Ckpt can be added to the ckpt path training that needs to continue training.
 
 ### ModelArts
 
@@ -128,10 +132,9 @@ Executing the above command will run in the background. You can view the results
 ### evaluation
 
 ```shell
-bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID] [LOG_NAME](optional)
+bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
 # CONFIG_PATH: The configuration file path, device target default is Ascend. If you need to modify it, please modify the device in the config file.
 # DEVICE_ID: Device id used for training
-# LOG_NAME: The name of the saved log and output folder. The default is eval
 ```
 
 Executing the above command will run in the background. You can view the results through the [LOG_NAME].txt file.
@@ -144,7 +147,7 @@ Executing the above command will run in the background. You can view the results
 python export.py --config_path=[CONFIG_PATH] --ckpt_path=[CKPT_PATH]
 ```
 
-You can find the MINDIR file in `output_dir` in config file.
+You can find the MINDIR file in current path.
 
 ### 310 Inference
 
