@@ -74,7 +74,7 @@ def load_model(args_opt):
     context.set_context(save_graphs=False,
                         mode=context.GRAPH_MODE,
                         device_target=args_opt.device_target)
-    context.set_context(variable_memory_max_size="30GB")
+    context.set_context(max_device_memory="30GB")
     # Set parallel context
     rank, device_num = set_auto_parallel_context(args_opt)
 
