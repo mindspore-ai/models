@@ -747,7 +747,16 @@ Please check the official [homepage](https://gitee.com/mindspore/models).
 - mindspore 1.9.0 or higher version
 - jieba 0.42.1
 - sentencepiece 0.1.94
+- mindformers 0.3
 - transformers >= 4.7.0
+
+Note: user can use following commands to download the mindformers:
+
+```shell
+git clone --branch r0.3 https://gitee.com/mindspore/mindformers.git
+cd mindformers
+python setup.py install
+```
 
 For Serving and flask server, extra requirements:
 

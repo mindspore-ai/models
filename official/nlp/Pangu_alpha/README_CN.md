@@ -717,12 +717,21 @@ python predict.py --enable_client --eval_task=$EVAL_TASK \
 - jieba 0.42.1
 - sentencepiece 0.1.94
 - transformers 4.7.0 or later
+- mindformers 0.3
 
 对于Serving和flask server，要求如下：
 
 - MindSpore Serving 1.3.0
 - flask-apscheduler 1.12.2
 - flask 1.1.2
+
+注意: 用户可以使用下述的命令来安装mindformers:
+
+```shell
+git clone --branch r0.3 https://gitee.com/mindspore/mindformers.git
+cd mindformers
+python setup.py install
+```
 
 # [FAQ](#目录)
 

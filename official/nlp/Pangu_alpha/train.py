@@ -33,9 +33,18 @@ import mindspore.common.dtype as mstype
 from mindspore.parallel import set_algo_parameters
 from mindspore.parallel._cost_model_context import _set_multi_subgraphs
 from mindspore.nn.wrap.cell_wrapper import PipelineCell, _VirtualDatasetCell, MicroBatchInterleaved
-from mindspore.nn.transformer import TransformerOpParallelConfig, CrossEntropyLoss, TransformerRecomputeConfig
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.serialization import load_distributed_checkpoint, load_checkpoint, load_param_into_net
+
+try:
+    from mindformers.common import CrossEntropyLoss
+    from mindformers.modules.transformer import TransformerOpParallelConfig, TransformerRecomputeConfig
+
+except ImportError as e:
+    print("Import ERROR, expect mindformers to be installed. "
+          "Please refer to the page https://gitee.com/mindspore/mindformers.git to install the mindformers.")
+    print("Now exit the program.")
+    exit(1)
 
 from src.adam import AdamWeightDecayOp
 from src.dataset import create_dataset
