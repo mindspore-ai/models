@@ -47,7 +47,7 @@ class ProgressMonitor(Callback):
     def step_end(self, run_context):
         cb_params = run_context.original_args()
         time_used = time.time() - self.step_start_time
-        cur_lr = self.reid_args.lrs[cb_params.cur_step_num]
+        cur_lr = self.reid_args.lrs[cb_params.cur_step_num - 1]
         fps_mean = self.reid_args.per_batch_size * self.reid_args.log_interval * self.reid_args.world_size / time_used
         self.reid_args.logger.info('epoch[{}], iter[{}], loss:{}, cur_lr:{:.6f}, mean_fps:{:.2f} imgs/sec'.format(
             self.reid_args.epoch_cnt, cb_params.cur_step_num, cb_params.net_outputs, cur_lr, fps_mean))

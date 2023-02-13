@@ -29,7 +29,7 @@ from src.NavierStokes.net import PINNs_navier
 
 class EvalCallback(Callback):
     """eval callback."""
-    def __init__(self, data_path, ckpt_dir, per_eval_epoch, num_neuron=20, eval_begin_epoch=10000):
+    def __init__(self, data_path, ckpt_dir, per_eval_epoch, num_neuron=20, eval_begin_epoch=1000):
         super(EvalCallback, self).__init__()
         if not isinstance(per_eval_epoch, int) or per_eval_epoch <= 0:
             raise ValueError("per_eval_epoch must be int and > 0")
@@ -105,6 +105,7 @@ def train_navier(epoch, lr, batch_size, n_train, path, noise, num_neuron, ck_pat
 
     model = Model(network=n, loss_fn=loss, optimizer=opt)
 
-    model.train(epoch=epoch, train_dataset=training_set,
-                callbacks=[LossMonitor(loss_print_num), ckpoint, TimeMonitor(1), eval_cb], dataset_sink_mode=True)
+    model.train(epoch=epoch // 10, train_dataset=training_set,
+                callbacks=[LossMonitor(loss_print_num), TimeMonitor(1), ckpoint, eval_cb], dataset_sink_mode=True,
+                sink_size=training_set.get_dataset_size() * 10)
     print('Training complete')

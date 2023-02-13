@@ -2,6 +2,7 @@ general:
     backend: mindspore
     parallel_search: True
     parallel_fully_train: True
+    ms_execute_mode: 1
 
 
 pipeline: [random, mutate, fully_train]
@@ -46,6 +47,7 @@ random:
         modules: ['custom']
         custom:
             type: AdelaideFastNAS
+            backbone_load_path: null
             backbone_out_sizes: [24, 32, 96, 320]
             op_names: [conv1x1, conv3x3, sep_conv_3x3, sep_conv_5x5, conv3x3_dil3, sep_conv_3x3_dil3, sep_conv_5x5_dil6]
             agg_size: 64
