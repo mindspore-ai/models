@@ -18,10 +18,12 @@ CURPATH="$(dirname "$0")"
 # shellcheck source=/dev/null
 . ${CURPATH}/cache_util.sh
 
-if [ $# != 2 ] && [ $# != 3 ] && [ $# != 4 ]
-then 
-    echo "Usage: bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)"
-    echo "bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)"
+if [ $# != 2 ] && [ $# != 3 ] && [ $# != 4 ] && [ $# != 5 ]
+then
+    echo "Usage: bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH]"
+    echo "Usage: bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)"
+    echo "Usage: bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)"
+    echo "Usage: bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional) [RESUME_CKPT](optional)"
 exit 1
 fi
 
@@ -37,13 +39,20 @@ PATH1=$(get_real_path $1)
 CONFIG_FILE=$(get_real_path $2)
 if [ $# == 3 ]
 then
-    PATH2=$(get_real_path $3)
+    RESUME_CKPT=$(get_real_path $3)
 fi
 
 if [ $# == 4 ]
 then
-  RUN_EVAL=$2
+  RUN_EVAL=$3
   EVAL_DATASET_PATH=$(get_real_path $4)
+fi
+
+if [ $# == 5 ]
+then
+  RUN_EVAL=$3
+  EVAL_DATASET_PATH=$(get_real_path $4)
+  RESUME_CKPT=$(get_real_path $5)
 fi
 
 if [ ! -d $PATH1 ]
@@ -52,9 +61,9 @@ then
 exit 1
 fi
 
-if [ $# == 3 ] && [ ! -f $PATH2 ]
+if [ $# == 3 ] && [ ! -f $RESUME_CKPT ]
 then
-    echo "error: PRETRAINED_CKPT_PATH=$PATH2 is not a file"
+    echo "error: RESUME_CKPT=$RESUME_CKPT is not a file"
 exit 1
 fi
 
@@ -71,6 +80,7 @@ then
 fi
 
 export DEVICE_NUM=1
+export DEVICE_ID=0
 export RANK_ID=0
 export RANK_SIZE=1
 
@@ -88,19 +98,30 @@ echo "start training for device $DEVICE_ID"
 env > env.log
 if [ $# == 2 ]
 then
-    python train.py  --data_path=$PATH1 --config_path=$CONFIG_FILE --output_path './output' &> log &
+    python train.py  --data_path=$PATH1 --config_path=$CONFIG_FILE --output_dir '../outputs' &> log.txt &
 fi
 
 if [ $# == 3 ]
 then
-    python train.py --data_path=$PATH1 --pre_trained=$PATH2 --config_path=$CONFIG_FILE --output_path './output' &> log &
+    python train.py --data_path=$PATH1 --resume_ckpt=$RESUME_CKPT --config_path=$CONFIG_FILE --output_dir '../outputs' &> log.txt &
 fi
 
 if [ $# == 4 ]
 then
     python train.py --data_path=$PATH1 --run_eval=$RUN_EVAL --eval_dataset_path=$EVAL_DATASET_PATH \
            --enable_cache=True --cache_session_id=$CACHE_SESSION_ID \
-           --config_path=$CONFIG_FILE --output_path './output' &> log &
+           --config_path=$CONFIG_FILE --output_dir '../outputs' &> log.txt &
+    if [ "x${RUN_EVAL}" == "xTrue" ]
+    then
+      echo -e "\nWhen training run is done, remember to shut down the cache server via \"cache_admin --stop\""
+    fi
+fi
+
+if [ $# == 5 ]
+then
+    python train.py --data_path=$PATH1 --run_eval=$RUN_EVAL --eval_dataset_path=$EVAL_DATASET_PATH \
+           --enable_cache=True --cache_session_id=$CACHE_SESSION_ID --resume_ckpt=$RESUME_CKPT \
+           --config_path=$CONFIG_FILE --output_dir '../outputs' &> log.txt &
     if [ "x${RUN_EVAL}" == "xTrue" ]
     then
       echo -e "\nWhen training run is done, remember to shut down the cache server via \"cache_admin --stop\""

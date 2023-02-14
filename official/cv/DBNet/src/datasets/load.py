@@ -109,6 +109,7 @@ class IC15DataLoader():
         self.img_paths = glob.glob(os.path.join(self.img_dir, '*' + str(config.train.img_format)))
         self.gt_paths = [os.path.join(self.gt_dir, 'gt_' + img_path.split('/')[-1].split('.')[0] + '.txt') for img_path
                          in self.img_paths]
+        assert self.img_paths and self.gt_paths
 
     def __len__(self):
         return len(self.img_paths)

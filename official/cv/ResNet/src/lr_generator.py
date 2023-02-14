@@ -17,7 +17,7 @@ import math
 import numpy as np
 
 
-def _generate_steps_lr(lr_init, lr_max, total_steps, warmup_steps):
+def _generate_steps_lr(lr_init, lr_max, total_steps, warmup_steps, start_steps):
     """
     Applies three steps decay to generate learning rate array.
 
@@ -45,10 +45,10 @@ def _generate_steps_lr(lr_init, lr_max, total_steps, warmup_steps):
             else:
                 lr = lr_max * 0.001
         lr_each_step.append(lr)
-    return lr_each_step
+    return lr_each_step[start_steps:]
 
 
-def _generate_step_lr(lr_init, lr_max, total_steps, warmup_steps):
+def _generate_step_lr(lr_max, total_steps, start_steps):
     """
     Applies three steps decay to generate learning rate array.
 
@@ -75,10 +75,10 @@ def _generate_step_lr(lr_init, lr_max, total_steps, warmup_steps):
         else:
             lr = 0.00005
         lr_each_step.append(lr)
-    return lr_each_step
+    return lr_each_step[start_steps:]
 
 
-def _generate_poly_lr(lr_init, lr_end, lr_max, total_steps, warmup_steps):
+def _generate_poly_lr(lr_init, lr_max, total_steps, warmup_steps, start_steps):
     """
     Applies polynomial decay to generate learning rate array.
 
@@ -106,10 +106,10 @@ def _generate_poly_lr(lr_init, lr_end, lr_max, total_steps, warmup_steps):
             if lr < 0.0:
                 lr = 0.0
         lr_each_step.append(lr)
-    return lr_each_step
+    return lr_each_step[start_steps:]
 
 
-def _generate_cosine_lr(lr_init, lr_end, lr_max, total_steps, warmup_steps):
+def _generate_cosine_lr(lr_init, lr_max, total_steps, warmup_steps, start_steps):
     """
     Applies cosine decay to generate learning rate array.
 
@@ -135,10 +135,10 @@ def _generate_cosine_lr(lr_init, lr_end, lr_max, total_steps, warmup_steps):
             decayed = linear_decay * cosine_decay + 0.00001
             lr = lr_max * decayed
         lr_each_step.append(lr)
-    return lr_each_step
+    return lr_each_step[start_steps:]
 
 
-def _generate_liner_lr(lr_init, lr_end, lr_max, total_steps, warmup_steps):
+def _generate_liner_lr(lr_init, lr_end, lr_max, total_steps, warmup_steps, start_steps):
     """
     Applies liner decay to generate learning rate array.
 
@@ -159,11 +159,10 @@ def _generate_liner_lr(lr_init, lr_end, lr_max, total_steps, warmup_steps):
         else:
             lr = lr_max - (lr_max - lr_end) * (i - warmup_steps) / (total_steps - warmup_steps)
         lr_each_step.append(lr)
-    return lr_each_step
+    return lr_each_step[start_steps:]
 
 
-
-def get_lr(lr_init, lr_end, lr_max, warmup_epochs, total_epochs, steps_per_epoch, lr_decay_mode):
+def get_lr(lr_init, lr_end, lr_max, warmup_epochs, total_epochs, start_epoch, steps_per_epoch, lr_decay_mode):
     """
     generate learning rate array
 
@@ -179,21 +178,20 @@ def get_lr(lr_init, lr_end, lr_max, warmup_epochs, total_epochs, steps_per_epoch
     Returns:
        np.array, learning rate array
     """
-    lr_each_step = []
     total_steps = steps_per_epoch * total_epochs
     warmup_steps = steps_per_epoch * warmup_epochs
+    start_steps = steps_per_epoch * start_epoch
 
     if lr_decay_mode == 'steps':
-        lr_each_step = _generate_steps_lr(lr_init, lr_max, total_steps, warmup_steps)
+        lr_each_step = _generate_steps_lr(lr_init, lr_max, total_steps, warmup_steps, start_steps)
     elif lr_decay_mode == 'step':
-        warmup_steps = warmup_epochs
-        lr_each_step = _generate_step_lr(lr_init, lr_max, total_steps, warmup_steps)
+        lr_each_step = _generate_step_lr(lr_max, total_steps, start_steps)
     elif lr_decay_mode == 'poly':
-        lr_each_step = _generate_poly_lr(lr_init, lr_end, lr_max, total_steps, warmup_steps)
+        lr_each_step = _generate_poly_lr(lr_init, lr_max, total_steps, warmup_steps, start_steps)
     elif lr_decay_mode == 'cosine':
-        lr_each_step = _generate_cosine_lr(lr_init, lr_end, lr_max, total_steps, warmup_steps)
+        lr_each_step = _generate_cosine_lr(lr_init, lr_max, total_steps, warmup_steps, start_steps)
     else:
-        lr_each_step = _generate_liner_lr(lr_init, lr_end, lr_max, total_steps, warmup_steps)
+        lr_each_step = _generate_liner_lr(lr_init, lr_end, lr_max, total_steps, warmup_steps, start_steps)
 
     lr_each_step = np.array(lr_each_step).astype(np.float32)
     return lr_each_step

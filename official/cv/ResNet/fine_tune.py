@@ -21,11 +21,12 @@ import mindspore.nn as nn
 from mindspore.train.model import Model
 from mindspore.train.callback import TimeMonitor
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
-from train import LossCallBack
 from src.resnet import resnet34
 from src.dataset import create_dataset2
 from src.model_utils.config import config
-from src.eval_callback import EvalCallBack
+from src.callback import LossCallBack
+from src.util import eval_callback, set_output_dir
+from src.logger import get_logger
 
 
 ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, save_graphs=False)
@@ -44,8 +45,8 @@ def import_data():
     data = next(dataset_train.create_dict_iterator())
     images = data["image"]
     labels = data["label"]
-    print("Tensor of image", images.shape)
-    print("Labels:", labels)
+    config.logger.info("Tensor of image: %s", images.shape)
+    config.logger.info("Labels: %s", labels)
 
     return dataset_train, dataset_val
 
@@ -65,7 +66,7 @@ def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
     for key in list(origin_dict.keys()):
         for name in param_filter:
             if name in key:
-                print("Delete parameter from checkpoint: ", key)
+                config.logger.info("Delete parameter from checkpoint: %s", key)
                 del origin_dict[key]
                 break
 
@@ -90,37 +91,20 @@ def eval_net(net, dataset):
 
     # eval model
     res = model.eval(dataset)
-    print("result:", res)
-
-
-def apply_eval(eval_param):
-    eval_model = eval_param["model"]
-    eval_ds = eval_param["dataset"]
-    metrics_name = eval_param["metrics_name"]
-    res = eval_model.eval(eval_ds)
-    print("res:", res)
-    return res[metrics_name]
-
-
-def run_eval(model, ckpt_save_dir, eval_dataset, cb):
-    """run_eval"""
-    eval_param_dict = {"model": model, "dataset": eval_dataset, "metrics_name": "top_1_accuracy"}
-    eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=1,
-                           eval_start_epoch=0, save_best_ckpt=True,
-                           ckpt_directory=ckpt_save_dir, besk_ckpt_name="best_acc.ckpt",
-                           metrics_name="acc")
-    cb += [eval_cb]
+    config.logger.info("result: %s", res)
 
 
 def finetune_train():
+    set_output_dir(config)
+    config.logger = get_logger(config.log_dir, 0)
     dataset_train, data_val = import_data()
 
     ckpt_param_dict = ms.load_checkpoint(config.checkpoint_path)
     net = resnet34(class_num=1001)
     init_weight(net=net, param_dict=ckpt_param_dict)
-    print("net parameter:")
+    config.logger.info("net parameter:")
     for param in net.get_parameters():
-        print("param:", param)
+        config.logger.info("param: %s", param)
 
     # fully Connected layer the size of the input layer
     src_head = net.end_point
@@ -130,8 +114,6 @@ def finetune_train():
     # reset the fully connected layer
     net.end_point = head
 
-    print("net.get_parameters():", net.get_parameters())
-    print("net.trainable_params():", net.trainable_params())
     # freeze all parameters except the last layer
     for param in net.get_parameters():
         if param.name not in ["end_point.dense.weight", "end_point.dense.bias"]:
@@ -151,10 +133,12 @@ def finetune_train():
     # define callbacks
     step_size = dataset_train.get_dataset_size()
     time_cb = TimeMonitor(data_size=step_size)
-    loss_cb = LossCallBack(config.has_trained_epoch)
+    lr = ms.Tensor([config.learning_rate] * step_size * config.epoch_size)
+    loss_cb = LossCallBack(config.epoch_size, step_size, config.logger, lr, per_print_time=10)
     cb = [time_cb, loss_cb]
 
-    run_eval(model, "./", data_val, cb)
+    if config.run_eval:
+        cb.append(eval_callback(model, config, data_val))
 
     num_epochs = config.epoch_size
     model.train(num_epochs, dataset_train, callbacks=cb, dataset_sink_mode=True)

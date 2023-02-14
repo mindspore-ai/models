@@ -16,7 +16,7 @@
 
 if [ $# != 3 ] && [ $# != 4 ]
 then 
-    echo "Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)"
+    echo "Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)"
     exit 1
 fi
 
@@ -34,7 +34,7 @@ CONFIG_FILE=$(get_real_path $3)
 
 if [ $# == 4 ]
 then 
-    PATH3=$(get_real_path $4)
+    RESUME_CKPT=$(get_real_path $4)
 fi
 
 if [ ! -f $PATH1 ]
@@ -47,11 +47,11 @@ if [ ! -d $PATH2 ]
 then 
     echo "error: DATASET_PATH=$PATH2 is not a directory"
     exit 1
-fi 
+fi
 
-if [ $# == 4 ] && [ ! -f $PATH3 ]
+if [ $# == 4 ] && [ ! -f $RESUME_CKPT ]
 then
-    echo "error: PRETRAINED_CKPT_PATH=$PATH3 is not a file"
+    echo "error: RESUME_CKPT=$RESUME_CKPT is not a file"
     exit 1
 fi
 
@@ -83,13 +83,13 @@ echo "start scheduler"
 if [ $# == 3 ]
 then
     python train.py --run_distribute=True --device_num=1 --data_path=$PATH2 --parameter_server=True \
-    --config_path=$CONFIG_FILE --output_path './output' &> sched.log &
+    --config_path=$CONFIG_FILE --output_dir '../outputs' &> sched.log &
 fi
 
 if [ $# == 4 ]
 then
-    python train.py --run_distribute=True --device_num=1 --data_path=$PATH2 --parameter_server=True --pre_trained=$PATH3 \
-    --config_path=$CONFIG_FILE --output_path './output' &> sched.log &
+    python train.py --run_distribute=True --device_num=1 --data_path=$PATH2 --parameter_server=True --RESUME_CKPT=$RESUME_CKPT \
+    --config_path=$CONFIG_FILE --output_dir '../outputs' &> sched.log &
 fi
 cd ..
 
@@ -109,13 +109,13 @@ do
     if [ $# == 3 ]
     then
         python train.py --run_distribute=True --device_num=1 --data_path=$PATH2 --parameter_server=True \
-        --config_path=$CONFIG_FILE --output_path './output' &> server_$i.log &
+        --config_path=$CONFIG_FILE --output_dir '../outputs' &> server_$i.log &
     fi
     
     if [ $# == 4 ]
     then
-        python train.py --run_distribute=True --device_num=1 --data_path=$PATH2 --parameter_server=True --pre_trained=$PATH3 \
-        --config_path=$CONFIG_FILE --output_path './output' &> server_$i.log &
+        python train.py --run_distribute=True --device_num=1 --data_path=$PATH2 --parameter_server=True --resume_ckpt=$RESUME_CKPT \
+        --config_path=$CONFIG_FILE --output_dir '../outputs' &> server_$i.log &
     fi
 
     cd ..
@@ -138,13 +138,13 @@ do
     if [ $# == 3 ]
     then
         python train.py --run_distribute=True --device_num=$DEVICE_NUM --data_path=$PATH2 --parameter_server=True \
-        --config_path=$CONFIG_FILE --output_path './output' &> worker_$i.log &
+        --config_path=$CONFIG_FILE --output_dir '../outputs' &> worker_$i.log &
     fi
     
     if [ $# == 4 ]
     then
-        python train.py --run_distribute=True --device_num=$DEVICE_NUM --data_path=$PATH2 --parameter_server=True --pre_trained=$PATH3 \
-        --config_path=$CONFIG_FILE --output_path './output' &> worker_$i.log &
+        python train.py --run_distribute=True --device_num=$DEVICE_NUM --data_path=$PATH2 --parameter_server=True --resume_ckpt=$RESUME_CKPT \
+        --config_path=$CONFIG_FILE --output_dir '../outputs' &> worker_$i.log &
     fi
 
     cd ..

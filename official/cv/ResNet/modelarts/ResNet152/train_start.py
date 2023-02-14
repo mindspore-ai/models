@@ -32,12 +32,11 @@ from modelarts.ResNet152.config import config
 
 from src.lr_generator import get_lr, warmup_cosine_annealing_lr
 from src.CrossEntropySmooth import CrossEntropySmooth
-from src.eval_callback import EvalCallBack
+from src.callback import EvalCallBack
 from src.metric import DistAccuracy, ClassifyCorrectCell
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_rank_id, get_device_num
 from src.resnet import conv_variance_scaling_initializer
-
 
 
 ms.set_seed(1)

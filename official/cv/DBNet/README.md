@@ -67,6 +67,18 @@ GPU v100 PCIE 32G 8 devices; Operating system: Ubuntu 18.04; Memory: 502 G; x86 
 
 ## Quickly Start
 
+```text
+Take the training ICDAR2015 data as an example
+config/config_base.yaml Configure training and reasoning dataset path
+train:
+    img_dir:
+    gt_dir:
+eval:
+    img_dir:
+    gt_dir:
+Download the pre-training weights and put them in the DBNet/retrained directory
+```
+
 Run standalone:
 
 ```shell

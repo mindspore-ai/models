@@ -62,5 +62,5 @@ cp -r ../src ./eval
 cd ./eval || exit
 env > env.log
 echo "start evaluation for device $DEVICE_ID"
-python eval.py --data_path=$PATH1 --checkpoint_file_path=$PATH2 --config_path=$CONFIG_FILE &> log &
+python eval.py --data_path=$PATH1 --checkpoint_file_path=$PATH2 --config_path=$CONFIG_FILE &> log.txt &
 cd ..

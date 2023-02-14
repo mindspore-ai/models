@@ -16,7 +16,7 @@
 
 if [ $# != 2 ] && [ $# != 3 ]
 then 
-    echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)"
+    echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)"
     exit 1
 fi
 
@@ -32,19 +32,18 @@ PATH1=$(get_real_path $1)
 CONFIG_FILE=$(get_real_path $2)
 if [ $# == 3 ]
 then 
-    PATH2=$(get_real_path $3)
+    RESUME_CKPT=$(get_real_path $3)
 fi
 
-
-if [ ! -d $PATH2 ]
+if [ ! -d $PATH1 ]
 then 
     echo "error: DATASET_PATH=$PATH1 is not a directory"
     exit 1
 fi 
 
-if [ $# == 4 ] && [ ! -f $PATH2 ]
+if [ $# == 3 ] && [ ! -f $RESUME_CKPT ]
 then
-    echo "error: PRETRAINED_CKPT_PATH=$PATH2 is not a file"
+    echo "error: RESUME_CKPT=$RESUME_CKPT is not a file"
     exit 1
 fi
 
@@ -71,13 +70,13 @@ cd ./sched || exit
 if [ $# == 2 ]
 then
     python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU" \
-    --data_path=$PATH1 --parameter_server=True --config_path=$CONFIG_FILE --output_path './output' &> sched.log &
+    --data_path=$PATH1 --parameter_server=True --config_path=$CONFIG_FILE --output_dir '../outputs' &> sched.log &
 fi
 
 if [ $# == 3 ]
 then
     python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU" \
-    --data_path=$PATH1 --parameter_server=True --pre_trained=$PATH2 --config_path=$CONFIG_FILE --output_path './output' &> sched.log &
+    --data_path=$PATH1 --parameter_server=True --resume_ckpt=$RESUME_CKPT --config_path=$CONFIG_FILE --output_dir '../output' &> sched.log &
 fi
 cd ..
 
@@ -94,14 +93,14 @@ do
     if [ $# == 2 ]
     then
         python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU" \
-        --data_path=$PATH1 --parameter_server=True --config_path=$CONFIG_FILE --output_path './output' &> server_$i.log &
+        --data_path=$PATH1 --parameter_server=True --config_path=$CONFIG_FILE --output_dir '../outputs' &> server_$i.log &
     fi
         
     if [ $# == 3 ]
     then
         python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU" \
-        --data_path=$PATH1 --parameter_server=True --pre_trained=$PATH2 \
-        --config_path=$CONFIG_FILE --output_path './output' &> server_$i.log &
+        --data_path=$PATH1 --parameter_server=True --resume_ckpt=$RESUME_CKPT \
+        --config_path=$CONFIG_FILE --output_dir '../outputs' &> server_$i.log &
     fi
     cd ..
 done
@@ -119,14 +118,14 @@ do
     if [ $# == 2 ]
     then
         python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU" \
-        --data_path=$PATH1 --parameter_server=True --config_path=$CONFIG_FILE --output_path './output' &> worker_$i.log &
+        --data_path=$PATH1 --parameter_server=True --config_path=$CONFIG_FILE --output_dir '../outputs' &> worker_$i.log &
     fi
 
     if [ $# == 3 ]
     then
         python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU"\
-        --data_path=$PATH1 --parameter_server=True --pre_trained=$PATH2 \
-        --config_path=$CONFIG_FILE --output_path './output' &> worker_$i.log &
+        --data_path=$PATH1 --parameter_server=True --resume_ckpt=$RESUME_CKPT \
+        --config_path=$CONFIG_FILE --output_dir '../outputs' &> worker_$i.log &
     fi
     cd ..
 done

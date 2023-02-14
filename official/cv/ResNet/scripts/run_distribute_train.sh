@@ -18,10 +18,12 @@ CURPATH="$(dirname "$0")"
 # shellcheck source=/dev/null
 . ${CURPATH}/cache_util.sh
 
-if [ $# != 3 ] && [ $# != 4 ] && [ $# != 5 ]
+if [ $# != 3 ] && [ $# != 4 ] && [ $# != 5 ] && [ $# != 6 ]
 then
-  echo "Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)"
-  echo "       bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)"
+  echo "Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH]"
+  echo "Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)"
+  echo "Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)"
+  echo "Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional) [RESUME_CKPT](optional)"
   exit 1
 fi
 
@@ -39,13 +41,20 @@ CONFIG_FILE=$(get_real_path $3)
 
 if [ $# == 4 ]
 then 
-    PATH3=$(get_real_path $4)
+    RESUME_CKPT=$(get_real_path $4)
 fi
 
 if [ $# == 5 ]
 then
   RUN_EVAL=$4
   EVAL_DATASET_PATH=$(get_real_path $5)
+fi
+
+if [ $# == 6 ]
+then
+  RUN_EVAL=$4
+  EVAL_DATASET_PATH=$(get_real_path $5)
+  RESUME_CKPT=$(get_real_path $6)
 fi
 
 if [ ! -f $PATH1 ]
@@ -60,9 +69,9 @@ then
 exit 1
 fi 
 
-if [ $# == 4 ] && [ ! -f $PATH3 ]
+if [ $# == 4 ] && [ ! -f $RESUME_CKPT ]
 then
-    echo "error: PRETRAINED_CKPT_PATH=$PATH3 is not a file"
+    echo "error: RESUME_CKPT=$RESUME_CKPT is not a file"
 exit 1
 fi
 
@@ -109,20 +118,31 @@ do
     if [ $# == 3 ]
     then    
         taskset -c $cmdopt python train.py --run_distribute=True --device_num=$RANK_SIZE --data_path=$PATH2 \
-        --config_path=$CONFIG_FILE --output_path './output' &> log &
+        --config_path=$CONFIG_FILE --output_dir '../outputs' &> log.txt &
     fi
-    
+
     if [ $# == 4 ]
     then
-        taskset -c $cmdopt python train.py --run_distribute=True --device_num=$RANK_SIZE --data_path=$PATH2 --pre_trained=$PATH3 \
-        --config_path=$CONFIG_FILE --output_path './output' &> log &
+        taskset -c $cmdopt python train.py --run_distribute=True --device_num=$RANK_SIZE --data_path=$PATH2 --resume_ckpt=$RESUME_CKPT \
+        --config_path=$CONFIG_FILE --output_dir '../outputs' &> log.txt &
     fi
 
     if [ $# == 5 ]
     then
       taskset -c $cmdopt python train.py --run_distribute=True --device_num=$RANK_SIZE --data_path=$PATH2 \
       --run_eval=$RUN_EVAL --eval_dataset_path=$EVAL_DATASET_PATH --enable_cache=True \
-      --cache_session_id=$CACHE_SESSION_ID --config_path=$CONFIG_FILE --output_path './output' &> log &
+      --cache_session_id=$CACHE_SESSION_ID --config_path=$CONFIG_FILE --output_dir '../outputs' &> log.txt &
+      if [ "x${RUN_EVAL}" == "xTrue" ]
+      then
+        echo -e "\nWhen training run is done, remember to shut down the cache server via \"cache_admin --stop\""
+      fi
+    fi
+
+    if [ $# == 6 ]
+    then
+      taskset -c $cmdopt python train.py --run_distribute=True --device_num=$RANK_SIZE --data_path=$PATH2 \
+      --run_eval=$RUN_EVAL --eval_dataset_path=$EVAL_DATASET_PATH --enable_cache=True --resume_ckpt=$RESUME_CKPT \
+      --cache_session_id=$CACHE_SESSION_ID --config_path=$CONFIG_FILE --output_dir '../outputs' &> log.txt &
       if [ "x${RUN_EVAL}" == "xTrue" ]
       then
         echo -e "\nWhen training run is done, remember to shut down the cache server via \"cache_admin --stop\""
