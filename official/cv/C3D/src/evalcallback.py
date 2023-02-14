@@ -28,37 +28,37 @@ from src.dataset import classification_dataset
 
 class EvalCallBack(Callback):
     """EvalCallBack"""
-    def __init__(self, model, eval_per_epoch, epoch_per_eval, save_ckpt_path, train_batch_num):
+    def __init__(self, eval_per_epoch, epoch_per_eval, save_ckpt_path, train_batch_num):
         config.load_type = 'test'
-        self.model = model
         self.rank = get_rank() if config.is_distributed else 0
         self.eval_per_epoch = eval_per_epoch
         self.epoch_per_eval = epoch_per_eval
         self.save_ckpt_path = save_ckpt_path
         self.eval_dataset, self.eval_dataset_len = classification_dataset(config.batch_size, 1, shuffle=True,
                                                                           repeat_num=1, drop_remainder=True)
+        self.network = C3D(config.num_classes)
+
         self.best_ckpt = 0
         self.best_acc = 0
         self.train_batch_num = train_batch_num
 
     def epoch_end(self, run_context):
         """culculate acc"""
-        network = C3D(config.num_classes)
         cb_param = run_context.original_args()
         cur_epoch = cb_param.cur_epoch_num
         save_ckpt_path = self.save_ckpt_path + str(self.rank) + '-' + str(cur_epoch) + '_' \
                          + str(self.train_batch_num) + '.ckpt'
         # pre_trained
         param_dict = load_checkpoint(save_ckpt_path)
-        param_not_load = load_param_into_net(network, param_dict)
+        param_not_load = load_param_into_net(self.network, param_dict)
         batch_num = self.eval_dataset.get_dataset_size()
         print('ckpt:', save_ckpt_path)
         print('param_not_load', param_not_load)
         if cur_epoch % self.eval_per_epoch == 0:
-            network.set_train(mode=False)
+            self.network.set_train(mode=False)
             acc_sum, sample_num = 0, 0
             for idnum, (input_data, label) in enumerate(self.eval_dataset):
-                predictions = network(Tensor(input_data))
+                predictions = self.network(Tensor(input_data))
                 predictions, label = predictions.asnumpy(), label.asnumpy()
                 acc = np.sum(np.argmax(predictions, 1) == label[:, -1])
                 batch_size = label.shape[0]
@@ -74,6 +74,6 @@ class EvalCallBack(Callback):
                 self.best_ckpt = cur_epoch
                 best_ckpt_file = 'best_acc.ckpt'
                 best_ckpt_file = self.save_ckpt_path + str(self.rank) + best_ckpt_file
-                save_checkpoint(network, best_ckpt_file)
+                save_checkpoint(self.network, best_ckpt_file)
             print('best result: top_1 {:.3f}%'.format(self.best_acc * 100))
             print('best ckpt:{}'.format(self.best_ckpt))

@@ -28,7 +28,7 @@ pre_trained_ckpt_path : ./pretrained_model/pre_trained_model.ckpt # pre_trained 
 sport1m_mean_file_path: ./pretrained_model/sport1m_train16_128_mean.npy # Sport1m data distribution information
 num_classes:       51                    # Number of total classes in the dataset, 51 for HMDB51 and 101 for UCF101
 loss_type:         M_XENTROPY            # Loss function
-lr:                1e-4                  # Learning rate
+lr:                0.0001                  # Learning rate
 milestones:        [10, 20]              # Epoch values to change learning rate
 momentum:          0.9                   # Momentum value in optimizer
 loss_scale:        1.0
