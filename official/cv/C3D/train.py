@@ -55,7 +55,6 @@ def train():
             init()
             config.rank = get_rank()
             config.group_size = get_group_size()
-            config.batch_size = config.batch_size // (config.group_size)
             context.set_context(device_id=config.device_id)
         elif config.device_target == "GPU":
             init()
@@ -75,8 +74,12 @@ def train():
 
     # dataset
     config.load_type = 'train'
-    train_dataset, _ = classification_dataset(config.batch_size, config.group_size, shuffle=True,
-                                              repeat_num=1, drop_remainder=True)
+    if config.device_target == "Ascend":
+        train_dataset, _ = classification_dataset(config.batch_size // config.group_size, config.group_size,
+                                                  shuffle=True, repeat_num=1, drop_remainder=True)
+    else:
+        train_dataset, _ = classification_dataset(config.batch_size, config.group_size,
+                                                  shuffle=True, repeat_num=1, drop_remainder=True)
     batch_num = train_dataset.get_dataset_size()
 
     # get network and init
@@ -89,14 +92,9 @@ def train():
         print('load pre_trained model, but parameters {} not load'.format(param_not_load))
 
     # lr scheduler
-    if config.device_target == "GPU":
-        lr = linear_warmup_learning_rate(lr_max=config.lr*config.group_size, epoch_step=config.milestones,
-                                         global_step=0, lr_init=1e-6*config.group_size, warmup_epochs=1,
-                                         total_epochs=config.epoch, steps_per_epoch=batch_num)
-    elif config.device_target == "Ascend":
-        lr = linear_warmup_learning_rate(lr_max=config.lr, epoch_step=config.milestones,
-                                         global_step=0, lr_init=1e-6, warmup_epochs=1,
-                                         total_epochs=config.epoch, steps_per_epoch=batch_num)
+    lr = linear_warmup_learning_rate(lr_max=config.lr * config.group_size, epoch_step=config.milestones,
+                                     global_step=0, lr_init=1e-6 * config.group_size, warmup_epochs=1,
+                                     total_epochs=config.epoch, steps_per_epoch=batch_num)
 
     # optimizer
     lr_1x_params, lr_10x_params = get_adaptive_lr_param_groups(network)
@@ -128,7 +126,7 @@ def train():
     if config.is_evalcallback:
         eval_per_epoch = 5
         epoch_per_eval = {"epoch": [], "acc": []}
-        eval_cb = EvalCallBack(model, eval_per_epoch, epoch_per_eval, save_ckpt_path, batch_num)
+        eval_cb = EvalCallBack(eval_per_epoch, epoch_per_eval, save_ckpt_path, batch_num)
         callbacks.append(eval_cb)
 
     model.train(config.epoch, train_dataset, callbacks=callbacks, dataset_sink_mode=True, sink_size=-1)
