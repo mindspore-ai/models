@@ -10,6 +10,7 @@ output_path: "/cache/train"
 load_path: "/cache/checkpoint_path"
 device_target: "Ascend"
 enable_profiling: False
+output_dir: "../output/"
 
 # ======================================================================================
 # common options
@@ -34,7 +35,6 @@ save_checkpoint: True
 save_checkpoint_steps: 1000
 keep_checkpoint_max: 30
 per_print_time: 100
-save_checkpoint_path: "./"
 class_num: 37
 input_size: 512
 num_step: 24
