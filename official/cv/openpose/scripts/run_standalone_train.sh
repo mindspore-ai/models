@@ -20,6 +20,7 @@ then
 exit 1
 fi
 
+ulimit -n 2048
 export DEVICE_ID=$5
 export RANK_SIZE=1
 export RANK_ID=0
