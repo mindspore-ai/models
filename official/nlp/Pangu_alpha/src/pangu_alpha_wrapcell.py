@@ -238,6 +238,7 @@ class PanguAlphaTrainPipelineWithLossScaleCell(nn.Cell):
         # alloc status and clear should be right before gradoperation
         init = self.alloc_status()
         status_clear = self.clear_before_grad(init)
+        scaling_sens = F.depend(scaling_sens, status_clear)
         grads = self.grad(self.network, weights)(input_ids,
                                                  input_position,
                                                  attention_mask,
