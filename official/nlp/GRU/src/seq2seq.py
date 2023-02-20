@@ -19,7 +19,6 @@ import mindspore.nn as nn
 import mindspore.ops.operations as P
 import mindspore.common.dtype as mstype
 from src.weight_init import dense_default_state
-from src.rnns import GRU
 
 class Attention(nn.Cell):
     '''
@@ -79,7 +78,7 @@ class Encoder(nn.Cell):
         self.vocab_size = config.src_vocab_size
         self.embedding_size = config.encoder_embedding_size
         self.embedding = nn.Embedding(self.vocab_size, self.embedding_size)
-        self.rnn = GRU(input_size=self.embedding_size, \
+        self.rnn = nn.GRU(input_size=self.embedding_size, \
             hidden_size=self.hidden_size, bidirectional=True).to_float(config.compute_type)
         self.fc = nn.Dense(2*self.hidden_size, self.hidden_size).to_float(config.compute_type)
         self.shape = P.Shape()
@@ -125,7 +124,7 @@ class Decoder(nn.Cell):
         self.vocab_size = config.trg_vocab_size
         self.embedding_size = config.decoder_embedding_size
         self.embedding = nn.Embedding(self.vocab_size, self.embedding_size)
-        self.rnn = GRU(input_size=self.embedding_size + self.hidden_size*2, \
+        self.rnn = nn.GRU(input_size=self.embedding_size + self.hidden_size*2, \
             hidden_size=self.hidden_size).to_float(config.compute_type)
         self.text_len = config.max_length
         self.shape = P.Shape()
