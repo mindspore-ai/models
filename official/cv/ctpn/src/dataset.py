@@ -282,6 +282,7 @@ def anno_parser(annos_str):
 def create_ctpn_dataset(mindrecord_file, batch_size=1, device_num=1, rank_id=0,
                         is_training=True, num_parallel_workers=12):
     """Creatr ctpn dataset with MindDataset."""
+    cv2.setNumThreads(2)
     ds = de.MindDataset(mindrecord_file, columns_list=["image", "annotation"], num_shards=device_num, shard_id=rank_id,\
         num_parallel_workers=num_parallel_workers, shuffle=is_training)
     decode = C.Decode()
@@ -299,7 +300,8 @@ def create_ctpn_dataset(mindrecord_file, batch_size=1, device_num=1, rank_id=0,
                     output_columns=["image", "box", "label", "valid_num", "image_shape"],
                     column_order=["image", "box", "label", "valid_num", "image_shape"],
                     num_parallel_workers=num_parallel_workers,
-                    python_multiprocessing=True)
+                    python_multiprocessing=True,
+                    max_rowsize=32)
         ds = ds.map(operations=[normalize_op, type_cast0], input_columns=["image"],
                     num_parallel_workers=num_parallel_workers,
                     python_multiprocessing=True)
