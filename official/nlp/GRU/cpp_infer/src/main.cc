@@ -76,11 +76,9 @@ int main(int argc, char **argv) {
     std::cout << "Start predict input files:" << input0_files[i] << std::endl;
 
     auto input0 = ReadFileToTensor(input0_files[i]);
-    auto input1 = ReadFileToTensor(input1_files[i]);
+    // input1 has been optimized and not needed as input
     inputs.emplace_back(model_inputs[0].Name(), model_inputs[0].DataType(), model_inputs[0].Shape(),
                         input0.Data().get(), input0.DataSize());
-    inputs.emplace_back(model_inputs[1].Name(), model_inputs[1].DataType(), model_inputs[1].Shape(),
-                        input1.Data().get(), input1.DataSize());
 
     gettimeofday(&start, nullptr);
     ret = model.Predict(inputs, &outputs);
