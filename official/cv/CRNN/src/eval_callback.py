@@ -18,8 +18,8 @@ import os
 import stat
 import glob
 from mindspore import save_checkpoint, load_checkpoint, load_param_into_net
-from mindspore import log as logger
 from mindspore.train.callback import Callback
+from src.model_utils.config import config
 
 class EvalCallBack(Callback):
     """
@@ -67,9 +67,9 @@ class EvalCallBack(Callback):
             os.chmod(file_name, stat.S_IWRITE)
             os.remove(file_name)
         except OSError:
-            logger.warning("OSError, failed to remove the older ckpt file %s.", file_name)
+            config.logger.warning("OSError, failed to remove the older ckpt file %s.", file_name)
         except ValueError:
-            logger.warning("ValueError, failed to remove the older ckpt file %s.", file_name)
+            config.logger.warning("ValueError, failed to remove the older ckpt file %s.", file_name)
 
     def epoch_end(self, run_context):
         """Callback when epoch end."""
@@ -84,33 +84,32 @@ class EvalCallBack(Callback):
                     param_dict = load_checkpoint(ckpt_path)
                     load_param_into_net(net, param_dict)
                     res = self.eval_function(self.eval_param_dict)
-                    print("{}: {}".format(self.metrics_name, res), flush=True)
+                    config.logger.info("{%s}: {%.6f}", self.metrics_name, res)
                     if res >= self.best_res:
                         self.best_epoch = cur_epoch
                         self.best_res = res
-                        print("update best result: {}".format(res), flush=True)
-                        if os.path.exists(self.best_ckpt_path):
+                        config.logger.info("update best result: {%.6f}", res)
+                        if os.path.exists(self.best_ckpt_path) and int(os.getenv('RANK_ID')) == 0:
                             self.remove_ckpoint_file(self.best_ckpt_path)
-                        if self.save_best_ckpt:
+                        if self.save_best_ckpt and int(os.getenv('RANK_ID')) == 0:
                             save_checkpoint(net, self.best_ckpt_path)
-                            print("update best checkpoint at: {}".format(self.best_ckpt_path), flush=True)
+                            config.logger.info("update best checkpoint at: {%s}", self.best_ckpt_path)
                 param_dict = load_checkpoint(self.last_ckpt_path)
                 load_param_into_net(net, param_dict)
                 self.remove_ckpoint_file(self.last_ckpt_path)
             else:
                 res = self.eval_function(self.eval_param_dict)
-                print("epoch: {}, {}: {}".format(cur_epoch, self.metrics_name, res), flush=True)
+                config.logger.info("epoch: {%d}, {%s}: {%.6f}", cur_epoch, self.metrics_name, res)
                 if res >= self.best_res:
                     self.best_res = res
                     self.best_epoch = cur_epoch
-                    print("update best result: {}".format(res), flush=True)
+                    config.logger.info("update best result: {%.6f}", res)
                     if self.save_best_ckpt:
                         if os.path.exists(self.best_ckpt_path):
                             self.remove_ckpoint_file(self.best_ckpt_path)
                         save_checkpoint(cb_params.train_network, self.best_ckpt_path)
-                        print("update best checkpoint at: {}".format(self.best_ckpt_path), flush=True)
+                        config.logger.info("update best checkpoint at: {%s}", self.best_ckpt_path)
 
     def end(self, run_context):
-        print("End training, the best {0} is: {1}, the best {0} epoch is {2}".format(self.metrics_name,
-                                                                                     self.best_res,
-                                                                                     self.best_epoch), flush=True)
+        config.logger.info("End training, the best {%s} is: {%.6f}, the best {%s} epoch is {%d}",
+                           self.metrics_name, self.best_res, self.metrics_name, self.best_epoch)
