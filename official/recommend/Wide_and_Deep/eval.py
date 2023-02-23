@@ -22,7 +22,7 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net,\
     build_searched_strategy, merge_sliced_parameter
 
 from src.wide_and_deep import PredictWithSigmoid, TrainStepWrap, NetWithLossClass, WideDeepModel
-from src.callbacks import LossCallBack, EvalCallBack
+from src.callbacks import LossCallBack
 from src.datasets import create_dataset, DataType
 from src.metrics import AUCMetric
 from src.model_utils.config import config as cfg
@@ -110,9 +110,7 @@ def test_eval(config):
     auc_metric = AUCMetric()
     model = Model(train_net, eval_network=eval_net, metrics={"auc": auc_metric})
 
-    eval_callback = EvalCallBack(model, ds_eval, auc_metric, config)
-
-    model.eval(ds_eval, callbacks=eval_callback)
+    model.eval(ds_eval)
 
 
 def modelarts_pre_process():
