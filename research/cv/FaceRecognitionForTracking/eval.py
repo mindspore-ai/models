@@ -23,7 +23,7 @@ from tqdm import tqdm
 
 import mindspore.dataset.vision as V
 import mindspore.dataset.transforms as T
-from mindspore import context, Tensor
+from mindspore import context, Tensor, Parameter
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 from src.reid import SphereNet
@@ -187,6 +187,9 @@ def run_eval():
             param_dict = load_checkpoint(model_path)
             param_dict_new = {}
             for key, values in param_dict.items():
+                np_value = values.asnumpy()
+                np_value[np_value.isnan(np_value)] = 0
+                values = Parameter(np_value)
                 if key.startswith('moments.'):
                     continue
                 elif key.startswith('model.'):
