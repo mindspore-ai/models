@@ -95,6 +95,7 @@ class DBNetMonitor(Callback):
         cb_params = run_context.original_args()
         loss = cb_params.net_outputs
         cur_epoch = cb_params.cur_epoch_num
+        data_sink_mode = cb_params.dataset_sink_mode
         if cb_params.net_outputs is not None:
             if isinstance(loss, tuple):
                 if loss[1]:
@@ -114,7 +115,8 @@ class DBNetMonitor(Callback):
         if isinstance(loss, float) and (np.isnan(loss) or np.isinf(loss)):
             raise ValueError(
                 "epoch: {} step: {}. Invalid loss, terminating training.".format(cur_epoch, cur_step_in_epoch))
-        if self._per_print_times != 0 and (cb_params.cur_step_num - self._last_print_time) >= self._per_print_times:
+        if self._per_print_times != 0 and (
+                cb_params.cur_step_num - self._last_print_time) >= self._per_print_times and not data_sink_mode:
             self._last_print_time = cb_params.cur_step_num
             loss_log = "epoch: [%s/%s] step: [%s/%s], loss: %.6f, lr: %.6f, per step time: %.3f ms" % (
                 cur_epoch, self.config.train.total_epochs, cur_step_in_epoch, self.config.steps_per_epoch,

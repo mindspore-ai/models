@@ -8,7 +8,7 @@ checkpoint_url: ""
 run_distribute: False
 enable_profiling: False
 data_path: "/cache/data"
-output_path: "/cache/train"
+output_dir: "../outputs"
 load_path: "/cache/checkpoint_path/"
 device_target: "GPU"
 checkpoint_path: "./checkpoint/"
@@ -24,7 +24,8 @@ loss_scale: 128
 momentum: 0.9
 weight_decay: 0.0005
 epoch_size: 40
-pretrain_epoch_size: 0
+start_epoch: 0
+resume_ckpt: ""
 save_checkpoint: True
 save_checkpoint_epochs: 1
 keep_checkpoint_max: 15

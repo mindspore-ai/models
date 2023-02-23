@@ -8,7 +8,7 @@ checkpoint_url: ""
 run_distribute: False
 enable_profiling: False
 data_path: "/cache/data"
-output_path: "/cache/train"
+output_dir: "../outputs"
 load_path: "/cache/checkpoint_path/"
 device_target: "Ascend"
 checkpoint_path: "./checkpoint/"
@@ -24,8 +24,9 @@ loss_scale: 1024
 momentum: 0.9
 weight_decay: 0.0001
 epoch_size: 28
+start_epoch: 0
+resume_ckpt: ""
 train_epoch_size: 24
-pretrain_epoch_size: 0
 save_checkpoint: True
 save_checkpoint_epochs: 4
 keep_checkpoint_max: 10

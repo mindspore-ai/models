@@ -139,10 +139,10 @@ After installing MindSpore via the official website, you can start training and 
 
 ```bash
 # distributed training
-Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)
+Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)
 
 # standalone training
-Usage: bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)
+Usage: bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)
 
 # run evaluation example
 Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
@@ -152,10 +152,10 @@ Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
 
 ```bash
 # distributed training example
-bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)
+bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)
 
 # standalone training example
-bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)
+bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)
 
 # infer example
 bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
@@ -246,11 +246,13 @@ If you want to run in modelarts, please check the official documentation of [mod
     └── cache_util.sh                      # a collection of helper functions to manage cache
   ├── src
     ├── dataset.py                         # data preprocessing
-    ├─  eval_callback.py                   # evaluation callback while training
+    ├─  callback.py                        # evaluation callback while training
     ├── CrossEntropySmooth.py              # loss definition for ImageNet2012 dataset
     ├── lr_generator.py                    # generate learning rate for each step
+    ├── logger.py                          # logger function
     ├── resnet.py                          # resnet backbone, including resnet50 and resnet101 and se-resnet50
     └── resnet_gpu_benchmark.py            # resnet50 for GPU benchmark
+    ├─  util.py                            # define basic function
     ├── model_utils
        ├──config.py                        # parameter configuration
        ├──device_adapter.py                # device adapter
@@ -423,10 +425,10 @@ Parameters for both training and evaluation can be set in config file.
 
 ```bash
 # distributed training
-Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)
+Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)
 
 # standalone training
-Usage: bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)
+Usage: bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)
 
 # run evaluation example
 Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
@@ -444,10 +446,10 @@ If you want to change device_id for standalone training, you can set environment
 
 ```bash
 # distributed training example
-bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)
+bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)
 
 # standalone training example
-bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)
+bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)
 
 # infer example
 bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]
@@ -469,13 +471,13 @@ Please follow the instructions in the link [GPU-Multi-Host](https://www.mindspor
 - Parameter server training Ascend example
 
 ```bash
-bash run_parameter_server_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)
+bash run_parameter_server_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)
 ```
 
 - Parameter server training GPU example
 
 ```bash
-bash run_parameter_server_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)
+bash run_parameter_server_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)
 ```
 
 #### Evaluation while training
@@ -483,19 +485,27 @@ bash run_parameter_server_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_
 ```bash
 # evaluation with distributed training Ascend example:
 cd scripts/
-bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
+bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL] [EVAL_DATASET_PATH]
+
+# example of reasoning during distributed breakpoint training:
+cd scripts/
+bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL] [EVAL_DATASET_PATH] [RESUME_CKPT]
 
 # evaluation with standalone training Ascend example:
 cd scripts/
-bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
+bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL] [EVAL_DATASET_PATH]
+
+# example of reasoning during single machine breakpoint training:
+cd scripts/
+bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL] [EVAL_DATASET_PATH] [RESUME_CKPT]
 
 # evaluation with distributed training GPU example:
 cd scripts/
-bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
+bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL] [EVAL_DATASET_PATH]
 
 # evaluation with standalone training GPU example:
 cd scripts/
-bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
+bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL] [EVAL_DATASET_PATH]
 ```
 
 `RUN_EVAL` and `EVAL_DATASET_PATH` are optional arguments, setting `RUN_EVAL`=True allows you to do evaluation while training. When `RUN_EVAL` is set, `EVAL_DATASET_PATH` must also be set.
@@ -513,10 +523,10 @@ Users can choose to shutdown the cache server after training or leave it alone f
 
 ```text
 # distributed training
-用法：bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH]
+用法：bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT]
 
 # standalone training
-用法：bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH]
+用法：bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT]
 ```
 
 ### Result
@@ -525,11 +535,11 @@ Users can choose to shutdown the cache server after training or leave it alone f
 
 ```bash
 # distribute training result(8 pcs)
-epoch: 1 step: 195, loss is 1.5783054
-epoch: 2 step: 195, loss is 1.0682616
-epoch: 3 step: 195, loss is 0.8836588
-epoch: 4 step: 195, loss is 0.36090446
-epoch: 5 step: 195, loss is 0.80853784
+2023-02-17 14:27:29,405:INFO:epoch: [1/90] loss: 1.082604, epoch time: 40.559 s, per step time: 207.995 ms
+2023-02-17 14:27:31,711:INFO:epoch: [2/90] loss: 1.045892, epoch time: 2.413 s, per step time: 12.377 ms
+2023-02-17 14:27:34,012:INFO:epoch: [3/90] loss: 0.729006, epoch time: 2.486 s, per step time: 12.750 ms
+2023-02-17 14:27:36,326:INFO:epoch: [4/90] loss: 0.766412, epoch time: 2.443 s, per step time: 12.529 ms
+2023-02-17 14:27:39,646:INFO:epoch: [5/90] loss: 0.655058, epoch time: 2.851 s, per step time: 14.621 ms
 ...
 ```
 
@@ -537,11 +547,11 @@ epoch: 5 step: 195, loss is 0.80853784
 
 ```bash
 # distribute training result(8 pcs)
-epoch: 1 step: 625, loss is 4.757934
-epoch: 2 step: 625, loss is 4.0891967
-epoch: 3 step: 625, loss is 3.9131956
-epoch: 4 step: 625, loss is 3.5302577
-epoch: 5 step: 625, loss is 3.597817
+2023-02-17 15:30:06,405:INFO:epoch: [1/90] loss: 5.023574, epoch time: 154.658 s, per step time: 247.453 ms
+2023-02-17 15:31:45,711:INFO:epoch: [2/90] loss: 4.253309, epoch time: 99.524 s, per step time: 159.239 ms
+2023-02-17 15:33:18,012:INFO:epoch: [3/90] loss: 3.703176, epoch time: 92.655 s, per step time: 148.248 ms
+2023-02-17 15:34:34,326:INFO:epoch: [4/90] loss: 3.458283, epoch time: 76.299 s, per step time: 122.078 ms
+2023-02-17 15:35:59,646:INFO:epoch: [5/90] loss: 3.603806, epoch time: 84.435 s, per step time: 135.097 ms
 ...
 ```
 
@@ -549,10 +559,11 @@ epoch: 5 step: 625, loss is 3.597817
 
 ```text
 # 分布式训练结果（8P）
-epoch: 2 step: 625, loss is 4.181185
-epoch: 3 step: 625, loss is 3.8856044
-epoch: 4 step: 625, loss is 3.423355
-epoch: 5 step: 625, loss is 3.506971
+2023-02-20 09:47:10,405:INFO:epoch: [1/90] loss: 5.044510, epoch time: 139.308 s, per step time: 222.893 ms
+2023-02-20 09:48:30,711:INFO:epoch: [2/90] loss: 4.194771, epoch time: 79.498 s, per step time: 127.196 ms
+2023-02-20 09:49:53,012:INFO:epoch: [3/90] loss: 3.736507, epoch time: 83.387 s, per step time: 133.419 ms
+2023-02-20 09:51:17,326:INFO:epoch: [4/90] loss: 3.417167, epoch time: 83.253 s, per step time: 133.204 ms
+2023-02-20 09:52:41,646:INFO:epoch: [5/90] loss: 3.444441, epoch time: 83.931 s, per step time: 134.290 ms
 ...
 ```
 
@@ -560,11 +571,11 @@ epoch: 5 step: 625, loss is 3.506971
 
 ```bash
 # distribute training result(8 pcs)
-epoch: 1 step: 195, loss is 1.9601055
-epoch: 2 step: 195, loss is 1.8555021
-epoch: 3 step: 195, loss is 1.6707983
-epoch: 4 step: 195, loss is 1.8162166
-epoch: 5 step: 195, loss is 1.393667
+2023-02-20 10:14:13,405:INFO:epoch: [1/90] loss: 1.519848, epoch time: 63.275 s, per step time: 324.489 ms
+2023-02-20 10:14:16,711:INFO:epoch: [2/90] loss: 1.497206, epoch time: 3.305 s, per step time: 16.950 ms
+2023-02-20 10:14:19,012:INFO:epoch: [3/90] loss: 1.097057, epoch time: 3.315 s, per step time: 17.002 ms
+2023-02-20 10:14:23,326:INFO:epoch: [4/90] loss: 0.852322, epoch time: 3.322 s, per step time: 17.036 ms
+2023-02-20 10:14:27,646:INFO:epoch: [5/90] loss: 0.896606, epoch time: 4.432 s, per step time: 22.730 ms
 ...
 ```
 
@@ -572,11 +583,11 @@ epoch: 5 step: 195, loss is 1.393667
 
 ```bash
 # distribute training result(8 pcs)
-epoch: 1 step: 5004, loss is 4.8995576
-epoch: 2 step: 5004, loss is 3.9235563
-epoch: 3 step: 5004, loss is 3.833077
-epoch: 4 step: 5004, loss is 3.2795618
-epoch: 5 step: 5004, loss is 3.1978393
+2023-02-20 10:01:18,405:INFO:epoch: [1/90] loss: 5.282135, epoch time: 183.647 s, per step time: 588.613 ms
+2023-02-20 10:03:02,711:INFO:epoch: [2/90] loss: 4.446517, epoch time: 103.711 s, per step time: 332.408 ms
+2023-02-20 10:04:41,012:INFO:epoch: [3/90] loss: 3.916948, epoch time: 99.554 s, per step time: 319.804 ms
+2023-02-20 10:06:15,326:INFO:epoch: [4/90] loss: 3.510729, epoch time: 94.192 s, per step time: 301.897 ms
+2023-02-20 10:07:43,646:INFO:epoch: [5/90] loss: 3.402662, epoch time: 87.943 s, per step time: 281.867 ms
 ...
 ```
 
@@ -584,11 +595,11 @@ epoch: 5 step: 5004, loss is 3.1978393
 
 ```bash
 # distribute training result(8 pcs)
-epoch: 1 step: 5004, loss is 4.805483
-epoch: 2 step: 5004, loss is 3.2121816
-epoch: 3 step: 5004, loss is 3.429647
-epoch: 4 step: 5004, loss is 3.3667371
-epoch: 5 step: 5004, loss is 3.1718972
+2023-02-20 10:52:57,405:INFO:epoch: [1/90] loss: 5.139862, epoch time: 218.528 s, per step time: 43.671 ms
+2023-02-20 10:55:18,711:INFO:epoch: [2/90] loss: 4.252709, epoch time: 140.305 s, per step time: 28.039 ms
+2023-02-20 10:57:38,012:INFO:epoch: [3/90] loss: 4.101140, epoch time: 140.267 s, per step time: 28.031 ms
+2023-02-20 10:59:58,326:INFO:epoch: [4/90] loss: 3.468216, epoch time: 140.142 s, per step time: 28.006 ms
+2023-02-20 11:02:20,646:INFO:epoch: [5/90] loss: 3.155962, epoch time: 140.167 s, per step time: 28.411 ms
 ...
 ```
 
@@ -596,11 +607,11 @@ epoch: 5 step: 5004, loss is 3.1718972
 
 ```bash
 # 分布式训练结果（8P）
-epoch: 1 step: 5004, loss is 4.184874
-epoch: 2 step: 5004, loss is 4.013571
-epoch: 3 step: 5004, loss is 3.695777
-epoch: 4 step: 5004, loss is 3.3244863
-epoch: 5 step: 5004, loss is 3.4899402
+2023-02-20 11:29:43,405:INFO:epoch: [1/90] loss: 4.546348, epoch time: 308.530 s, per step time: 61.657 ms
+2023-02-20 11:33:08,711:INFO:epoch: [2/90] loss: 4.020557, epoch time: 205.175 s, per step time: 41.002 ms
+2023-02-20 11:36:34,012:INFO:epoch: [3/90] loss: 3.691725, epoch time: 205.198 s, per step time: 41.007 ms
+2023-02-20 11:39:59,326:INFO:epoch: [4/90] loss: 3.230466, epoch time: 205.363 s, per step time: 41.040 ms
+2023-02-20 11:43:27,646:INFO:epoch: [5/90] loss: 2.961051, epoch time: 208.493 s, per step time: 41.665 ms
 ...
 ```
 
@@ -608,11 +619,11 @@ epoch: 5 step: 5004, loss is 3.4899402
 
 ```bash
 # distribute training result(8 pcs)
-epoch: 1 step: 5004, loss is 5.1779146
-epoch: 2 step: 5004, loss is 4.139395
-epoch: 3 step: 5004, loss is 3.9240637
-epoch: 4 step: 5004, loss is 3.5011306
-epoch: 5 step: 5004, loss is 3.3501816
+2023-02-20 11:57:34,405:INFO:epoch: [1/90] loss: 4.478792, epoch time: 185.971 s, per step time: 37.164 ms
+2023-02-20 11:59:22,711:INFO:epoch: [2/90] loss: 4.082346, epoch time: 107.408 s, per step time: 21.464 ms
+2023-02-20 12:01:09,012:INFO:epoch: [3/90] loss: 4.116436, epoch time: 107.551 s, per step time: 21.493 ms
+2023-02-20 12:02:58,326:INFO:epoch: [4/90] loss: 3.494506, epoch time: 108.719 s, per step time: 21.726 ms
+2023-02-20 12:04:45,646:INFO:epoch: [5/90] loss: 3.412843, epoch time: 107.505 s, per step time: 21.484 ms
 ...
 ```
 

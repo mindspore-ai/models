@@ -18,11 +18,13 @@ CURPATH="$(dirname "$0")"
 # shellcheck source=/dev/null
 . ${CURPATH}/cache_util.sh
 
-if [ $# != 2 ] && [ $# != 3 ] && [ $# != 4 ]
-then 
-    echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)"
-    echo "       bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)"
-    exit 1
+if [ $# != 2 ] && [ $# != 3 ] && [ $# != 4 ] && [ $# != 5 ]
+then
+  echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH]"
+  echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RESUME_CKPT](optional)"
+  echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)"
+  echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional) [RESUME_CKPT](optional)"
+  exit 1
 fi
 
 get_real_path(){
@@ -37,8 +39,8 @@ PATH1=$(get_real_path $1)
 CONFIG_FILE=$(get_real_path $2)
 
 if [ $# == 3 ]
-then 
-    PATH2=$(get_real_path $3)
+then
+    RESUME_CKPT=$(get_real_path $3)
 fi
 
 if [ $# == 4 ]
@@ -47,6 +49,12 @@ then
   EVAL_DATASET_PATH=$(get_real_path $4)
 fi
 
+if [ $# == 5 ]
+then
+  RUN_EVAL=$3
+  EVAL_DATASET_PATH=$(get_real_path $4)
+  RESUME_CKPT=$(get_real_path $5)
+fi
 
 if [ ! -d $PATH1 ]
 then 
@@ -54,9 +62,9 @@ then
     exit 1
 fi 
 
-if [ $# == 4 ] && [ ! -f $PATH2 ]
+if [ $# == 3 ] && [ ! -f $RESUME_CKPT ]
 then
-    echo "error: PRETRAINED_CKPT_PATH=$PATH2 is not a file"
+    echo "error: RESUME_CKPT=$RESUME_CKPT is not a file"
     exit 1
 fi
 
@@ -88,14 +96,14 @@ if [ $# == 2 ]
 then
     mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
            python train.py --config_path=$CONFIG_FILE --run_distribute=True --device_num=$DEVICE_NUM \
-           --device_target="GPU" --data_path=$PATH1 --output_path './output' &> log &
+           --device_target="GPU" --data_path=$PATH1 --output_dir '../outputs' &> log.txt &
 fi
-    
+
 if [ $# == 3 ]
 then
     mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
            python train.py  --config_path=$CONFIG_FILE --run_distribute=True --device_num=$DEVICE_NUM \
-           --device_target="GPU" --data_path=$PATH1 --pre_trained=$PATH2 --output_path './output' &> log &
+           --device_target="GPU" --data_path=$PATH1 --resume_ckpt=$RESUME_CKPT --output_dir '../output' &> log.txt &
 fi
 
 if [ $# == 4 ]
@@ -103,7 +111,19 @@ then
   mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
            python train.py --config_path=$CONFIG_FILE --run_distribute=True  --device_num=$DEVICE_NUM \
            --device_target="GPU" --data_path=$PATH1 --run_eval=$RUN_EVAL --eval_dataset_path=$EVAL_DATASET_PATH \
-           --enable_cache=True --cache_session_id=$CACHE_SESSION_ID --output_path './output' &> log &
+           --enable_cache=True --cache_session_id=$CACHE_SESSION_ID --output_dir '../output' &> log.txt &
+  if [ "x${RUN_EVAL}" == "xTrue" ]
+  then
+    echo -e "\nWhen training run is done, remember to shut down the cache server via \"cache_admin --stop\""
+  fi
+fi
+
+if [ $# == 5 ]
+then
+  mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
+           python train.py --config_path=$CONFIG_FILE --run_distribute=True  --device_num=$DEVICE_NUM --resume_ckpt=$RESUME_CKPT \
+           --device_target="GPU" --data_path=$PATH1 --run_eval=$RUN_EVAL --eval_dataset_path=$EVAL_DATASET_PATH \
+           --enable_cache=True --cache_session_id=$CACHE_SESSION_ID --output_dir '../output' &> log.txt &
   if [ "x${RUN_EVAL}" == "xTrue" ]
   then
     echo -e "\nWhen training run is done, remember to shut down the cache server via \"cache_admin --stop\""

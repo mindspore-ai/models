@@ -64,5 +64,5 @@ cd ./eval || exit
 env > env.log
 echo "start evaluation for device $DEVICE_ID"
 python eval.py --data_path=$PATH1 --checkpoint_file_path=$PATH2 --device_target="GPU" \
---config_path=$CONFIG_FILE &> log &
+--config_path=$CONFIG_FILE &> log.txt &
 cd ..

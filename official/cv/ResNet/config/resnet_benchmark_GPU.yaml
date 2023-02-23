@@ -8,7 +8,7 @@ checkpoint_url: ""
 run_distribute: False
 enable_profiling: False
 data_path: "/cache/data"
-output_path: "/cache/train"
+output_dir: "../outputs"
 load_path: "/cache/checkpoint_path/"
 device_target: "GPU"
 checkpoint_path: "./checkpoint/"
@@ -20,6 +20,8 @@ optimizer: "Momentum"
 infer_label: ""
 batch_size: 256
 epoch_size: 2
+start_epoch: 0
+resume_ckpt: ""
 print_per_steps: 20
 eval: False
 save_ckpt: False

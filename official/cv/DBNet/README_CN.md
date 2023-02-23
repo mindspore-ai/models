@@ -69,6 +69,18 @@ GPU v100 PCIE 32G 8卡；系统： Ubuntu 18.04；内存：502 G；x86 72核 CPU
 
 ## 快速入门
 
+```text
+以训练ICDAR2015数据为例
+config/config_base.yaml配置训练和推理数据集路径
+train:
+    img_dir:
+    gt_dir:
+eval:
+    img_dir:
+    gt_dir:
+下载预训练权重放在DBNet/pretrained目录下
+```
+
 单卡训练：
 
 ```shell

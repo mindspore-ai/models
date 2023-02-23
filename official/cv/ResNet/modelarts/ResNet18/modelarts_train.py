@@ -28,7 +28,7 @@ from mindspore.parallel import set_algo_parameters
 
 from src.lr_generator import get_lr, warmup_cosine_annealing_lr
 from src.CrossEntropySmooth import CrossEntropySmooth
-from src.eval_callback import EvalCallBack
+from src.callback import EvalCallBack
 from src.metric import DistAccuracy, ClassifyCorrectCell
 from src.resnet import resnet18 as resnet
 from src.dataset import create_dataset1 as create_dataset
