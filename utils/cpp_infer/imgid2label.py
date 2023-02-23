@@ -16,7 +16,18 @@
 '''
 Convert imagenet id to label file
 You can run this script by:
-    python --dataset_path=/path/to/ImageNet2012/validation
+    python --dataset_path=/path/to/ImageNet2012/validation_preprocess
+validation_preprocess/ should like this:
+
+└─ validation_preprocess
+  ├─ n01440764
+    ├─ ILSVRC2012_val_00000293.JPEG
+    ├─ ILSVRC2012_val_00002138.JPEG
+    └─......
+  ├─ n01440764
+    └─......
+  └─......
+
 Then imgid2label.txt will be generated in current working directory
 '''
 
@@ -25,8 +36,8 @@ import os
 
 parser = argparse.ArgumentParser(description="default name", add_help=False)
 
-parser.add_argument("--dataset_path", type=str,
-                    default='/path/to/ImageNet2012/validation', help="imagenet path")
+parser.add_argument("--dataset_path", type=str, default='',
+                    help="imagenet absolute path like /path/to/ImageNet2012/validation_preprocess'")
 
 args, _ = parser.parse_known_args()
 dataset_path = args.dataset_path
