@@ -77,7 +77,7 @@ def main(opts):
     model = Model(net_without_loss)
 
     if params_dict:
-        net_not_load = load_param_into_net(net_without_loss, params_dict)
+        net_not_load, _ = load_param_into_net(net_without_loss, params_dict)
         print("===============net_not_load================", net_not_load)
 
     validate_td(model, ds, opts, metaloader, task="caption")

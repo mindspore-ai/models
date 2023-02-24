@@ -78,7 +78,7 @@ def run_train(args):
         param_dict['learning_rate'] = Parameter(Tensor(lr, mstype.float32))
         param_dict['global_step'] = Parameter(Tensor([args.start_epoch * args.steps_per_epoch], mstype.int32))
 
-        para_not_list = load_param_into_net(net, param_dict, strict_load=True)
+        para_not_list, _ = load_param_into_net(net, param_dict, strict_load=True)
         if args.rank == 0:
             logging.info('param not load: %s', str(para_not_list))
             logging.info("load_checkpoint success!!")

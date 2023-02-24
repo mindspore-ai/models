@@ -28,12 +28,12 @@ class Reranker(nn.Cell):
 
         self.encoder = Albert(batch_size)
         param_dict = load_checkpoint(encoder_ck_file)
-        not_load_params_1 = load_param_into_net(self.encoder, param_dict)
+        not_load_params_1, _ = load_param_into_net(self.encoder, param_dict)
         print(f"re-ranker albert not loaded params: {not_load_params_1}")
 
         self.no_answer_mlp = Rerank_Downstream()
         param_dict = load_checkpoint(downstream_ck_file)
-        not_load_params_2 = load_param_into_net(self.no_answer_mlp, param_dict)
+        not_load_params_2, _ = load_param_into_net(self.no_answer_mlp, param_dict)
         print(f"re-ranker downstream not loaded params: {not_load_params_2}")
 
     def construct(self, input_ids, attn_mask, token_type_ids):

@@ -120,7 +120,7 @@ def init_net(cfg):
             raise ValueError(f"pre_trained error: {cfg.pre_trained}")
         print(f"loading pre_trained = {pre_trained_path}", flush=True)
         param_dict = load_checkpoint(pre_trained_path)
-        param_not_load = ms.load_param_into_net(net, param_dict, strict_load=True)
+        param_not_load, _ = ms.load_param_into_net(net, param_dict, strict_load=True)
         print(f'param_not_load: {param_not_load}')
         # net.load_pre_trained_param_dict(param_dict, strict=False)
     return net

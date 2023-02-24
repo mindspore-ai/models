@@ -55,7 +55,7 @@ if __name__ == '__main__':
     # load checkpoint
     if args_opt.pre_trained:
         param_dict = load_checkpoint(args_opt.pre_trained)
-        not_load_param = load_param_into_net(network, param_dict)
+        not_load_param, _ = load_param_into_net(network, param_dict)
         if not_load_param:
             raise ValueError("Load param into network fail!")
     # export network

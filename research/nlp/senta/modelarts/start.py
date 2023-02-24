@@ -192,7 +192,7 @@ if __name__ == "__main__":
     mox.file.copy_parallel(args.ckpt, '/cache/data/roberta.ckpt')
 
     weights = load_checkpoint('/cache/data/roberta.ckpt')
-    unloaded = load_param_into_net(model_with_loss, weights)
+    unloaded, _ = load_param_into_net(model_with_loss, weights)
     print(unloaded)
 
     logging.info("Weights loaded")

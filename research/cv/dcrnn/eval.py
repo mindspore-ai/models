@@ -89,7 +89,7 @@ class DCRNNEVAL:
         print("Model has been completed")
         self.dcrnn_model.set_train(False)
         pretrained_weights = mindspore.load_checkpoint(config.ckpt_path)
-        param_not_load = mindspore.load_param_into_net(self.dcrnn_model, pretrained_weights)
+        param_not_load, _ = mindspore.load_param_into_net(self.dcrnn_model, pretrained_weights)
         print('param not load:', param_not_load)
         total_steps = self.eval_data.get_dataset_size()
         print('total steps:', total_steps)

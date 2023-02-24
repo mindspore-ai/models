@@ -55,7 +55,7 @@ def initialize_backbone(backbone, checkpoint_path):
     ckpt_data['fc.weight'] = backbone.fc.weight
     ckpt_data['fc.bias'] = backbone.fc.bias
 
-    not_loaded = load_param_into_net(backbone, ckpt_data)
+    not_loaded, _ = load_param_into_net(backbone, ckpt_data)
     if not_loaded:
         print(f'The following parameters are not loaded: {not_loaded}')
 

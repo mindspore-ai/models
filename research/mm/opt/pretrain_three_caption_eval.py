@@ -100,7 +100,7 @@ def main(opts):
                 modified_params_dict[k] = v
 
     if modified_params_dict:
-        net_not_load = load_param_into_net(net_without_loss, modified_params_dict)
+        net_not_load, _ = load_param_into_net(net_without_loss, modified_params_dict)
         print("===============net_not_load================", net_not_load)
 
     validate_td(net_without_loss, test_loader, opts, task="caption", ckpt_file=ckpt_file)

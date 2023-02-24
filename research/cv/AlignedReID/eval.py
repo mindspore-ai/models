@@ -190,7 +190,7 @@ def run_eval():
     # pre_trained
     if config.eval_model:
         print('Load model from', config.eval_model)
-        ret = load_param_into_net(network, load_checkpoint(config.eval_model))
+        ret, _ = load_param_into_net(network, load_checkpoint(config.eval_model))
         print(ret)
     else:
         print('PRETRAINED MODEL NOT SELECTED!!!')

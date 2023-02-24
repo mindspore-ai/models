@@ -52,7 +52,7 @@ def run_export():
     dcrnn_model = DCRNNModel(adj_mx, False, supervisor_config.get('data').get('batch_size'), **_model_kwargs)
 
     param_dict = load_checkpoint(config.checkpoint_path)
-    param_not_load = load_param_into_net(dcrnn_model, param_dict)
+    param_not_load, _ = load_param_into_net(dcrnn_model, param_dict)
     print('param_not_load:', param_not_load)
     dcrnn_model.set_train(False)
 

@@ -115,7 +115,7 @@ def infer_combine(images_path=None):
         for key, value in param_dict.items():
             tensor = value.asnumpy().astype(np.float32)
             param_dict[key] = Parameter(tensor, key)
-    param_not_load = load_param_into_net(net, param_dict, strict_load=True)
+    param_not_load, _ = load_param_into_net(net, param_dict, strict_load=True)
 
     if cfg.device_target == "Ascend":
         net.to_float(mstype.float16)

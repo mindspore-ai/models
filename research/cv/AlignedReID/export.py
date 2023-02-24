@@ -43,7 +43,7 @@ def export_network():
     config.image_size = list(map(int, config.image_size.split(',')))
 
     print('Load model from', config.ckpt_file)
-    ret = load_param_into_net(network, load_checkpoint(config.ckpt_file))
+    ret, _ = load_param_into_net(network, load_checkpoint(config.ckpt_file))
     print(ret)
 
     source_image = Tensor(np.ones((config.per_batch_size, 3, *config.image_size)).astype(np.float32))

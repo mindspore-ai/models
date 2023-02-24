@@ -40,7 +40,7 @@ def run_duconv():
 
     network = RetrievalWithSoftmax(config, use_kn)
     param_dict = load_checkpoint(cfg.load_checkpoint_path)
-    not_loaded = load_param_into_net(network, param_dict)
+    not_loaded, _ = load_param_into_net(network, param_dict)
     print(not_loaded)
     network.set_train(False)
 

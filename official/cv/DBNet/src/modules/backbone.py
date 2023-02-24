@@ -211,7 +211,7 @@ def resnet18(pretrained=True, backbone_ckpt=None, **kwargs):
 
     if pretrained:
         ms_dict = ms.load_checkpoint(backbone_ckpt)
-        param_not_load = ms.load_param_into_net(model, ms_dict)
+        param_not_load, _ = ms.load_param_into_net(model, ms_dict)
         print(param_not_load)
 
     return model
@@ -222,7 +222,7 @@ def deformable_resnet18(pretrained=True, backbone_ckpt=None, **kwargs):
 
     if pretrained:
         ms_dict = ms.load_checkpoint(backbone_ckpt)
-        param_not_load = ms.load_param_into_net(model, ms_dict)
+        param_not_load, _ = ms.load_param_into_net(model, ms_dict)
         print(param_not_load)
 
     return model
@@ -237,7 +237,7 @@ def resnet50(pretrained=True, backbone_ckpt=None, **kwargs):
 
     if pretrained:
         ms_dict = ms.load_checkpoint(backbone_ckpt)
-        param_not_load = ms.load_param_into_net(model, ms_dict)
+        param_not_load, _ = ms.load_param_into_net(model, ms_dict)
         print(param_not_load)
 
     return model
@@ -252,7 +252,7 @@ def deformable_resnet50(pretrained=True, backbone_ckpt=None, **kwargs):
 
     if pretrained:
         ms_dict = ms.load_checkpoint(backbone_ckpt)
-        param_not_load = ms.load_param_into_net(model, ms_dict)
+        param_not_load, _ = ms.load_param_into_net(model, ms_dict)
         print(param_not_load)
 
     return model

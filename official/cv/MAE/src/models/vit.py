@@ -132,7 +132,7 @@ class FineTuneVit(nn.Cell):
 
     def init_weights(self, param_dict):
         """Full model weights initialization."""
-        net_not_load = load_param_into_net(self, param_dict)
+        net_not_load, _ = load_param_into_net(self, param_dict)
         return net_not_load
 
     @staticmethod

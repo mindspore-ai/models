@@ -67,7 +67,7 @@ def do_train(task_type, dataset=None, network=None, load_checkpoint_path="", sav
                                  directory=None if save_checkpoint_path == "" else save_checkpoint_path,
                                  config=ckpt_config)
     param_dict = load_checkpoint(load_checkpoint_path)
-    unloaded_params = load_param_into_net(network, param_dict)
+    unloaded_params, _ = load_param_into_net(network, param_dict)
     if len(unloaded_params) > 2:
         print(unloaded_params)
         logger.warning('Loading ernie model failed, please check the checkpoint file.')

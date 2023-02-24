@@ -38,7 +38,7 @@ set_seed(config.seed)
 def initialize_trn_network(trn_net, checkpoint_path):
     """Initialize network with the specified checkpoint"""
     ckpt_data = load_checkpoint(checkpoint_path)
-    not_loaded = load_param_into_net(trn_net, ckpt_data)
+    not_loaded, _ = load_param_into_net(trn_net, ckpt_data)
     if not_loaded:
         print(f'The following parameters are not loaded: {not_loaded}')
 
