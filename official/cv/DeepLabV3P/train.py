@@ -163,7 +163,6 @@ def train():
 
     # loss
     loss_ = loss.SoftmaxCrossEntropyLoss(args.num_classes, args.ignore_label)
-    loss_.add_flags_recursive(fp32=True)
     train_net = BuildTrainNetwork(network, loss_)
 
     # load pretrained model
@@ -198,6 +197,7 @@ def train():
     manager_loss_scale = FixedLossScaleManager(args.loss_scale, drop_overflow_update=False)
     amp_level = "O0" if args.device_target != "Ascend" else "O3"
     model = Model(train_net, optimizer=opt, amp_level=amp_level, loss_scale_manager=manager_loss_scale)
+    loss_.add_flags_recursive(fp32=True)
 
     # callback for saving ckpts
     time_cb = TimeMonitor(data_size=iters_per_epoch)
