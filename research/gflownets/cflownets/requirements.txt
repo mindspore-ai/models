@@ -1,0 +1,5 @@
+numpy==1.19.2
+gym==0.21.0
+mindspore==1.9.0
+mindspore-gpu==1.9.0
+scipy==1.6.2
