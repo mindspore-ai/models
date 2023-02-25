@@ -38,6 +38,8 @@ parser = argparse.ArgumentParser(description="default name", add_help=False)
 
 parser.add_argument("--dataset_path", type=str, default='',
                     help="imagenet absolute path like /path/to/ImageNet2012/validation_preprocess'")
+parser.add_argument("--output_name", type=str, default='img_id_2_label.txt',
+                    help="output file name, default is img_id_2_label.txt")
 
 args, _ = parser.parse_known_args()
 dataset_path = args.dataset_path
@@ -51,5 +53,5 @@ for cls_idx, cls_name in enumerate(all_classes):
         img = img.split('.')[0]
         label_list.append(f'{img}:{cls_idx}\n')
 
-with open('imgid2label.txt', 'w') as fp:
+with open(args.output_name, 'w') as fp:
     fp.writelines(label_list)
