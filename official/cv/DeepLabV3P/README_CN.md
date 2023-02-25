@@ -63,7 +63,7 @@ Pascal VOC数据集: [链接](https://host.robots.ox.ac.uk/pascal/VOC/), 和语�
 
 - 准备Backbone模型
 
-准备resnet101模型，GPU: [点此下载](https://download.mindspore.cn/models/r1.3/resnet101_ascend_v130_imagenet2012_official_cv_top1acc78.55_top5acc94.34.ckpt); Ascend: [点此下载](https://download.mindspore.cn/model_zoo/official/cv/deeplabv3p/resnet101-5d3b4d8f.ckpt)。
+准备resnet101模型，GPU: [点此下载](https://download.mindspore.cn/models/r1.3/resnet101_ascend_v130_imagenet2012_official_cv_top1acc78.55_top5acc94.34.ckpt); Ascend: [点此下载](https://download.mindspore.cn/model_zoo/official/cv/deeplabv3p/resnet101_ascend_v120_imagenet2012_official_cv_bs32_acc78.ckpt)。
 
 - 下载分段数据集。
 
