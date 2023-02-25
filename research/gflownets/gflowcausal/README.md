@@ -2,7 +2,7 @@
 
 ## Paper
 
-GFlowCausal: Generative Flow Networks for Causal Discovery, NeurIPS 2022
+GFlowCausal: Generative Flow Networks for Causal Discovery
 
 ## Introduction
 
@@ -25,7 +25,7 @@ ER、SF
 
 language：python 3.7.0
 
-framework：MindSpore 1.5.0
+framework：MindSpore 1.9.0
 
 ## Directory
 
@@ -35,10 +35,11 @@ framework：MindSpore 1.5.0
   |
   ├─castle
   | ├─metrics
+  |   ├─evaluation.py
   | ├─datasets
-  | └─data_loader.py        # data
+  |   ├─simulator.py
   |
-  ├─networl
+  ├─network
   | ├─model_ms.py          # ms network model
   |
   ├─README.md
