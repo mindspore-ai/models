@@ -62,6 +62,8 @@ def set_default():
 def train():
     set_default()
     config.logger = get_logger(config.log_dir, config.rank_id)
+    config.logger.info("config : %s", config)
+    config.logger.info("Please check the above information for the configurations")
 
     if config.device_target == 'Ascend':
         device_id = get_device_id()

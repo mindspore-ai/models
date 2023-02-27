@@ -17,7 +17,7 @@
 import os
 import ast
 import argparse
-from pprint import pprint, pformat
+from pprint import pformat
 import yaml
 
 
@@ -92,7 +92,6 @@ def parse_yaml(yaml_path):
                 cfg, cfg_helper, cfg_choices = cfgs
             else:
                 raise ValueError('At most 3 docs (config description for help, choices) are supported in config yaml')
-            print(cfg_helper)
         except:
             raise ValueError('Failed to parse yaml')
     return cfg, cfg_helper, cfg_choices
@@ -124,8 +123,6 @@ def get_config():
     default, helper, choices = parse_yaml(path_args.config_path)
     args = parse_cli_to_yaml(parser=parser, cfg=default, helper=helper, choices=choices, cfg_path=path_args.config_path)
     final_config = merge(args, default)
-    pprint(final_config)
-    print("Please check the above information for the configurations", flush=True)
     return Config(final_config)
 
 config = get_config()
