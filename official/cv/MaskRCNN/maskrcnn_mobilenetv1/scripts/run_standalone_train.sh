@@ -32,7 +32,7 @@ PATH1=$(get_real_path $1)
 PATH2=$3
 echo $PATH1
 
-if [ $# == 2 ]
+if [ $# == 3 ]
 then
     echo $PATH2
 fi
@@ -55,12 +55,12 @@ cp -r ../src ./train
 cd ./train || exit
 echo "start training for device $DEVICE_ID"
 env > env.log
-if [ $# == 2 ]
+if [ $# == 3 ]
 then
     python train.py --coco_root=$PATH1 --do_train=True --device_id=$DEVICE_ID --pre_trained=$PATH2 &> log &
 fi
 
-if [ $# == 1 ]
+if [ $# == 2 ]
 then
     python train.py --coco_root=$PATH1 --do_train=True --device_id=$DEVICE_ID &> log &
 fi

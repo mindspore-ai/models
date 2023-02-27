@@ -32,7 +32,7 @@ PATH1=$(get_real_path $1)
 PATH2=$3
 echo $PATH1
 
-if [ $# == 2 ]
+if [ $# == 3 ]
 then
     echo $PATH2
 fi
@@ -54,12 +54,12 @@ cd ./train || exit
 
 echo "======start training======"
 env > env.log
-if [ $# == 2 ]
+if [ $# == 3 ]
 then
     python train.py --coco_root=$PATH1 --do_train=True --device_target=GPU --pre_trained=$PATH2 &> log &
 fi
 
-if [ $# == 1 ]
+if [ $# == 2 ]
 then
     python train.py --coco_root=$PATH1 --do_train=True --device_target=GPU &> log &
 fi
