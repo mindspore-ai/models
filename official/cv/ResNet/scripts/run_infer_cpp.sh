@@ -92,7 +92,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python ../preprocess.py --data_path=$data_path --output_path=./preprocess_Result --config_path=$config_path &> preprocess.log
+    python ../preprocess.py --data_path=$data_path --output_dir=./preprocess_Result --config_path=$config_path &> preprocess.log
 }
 
 function infer()

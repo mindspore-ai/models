@@ -175,7 +175,7 @@ def load_pre_trained_checkpoint():
     config.pre_trained = os.path.join(os.path.dirname(os.path.abspath(__file__)), config.pre_trained)
     if config.pre_trained:
         if os.path.isdir(config.pre_trained):
-            ckpt_save_dir = os.path.join(config.output_path, config.checkpoint_path, "ckpt_0")
+            ckpt_save_dir = os.path.join(config.output_dir, config.checkpoint_path, "ckpt_0")
             ckpt_pattern = os.path.join(ckpt_save_dir, "*.ckpt")
             ckpt_files = glob.glob(ckpt_pattern)
             if not ckpt_files:
@@ -298,7 +298,7 @@ def run_eval(target, model, ckpt_save_dir, cb):
 
 def set_save_ckpt_dir():
     """set save ckpt dir"""
-    ckpt_save_dir = os.path.join(config.output_path, config.checkpoint_path)
+    ckpt_save_dir = os.path.join(config.output_dir, config.checkpoint_path)
     if config.enable_modelarts and config.run_distribute:
         ckpt_save_dir = ckpt_save_dir + "ckpt_" + str(get_rank_id()) + "/"
     else:
@@ -332,7 +332,7 @@ def _export_air(ckpt_dir):
     ms.export(net, input_arr, file_name=config.file_name, file_format="AIR")
 
     file_name = config.file_name + ".air"
-    mox.file.copy(file_name, os.path.join(config.output_path, file_name))
+    mox.file.copy(file_name, os.path.join(config.output_dir, file_name))
     print("Export success.")
 
 

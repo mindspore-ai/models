@@ -89,14 +89,14 @@ def moxing_wrapper(pre_process=None, post_process=None):
                     sync_data(config.checkpoint_url, config.load_path)
                     print("Preload downloaded: ", os.listdir(config.load_path))
                 if config.train_url:
-                    sync_data(config.train_url, config.output_path)
-                    print("Workspace downloaded: ", os.listdir(config.output_path))
+                    sync_data(config.train_url, config.output_dir)
+                    print("Workspace downloaded: ", os.listdir(config.output_dir))
 
-                ms.set_context(save_graphs_path=os.path.join(config.output_path, str(get_rank_id())))
+                ms.set_context(save_graphs_path=os.path.join(config.output_dir, str(get_rank_id())))
                 config.device_num = get_device_num()
                 config.device_id = get_device_id()
-                if not os.path.exists(config.output_path):
-                    os.makedirs(config.output_path)
+                if not os.path.exists(config.output_dir):
+                    os.makedirs(config.output_dir)
 
                 if pre_process:
                     pre_process()
@@ -110,6 +110,6 @@ def moxing_wrapper(pre_process=None, post_process=None):
 
                 if config.train_url:
                     print("Start to copy output directory")
-                    sync_data(config.output_path, config.train_url)
+                    sync_data(config.output_dir, config.train_url)
         return wrapped_func
     return wrapper

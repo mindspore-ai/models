@@ -725,7 +725,7 @@ result: {'top_5_accuracy': 0.9342589628681178, 'top_1_accuracy': 0.7680657810499
 Export MindIR on local
 
 ```shell
-python export.py --checkpoint_file_path [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [CONFIG_PATH]
+python export.py --checkpoint_file_path [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [CONFIG_PATH] --batch_size 1
 ```
 
 The checkpoint_file_path parameter is required,
@@ -950,7 +950,7 @@ bash run_export.sh ../pruner/uni_pruning/ ../pruner/uni_pruning/resnet50_config.
 #At the end the pruned model is also exported as .MINDIR and .AIR for inference deployment
 
 !!! # To get pruned model, config.mask_path (pruning mask) should be set:
-    # Pruning masks are saved as .json during training in the os.path.join(config.output_path, config.exp_name)
+    # Pruning masks are saved as .json during training in the os.path.join(config.output_dir, config.exp_name)
 
 bash scripts/run_eval.sh pruner/uni_pruning pruner/uni_pruning/resnet50_config.yaml /path/to/val/dataset /path/to/checkpoint
 ```

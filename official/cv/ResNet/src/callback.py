@@ -29,10 +29,9 @@ class LossCallBack(Callback):
     If the loss in NAN or INF terminating training.
     """
 
-    def __init__(self, epoch_size, data_size, logger, lr, per_print_time=1, global_steps=0):
+    def __init__(self, epoch_size, logger, lr, per_print_time=1, global_steps=0):
         super(LossCallBack, self).__init__()
         self.epoch_size = epoch_size
-        self.data_size = data_size
         self.logger = logger
         self.lr = lr
         self.global_steps = global_steps
@@ -43,7 +42,7 @@ class LossCallBack(Callback):
     def step_end(self, run_context):
         cb_params = run_context.original_args()
         loss = cb_params.net_outputs
-        data_sink_mode = cb_params.dataset_sink_mode
+        data_sink_mode = cb_params.get('dataset_sink_mode', False)
         if not data_sink_mode:
             if isinstance(loss, (tuple, list)):
                 if isinstance(loss[0], ms.Tensor) and isinstance(loss[0].asnumpy(), np.ndarray):
@@ -58,13 +57,13 @@ class LossCallBack(Callback):
                 raise ValueError("epoch: {} step: {}. Invalid loss, terminating training.".format(
                     cb_params.cur_epoch_num, cur_step_in_epoch))
 
-            cur_epoch_step = (self.global_steps + 1) % self.data_size
+            cur_epoch_step = (self.global_steps + 1) % cb_params.batch_num
             if cur_epoch_step % self.per_print_time == 0 and self.global_steps != 0:
                 # pylint: disable=line-too-long
                 per_step_time = 1000 * (time.time() - self.step_start_time) / self.per_print_time
                 log_info = "epoch: [%s/%s] step: [%s/%s], lr: %.6f, loss: %.6f, per step time: %.3f ms" % (
-                    cur_epoch_num, self.epoch_size, cur_step_in_epoch, self.data_size, self.lr[self.global_steps], loss,
-                    per_step_time)
+                    cur_epoch_num, self.epoch_size, cur_step_in_epoch, cb_params.batch_num, self.lr[self.global_steps],
+                    loss, per_step_time)
                 self.logger.info(log_info)
                 self.step_start_time = time.time()
         self.global_steps += 1
@@ -86,7 +85,7 @@ class LossCallBack(Callback):
 
         epoch_time = time.time() - self.epoch_start_time
         log_info = 'epoch: [%s/%s] loss: %.6f, epoch time: %.3f s, per step time: %.3f ms' % (
-            cur_epoch_num, self.epoch_size, loss, epoch_time, epoch_time * 1000 / self.data_size)
+            cur_epoch_num, self.epoch_size, loss, epoch_time, epoch_time * 1000 / cb_params.batch_num)
         self.logger.info(log_info)
 
 

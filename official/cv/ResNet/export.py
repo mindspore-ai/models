@@ -29,7 +29,7 @@ if config.device_target != "GPU":
 
 def modelarts_pre_process():
     # modelarts pre process function.
-    config.file_name = os.path.join(config.output_path, config.file_name)
+    config.file_name = os.path.join(config.output_dir, config.file_name)
 
 
 @moxing_wrapper(pre_process=modelarts_pre_process)

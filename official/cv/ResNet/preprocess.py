@@ -23,8 +23,8 @@ if __name__ == '__main__':
                              target="Ascend")
     step_size = dataset.get_dataset_size()
 
-    img_path = os.path.join(config.output_path, "img_data")
-    label_path = os.path.join(config.output_path, "label")
+    img_path = os.path.join(config.output_dir, "img_data")
+    label_path = os.path.join(config.output_dir, "label")
     os.makedirs(img_path)
     os.makedirs(label_path)
 
