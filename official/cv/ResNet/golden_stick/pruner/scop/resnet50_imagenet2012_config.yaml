@@ -27,6 +27,7 @@ weight_decay: 0.0001
 epoch_kf: 50
 epoch_ft: 90
 pretrain_epoch_size: 0
+start_epoch: 0
 save_checkpoint: True
 save_checkpoint_epochs: 5
 keep_checkpoint_max: 10
