@@ -233,6 +233,7 @@ def train_net():
                 warmup_epochs=config.warmup_epochs,
                 total_epochs=config.epoch_size,
                 steps_per_epoch=step_size,
+                start_epoch=config.start_epoch,
                 lr_decay_mode=config.lr_decay_mode)
     if config.pre_trained:
         lr = lr[config.has_trained_epoch * step_size:]

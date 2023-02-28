@@ -210,6 +210,7 @@ def train_net():
                 lr_max=config.lr_max,
                 warmup_epochs=config.warmup_epochs,
                 total_epochs=config.epoch_size,
+                start_epoch=config.start_epoch,
                 steps_per_epoch=step_size,
                 lr_decay_mode='cosine')
 

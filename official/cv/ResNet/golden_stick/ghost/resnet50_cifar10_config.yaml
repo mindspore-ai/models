@@ -24,6 +24,7 @@ loss_scale: 1024
 momentum: 0.9
 weight_decay: 0.000001
 epoch_size: 500
+start_epoch: 0
 pretrain_epoch_size: 0
 save_checkpoint: True
 save_checkpoint_epochs: 5
