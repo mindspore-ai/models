@@ -33,7 +33,7 @@ DEFINE_int32(input_width, 960, "input width");
 DEFINE_int32(input_height, 576, "inputheight");
 DEFINE_int32(device_id, 0, "device id");
 DEFINE_string(device_type, "CPU", "device type");
-DEFINE_string(precision_mode, "allow_fp32_to_fp16", "precision mode");
+DEFINE_string(precision_mode, "preferred_fp32", "precision mode");
 DEFINE_string(op_select_impl_mode, "", "op select impl mode");
 DEFINE_string(aipp_path, "./aipp.cfg", "aipp path");
 DEFINE_string(device_target, "Ascend310", "device target");

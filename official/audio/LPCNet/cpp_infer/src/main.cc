@@ -77,7 +77,7 @@ DEFINE_string(encoder_path, "", "encoder path");
 DEFINE_string(decoder_path, "", "decoder path");
 DEFINE_string(dataset_path, ".", "dataset path");
 DEFINE_int32(device_id, 0, "device id");
-DEFINE_string(precision_mode, "allow_fp32_to_fp16", "precision mode");
+DEFINE_string(precision_mode, "preferred_fp32", "precision mode");
 DEFINE_string(op_select_impl_mode, "", "op select impl mode");
 DEFINE_string(aipp_path, "./aipp.cfg", "aipp path");
 DEFINE_string(device_target, "Ascend310", "device target");
@@ -243,7 +243,7 @@ int main(int argc, char **argv) {
 
     auto ascend310_info = std::make_shared<mindspore::Ascend310DeviceInfo>();
     ascend310_info->SetDeviceID(FLAGS_device_id);
-    ascend310_info->SetPrecisionMode("allow_fp32_to_fp16");
+    ascend310_info->SetPrecisionMode("preferred_fp32");
     ascend310_info->SetOpSelectImplMode("high_precision");
 
     Status ret;

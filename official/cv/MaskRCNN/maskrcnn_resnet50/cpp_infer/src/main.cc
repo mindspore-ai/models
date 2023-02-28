@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
   }
   auto ascend = std::make_shared<mindspore::AscendDeviceInfo>();
   ascend->SetDeviceID(FLAGS_device_id);
-  ascend->SetPrecisionMode("allow_fp32_to_fp16");
+  ascend->SetPrecisionMode("preferred_fp32");
   Model model;
   if (!LoadModel(FLAGS_mindir_path, FLAGS_device_type, FLAGS_device_id, ascend, &model)) {
     std::cout << "Failed to load model " << FLAGS_mindir_path << ", device id: " << FLAGS_device_id
