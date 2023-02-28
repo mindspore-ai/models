@@ -188,7 +188,7 @@ def run_eval():
             param_dict_new = {}
             for key, values in param_dict.items():
                 np_value = values.asnumpy()
-                np_value[np_value.isnan(np_value)] = 0
+                np_value[np.isnan(np_value)] = 0
                 values = Parameter(np_value)
                 if key.startswith('moments.'):
                     continue
