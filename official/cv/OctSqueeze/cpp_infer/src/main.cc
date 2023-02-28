@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
   }
   auto ascend = std::make_shared<mindspore::AscendDeviceInfo>();
   ascend->SetDeviceID(FLAGS_device_id);
-  ascend->SetPrecisionMode("allow_fp32_to_fp16");
+  ascend->SetPrecisionMode("preferred_fp32");
   ascend->SetOpSelectImplMode("high_precision");
   Model model;
   if (!LoadModel(FLAGS_model_path, FLAGS_device_type, FLAGS_device_id, ascend, &model)) {
