@@ -53,7 +53,7 @@ class GANLoss(nn.Cell):
         if use_lsgan:
             self.loss = nn.MSELoss()
         else:
-            self.loss = nn.BCEloss()
+            self.loss = nn.BCEloss(reduction="none")
         self.ones = ops.OnesLike()
         self.zeros = ops.ZerosLike()
 
