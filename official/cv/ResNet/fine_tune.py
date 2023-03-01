@@ -134,7 +134,7 @@ def finetune_train():
     step_size = dataset_train.get_dataset_size()
     time_cb = TimeMonitor(data_size=step_size)
     lr = ms.Tensor([config.learning_rate] * step_size * config.epoch_size)
-    loss_cb = LossCallBack(config.epoch_size, step_size, config.logger, lr, per_print_time=10)
+    loss_cb = LossCallBack(config.epoch_size, config.logger, lr, per_print_time=10)
     cb = [time_cb, loss_cb]
 
     if config.run_eval:

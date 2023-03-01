@@ -154,7 +154,7 @@ def train():
         mode = ms.PYNATIVE_MODE
         all_reduce_fusion_config = [30, 90, 160]
     ms.set_context(mode=mode, device_target=dev, save_graphs=False)
-    ckpt_save_dir = os.path.join(config.output_path, config.checkpoint_path)
+    ckpt_save_dir = os.path.join(config.output_dir, config.checkpoint_path)
     if config.run_distribute:
         init()
         device_num = get_group_size()

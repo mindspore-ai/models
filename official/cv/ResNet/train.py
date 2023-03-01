@@ -200,7 +200,7 @@ def train_net():
         config.logger.info('resume train from epoch: %s', config.start_epoch)
 
     # define callbacks
-    loss_cb = LossCallBack(config.epoch_size, step_size, config.logger, lr, per_print_time=10)
+    loss_cb = LossCallBack(config.epoch_size, config.logger, lr, per_print_time=10)
     resume_cb = ResumeCallback(config.start_epoch)
     cb = [loss_cb, resume_cb]
     if config.save_checkpoint and config.rank_id == 0:
