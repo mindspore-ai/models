@@ -59,7 +59,11 @@ ResNet-101 is used as the backbone, encoder-decoder is used to perform multi-sca
 
 # Datasets
 
-The PASCAL VOC dataset and semantic boundaries dataset (SBD)
+[The PASCAL VOC dataset](https://host.robots.ox.ac.uk/pascal/VOC/) and [semantic boundaries dataset (SBD)](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/semantic_contours/benchmark.tgz).
+
+- Download pretrain model
+
+GPU: [click to download](https://download.mindspore.cn/models/r1.3/resnet101_ascend_v130_imagenet2012_official_cv_top1acc78.55_top5acc94.34.ckpt); Ascend: [clink to download](https://download.mindspore.cn/model_zoo/official/cv/deeplabv3p/resnet101_ascend_v120_imagenet2012_official_cv_bs32_acc78.ckpt)
 
 - Download the segmentation dataset.
 

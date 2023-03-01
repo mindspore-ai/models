@@ -45,7 +45,7 @@ fi
 # check checkpoint file
 if [ ! -f $4 ]
 then
-    echo "error: CHECKPOINT_PATH=$3 is not a file"
+    echo "error: CHECKPOINT_PATH=$4 is not a file"
 exit 1
 fi
 
