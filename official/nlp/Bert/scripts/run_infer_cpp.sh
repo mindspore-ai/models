@@ -81,12 +81,24 @@ if [ $net_type == 'squad' ]; then
     echo "DEVICE_TYPE can choose from [Ascend, GPU, CPU]"
     exit 1
     fi
+
+    if [ ${10} == 'GPU' ]; then
+        if [ $CUDA_VISIABLE_DEVICES ]; then
+            device_id=$CUDA_VISIABLE_DEVICES
+        fi
+    fi
 else
     if [ $8 == 'Ascend' ] || [ $8 == 'GPU' ] || [ $8 == 'CPU' ]; then
     device_type=$8
     else
     echo "DEVICE_TYPE can choose from [Ascend, GPU, CPU]"
     exit 1
+    fi
+
+    if [ $8 == 'GPU' ]; then
+        if [ $CUDA_VISIABLE_DEVICES ]; then
+            device_id=$CUDA_VISIABLE_DEVICES
+        fi
     fi
 fi
 echo "device type: "$device_type

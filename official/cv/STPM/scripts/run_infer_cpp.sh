@@ -41,6 +41,12 @@ fi
 device_id=$4
 category=$5
 
+if [ $6 == 'GPU' ]; then
+    if [ $CUDA_VISIABLE_DEVICES ]; then
+        device_id=$CUDA_VISIABLE_DEVICES
+    fi
+fi
+
 echo "Mindir name: "$model
 echo "dataset path: "$dataset_path
 echo "need preprocess: "$need_preprocess

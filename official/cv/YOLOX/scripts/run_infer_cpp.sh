@@ -37,6 +37,12 @@ if [ $# == 4 ]; then
     device_id=$4
 fi
 
+if [ $3 == 'GPU' ]; then
+    if [ $CUDA_VISIABLE_DEVICES ]; then
+        device_id=$CUDA_VISIABLE_DEVICES
+    fi
+fi
+
 echo $model
 echo $data_dir
 echo $device_id

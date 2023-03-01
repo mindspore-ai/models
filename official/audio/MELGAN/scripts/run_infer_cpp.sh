@@ -42,6 +42,12 @@ elif [ $# == 3 ]; then
     fi
 fi
 
+if [ $3 == 'GPU' ]; then
+    if [ $CUDA_VISIABLE_DEVICES ]; then
+        device_id=$CUDA_VISIABLE_DEVICES
+    fi
+fi
+
 echo $model
 echo $data_path
 echo $device_id

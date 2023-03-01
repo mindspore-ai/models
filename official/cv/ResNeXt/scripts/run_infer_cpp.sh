@@ -37,6 +37,12 @@ if [ $# == 4 ]; then
     device_id=$4
 fi
 
+if [ $2 == 'GPU' ]; then
+    if [ $CUDA_VISIABLE_DEVICES ]; then
+        device_id=$CUDA_VISIABLE_DEVICES
+    fi
+fi
+
 echo "mindir name: "$model
 echo "mindir device target: "$device_target
 echo "dataset path: "$data_path

@@ -45,6 +45,12 @@ fi
 BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
 CONFIG_FILE="${BASE_PATH}/../default_config.yaml"
 
+if [ $4 == 'GPU' ]; then
+    if [ $CUDA_VISIABLE_DEVICES ]; then
+        device_id=$CUDA_VISIABLE_DEVICES
+    fi
+fi
+
 echo $model
 echo $data_path
 echo $label_file

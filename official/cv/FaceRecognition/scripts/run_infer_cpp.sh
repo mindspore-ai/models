@@ -37,6 +37,12 @@ if [ $# == 3 ]; then
     device_id=$3
 fi
 
+if [ $2 == 'GPU' ]; then
+    if [ $CUDA_VISIABLE_DEVICES ]; then
+        device_id=$CUDA_VISIABLE_DEVICES
+    fi
+fi
+
 echo ${dirname_path}
 # dev=`expr $USE_DEVICE_ID + 0`
 

@@ -58,6 +58,12 @@ if [ $# -eq 8 ]; then
     device_id=$8
 fi
 
+if [ $4 == 'GPU' ]; then
+    if [ $CUDA_VISIABLE_DEVICES ]; then
+        device_id=$CUDA_VISIABLE_DEVICES
+    fi
+fi
+
 echo "mindir name: "$model
 echo "dataset path: "$data_path
 echo "anno_path: " $anno_path

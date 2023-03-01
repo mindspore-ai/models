@@ -38,6 +38,12 @@ if [ $# == 3 ]; then
 fi
 dataset="shm"
 
+if [ $2 == 'GPU' ]; then
+    if [ $CUDA_VISIABLE_DEVICES ]; then
+        device_id=$CUDA_VISIABLE_DEVICES
+    fi
+fi
+
 if [ $2 == 'Ascend' ] || [ $2 == 'GPU' ] || [ $2 == 'CPU' ]; then
   device_type=$2
 else
