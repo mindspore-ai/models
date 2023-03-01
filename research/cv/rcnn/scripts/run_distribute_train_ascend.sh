@@ -45,13 +45,13 @@ for ((i = 0; i < ${DEVICE_NUM}; i++)); do
   rm -rf ./train_parallel$i
   mkdir ./train_parallel$i
   cp ../*.py ./train_parallel$i
+  cp ../*.yaml ./train_parallel$i
   cp -r ../src ./train_parallel$i
   cd train_parallel$i || exit
   ln -s ../../data data
-  ln -s ../../models models
   echo "start training finetune for rank $RANK_ID, device $DEVICE_ID"
   env >env.log
-  python train.py --device=${DEVICE_ID} --step 0 >log_train_finetune 2>&1 &
+  python train.py --config_path=./default_config.yaml --device_id=${DEVICE_ID} --step 0 >log_train_finetune 2>&1 &
   cd ..
 done
 
@@ -62,7 +62,7 @@ for ((i = 0; i < ${DEVICE_NUM}; i++)); do
   export RANK_ID=$i
   cd ./train_parallel$i || exit
   echo "start training svm for rank $RANK_ID, device $DEVICE_ID"
-  python train.py --device=${DEVICE_ID} --step 1 >log_train_svm 2>&1 &
+  python train.py --config_path=./default_config.yaml --device_id=${DEVICE_ID} --step 1 >log_train_svm 2>&1 &
   cd ..
 done
 
@@ -73,6 +73,6 @@ for ((i = 0; i < ${DEVICE_NUM}; i++)); do
   export RANK_ID=$i
   cd ./train_parallel$i || exit
   echo "start training regression for rank $RANK_ID, device $DEVICE_ID"
-  python train.py --device=${DEVICE_ID} --step 2 >log_train_regression 2>&1 &
+  python train.py --config_path=./default_config.yaml --device_id=${DEVICE_ID} --step 2 >log_train_regression 2>&1 &
   cd ..
 done
