@@ -15,6 +15,7 @@
 """
 Train RCNN and get checkpoint files.
 """
+import os
 import numpy as np
 import mindspore
 from mindspore import load_param_into_net, load_checkpoint, Tensor, nn
@@ -154,7 +155,7 @@ def eval_svm():
 
 
 if __name__ == '__main__':
-
+    os.makedirs(Model.save_path, exist_ok=True)
     device_id = config.device_id
     step = config.step
     device_type = config.device_type

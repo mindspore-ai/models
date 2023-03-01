@@ -20,8 +20,8 @@ exit 1
 fi
 
 export DEVICE_ID=$1
-python ../train.py -d=${DEVICE_ID} --step=0 >train_log_finetune 2>&1 &
+python ../train.py --config_path=../default_config.yaml --device_id=${DEVICE_ID} --step=0 >train_log_finetune 2>&1 &
 wait
-python ../train.py -d=${DEVICE_ID} --step=1 >train_log_svm 2>&1 &
+python ../train.py --config_path=../default_config.yaml --device_id=${DEVICE_ID} --step=1 >train_log_svm 2>&1 &
 wait
-python ../train.py -d=${DEVICE_ID} --step=2 >train_log_regression 2>&1 &
+python ../train.py --config_path=../default_config.yaml --device_id=${DEVICE_ID} --step=2 >train_log_regression 2>&1 &
