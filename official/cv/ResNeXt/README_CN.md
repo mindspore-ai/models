@@ -337,10 +337,11 @@ ModelArts导出mindir
 目前仅可处理batch_Size为1。
 
 ```shell
-bash run_infer_cpp.sh [MINDIR_PATH] [DEVICE_TARGET] [DATA_PATH] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [MODEL_DEVICE_TYPE] [INFER_DEVICE_TYPE] [DATA_PATH] [DEVICE_ID]
 ```
 
-`DEVICE_TARGET` 生成MindIR的环境, 在'Ascend'，'GPU'和'CPU'中选择。
+`MODEL_DEVICE_TYPE` 生成MindIR的环境, 在'Ascend'，'GPU'中选择。
+`INFER_DEVICE_TYPE` 执行推理的环境, 在'Ascend'，'GPU'和'CPU'中选择。
 `DEVICE_ID` 可选，默认值为 0。
 
 ### 结果
