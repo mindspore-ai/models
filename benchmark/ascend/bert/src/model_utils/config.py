@@ -157,6 +157,7 @@ def extra_operations(cfg):
             _bert_net_cfg = cfg.large_boost_net_cfg
         else:
             pass
+        _bert_net_cfg.use_packed = cfg.use_packed
         cfg.bert_net_cfg = BertConfig(**_bert_net_cfg.__dict__)
     elif cfg.description == 'run_ner':
         cfg.optimizer_cfg.AdamWeightDecay.decay_filter = \
@@ -193,7 +194,7 @@ def get_config():
         current_dir = os.path.dirname(os.path.abspath(__file__))
         return os.path.join(current_dir, path_relative)
     parser = argparse.ArgumentParser(description="default name", add_help=False)
-    parser.add_argument("--config_path", type=get_abs_path, default="../../pretrain_config.yaml",
+    parser.add_argument("--config_path", type=get_abs_path, default="../../pretrain_config_Ascend_Boost.yaml",
                         help="Config file path")
     path_args, _ = parser.parse_known_args()
     default, helper, choices = parse_yaml(path_args.config_path)

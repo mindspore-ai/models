@@ -164,9 +164,9 @@ class BertPreTraining(nn.Cell):
         self.cls2 = GetNextSentenceOutput(config)
 
     def construct(self, input_ids, input_mask, token_type_id,
-                  masked_lm_positions):
+                  masked_lm_positions, next_sentence_starts=None):
         sequence_output, pooled_output, embedding_table = \
-            self.bert(input_ids, token_type_id, input_mask)
+            self.bert(input_ids, token_type_id, input_mask, next_sentence_starts)
         prediction_scores = self.cls1(sequence_output,
                                       embedding_table,
                                       masked_lm_positions)
@@ -187,6 +187,7 @@ class BertPretrainingLoss(nn.Cell):
 
     def __init__(self, config):
         super(BertPretrainingLoss, self).__init__()
+        self.use_packed = config.use_packed
         self.vocab_size = config.vocab_size
         self.onehot = P.OneHot()
         self.on_value = Tensor(1.0, mstype.float32)
@@ -199,10 +200,12 @@ class BertPretrainingLoss(nn.Cell):
         self.cast = P.Cast()
 
     def construct(self, prediction_scores, seq_relationship_score, masked_lm_ids,
-                  masked_lm_weights, next_sentence_labels):
+                  masked_lm_weights, next_sentence_labels, next_sentence_weights=None):
         """Defines the computation performed."""
         label_ids = self.reshape(masked_lm_ids, self.last_idx)
         label_weights = self.cast(self.reshape(masked_lm_weights, self.last_idx), mstype.float32)
+        if self.use_packed:
+            label_weights = F.minimum(label_weights, 1.0)
         one_hot_labels = self.onehot(label_ids, self.vocab_size, self.on_value, self.off_value)
 
         per_example_loss = self.neg(self.reduce_sum(prediction_scores * one_hot_labels, self.last_idx))
@@ -215,7 +218,13 @@ class BertPretrainingLoss(nn.Cell):
         one_hot_labels = self.onehot(labels, 2, self.on_value, self.off_value)
         per_example_loss = self.neg(self.reduce_sum(
             one_hot_labels * seq_relationship_score, self.last_idx))
-        next_sentence_loss = self.reduce_mean(per_example_loss, self.last_idx)
+        if self.use_packed:
+            weights = self.cast(self.reshape(next_sentence_weights, self.last_idx), mstype.float32)
+            numerator = self.reduce_sum(weights * per_example_loss, ())
+            denominator = F.maximum(self.reduce_sum(weights, ()), 1e-5)
+            next_sentence_loss = numerator / denominator
+        else:
+            next_sentence_loss = self.reduce_mean(per_example_loss, self.last_idx)
 
         # total_loss
         total_loss = masked_lm_loss + next_sentence_loss
@@ -249,12 +258,14 @@ class BertNetworkWithLoss(nn.Cell):
                   next_sentence_labels,
                   masked_lm_positions,
                   masked_lm_ids,
-                  masked_lm_weights):
+                  masked_lm_weights,
+                  next_sentence_starts=None,
+                  next_sentence_weights=None):
         """Get pre-training loss"""
         prediction_scores, seq_relationship_score = \
-            self.bert(input_ids, input_mask, token_type_id, masked_lm_positions)
+            self.bert(input_ids, input_mask, token_type_id, masked_lm_positions, next_sentence_starts)
         total_loss = self.loss(prediction_scores, seq_relationship_score,
-                               masked_lm_ids, masked_lm_weights, next_sentence_labels)
+                               masked_lm_ids, masked_lm_weights, next_sentence_labels, next_sentence_weights)
         return self.cast(total_loss, mstype.float32)
 
 
@@ -367,6 +378,8 @@ class BertTrainOneStepWithLossScaleCell(nn.TrainOneStepWithLossScaleCell):
                   masked_lm_positions,
                   masked_lm_ids,
                   masked_lm_weights,
+                  next_sentence_starts=None,
+                  next_sentence_weights=None,
                   sens=None):
         """Defines the computation performed."""
         weights = self.weights
@@ -376,7 +389,9 @@ class BertTrainOneStepWithLossScaleCell(nn.TrainOneStepWithLossScaleCell):
                             next_sentence_labels,
                             masked_lm_positions,
                             masked_lm_ids,
-                            masked_lm_weights)
+                            masked_lm_weights,
+                            next_sentence_starts,
+                            next_sentence_weights)
         if sens is None:
             scaling_sens = self.loss_scale
         else:
@@ -389,6 +404,8 @@ class BertTrainOneStepWithLossScaleCell(nn.TrainOneStepWithLossScaleCell):
                                                  masked_lm_positions,
                                                  masked_lm_ids,
                                                  masked_lm_weights,
+                                                 next_sentence_starts,
+                                                 next_sentence_weights,
                                                  self.cast(scaling_sens,
                                                            mstype.float32))
         # apply grad reducer on grads
@@ -857,6 +874,7 @@ class BertPretrainEval(nn.Cell):
             self.network = BertPreTraining(config, False, False)
         else:
             self.network = network
+        self.use_packed = config.use_packed
         self.argmax = P.Argmax(axis=-1, output_type=mstype.int32)
         self.equal = P.Equal()
         self.sum = P.ReduceSum()
@@ -876,14 +894,18 @@ class BertPretrainEval(nn.Cell):
                   next_sentence_labels,
                   masked_lm_positions,
                   masked_lm_ids,
-                  masked_lm_weights):
+                  masked_lm_weights,
+                  next_sentence_starts=None,
+                  next_sentence_weights=None):
         """Calculate prediction scores"""
         bs, _ = self.shape(input_ids)
-        mlm, _ = self.network(input_ids, input_mask, token_type_id, masked_lm_positions)
+        mlm, _ = self.network(input_ids, input_mask, token_type_id, masked_lm_positions, next_sentence_starts)
         index = self.argmax(mlm)
         index = self.reshape(index, (bs, -1))
         eval_acc = self.equal(index, masked_lm_ids)
         eval_acc = self.cast(eval_acc, mstype.float32)
+        if self.use_packed:
+            masked_lm_weights = F.minimum(masked_lm_weights, 1.0)
         real_acc = eval_acc * masked_lm_weights
         acc = self.sum(real_acc)
         total = self.sum(masked_lm_weights)

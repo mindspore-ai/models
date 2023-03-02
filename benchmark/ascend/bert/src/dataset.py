@@ -118,17 +118,20 @@ class BucketDatasetGenerator:
 
 
 def create_bert_dataset(device_num=1, rank=0, do_shuffle="true", data_dir=None, schema_dir=None, batch_size=32,
-                        bucket_list=None):
+                        bucket_list=None, use_packed=False):
     """create train dataset"""
     # apply repeat operations
     files = os.listdir(data_dir)
     data_files = []
     for file_name in files:
-        if "tfrecord" in file_name:
+        if use_packed or "tfrecord" in file_name:
             data_files.append(os.path.join(data_dir, file_name))
+    columns_list = ["input_ids", "input_mask", "segment_ids", "next_sentence_labels", "masked_lm_positions",
+                    "masked_lm_ids", "masked_lm_weights"]
+    if use_packed:
+        columns_list.extend(["next_sentence_positions", "next_sentence_weights"])
     data_set = ds.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
-                                  columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
-                                                "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
+                                  columns_list=columns_list,
                                   shuffle=ds.Shuffle.FILES if do_shuffle == "true" else False,
                                   num_shards=device_num, shard_id=rank, shard_equal_rows=True)
     if bucket_list:
@@ -149,6 +152,9 @@ def create_bert_dataset(device_num=1, rank=0, do_shuffle="true", data_dir=None, 
     data_set = data_set.map(operations=type_cast_op, input_columns="segment_ids")
     data_set = data_set.map(operations=type_cast_op, input_columns="input_mask")
     data_set = data_set.map(operations=type_cast_op, input_columns="input_ids")
+    if use_packed:
+        data_set = data_set.map(operations=type_cast_op, input_columns="next_sentence_positions")
+        data_set = data_set.map(operations=type_cast_op, input_columns="next_sentence_weights")
     # apply batch operations
     logger.info("data size: {}".format(data_set.get_dataset_size()))
     logger.info("repeat count: {}".format(data_set.get_repeat_count()))
@@ -228,20 +234,22 @@ def create_squad_dataset(batch_size=1, data_file_path=None, schema_file_path=Non
     return data_set
 
 
-def create_eval_dataset(batchsize=32, device_num=1, rank=0, data_dir=None, schema_dir=None):
+def create_eval_dataset(batchsize=32, device_num=1, rank=0, data_dir=None, schema_dir=None, use_packed=False):
     """create evaluation dataset"""
     data_files = []
     if os.path.isdir(data_dir):
         files = os.listdir(data_dir)
         for file_name in files:
-            if "tfrecord" in file_name:
+            if use_packed or "tfrecord" in file_name:
                 data_files.append(os.path.join(data_dir, file_name))
     else:
         data_files.append(data_dir)
+    columns_list = ["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
+                    "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"]
+    if use_packed:
+        columns_list.extend(["next_sentence_positions", "next_sentence_weights"])
     data_set = ds.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
-                                  columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
-                                                "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
-                                  shard_equal_rows=True)
+                                  columns_list=columns_list, shard_equal_rows=True)
     ori_dataset_size = data_set.get_dataset_size()
     print("origin eval size: ", ori_dataset_size)
     dtypes = data_set.output_types()
@@ -257,6 +265,9 @@ def create_eval_dataset(batchsize=32, device_num=1, rank=0, data_dir=None, schem
                 "masked_lm_positions": np.zeros(shapes[4], dtypes[4]),
                 "masked_lm_ids": np.zeros(shapes[5], dtypes[5]),
                 "masked_lm_weights": np.zeros(shapes[6], dtypes[6])}
+        if use_packed:
+            item["next_sentence_positions"] = np.zeros(shapes[7], dtypes[7])
+            item["next_sentence_weights"] = np.zeros(shapes[8], dtypes[8])
         padded_samples = [item for x in range(padded_num)]
         padded_ds = ds.PaddedDataset(padded_samples)
         eval_ds = data_set + padded_ds
@@ -264,9 +275,8 @@ def create_eval_dataset(batchsize=32, device_num=1, rank=0, data_dir=None, schem
         eval_ds.use_sampler(sampler)
     else:
         eval_ds = ds.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
-                                     columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
-                                                   "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
-                                     num_shards=device_num, shard_id=rank, shard_equal_rows=True)
+                                     columns_list=columns_list, num_shards=device_num,
+                                     shard_id=rank, shard_equal_rows=True)
 
     type_cast_op = C.TypeCast(mstype.int32)
     eval_ds = eval_ds.map(input_columns="masked_lm_ids", operations=type_cast_op)
@@ -275,6 +285,9 @@ def create_eval_dataset(batchsize=32, device_num=1, rank=0, data_dir=None, schem
     eval_ds = eval_ds.map(input_columns="segment_ids", operations=type_cast_op)
     eval_ds = eval_ds.map(input_columns="input_mask", operations=type_cast_op)
     eval_ds = eval_ds.map(input_columns="input_ids", operations=type_cast_op)
+    if use_packed:
+        eval_ds = eval_ds.map(input_columns="next_sentence_positions", operations=type_cast_op)
+        eval_ds = eval_ds.map(input_columns="next_sentence_weights", operations=type_cast_op)
 
     eval_ds = eval_ds.batch(batchsize, drop_remainder=True)
     print("eval data size: {}".format(eval_ds.get_dataset_size()))

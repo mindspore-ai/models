@@ -69,7 +69,8 @@ class BertConfig:
                  initializer_range=0.02,
                  use_relative_positions=False,
                  dtype=mstype.float32,
-                 compute_type=mstype.float32):
+                 compute_type=mstype.float32,
+                 use_packed=False):
         self.seq_length = seq_length
         self.vocab_size = vocab_size
         self.hidden_size = hidden_size
@@ -85,6 +86,7 @@ class BertConfig:
         self.use_relative_positions = use_relative_positions
         self.dtype = dtype
         self.compute_type = compute_type
+        self.use_packed = use_packed
 
 
 class EmbeddingLookup(nn.Cell):
@@ -736,14 +738,24 @@ class CreateAttentionMaskFromInputMask(nn.Cell):
     """
     def __init__(self, config):
         super(CreateAttentionMaskFromInputMask, self).__init__()
+        self.use_packed = config.use_packed
         self.input_mask = None
 
         self.cast = P.Cast()
         self.reshape = P.Reshape()
+        self.tile = P.Tile()
+        self.transpose = P.Transpose()
 
     def construct(self, input_mask):
         seq_length = F.shape(input_mask)[1]
-        attention_mask = self.cast(self.reshape(input_mask, (-1, 1, seq_length)), mstype.float32)
+        if self.use_packed:
+            mask_tile = self.reshape(self.tile(input_mask, (1, seq_length)), (-1, seq_length))
+            reshape_mask = F.broadcast_to(self.reshape(input_mask, (1, -1)), (seq_length, -1))
+            transpose_mask = self.transpose(reshape_mask, (1, 0))
+            attention_mask = self.reshape(self.cast(mask_tile == transpose_mask, mstype.float32),
+                                          (-1, seq_length, seq_length))
+        else:
+            attention_mask = self.cast(self.reshape(input_mask, (-1, 1, seq_length)), mstype.float32)
         return attention_mask
 
 
@@ -769,6 +781,7 @@ class BertModel(nn.Cell):
         self.hidden_size = config.hidden_size
         self.num_hidden_layers = config.num_hidden_layers
         self.embedding_size = config.hidden_size
+        self.use_packed = config.use_packed
         self.token_type_ids = None
 
         self.last_idx = self.num_hidden_layers - 1
@@ -809,6 +822,7 @@ class BertModel(nn.Cell):
         self.dtype = config.dtype
         self.cast_compute_type = SaturateCast(dst_type=config.compute_type)
         self.slice = P.StridedSlice()
+        self.gather = P.Gather()
 
         self.squeeze_1 = P.Squeeze(axis=1)
         self.dense = nn.Dense(self.hidden_size, self.hidden_size,
@@ -816,7 +830,7 @@ class BertModel(nn.Cell):
                               weight_init=TruncatedNormal(config.initializer_range)).to_float(config.compute_type)
         self._create_attention_mask_from_input_mask = CreateAttentionMaskFromInputMask(config)
 
-    def construct(self, input_ids, token_type_ids, input_mask):
+    def construct(self, input_ids, token_type_ids, input_mask, next_sentence_starts=None):
         """Bidirectional Encoder Representations from Transformers."""
         # embedding
         embedding_tables = self.bert_embedding_lookup.embedding_table
@@ -835,11 +849,18 @@ class BertModel(nn.Cell):
 
         # pooler
         batch_size = P.Shape()(input_ids)[0]
-        sequence_slice = self.slice(sequence_output,
-                                    (0, 0, 0),
-                                    (batch_size, 1, self.hidden_size),
-                                    (1, 1, 1))
-        first_token = self.squeeze_1(sequence_slice)
+        if self.use_packed:
+            slices = []
+            for i in range(batch_size):
+                slices.append(sequence_output[i][next_sentence_starts[i]])
+            sequence_slice = F.stack(slices)
+            first_token = F.reshape(sequence_slice, (-1, self.hidden_size))
+        else:
+            sequence_slice = self.slice(sequence_output,
+                                        (0, 0, 0),
+                                        (batch_size, 1, self.hidden_size),
+                                        (1, 1, 1))
+            first_token = self.squeeze_1(sequence_slice)
         pooled_output = self.dense(first_token)
         pooled_output = self.cast(pooled_output, self.dtype)
 
