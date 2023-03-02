@@ -88,7 +88,7 @@ def train():
     # load pre_trained model
     if config.pre_trained:
         param_dict = load_checkpoint(config.pre_trained_ckpt_path)
-        param_not_load = load_param_into_net(network, param_dict)
+        param_not_load, _ = load_param_into_net(network, param_dict)
         print('load pre_trained model, but parameters {} not load'.format(param_not_load))
 
     # lr scheduler

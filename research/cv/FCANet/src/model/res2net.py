@@ -267,7 +267,7 @@ class Resnet(nn.Cell):
         tmp[:, :3, :, :] = parameter_dict["conv1_0.weight"]
         parameter_dict["conv1_0.weight"] = tmp
 
-        param_not_load = load_param_into_net(self, parameter_dict)
+        param_not_load, _ = load_param_into_net(self, parameter_dict)
 
         print(
             "Load pretrained model from [{}]!([{}] not load!)".format(

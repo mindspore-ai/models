@@ -178,7 +178,7 @@ def train_fasterrcnn():
         for key, value in param_dict.items():
             tensor = value.asnumpy().astype(np.float32)
             param_dict[key] = Parameter(tensor, key)
-        load_results = load_param_into_net(net, param_dict)
+        load_results, _ = load_param_into_net(net, param_dict)
         print(load_results)
 
     device_type = "Ascend" if context.get_context(

@@ -50,7 +50,7 @@ class EvalCallBack(Callback):
                          + str(self.train_batch_num) + '.ckpt'
         # pre_trained
         param_dict = load_checkpoint(save_ckpt_path)
-        param_not_load = load_param_into_net(self.network, param_dict)
+        param_not_load, _ = load_param_into_net(self.network, param_dict)
         batch_num = self.eval_dataset.get_dataset_size()
         print('ckpt:', save_ckpt_path)
         print('param_not_load', param_not_load)

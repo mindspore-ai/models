@@ -46,7 +46,7 @@ def run_select(args):
         if param_key.startswith('comatch_network.encode.'):
             param_dict_new[param_key[16:]] = param_values
 
-    para_not_list = load_param_into_net(netbase, param_dict_new, strict_load=True)
+    para_not_list, _ = load_param_into_net(netbase, param_dict_new, strict_load=True)
     netbase.set_train(False)
     if args.rank == 0:
         logging.info('param not load: %s', str(para_not_list))

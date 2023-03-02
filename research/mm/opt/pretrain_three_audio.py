@@ -212,8 +212,8 @@ def main(opts):
     print('=====copy kernel meta and somas meta end=====')
     model = Model(net_with_grads)
     if params_dict:
-        net_not_load = load_param_into_net(net_with_loss, params_dict)
-        opt_not_load = load_param_into_net(optimizer, params_dict)
+        net_not_load, _ = load_param_into_net(net_with_loss, params_dict)
+        opt_not_load, _ = load_param_into_net(optimizer, params_dict)
         print("===============net_not_load================", net_not_load)
         print("===============opt_not_load================", opt_not_load)
 

@@ -93,11 +93,11 @@ def main(opts):
         new_params_dict["uniter.audio_embeddings.audio_linear.weight"] = new_params_dict["audio_feat_regress.weight"]
         new_params_dict["uniter.embeddings.word_embeddings.embedding_table"] = new_params_dict[
             "cls.predictions.decoder.weight"]
-        net_not_load = load_param_into_net(net_without_loss, new_params_dict)
+        net_not_load, _ = load_param_into_net(net_without_loss, new_params_dict)
         print("===============net_not_load================", net_not_load)
 
     if params_dict:
-        net_not_load = load_param_into_net(net_without_loss, params_dict)
+        net_not_load, _ = load_param_into_net(net_without_loss, params_dict)
         print("===============net_not_load================", net_not_load)
 
     validate_itm_matching(model, ds)

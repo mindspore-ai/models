@@ -369,7 +369,7 @@ class UGATIT:
         """load checkpoint"""
         genA2B_params = load_checkpoint(os.path.join(loaddir, self.dataset + '_genA2B_params_%07d.ckpt' % epoch))
         not_load = {}
-        not_load['genA2B'] = load_param_into_net(self.genA2B, genA2B_params)
+        not_load['genA2B'], _ = load_param_into_net(self.genA2B, genA2B_params)
         if self.mode == 'train':
             genB2A_params = load_checkpoint(os.path.join(loaddir, self.dataset + '_genB2A_params_%07d.ckpt' % epoch))
             disGA_params = load_checkpoint(os.path.join(loaddir, self.dataset + '_disGA_params_%07d.ckpt' % epoch))
@@ -377,11 +377,11 @@ class UGATIT:
             disLA_params = load_checkpoint(os.path.join(loaddir, self.dataset + '_disLA_params_%07d.ckpt' % epoch))
             disLB_params = load_checkpoint(os.path.join(loaddir, self.dataset + '_disLB_params_%07d.ckpt' % epoch))
 
-            not_load['genB2A'] = load_param_into_net(self.genB2A, genB2A_params)
-            not_load['disGA'] = load_param_into_net(self.disGA, disGA_params)
-            not_load['disGB'] = load_param_into_net(self.disGB, disGB_params)
-            not_load['disLA'] = load_param_into_net(self.disLA, disLA_params)
-            not_load['disLB'] = load_param_into_net(self.disLB, disLB_params)
+            not_load['genB2A'], _ = load_param_into_net(self.genB2A, genB2A_params)
+            not_load['disGA'], _ = load_param_into_net(self.disGA, disGA_params)
+            not_load['disGB'], _ = load_param_into_net(self.disGB, disGB_params)
+            not_load['disLA'], _ = load_param_into_net(self.disLA, disLA_params)
+            not_load['disLB'], _ = load_param_into_net(self.disLB, disLB_params)
         print("these params are not loaded: ", not_load)
 
     def test(self, inception_ckpt_path=None):

@@ -56,7 +56,7 @@ def load_model_from_config(config, ckpt, verbose=False):
     if os.path.exists(ckpt):
         param_dict = ms.load_checkpoint(ckpt)
         if param_dict:
-            param_not_load = ms.load_param_into_net(model, param_dict)
+            param_not_load, _ = ms.load_param_into_net(model, param_dict)
             print("param not load:", param_not_load)
     else:
         print(f"{ckpt} not exist:")

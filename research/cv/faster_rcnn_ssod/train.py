@@ -58,7 +58,7 @@ def train_combine():
         cfg.filter_prefix = None
         if cfg.start_iter > cfg.burn_up_iter and cfg.pre_trained_teacher:
             param_dict = load_checkpoint(ckpt_file_name=cfg.pre_trained_teacher)
-            param_not_load = load_param_into_net(net_teacher, param_dict, strict_load=True)
+            param_not_load, _ = load_param_into_net(net_teacher, param_dict, strict_load=True)
             logging.info("load %s to net_teacher, params not load: %s", cfg.pre_trained_teacher, param_not_load)
         elif cfg.start_iter > cfg.burn_up_iter and not cfg.pre_trained_teacher:
             raise Exception("pre_trained_teacher ckpt is not set.")
@@ -72,7 +72,7 @@ def train_combine():
 
     if cfg.pre_trained:
         param_dict = load_checkpoint(ckpt_file_name=cfg.pre_trained, filter_prefix=cfg.filter_prefix)
-        param_not_load = load_param_into_net(net_student, param_dict, strict_load=True)
+        param_not_load, _ = load_param_into_net(net_student, param_dict, strict_load=True)
         logging.info("load %s to net_student, params not load: %s", cfg.pre_trained, param_not_load)
 
     if cfg.device_target == "Ascend":

@@ -49,7 +49,7 @@ if __name__ == '__main__':
     # load pre-trained quant ckpt
     if args.checkpoint_path:
         param_dict = load_checkpoint(args.checkpoint_path)
-        not_load_param = load_param_into_net(network, param_dict)
+        not_load_param, _ = load_param_into_net(network, param_dict)
         if not_load_param:
             raise ValueError("Load param into net fail!")
 

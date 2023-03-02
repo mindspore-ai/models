@@ -117,7 +117,7 @@ class UNet2D(nn.Cell):
         self.concat = P.Concat(axis=1)
 
         param_dict = mindspore.load_checkpoint("./ckpts/feat_ext.ckpt")
-        params_not_loaded = mindspore.load_param_into_net(self, param_dict, strict_load=True)
+        params_not_loaded, _ = mindspore.load_param_into_net(self, param_dict, strict_load=True)
         print(params_not_loaded)
 
     def construct(self, imgs):
@@ -181,7 +181,7 @@ class CostCompression(nn.Cell):
         self.basicblock_2 = ConvBnReLu(64, 8)
 
         param_dict = mindspore.load_checkpoint("./ckpts/stage1_cost_compression.ckpt")
-        params_not_loaded = mindspore.load_param_into_net(self, param_dict, strict_load=True)
+        params_not_loaded, _ = mindspore.load_param_into_net(self, param_dict, strict_load=True)
         print(params_not_loaded)
 
     def construct(self, x):
@@ -278,7 +278,7 @@ class CoarseStageRegFuse(nn.Cell):
         self.squeeze_1 = P.Squeeze(axis=1)
 
         param_dict = mindspore.load_checkpoint("./ckpts/stage1_reg_fuse.ckpt")
-        params_not_loaded = mindspore.load_param_into_net(self, param_dict, strict_load=True)
+        params_not_loaded, _ = mindspore.load_param_into_net(self, param_dict, strict_load=True)
         print(params_not_loaded)
 
     def construct(self, fused_interim, depth_values):
@@ -326,7 +326,7 @@ class CoarseStageRegPair(nn.Cell):
         self.squeeze_1 = P.Squeeze(axis=1)
 
         param_dict = mindspore.load_checkpoint("./ckpts/stage1_reg_pair.ckpt")
-        params_not_loaded = mindspore.load_param_into_net(self, param_dict, strict_load=True)
+        params_not_loaded, _ = mindspore.load_param_into_net(self, param_dict, strict_load=True)
         print(params_not_loaded)
 
     def construct(self, cost_volume, depth_values):
@@ -379,7 +379,7 @@ class StageRegFuse(nn.Cell):
         self.squeeze_1 = P.Squeeze(axis=1)
 
         param_dict = mindspore.load_checkpoint(ckpt_path)
-        params_not_loaded = mindspore.load_param_into_net(self, param_dict, strict_load=True)
+        params_not_loaded, _ = mindspore.load_param_into_net(self, param_dict, strict_load=True)
         print(params_not_loaded)
 
     def construct(self, fused_interim, depth_values):

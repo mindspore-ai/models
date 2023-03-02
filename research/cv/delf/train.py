@@ -179,7 +179,7 @@ def run_train():
     # load ckpt
     if args.checkpoint_path != "":
         param_dict = load_checkpoint(args.checkpoint_path)
-        not_load = load_param_into_net(delf_net, param_dict)
+        not_load, _ = load_param_into_net(delf_net, param_dict)
         print('weights not load in ckpt: ', not_load)
 
     # freeze laysers

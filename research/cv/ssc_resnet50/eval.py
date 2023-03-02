@@ -55,7 +55,7 @@ def run_eval(args):
             if key.startswith('comatch_network.encode.'):
                 param_dict_new[key[16:]] = values
 
-        para_not_list = load_param_into_net(netbase, param_dict_new, strict_load=True)
+        para_not_list, _ = load_param_into_net(netbase, param_dict_new, strict_load=True)
         netbase.set_train(False)
         logging.info('param not load: %s', str(para_not_list))
         logging.info("load_checkpoint success!!")

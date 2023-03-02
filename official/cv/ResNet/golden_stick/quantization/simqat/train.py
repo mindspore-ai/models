@@ -168,7 +168,7 @@ def load_pretrained_ckpt(net):
             if config.filter_weight:
                 filter_list = [x.name for x in net.end_point.get_parameters()]
                 filter_checkpoint_parameter_by_list(ckpt, filter_list)
-            not_load_param = ms.load_param_into_net(net, ckpt)
+            not_load_param, _ = ms.load_param_into_net(net, ckpt)
             if not_load_param:
                 raise RuntimeError("Load param into net fail.")
         else:

@@ -71,7 +71,7 @@ def test(model_path, data_path, save_name):
     # ------------ prepare models  -----------
     model = SiameseRPN()
     param_dict = load_checkpoint(model_path)
-    param_not_load = load_param_into_net(model, param_dict)
+    param_not_load, _ = load_param_into_net(model, param_dict)
     print(param_not_load)
     # ------------ starting validation  -----------
     results = {}

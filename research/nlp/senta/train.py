@@ -143,7 +143,7 @@ if __name__ == "__main__":
     model_with_loss = model_from_params(model_params_dict, ds, epoch_num)
 
     weights = load_checkpoint(args.ckpt)
-    unloaded = load_param_into_net(model_with_loss, weights)
+    unloaded, _ = load_param_into_net(model_with_loss, weights)
     print(unloaded)
 
     logging.info("Weights loaded")

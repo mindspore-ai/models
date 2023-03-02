@@ -35,12 +35,12 @@ class Reader(nn.Cell):
 
         self.encoder = Albert(batch_size)
         param_dict = load_checkpoint(encoder_ck_file)
-        not_load_params = load_param_into_net(self.encoder, param_dict)
+        not_load_params, _ = load_param_into_net(self.encoder, param_dict)
         print(f"reader albert not loaded params: {not_load_params}")
 
         self.downstream = Reader_Downstream()
         param_dict = load_checkpoint(downstream_ck_file)
-        not_load_params = load_param_into_net(self.downstream, param_dict)
+        not_load_params, _ = load_param_into_net(self.downstream, param_dict)
         print(f"reader downstream not loaded params: {not_load_params}")
 
         self.bmm = BatchMatMul()

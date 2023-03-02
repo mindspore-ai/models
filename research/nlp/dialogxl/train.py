@@ -89,7 +89,7 @@ if __name__ == '__main__':
     dialogXL = DialogXL(config)
 
     param_dict = load_checkpoint('pretrained/xlnet.ckpt')
-    param_not_load = load_param_into_net(dialogXL, param_dict)
+    param_not_load, _ = load_param_into_net(dialogXL, param_dict)
     if len(param_not_load) == len(dialogXL.trainable_params()):
         print(param_not_load)
         raise ValueError
