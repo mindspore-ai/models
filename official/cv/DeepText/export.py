@@ -17,7 +17,6 @@ import os
 import numpy as np
 
 import mindspore as ms
-import mindspore.common.dtype as mstype
 from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
 
 from src.Deeptext.deeptext_vgg16 import Deeptext_VGG16_Infer
@@ -50,10 +49,6 @@ def run_export():
         param_dict_new["network." + key] = value
 
     load_param_into_net(net, param_dict_new)
-
-    device_type = "Ascend" if context.get_context("device_target") == "Ascend" else "Others"
-    if device_type == "Ascend":
-        net.to_float(mstype.float16)
 
     img_data = Tensor(np.zeros([config.test_batch_size, 3, config.img_height, config.img_width]), ms.float32)
 
