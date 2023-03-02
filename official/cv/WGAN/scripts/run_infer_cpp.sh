@@ -50,6 +50,12 @@ if [ $# == 6 ]; then
     device_id=$6
 fi
 
+if [ $5 == 'GPU' ]; then
+    if [ $CUDA_VISIABLE_DEVICES ]; then
+        device_id=$CUDA_VISIABLE_DEVICES
+    fi
+fi
+
 echo "mindir name: "$model
 echo "config path: "$config_path
 echo "need preprocess: "$need_preprocess

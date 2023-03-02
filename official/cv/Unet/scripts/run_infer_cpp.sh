@@ -44,6 +44,12 @@ if [ $# == 5 ]; then
     device_id=$5
 fi
 
+if [ $4 == 'GPU' ]; then
+    if [ $CUDA_VISIABLE_DEVICES ]; then
+        device_id=$CUDA_VISIABLE_DEVICES
+    fi
+fi
+
 echo "network: " $network
 echo "mindir name: "$model
 echo "need preprocess or not: "$need_preprocess

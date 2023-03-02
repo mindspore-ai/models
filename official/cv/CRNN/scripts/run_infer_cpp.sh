@@ -43,6 +43,12 @@ elif [ $# == 5 ]; then
     fi
 fi
 
+if [ $5 == 'GPU' ]; then
+    if [ $CUDA_VISIABLE_DEVICES ]; then
+        device_id=$CUDA_VISIABLE_DEVICES
+    fi
+fi
+
 echo $model
 echo $data_path
 echo $ann_file

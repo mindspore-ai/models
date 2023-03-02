@@ -37,6 +37,12 @@ if [ $# == 5 ]; then
     device_id=$5
 fi
 
+if [ $4 == 'GPU' ]; then
+    if [ $CUDA_VISIABLE_DEVICES ]; then
+        device_id=$CUDA_VISIABLE_DEVICES
+    fi
+fi
+
 echo "mindir name: "$model
 echo "dataset path: "$data_path
 echo "ann file: "$ann_file

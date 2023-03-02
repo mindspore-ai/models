@@ -53,6 +53,12 @@ if [ $# == 7 ]; then
     device_id=$7
 fi
 
+if [ $6 == 'GPU' ]; then
+    if [ $CUDA_VISIABLE_DEVICES ]; then
+        device_id=$CUDA_VISIABLE_DEVICES
+    fi
+fi
+
 # shellcheck disable=SC2153
 if [ $6 == 'Ascend' ] || [ $6 == 'GPU' ] || [ $6 == 'CPU' ]; then
   device_type=$6
