@@ -45,6 +45,7 @@ log_interval: 100
 ckpt_path: "outputs/"
 ckpt_interval: -1
 is_save_on_master: 1
+max_checkpoint_num: 10
 
 # distributed related
 is_distributed: 1
