@@ -267,6 +267,7 @@ def train_ft(net):
                                  lr_max=config.lr_max_ft,
                                  warmup_epochs=config.warmup_epochs,
                                  total_epochs=config.epoch_ft,
+                                 start_epoch=config.start_epoch,
                                  steps_per_epoch=dataset.get_dataset_size(),
                                  lr_decay_mode='poly'))
 
