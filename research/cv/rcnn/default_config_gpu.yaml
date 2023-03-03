@@ -9,35 +9,35 @@ step: 0
 # config on Ascend/GPU for RCNN, VOC2007.
 # training options
 train_batch_size: 512
-train_finetune_epoch: 20
+train_finetune_epoch: 2
 finetune_learning_rate: 0.013
 finetune_momentum: 0.9
-finetune_weight_decay: 1e-4
-train_svm_epoch: 130
-svm_learning_rate: 1e-3
+finetune_weight_decay: 0.0001
+train_svm_epoch: 30
+svm_learning_rate: 0.001
 svm_momentum: 0.9
-svm_weight_decay: 1e-4
-train_regression_epoch: 130
-regression_learning_rate: 1e-4
+svm_weight_decay: 0.0001
+train_regression_epoch: 30
+regression_learning_rate: 0.0001
 # evaluation options
 work_nums: 1
 eval_batch_size: 512
 
 ---
 # Help description for each configuration
-device_type: "support Ascend/GPU ,chose the right option for your environments,default: Ascend"
+device_type: "support Ascend/GPU ,chose the right option for your environments,default: GPU"
 device_id: "the physical serial number of the card, default: 0"
-train_batch_size: "batch_size for training phase, default: 4096"
-train_finetune_epoch: "finetune_epoch for training phase, multiple cards: 20, default: 2."
+train_batch_size: "batch_size for training phase, default: 512"
+train_finetune_epoch: "finetune_epoch for training phase, multiple cards, default: 2"
 finetune_learning_rate: "learning rate of finetune, default: 0.013"
 finetune_momentum: "momentum of finetune, default: 0.9"
-finetune_weight_decay: "weight_decay of finetune, default: 1e-4"
-train_svm_epoch: "svm_epoch for training phase, multiple cards: 130, default: 30."
-svm_learning_rate: "learning rate of svm, default: 1e-3"
+finetune_weight_decay: "weight_decay of finetune, default: 0.0001"
+train_svm_epoch: "svm_epoch for training phase, multiple cards, default: 30"
+svm_learning_rate: "learning rate of svm, default: 0.001"
 svm_momentum: "momentum of svm, default: 0.9"
-svm_weight_decay: "weight_decay of svm, default: 1e-4"
-train_regression_epoch: "regression_epoch for training phase, multiple cards: 130, default: 30."
-regression_learning_rate: "learning rate of regression, default:1e-4"
-work_nums: "the numbers of parallel processing threads for evaluation, default: 8"
-eval_batch_size: "batch_size for inference phase, default: 4096."
+svm_weight_decay: "weight_decay of svm, default: 0.0001"
+train_regression_epoch: "regression_epoch for training phase, multiple cards, default: 30"
+regression_learning_rate: "learning rate of regression, default: 0.0001"
+work_nums: "the numbers of parallel processing threads for evaluation, default: 1"
+eval_batch_size: "batch_size for inference phase, default: 512."
 ---
