@@ -21,5 +21,5 @@ fi
 
 export DEVICE_ID=$1
 cd ../
-python eval.py -d=${DEVICE_ID} 1>scripts/result.txt 2>scripts/eval_log.txt &
+python eval.py --config_path=./default_config.yaml --device_id=${DEVICE_ID} 1>scripts/result.txt 2>scripts/eval_log.txt &
 cd scripts || exit
