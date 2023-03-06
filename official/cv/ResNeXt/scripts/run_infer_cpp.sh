@@ -14,9 +14,10 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 3 || $# -gt 4 ]]; then
-    echo "Usage: bash run_infer_cpp.sh [MINDIR_PATH] [DEVICE_TARGET] [DATA_PATH] [DEVICE_ID]
-    DEVICE_TARGET can choose from [Ascend, GPU, CPU]
+if [[ $# -lt 4 || $# -gt 5 ]]; then
+    echo "Usage: bash run_infer_cpp.sh [MINDIR_PATH] [MODEL_DEVICE_TYPE] [INFER_DEVICE_TYPE] [DATA_PATH] [DEVICE_ID]
+    MODEL_DEVICE_TYPE can choose from [Ascend, GPU]
+    INFER_DEVICE_TYPE can choose from [Ascend, GPU, CPU]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi
@@ -30,14 +31,15 @@ get_real_path(){
 }
 model=$(get_real_path $1)
 device_target=$2
-data_path=$(get_real_path $3)
+infer_device_type=$3
+data_path=$(get_real_path $4)
 
 device_id=0
-if [ $# == 4 ]; then
-    device_id=$4
+if [ $# == 5 ]; then
+    device_id=$5
 fi
 
-if [ $2 == 'GPU' ]; then
+if [ $3 == 'GPU' ]; then
     if [ $CUDA_VISIABLE_DEVICES ]; then
         device_id=$CUDA_VISIABLE_DEVICES
     fi
@@ -45,6 +47,7 @@ fi
 
 echo "mindir name: "$model
 echo "mindir device target: "$device_target
+echo "inference device target: "$infer_device_type
 echo "dataset path: "$data_path
 echo "device id: "$device_id
 
@@ -78,7 +81,7 @@ function infer()
     fi
     mkdir result_Files
     mkdir time_Result
-    ../cpp_infer/src/main --device_type=$device_target --mindir_path=$model --dataset_path=$data_path --device_id=$device_id  &> infer.log
+    ../cpp_infer/src/main --device_type=$infer_device_type --mindir_path=$model --dataset_path=$data_path --device_id=$device_id  &> infer.log
 }
 
 function cal_acc()
