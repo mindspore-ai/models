@@ -48,18 +48,18 @@ The overall network architecture contains a VGG16 as backbone, and use bidirecti
 
 Here we used 6 datasets for training, and 1 datasets for Evaluation.
 
-- Dataset1: ICDAR 2013: Focused Scene Text
+- Dataset1: [ICDAR 2013: Focused Scene Text](https://rrc.cvc.uab.es/?ch=2&com=tasks):
     - Train: 142MB, 229 images
     - Test: 110MB, 233 images
-- Dataset2: ICDAR 2011: Born-Digital Images
+- Dataset2: [ICDAR 2011: Born-Digital Images](https://rrc.cvc.uab.es/?ch=1&com=tasks):
     - Train: 27.7MB, 410 images
-- Dataset3: ICDAR 2015:
+- Dataset3: [ICDAR 2015: Incidental Scene Text](https://rrc.cvc.uab.es/?ch=4&com=tasks):
     - Train：89MB, 1000 images
-- Dataset4: SCUT-FORU: Flickr OCR Universal Database
+- Dataset4: [SCUT-FORU: Flickr OCR Universal Database](https://github.com/yan647/SCUT_FORU_DB_Release):
     - Train: 388MB, 1715 images
-- Dataset5: CocoText v2(Subset of MSCOCO2017):
+- Dataset5: [CocoText v2(Subset of MSCOCO2017)](https://rrc.cvc.uab.es/?ch=5&com=tasks):
     - Train: 13GB, 63686 images
-- Dataset6: SVT(The Street View Dataset)
+- Dataset6: [SVT(The Street View Dataset)](https://www.kaggle.com/datasets/nageshsingh/the-street-view-text-dataset):
     - Train: 115MB, 349 images
 
 # [Features](#contents)

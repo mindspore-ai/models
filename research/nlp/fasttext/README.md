@@ -46,9 +46,9 @@ The feature is mapped to the hidden layer through linear transformation, and the
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network
 architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 
-- AG's news topic classification dataset
-- DBPedia Ontology Classification Dataset
-- Yelp Review Polarity Dataset
+- [AG's news topic classification dataset](https://www.kaggle.com/datasets/amananandrai/ag-news-classification-dataset)
+- [DBPedia Ontology Classification Dataset](https://emilhvitfeldt.github.io/textdata/reference/dataset_dbpedia.html)
+- [Yelp Review Polarity Dataset](https://www.kaggle.com/datasets/irustandi/yelp-review-polarity)
 
 ## [Environment Requirements](#content)
 
