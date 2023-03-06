@@ -33,17 +33,17 @@ InceptionV4的整体网络架构如下：
 
 # [数据集](#目录)
 
-我们使用了6个数据集进行训练，1个数据集用于评估。
+我们使用了4个数据集进行训练，1个数据集用于评估。
 
-- 数据集1：ICDAR 2013：聚焦场景文本
-    - 训练集：142MB, 229张图像
-    - 测试集：110MB，233张图像
-- 数据集2：ICDAR 2013: Born-Digital Images
-    - 训练集：27.7MB，410张图像
-- 数据集3：SCUT-FORU: Flickr OCR Universal Database
-    - 训练集：388MB，1715张图像
-- 数据集4：CocoText v2（MSCCO2017的子集）：
-    - 训练集：13GB，63686张图像
+- 数据集1：[ICDAR 2013: Focused Scene Text](https://rrc.cvc.uab.es/?ch=2&com=tasks)：
+    - 训练集：142 MB，229张图像
+    - 测试集：110 MB，233张图像
+- 数据集2：[ICDAR 2011: Born-Digital Images](https://rrc.cvc.uab.es/?ch=1&com=tasks)：
+    - 训练集：27.7 MB，410张图像
+- 数据集3：[SCUT-FORU: Flickr OCR Universal Database](https://github.com/yan647/SCUT_FORU_DB_Release)：
+    - 训练集：388 MB，1715张图像
+- 数据集4：[CocoText v2（MSCCO2017的子集）](https://rrc.cvc.uab.es/?ch=5&com=tasks)：
+    - 训练集：13 GB，63686张图像
 
 # [特性](#目录)
 

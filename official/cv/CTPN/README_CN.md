@@ -37,18 +37,18 @@ CTPN是一种基于目标检测方法的文本检测模型。在Faster R-CNN的�
 
 我们使用了6个数据集进行训练，1个数据集用于评估。
 
-- 数据集1：ICDAR 2013: Focused Scene Text
+- 数据集1：[ICDAR 2013: Focused Scene Text](https://rrc.cvc.uab.es/?ch=2&com=tasks)：
     - 训练集：142 MB，229张图像
     - 测试集：110 MB，233张图像
-- 数据集2：ICDAR 2011: Born-Digital Images
+- 数据集2：[ICDAR 2011: Born-Digital Images](https://rrc.cvc.uab.es/?ch=1&com=tasks)：
     - 训练集：27.7 MB，410张图像
-- 数据集3：ICDAR 2015：
+- 数据集3：[ICDAR 2015: Incidental Scene Text](https://rrc.cvc.uab.es/?ch=4&com=tasks)：
     - 训练集：89 MB，1000张图像
-- 数据集4：SCUT-FORU: Flickr OCR Universal Database
+- 数据集4：[SCUT-FORU: Flickr OCR Universal Database](https://github.com/yan647/SCUT_FORU_DB_Release)：
     - 训练集：388 MB，1715张图像
-- 数据集5：CocoText v2（MSCCO2017的子集）：
+- 数据集5：[CocoText v2（MSCCO2017的子集）](https://rrc.cvc.uab.es/?ch=5&com=tasks)：
     - 训练集：13 GB，63686张图像
-- 数据集6：SVT（街景数据集）
+- 数据集6：[SVT（街景数据集）](https://www.kaggle.com/datasets/nageshsingh/the-street-view-text-dataset)：
     - 训练集：115 MB，349张图像
 
 # [特性](#目录)
