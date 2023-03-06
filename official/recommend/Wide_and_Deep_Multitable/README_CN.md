@@ -33,7 +33,7 @@ Wide&Deep模型训练了宽线性模型和深度学习神经网络，结合了�
 
 ## 数据集
 
-- [1]点击预测中使用的数据集
+- [1]点击预测中使用的数据集 (https://www.kaggle.com/c/outbrain-click-prediction/data)
 
 ## 环境要求
 

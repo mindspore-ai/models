@@ -32,7 +32,7 @@ Dataset used: Seamount
 
 - Download the dataset  
 
-> download the GOMO from Github and you can find the seamount dataset file in the `GOMO/bin/data` directory.  
+> download the GOMO(https://github.com/hxmhuang/GOMO) from Github and you can find the seamount dataset file in the `GOMO/bin/data` directory.  
 
 ## Environment Requirements
 

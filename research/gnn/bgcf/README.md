@@ -58,7 +58,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
   | # Density          | 0.315%                |
 
 - Data Preparation
-    - Place the dataset to any path you want, the folder should include files as follows(we use Amazon-Beauty dataset as an example)"
+    - Place the dataset to any path you want, the folder should include files as follows(we use Amazon-Beauty dataset as an example)(https://www.kaggle.com/datasets/skillsmuggler/amazon-ratings)"
 
   ```python
   .

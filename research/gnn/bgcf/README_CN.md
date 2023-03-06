@@ -55,7 +55,7 @@ BGCF包含两个主要模块。首先是抽样，它生成基于节点复制的�
   | # 密度             | 0.315%             |  
 
 - 数据准备
-    - 将数据集放到任意路径，文件夹应该包含如下文件（以Amazon-Beauty数据集为例）：
+    - 将数据集放到任意路径，文件夹应该包含如下文件（以Amazon-Beauty数据集为例）(https://www.kaggle.com/datasets/skillsmuggler/amazon-ratings)：
 
   ```text
 

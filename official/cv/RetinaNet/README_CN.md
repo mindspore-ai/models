@@ -50,7 +50,7 @@ Retinanet的整体网络架构如下所示：
 
 数据集可参考文献：
 
-MSCOCO2017
+COCO2017(https://cocodataset.org/)
 
 - 数据集大小：19.3G, 123287张80类彩色图像
 
@@ -62,7 +62,7 @@ MSCOCO2017
 
     - 注意：数据将在src/dataset.py 中被处理
 
-face-mask-detection(迁移学习使用)
+face-mask-detection (https://www.kaggle.com/datasets/andrewmvd/face-mask-detection) (迁移学习使用)
 
 - 数据集大小：397.65MB, 853张3类彩色图像
 - 数据格式：RGB图像.

@@ -55,7 +55,7 @@ The following shows the overall network architecture of RetinaNet.
 
 The following datasets are for reference.
 
-MSCOCO2017
+COCO2017(https://cocodataset.org/)
 
 - Dataset size: 19.3 GB, 123287 color images of 80 classes
 
@@ -67,7 +67,7 @@ MSCOCO2017
 
     - Note: Data will be processed in **src/dataset.py**.
 
-face-mask-detection (for transfer learning)
+face-mask-detection (https://www.kaggle.com/datasets/andrewmvd/face-mask-detection) (for transfer learning)
 
 - Dataset size: 397.65 MB, 853 color images of three classes
 - Data format: RGB

@@ -34,7 +34,7 @@ GCN(Graph Convolutional Networks) was proposed in 2016 and designed to do semi-s
 
 GCN contains two graph convolution layers. Each layer takes nodes features and adjacency matrix as input, nodes' features are then updated by aggregating neighbours' features.
 
-## [Dataset](#contents)
+## [Dataset](#contents) (https://github.com/kimiyoung/planetoid/tree/master/data)
 
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 

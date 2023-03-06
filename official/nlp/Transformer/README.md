@@ -44,8 +44,8 @@ Specifically, Transformer contains six encoder modules and six decoder modules. 
 
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 
-- *WMT English-German* for training.
-- *WMT newstest2014* for evaluation.
+- *WMT English-German(https://nlp.stanford.edu/projects/nmt/)* for training.
+- *WMT newstest2014(https://nlp.stanford.edu/projects/nmt/)* for evaluation.
 
 ## [Environment Requirements](#contents)
 

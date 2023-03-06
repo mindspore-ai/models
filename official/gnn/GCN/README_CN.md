@@ -59,7 +59,7 @@ GCN包含两个图卷积层。每一层以节点特征和邻接矩阵为输入�
 
 - 安装[MindSpore](https://www.mindspore.cn/install)
 
-- 从github下载/kimiyoung/planetoid提供的数据集Cora或Citeseer
+- 从github下载/kimiyoung/planetoid提供的数据集Cora或Citeseer (https://github.com/kimiyoung/planetoid/tree/master/data)
 
 - 将数据集放到任意路径，文件夹应该包含如下文件（以Cora数据集为例）：
 
