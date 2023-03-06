@@ -71,14 +71,15 @@ GPU v100 PCIE 32G 8卡；系统： Ubuntu 18.04；内存：502 G；x86 72核 CPU
 
 ```text
 以训练ICDAR2015数据为例
-config/config_base.yaml配置训练和推理数据集路径
+config/config_base.yaml配置训练、推理数据集路径以及backbone_ckpt路径
 train:
     img_dir:
     gt_dir:
 eval:
     img_dir:
     gt_dir:
-下载预训练权重放在DBNet/pretrained目录下
+backbone:
+    backbone_ckpt:
 ```
 
 单卡训练：

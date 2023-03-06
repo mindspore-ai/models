@@ -50,14 +50,15 @@ class DBNetMonitor(Callback):
         ValueError: If per_print_times is not an integer or less than zero.
     """
 
-    def __init__(self, config, train_net, lr, per_print_times=1):
+    def __init__(self, config, train_net, lr, per_print_times=1, cur_steps=0):
         super(DBNetMonitor, self).__init__()
         if not isinstance(per_print_times, int) or per_print_times < 0:
             raise ValueError("The argument 'per_print_times' must be int and >= 0, "
                              "but got {}".format(per_print_times))
-        self._per_print_times = per_print_times
+        self._per_print_times = max(per_print_times, 1)
         self._last_print_time = 0
         self.config = config
+        self.batch_size = config.train.batch_size
         self.lr = lr
         self.loss_avg = AverageMeter()
         self.rank_id = config.rank_id
@@ -74,7 +75,7 @@ class DBNetMonitor(Callback):
         self.train_net = train_net
         self.epoch_start_time = time.time()
         self.step_start_time = time.time()
-        self.cur_steps = 0
+        self.cur_steps = cur_steps
 
     def load_parameter(self):
         param_dict = dict()
@@ -82,7 +83,24 @@ class DBNetMonitor(Callback):
             param_dict[name] = param
         ms.load_param_into_net(self.eval_net.model, param_dict)
 
-    def on_train_step_begin(self, run_context):
+    def handle_loss(self, net_outputs):
+        """Handle loss"""
+        if isinstance(net_outputs, (tuple, list)):
+            if isinstance(net_outputs[0], ms.Tensor) and isinstance(net_outputs[0].asnumpy(), np.ndarray):
+                loss = net_outputs[0].asnumpy()
+                if bool(net_outputs[1].asnumpy()):
+                    self.config.logger.info('=====================overflow=====================')
+        elif isinstance(net_outputs, ms.Tensor) and isinstance(net_outputs.asnumpy(), np.ndarray):
+            loss = float(np.mean(net_outputs.asumpy()))
+        return loss
+
+    def on_train_epoch_begin(self, run_context):
+        """
+        Called before each epoch beginning.
+        Args:
+            run_context (RunContext): Include some information of the model.
+        """
+        self.epoch_start_time = time.time()
         self.step_start_time = time.time()
 
     def on_train_step_end(self, run_context):
@@ -93,44 +111,30 @@ class DBNetMonitor(Callback):
             run_context (RunContext): Context of the train running.
         """
         cb_params = run_context.original_args()
-        loss = cb_params.net_outputs
+        loss = self.handle_loss(cb_params.net_outputs)
         cur_epoch = cb_params.cur_epoch_num
-        data_sink_mode = cb_params.dataset_sink_mode
-        if cb_params.net_outputs is not None:
-            if isinstance(loss, tuple):
-                if loss[1]:
-                    self.config.logger.info("==========overflow!==========")
-                loss = loss[0]
-            loss = loss.asnumpy()
-        else:
-            self.config.logger.info("custom loss callback class loss is None.")
-            return
+        data_sink_mode = cb_params.get('dataset_sink_mode', False)
+        if not data_sink_mode:
+            cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
 
-        cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
+            if cur_step_in_epoch == 1:
+                self.loss_avg = AverageMeter()
+            self.loss_avg.update(loss)
 
-        if cur_step_in_epoch == 1:
-            self.loss_avg = AverageMeter()
-        self.loss_avg.update(loss)
+            if isinstance(loss, float) and (np.isnan(loss) or np.isinf(loss)):
+                raise ValueError(
+                    "epoch: {} step: {}. Invalid loss, terminating training.".format(cur_epoch, cur_step_in_epoch))
 
-        if isinstance(loss, float) and (np.isnan(loss) or np.isinf(loss)):
-            raise ValueError(
-                "epoch: {} step: {}. Invalid loss, terminating training.".format(cur_epoch, cur_step_in_epoch))
-        if self._per_print_times != 0 and (
-                cb_params.cur_step_num - self._last_print_time) >= self._per_print_times and not data_sink_mode:
-            self._last_print_time = cb_params.cur_step_num
-            loss_log = "epoch: [%s/%s] step: [%s/%s], loss: %.6f, lr: %.6f, per step time: %.3f ms" % (
-                cur_epoch, self.config.train.total_epochs, cur_step_in_epoch, self.config.steps_per_epoch,
-                np.mean(self.loss_avg.avg), self.lr[self.cur_steps], (time.time() - self.step_start_time) * 1000)
-            self.config.logger.info(loss_log)
+            if cur_step_in_epoch % self._per_print_times == 0:
+                per_step_time = (time.time() - self.step_start_time) * 1000 / self._per_print_times
+                fps = self.batch_size * 1000 / per_step_time
+                loss_log = "epoch: [%s/%s] step: [%s/%s], loss: %.6f, lr: %.6f, per step time: %.3f ms, " \
+                           "fps: %.2f img/s" % (
+                               cur_epoch, self.config.train.total_epochs, cur_step_in_epoch, cb_params.batch_num,
+                               np.mean(self.loss_avg.avg), self.lr[self.cur_steps], per_step_time, fps)
+                self.config.logger.info(loss_log)
+                self.step_start_time = time.time()
         self.cur_steps += 1
-
-    def on_train_epoch_begin(self, run_context):
-        """
-        Called before each epoch beginning.
-        Args:
-            run_context (RunContext): Include some information of the model.
-        """
-        self.epoch_start_time = time.time()
 
     def on_train_epoch_end(self, run_context):
         """
@@ -143,11 +147,13 @@ class DBNetMonitor(Callback):
         loss = cb_params.net_outputs
         cur_epoch = cb_params.cur_epoch_num
         epoch_time = (time.time() - self.epoch_start_time)
-        loss_log = "epoch: [%s/%s], loss: %.6f, epoch time: %.3f s, per step time: %.3f ms" % (
-            cur_epoch, self.config.train.total_epochs, loss[0].asnumpy(), epoch_time,
-            epoch_time * 1000 / self.config.steps_per_epoch)
+        per_step_time = epoch_time * 1000 / cb_params.batch_num
+        fps = 1000 * self.batch_size / per_step_time
+        loss_log = "epoch: [%s/%s], loss: %.6f, epoch time: %.3f s, per step time: %.3f ms, fps: %.2f img/s" % (
+            cur_epoch, self.config.train.total_epochs, loss[0].asnumpy(), epoch_time, per_step_time, fps)
         self.config.logger.info(loss_log)
-        if self.run_eval and cur_epoch % self.eval_interval == 0:
+        if self.run_eval and (cur_epoch - self.config.eval_start_epoch) % self.eval_interval == 0 and \
+                cur_epoch >= self.config.eval_start_epoch:
             self.load_parameter()
             self.eval_net.model.set_train(False)
             metrics, fps = self.eval_net.eval(self.val_dataset, show_imgs=self.config.eval.show_images)
