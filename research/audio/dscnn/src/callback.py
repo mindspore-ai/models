@@ -31,19 +31,19 @@ class ProgressMonitor(Callback):
         self.local_step_cnt = 0
         self.ckpt_history = []
 
-    def begin(self, run_context):
+    def on_train_begin(self, run_context):
         if not self.args.epoch_cnt:
             self.args.logger.info('start network train...')
         if run_context is None:
             pass
 
-    def step_begin(self, run_context):
+    def on_train_step_begin(self, run_context):
         if self.local_step_cnt == 0:
             self.step_start_time = time.time()
         if run_context is None:
             pass
 
-    def step_end(self, run_context):
+    def on_train_step_end(self, run_context):
         '''Callback when step end.'''
         if self.local_step_cnt % self.args.log_interval == 0 and self.local_step_cnt > 0:
             cb_params = run_context.original_args()
@@ -57,12 +57,12 @@ class ProgressMonitor(Callback):
             self.step_start_time = time.time()
         self.local_step_cnt += 1
 
-    def epoch_begin(self, run_context):
+    def on_train_epoch_begin(self, run_context):
         self.epoch_start_time = time.time()
         if run_context is None:
             pass
 
-    def epoch_end(self, run_context):
+    def on_train_epoch_end(self, run_context):
         '''Callback when epoch end.'''
         cb_params = run_context.original_args()
         self.globe_step_cnt = self.args.steps_per_epoch * (self.args.epoch_cnt + 1) - 1
@@ -75,7 +75,7 @@ class ProgressMonitor(Callback):
         self.args.epoch_cnt += 1
         self.local_step_cnt = 0
 
-    def end(self, run_context):
+    def on_train_end(self, run_context):
         pass
 
 
