@@ -87,6 +87,9 @@ function infer()
 function cal_acc()
 {
     python ../create_imagenet2012_label.py  --img_path=$data_path
+    if [ $device_target == 'GPU' ] || [ $infer_device_type == 'GPU' ]; then
+        device_target='GPU'
+    fi
     python ../postprocess.py --result_path=./result_Files --label_path=./imagenet_label.json --device_target=$device_target &> acc.log &
 }
 
