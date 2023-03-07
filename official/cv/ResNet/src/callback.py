@@ -57,8 +57,7 @@ class LossCallBack(Callback):
                 raise ValueError("epoch: {} step: {}. Invalid loss, terminating training.".format(
                     cb_params.cur_epoch_num, cur_step_in_epoch))
 
-            cur_epoch_step = (self.global_steps + 1) % cb_params.batch_num
-            if cur_epoch_step % self.per_print_time == 0 and self.global_steps != 0:
+            if cur_step_in_epoch % self.per_print_time == 0:
                 # pylint: disable=line-too-long
                 per_step_time = 1000 * (time.time() - self.step_start_time) / self.per_print_time
                 log_info = "epoch: [%s/%s] step: [%s/%s], lr: %.6f, loss: %.6f, per step time: %.3f ms" % (

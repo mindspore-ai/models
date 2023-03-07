@@ -2,7 +2,9 @@ net: DBnet
 seed: 1
 device_num: 1
 device_id: 0
+per_print_times: 10
 run_eval: True
+eval_start_epoch: 100
 eval_interval: 20
 device_target: "Ascend"
 context_mode: "graph"

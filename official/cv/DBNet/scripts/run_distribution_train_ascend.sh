@@ -48,7 +48,6 @@ do
     cp ../*.py ./train_parallel$i
     cp -r ../src ./train_parallel$i
     cp -r ../config ./train_parallel$i
-    cp -r ../pretrained ./train_parallel$i
     cd ./train_parallel$i || exit
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     python train.py \

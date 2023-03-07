@@ -64,19 +64,13 @@ def set_graph_kernel_context(run_platform, net_name):
 def set_parameter():
     """set_parameter"""
     target = config.device_target
-    config.device_id = int(os.getenv('DEVICE_ID'))
-    config.rank_id = get_rank_id()
     if target == "CPU":
         config.run_distribute = False
-        config.device_id = 0
-        config.device_num = 0
-        config.rank_id = 0
 
     # init context
-    ms.set_context(device_id=config.device_id)
     if config.mode_name == 'GRAPH':
         if target == "Ascend":
-            rank_save_graphs_path = os.path.join(config.save_graphs_path, "soma", str(config.device_id))
+            rank_save_graphs_path = os.path.join(config.save_graphs_path, "soma", str(os.getenv('DEVICE_ID')))
             ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=config.save_graphs,
                            save_graphs_path=rank_save_graphs_path)
         else:
@@ -89,6 +83,8 @@ def set_parameter():
         ms.set_ps_context(enable_ps=True)
     if config.run_distribute:
         if target == "Ascend":
+            device_id = int(os.getenv('DEVICE_ID'))
+            ms.set_context(device_id=device_id)
             ms.set_auto_parallel_context(device_num=config.device_num, parallel_mode=ms.ParallelMode.DATA_PARALLEL,
                                          gradients_mean=True)
             set_algo_parameters(elementwise_op_strategy_follow=True)
@@ -142,6 +138,7 @@ def train_net():
     target = config.device_target
     set_parameter()
     set_output_dir(config)
+    config.rank_id = get_rank_id()
     config.logger = get_logger(config.log_dir, config.rank_id)
     dataset = create_dataset(dataset_path=config.data_path, do_train=True,
                              batch_size=config.batch_size, train_image_size=config.train_image_size,

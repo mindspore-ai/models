@@ -39,7 +39,6 @@ mkdir ./train
 cp ../*.py ./train
 cp -r ../src ./train
 cp -r ../config ./train
-cp -r ../pretrained ./train
 cd ./train || exit
 env > env.log
 
