@@ -197,6 +197,10 @@ def run_train():
                 os.makedirs(ckpt_path, exist_ok=True)
             ckpt_name = os.path.join(ckpt_path, "yolov3_{}_{}.ckpt".format(epoch_idx + 1, config.steps_per_epoch))
             ms.save_checkpoint(network, ckpt_name)
+            ckpt_list = [os.path.join(ckpt_path, f) for f in os.listdir(ckpt_path)]
+            ckpt_list = sorted(ckpt_list, key=os.path.getmtime)
+            for i in range(len(ckpt_list) - config.max_checkpoint_num):
+                os.remove(ckpt_list[i])
         if stop_profiler:
             break
 
