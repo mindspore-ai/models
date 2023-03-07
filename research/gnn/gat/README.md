@@ -36,7 +36,7 @@ Graph Attention Networks(GAT) was proposed in 2017 by Petar Veličković et al. 
 
 Note that according to whether this attention layer is the output layer of the network or not, the node update function can be concatenate or average.
 
-## [Dataset](#contents)
+## [Dataset](#contents)(https://github.com/kimiyoung/planetoid/tree/master/data)
 
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 

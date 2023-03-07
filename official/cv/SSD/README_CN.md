@@ -62,6 +62,12 @@ SSD方法基于前向卷积网络，该网络产生固定大小的边界框集�
 - 数据格式：图像和json文件
     - 注意：数据在dataset.py中处理
 
+[helmet](<https://osf.io/4pwj8>)
+
+- 数据集大小：526 MB
+    - 训练集：325 MB，1500张图像
+    - 验证集：201 MB，1000张图像
+
 # 环境要求
 
 - 安装[MindSpore](https://www.mindspore.cn/install)。
@@ -566,23 +572,23 @@ mAP: 0.3510553464069668
 
 ## 性能
 
-| 参数         | Ascend                                                       | GPU                                                    |
-| ------------ | ------------------------------------------------------------ | ------------------------------------------------------ |
-| 网络         | SSD MobileNetV2                                              | SSD MobileNetV2                                        |
-| 资源         | Ascend 910; OS Euler2.8                                      | GPU(Tesla V100 PCIE)，CPU 2.1GHz 64 cores，Memory 128G |
-| 上传日期     | 07/05/2020 (month/day/year)                                  | 09/24/2020 (month/day/year)                            |
-| 昇思版本     | 1.3.0                                                        | 1.3.0                                                  |
-| 数据集       | COCO2017                                                     | COCO2017                                               |
-| 训练参数     | epoch = 500,  batch_size = 32                                | epoch = 800,  batch_size = 24(8ps)/32(1ps)             |
-| 优化器       | Momentum                                                     | Momentum                                               |
-| 损失函数     | Sigmoid Cross Entropy,SmoothL1Loss                           | Sigmoid Cross Entropy,SmoothL1Loss                     |
-| 性能         | 8pcs: 90ms/step                                              | 8pcs: 121ms/step                                       |
-| 训练耗时     | 8pcs: 4.81hours                                              | 8pcs: 12.31hours                                       |
-| 推理输出     | mAP                                                          | mAP                                                    |
-| 评价指标     | IoU=0.50: 22%                                                | IoU=0.50: 22%                                          |
-| 推理模型大小 | 34M(.ckpt file)                                              | 34M(.ckpt file)                                        |
-| 参数文件     | ssd300_config.yaml                                           | ssd300_config_gpu.yaml                                 |
-| 脚本链接     | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |                                                        |
+| 参数         | Ascend                                                       | GPU                                                    | CPU                                                               |
+| ------------ | ------------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------------------------ |
+| 网络         | SSD MobileNetV2                                              | SSD MobileNetV2                                        | SSD MobileNetV2                                        |
+| 资源         | Ascend 910; OS Euler2.8                                      | GPU(Tesla V100 PCIE)，CPU 2.1GHz 64 cores，Memory 128G | CPU                                                          |
+| 上传日期     | 07/05/2020 (month/day/year)                                  | 09/24/2020 (month/day/year)                            | 11/05/2020 (month/day/year)                                  |
+| 昇思版本     | 1.3.0                                                        | 1.3.0                                                  | 1.3.0                                                        |
+| 数据集       | COCO2017                                                     | COCO2017                                               | helmet                                                     |
+| 训练参数     | epoch = 500,  batch_size = 32                                | epoch = 800,  batch_size = 24(8ps)/32(1ps)             | epoch = 40,  batch_size = 16                               |
+| 优化器       | Momentum                                                     | Momentum                                               | Momentum                                               |
+| 损失函数     | Sigmoid Cross Entropy,SmoothL1Loss                           | Sigmoid Cross Entropy,SmoothL1Loss                     | Sigmoid Cross Entropy,SmoothL1Loss                     |
+| 性能         | 8pcs: 90ms/step                                              | 8pcs: 121ms/step                                       | 1230ms/step                                                      |
+| 训练耗时     | 8pcs: 4.81hours                                              | 8pcs: 12.31hours                                       | 1.2h                                                              |
+| 推理输出     | mAP                                                          | mAP                                                    | mAP                                                         |
+| 评价指标     | IoU=0.50: 22%                                                | IoU=0.50: 22%                                          | IoU=0.50: 49.0%                                                |
+| 推理模型大小 | 34M(.ckpt file)                                              | 34M(.ckpt file)                                        | 34M(.ckpt file)                                              |
+| 参数文件     | ssd300_config.yaml                                           | ssd300_config_gpu.yaml                                 | ssd300_config.yaml                                           |
+| 脚本链接     | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |                                                        |                                                        |
 
 | 参数         | Ascend                                                       | GPU                                                    |
 | ------------ | ------------------------------------------------------------ | ------------------------------------------------------ |

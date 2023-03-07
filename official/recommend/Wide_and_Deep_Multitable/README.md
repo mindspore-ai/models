@@ -31,7 +31,7 @@ Wide&Deep model jointly trained wide linear models and deep neural network, whic
 
 ## [Dataset](#contents)
 
-- [1] A dataset used in Click Prediction
+- [1] A dataset used in Click Prediction (https://www.kaggle.com/c/outbrain-click-prediction/data)
 
 ## [Environment Requirements](#contents)
 

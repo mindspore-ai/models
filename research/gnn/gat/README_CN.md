@@ -36,7 +36,7 @@
 
 请注意节点更新函数是级联还是平均，取决于注意力层是否为网络输出层。
 
-## 数据集
+## 数据集(https://github.com/kimiyoung/planetoid/tree/master/data)
 
 - 数据集大小：
 

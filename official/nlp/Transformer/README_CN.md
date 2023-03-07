@@ -45,8 +45,8 @@ Transformer具体包括六个编码模块和六个解码模块。每个编码模
 
 ## 数据集
 
-- 训练数据集*WMT English-German*
-- 评估数据集*WMT newstest2014*
+- 训练数据集*WMT English-German(https://nlp.stanford.edu/projects/nmt/)*
+- 评估数据集*WMT newstest2014(https://nlp.stanford.edu/projects/nmt/)*
 
 ## 环境要求
 
