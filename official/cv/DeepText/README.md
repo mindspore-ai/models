@@ -35,14 +35,14 @@ The overall network architecture of InceptionV4 is show below:
 
 Here we used 4 datasets for training, and 1 datasets for Evaluation.
 
-- Dataset1: ICDAR 2013: Focused Scene Text
+- Dataset1: [ICDAR 2013: Focused Scene Text](https://rrc.cvc.uab.es/?ch=2&com=tasks):
     - Train: 142MB, 229 images
     - Test: 110MB, 233 images
-- Dataset2: ICDAR 2013: Born-Digital Images
+- Dataset2: [ICDAR 2011: Born-Digital Images](https://rrc.cvc.uab.es/?ch=1&com=tasks):
     - Train: 27.7MB, 410 images
-- Dataset3: SCUT-FORU: Flickr OCR Universal Database
+- Dataset3: [SCUT-FORU: Flickr OCR Universal Database](https://github.com/yan647/SCUT_FORU_DB_Release):
     - Train: 388MB, 1715 images
-- Dataset4: CocoText v2(Subset of MSCOCO2017):
+- Dataset4: [CocoText v2(Subset of MSCOCO2017)](https://rrc.cvc.uab.es/?ch=5&com=tasks):
     - Train: 13GB, 63686 images
 
 # [Features](#contents)
