@@ -311,5 +311,5 @@ class Seq2seqTrainOneStepWithLossScaleCell(nn.TrainOneStepWithLossScaleCell):
             overflow = self.loss_scaling_manager(self.loss_scale, cond)
         if not overflow:
             self.optimizer(grads)
-        ret = (loss, cond, scaling_sens)
+        ret = (loss, cond, scaling_sens.value())
         return ret
