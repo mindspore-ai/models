@@ -46,9 +46,7 @@ BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
 CONFIG_FILE="${BASE_PATH}/../default_config.yaml"
 
 if [ $4 == 'GPU' ]; then
-    if [ $CUDA_VISIABLE_DEVICES ]; then
-        device_id=$CUDA_VISIABLE_DEVICES
-    fi
+    device_id=0
 fi
 
 echo $model

@@ -45,9 +45,7 @@ elif [ $# == 4 ]; then
 fi
 
 if [ $4 == 'GPU' ]; then
-    if [ $CUDA_VISIABLE_DEVICES ]; then
-        device_id=$CUDA_VISIABLE_DEVICES
-    fi
+    device_id=0
 fi
 
 if [ $4 == 'Ascend' ] || [ $4 == 'GPU' ] || [ $4 == 'CPU' ]; then

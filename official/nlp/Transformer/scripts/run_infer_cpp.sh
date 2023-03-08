@@ -58,9 +58,7 @@ fi
 echo $CONFIG_PATH
 
 if [ $3 == 'GPU' ]; then
-    if [ $CUDA_VISIABLE_DEVICES ]; then
-        device_id=$CUDA_VISIABLE_DEVICES
-    fi
+    device_id=0
 fi
 
 echo "mindir name: "$model

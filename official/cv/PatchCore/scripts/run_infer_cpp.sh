@@ -48,9 +48,7 @@ fi
 category=$4
 
 if [ $5 == 'GPU' ]; then
-    if [ $CUDA_VISIABLE_DEVICES ]; then
-        device_id=$CUDA_VISIABLE_DEVICES
-    fi
+    device_id=0
 fi
 
 echo "Mindir name: "$model
