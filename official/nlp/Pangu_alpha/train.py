@@ -37,7 +37,7 @@ from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.serialization import load_distributed_checkpoint, load_checkpoint, load_param_into_net
 
 try:
-    from mindformers.common import CrossEntropyLoss
+    from mindformers.core import CrossEntropyLoss
     from mindformers.modules.transformer import TransformerOpParallelConfig, TransformerRecomputeConfig
 
 except ImportError as e:
