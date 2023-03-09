@@ -83,9 +83,7 @@ if [ $net_type == 'squad' ]; then
     fi
 
     if [ ${10} == 'GPU' ]; then
-        if [ $CUDA_VISIABLE_DEVICES ]; then
-            device_id=$CUDA_VISIABLE_DEVICES
-        fi
+        device_id=0
     fi
 else
     if [ $8 == 'Ascend' ] || [ $8 == 'GPU' ] || [ $8 == 'CPU' ]; then
@@ -96,9 +94,7 @@ else
     fi
 
     if [ $8 == 'GPU' ]; then
-        if [ $CUDA_VISIABLE_DEVICES ]; then
-            device_id=$CUDA_VISIABLE_DEVICES
-        fi
+        device_id=0
     fi
 fi
 echo "device type: "$device_type

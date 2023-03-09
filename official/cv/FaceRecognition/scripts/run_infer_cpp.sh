@@ -38,9 +38,7 @@ if [ $# == 3 ]; then
 fi
 
 if [ $2 == 'GPU' ]; then
-    if [ $CUDA_VISIABLE_DEVICES ]; then
-        device_id=$CUDA_VISIABLE_DEVICES
-    fi
+    device_id=0
 fi
 
 echo ${dirname_path}
