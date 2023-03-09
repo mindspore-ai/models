@@ -227,7 +227,7 @@ class ResNet3D(nn.Cell):
             block, block_inplanes[3], layers[3], stride=2, sync=sync)
         self.mean = ops.ReduceMean(keep_dims=True)
         self.flatten = nn.Flatten()
-        self.drop = nn.Dropout(0.5)
+        self.drop = nn.Dropout(p=0.5)
         self.fc = nn.Dense(block_inplanes[3] * block.expansion, n_classes)
 
     def _make_layer(self, block, planes, blocks, stride=1, sync=False):

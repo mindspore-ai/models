@@ -51,7 +51,7 @@ class XLNetRelativeAttention(nn.Cell):
                                                  (self.n_head, self.d_head)), 'r_w_bias')
 
         self.layer_norm = nn.LayerNorm([self.d_model], epsilon=config.layer_norm_eps)
-        self.dropout = nn.Dropout(1 - config.dropout)
+        self.dropout = nn.Dropout(p=config.dropout)
         self.softmax = ops.Softmax(-1)
 
     def rel_shift_bnij(self, x, klen=-1):
@@ -129,7 +129,7 @@ class XLNetFeedForward(nn.Cell):
         self.layer_norm = nn.LayerNorm([config.d_model], epsilon=config.layer_norm_eps)
         self.layer_1 = nn.Dense(config.d_model, config.d_inner)
         self.layer_2 = nn.Dense(config.d_inner, config.d_model)
-        self.dropout = nn.Dropout(1 - config.dropout)
+        self.dropout = nn.Dropout(p=config.dropout)
         if config.ff_activation == 'gelu':
             self.activation_function = nn.GELU()
         elif config.ff_activation == 'relu':
@@ -149,7 +149,7 @@ class XLNetLayer(nn.Cell):
         super(XLNetLayer, self).__init__()
         self.rel_attn = XLNetRelativeAttention(config)
         self.ff = XLNetFeedForward(config)
-        self.dropout = nn.Dropout(1 - config.dropout)
+        self.dropout = nn.Dropout(p=config.dropout)
 
     def construct(self, input_h, attn_mask_h, r, mems):
         output_h = self.rel_attn(input_h, attn_mask_h, r, mems)
@@ -168,7 +168,7 @@ class DialogXL(nn.Cell):
 
         self.word_embedding = nn.Embedding(config.vocab_size, config.d_model)
         self.layer = nn.CellList([XLNetLayer(config) for _ in range(self.n_layer)])
-        self.dropout = nn.Dropout(1 - config.dropout)
+        self.dropout = nn.Dropout(p=config.dropout)
 
     def create_mask(self, qlen, speaker_mask, window_mask, speaker_ids):
         if speaker_mask is not None:
@@ -311,7 +311,7 @@ class DialogXL(nn.Cell):
 class ERC_xlnet(nn.Cell):
     def __init__(self, args, backbone):
         super(ERC_xlnet, self).__init__()
-        self.dropout = nn.Dropout(1 - args.output_dropout)
+        self.dropout = nn.Dropout(p=args.output_dropout)
         self.xlnet = backbone
 
         self.pool_fc = nn.SequentialCell([nn.Dense(args.bert_dim, args.hidden_dim, weight_init='he_uniform'),

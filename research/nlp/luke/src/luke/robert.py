@@ -58,7 +58,7 @@ class BertSelfAttention(nn.Cell):
         self.value = nn.Dense(config.hidden_size, self.all_head_size).to_float(mindspore.float16)
         self.transpose_for_scores = TransposeForScores(
             num_attention_heads=self.num_attention_heads, attention_head_size=self.attention_head_size)
-        self.dropout = nn.Dropout(1 - config.attention_probs_dropout_prob)
+        self.dropout = nn.Dropout(p=config.attention_probs_dropout_prob)
         self.matmul = ops.BatchMatMul()
         self.permute = ops.Transpose()
         self.transpose = ops.Transpose()
@@ -266,7 +266,7 @@ class RobertaEmbeddings(nn.Cell):
         self.position_embeddings = nn.Embedding(config.max_position_embeddings, config.hidden_size)
         self.token_type_embeddings = nn.Embedding(config.type_vocab_size, config.hidden_size)
         self.LayerNorm = nn.LayerNorm((config.hidden_size,), epsilon=config.layer_norm_eps).to_float(mindspore.float16)
-        self.dropout = nn.Dropout(1 - config.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
         self.unsqueeze = ops.ExpandDims()
         self.cumsum = ops.CumSum()
         self.not_equal = ops.NotEqual()
@@ -298,7 +298,7 @@ class BertEmbeddings(nn.Cell):
         self.position_embeddings = nn.Embedding(config.max_position_embeddings, config.hidden_size)
         self.token_type_embeddings = nn.Embedding(config.type_vocab_size, config.hidden_size)
         self.LayerNorm = nn.LayerNorm((config.hidden_size,), epsilon=config.layer_norm_eps).to_float(mindspore.float16)
-        self.dropout = nn.Dropout(1 - config.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
         self.unsqueeze = ops.ExpandDims()
         self.cast = ops.Cast()
 
@@ -329,7 +329,7 @@ class BertOutput(nn.Cell):
         super(BertOutput, self).__init__()
         self.dense = nn.Dense(config.intermediate_size, config.hidden_size).to_float(mindspore.float16)
         self.LayerNorm = nn.LayerNorm((config.hidden_size,), epsilon=config.layer_norm_eps).to_float(mindspore.float16)
-        self.dropout = nn.Dropout(1 - config.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
         self.cast = ops.Cast()
 
     def construct(self, hidden_states, input_tensor):
@@ -392,7 +392,7 @@ class BertSelfOutput(nn.Cell):
         super(BertSelfOutput, self).__init__()
         self.dense = nn.Dense(config.hidden_size, config.hidden_size).to_float(mindspore.float16)
         self.LayerNorm = nn.LayerNorm((config.hidden_size,), epsilon=config.layer_norm_eps).to_float(mindspore.float16)
-        self.dropout = nn.Dropout(1 - config.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
         self.cast = ops.Cast()
 
     def construct(self, hidden_states, input_tensor):

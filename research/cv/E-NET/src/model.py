@@ -67,7 +67,7 @@ class RegularBottleNeck(nn.Cell):
         self.drop_prob = drop_prob
         self.reduced_depth = int(channels // 4)
         if drop_prob > 0:
-            self.dropout = P.Dropout(keep_prob=1-drop_prob)
+            self.dropout = P.Dropout(p=drop_prob)
 
         self.concat = P.Concat(axis=1)
 
@@ -130,7 +130,7 @@ class DlilatedBottleNeck(nn.Cell):
         self.dilation = dilation
         self.reduced_depth = int(channels // 4)
         if drop_prob > 0:
-            self.dropout = P.Dropout(keep_prob=1-drop_prob)
+            self.dropout = P.Dropout(p=drop_prob)
         self.concat = P.Concat(axis=1)
 
         self.conv1 = nn.SequentialCell(nn.Conv2d(in_channels=channels,
@@ -191,7 +191,7 @@ class Asym5BottleNeck(nn.Cell):
         self.drop_prob = drop_prob
         self.reduced_depth = int(channels // 4)
         if drop_prob > 0:
-            self.dropout = P.Dropout(keep_prob=1-drop_prob)
+            self.dropout = P.Dropout(p=drop_prob)
         self.concat = P.Concat(axis=1)
 
         self.conv1 = nn.SequentialCell(nn.Conv2d(in_channels=channels,
@@ -294,7 +294,7 @@ class DownsampleNeck(nn.Cell):
                                            nn.ReLU() if relu else nn.PReLU(out_channels))
 
         if drop_prob > 0:
-            self.ext_regul = P.Dropout(1-drop_prob)
+            self.ext_regul = P.Dropout(p=drop_prob)
 
         self.out_activation = nn.ReLU() if relu else nn.PReLU(out_channels)
 
@@ -348,7 +348,7 @@ class UpsampleNeck(nn.Cell):
                                            nn.BatchNorm2d(out_channels))
 
         if drop_prob > 0:
-            self.ext_regul = P.Dropout(1-drop_prob)
+            self.ext_regul = P.Dropout(p=drop_prob)
         self.drop_prob = drop_prob
         self.out_activation = nn.ReLU() if relu else nn.PReLU(out_channels)
 

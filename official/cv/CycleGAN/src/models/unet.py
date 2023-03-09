@@ -111,7 +111,7 @@ class UnetSkipConnectionBlock(nn.Cell):
 
             model = down + [submodule] + up
             if dropout:
-                model.append(nn.Dropout(0.5))
+                model.append(nn.Dropout(p=0.5))
 
         self.model = nn.SequentialCell(model)
         self.skip_connections = not outermost

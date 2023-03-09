@@ -92,7 +92,7 @@ class MaskedSelfAttention(nn.Cell):
         if self.has_attention_mask:
             self.expand_dims = P.ExpandDims().shard(((config.dp, 1, 1),))
             self.sub = P.Sub().shard(((1,), (config.dp, 1, 1, 1))).add_prim_attr("_side_effect", True)
-            self.add = P.TensorAdd().shard(((config.dp, 1, 1, 1), (config.dp, config.mp, 1, 1)))
+            self.add = P.Add().shard(((config.dp, 1, 1, 1), (config.dp, config.mp, 1, 1)))
         self.cast = P.Cast()
         self.get_dtype = P.DType()
 
@@ -106,11 +106,11 @@ class MaskedSelfAttention(nn.Cell):
         self.softmax_cast = P.Cast()
         self.shape = P.Shape()
 
-        self.dropout = Dropout(1 - attention_dropout)
+        self.dropout = Dropout(p=attention_dropout)
         self.dropout.dropout_gen_mask.shard(((config.dp, 1),))
         self.dropout.dropout_do_mask.shard(((config.dp, 1),))
 
-        self.dropout_probs = Dropout(1 - attention_dropout)
+        self.dropout_probs = Dropout(p=attention_dropout)
         self.dropout_probs.dropout_gen_mask.shard(((config.dp, config.mp, 1, 1),))
         self.dropout_probs.dropout_do_mask.shard(((config.dp, config.mp, 1, 1),))
 

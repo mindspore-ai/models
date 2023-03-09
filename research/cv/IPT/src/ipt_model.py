@@ -127,13 +127,13 @@ class MultiheadAttention(nn.Cell):
         self.matmul = ops.BatchMatMul()
 
         self.softmax = nn.Softmax()
-        self.dropout = nn.Dropout(1. - attention_probs_dropout_prob)
+        self.dropout = nn.Dropout(p=attention_probs_dropout_prob)
         self.use_dropout = attention_probs_dropout_prob > 0
 
         if self.has_attention_mask:
             self.expand_dims = ops.ExpandDims()
             self.sub = ops.Sub()
-            self.add = ops.TensorAdd()
+            self.add = ops.Add()
             self.cast = ops.Cast()
             self.get_dtype = ops.DType()
 
@@ -228,13 +228,13 @@ class TransformerEncoderLayer(nn.Cell):
                                             num_attention_heads=nhead,
                                             attention_probs_dropout_prob=dropout)
         self.linear1 = nn.Dense(d_model, dim_feedforward).to_float(compute_type)
-        self.dropout = nn.Dropout(1. - dropout)
+        self.dropout = nn.Dropout(p=dropout)
         self.linear2 = nn.Dense(dim_feedforward, d_model)
 
         self.norm1 = LayerPreprocess(d_model)
         self.norm2 = LayerPreprocess(d_model)
-        self.dropout1 = nn.Dropout(1. - dropout)
-        self.dropout2 = nn.Dropout(1. - dropout)
+        self.dropout1 = nn.Dropout(p=dropout)
+        self.dropout2 = nn.Dropout(p=dropout)
         self.reshape = ops.Reshape()
 
         self.activation = ops.ReLU()
@@ -278,15 +278,15 @@ class TransformerDecoderLayer(nn.Cell):
                                                  num_attention_heads=nhead,
                                                  attention_probs_dropout_prob=dropout)
         self.linear1 = nn.Dense(d_model, dim_feedforward)
-        self.dropout = nn.Dropout(1. - dropout)
+        self.dropout = nn.Dropout(p=dropout)
         self.linear2 = nn.Dense(dim_feedforward, d_model)
 
         self.norm1 = LayerPreprocess(d_model)
         self.norm2 = LayerPreprocess(d_model)
         self.norm3 = LayerPreprocess(d_model)
-        self.dropout1 = nn.Dropout(1. - dropout)
-        self.dropout2 = nn.Dropout(1. - dropout)
-        self.dropout3 = nn.Dropout(1. - dropout)
+        self.dropout1 = nn.Dropout(p=dropout)
+        self.dropout2 = nn.Dropout(p=dropout)
+        self.dropout3 = nn.Dropout(p=dropout)
         self.reshape = ops.Reshape()
         self.activation = ops.ReLU()
 
@@ -407,10 +407,10 @@ class VisionTransformer(nn.Cell):
                 self.flatten_dim, embedding_dim)
             self.mlp_head = nn.SequentialCell(
                 nn.Dense(embedding_dim, hidden_dim),
-                nn.Dropout(1. - dropout_rate),
+                nn.Dropout(p=dropout_rate),
                 nn.ReLU(),
                 nn.Dense(hidden_dim, self.out_dim),
-                nn.Dropout(1. - dropout_rate))
+                nn.Dropout(p=dropout_rate))
 
         self.query_embed = nn.Embedding(
             num_queries, embedding_dim * self.seq_length)
@@ -428,7 +428,7 @@ class VisionTransformer(nn.Cell):
         if not self.no_pos:
             self.position_encoding = LearnedPositionalEncoding(self.seq_length, self.embedding_dim, self.seq_length)
 
-        self.dropout_layer1 = nn.Dropout(1. - dropout_rate)
+        self.dropout_layer1 = nn.Dropout(p=dropout_rate)
         self.con_loss = con_loss
 
     def construct(self, x, query_idx_tensor):

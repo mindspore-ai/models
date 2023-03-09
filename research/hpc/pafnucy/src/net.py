@@ -90,8 +90,8 @@ class FeedFrowd(nn.Cell):
                                bias_init='one',
                                has_bias=True,
                                activation='relu').to_float(mstype.float16)
-        self.dropout = nn.Dropout(keep_prob=keep_prob)
-        self.dropout1 = nn.Dropout(keep_prob=1.)
+        self.dropout = nn.Dropout(p=1 - keep_prob)
+        self.dropout1 = nn.Dropout(p=0.0)
 
     def construct(self, x, prob=False):
         x = self.dense1(x)

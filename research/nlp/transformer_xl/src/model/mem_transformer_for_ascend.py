@@ -58,7 +58,7 @@ class MemTransformerLM(nn.Cell):
         self.word_emb = AdaptiveEmbedding(n_token, d_embed, d_model, cutoffs,
                                           div_val=div_val)
 
-        self.drop = nn.Dropout(1 - dropout, dtype=ms.float32)
+        self.drop = nn.Dropout(p=dropout)
 
         self.n_layer = n_layer
 

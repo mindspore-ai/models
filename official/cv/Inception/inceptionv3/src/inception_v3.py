@@ -172,7 +172,7 @@ class Logits(nn.Cell):
     def __init__(self, num_classes=10, dropout_keep_prob=0.8):
         super(Logits, self).__init__()
         self.avg_pool = nn.AvgPool2d(8, pad_mode='valid')
-        self.dropout = nn.Dropout(keep_prob=dropout_keep_prob)
+        self.dropout = nn.Dropout(p=1 - dropout_keep_prob)
         self.flatten = P.Flatten()
         self.fc = nn.Dense(2048, num_classes)
 

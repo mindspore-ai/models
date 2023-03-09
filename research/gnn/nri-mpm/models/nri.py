@@ -193,17 +193,17 @@ class RNNDEC(GNN):
             nn.SequentialCell([
                 nn.Dense(2 * n_in_node, msg_hid),
                 nn.ReLU(),
-                nn.Dropout(1-do_prob),
+                nn.Dropout(p=do_prob),
                 nn.Dense(msg_hid, msg_out),
                 nn.ReLU()])
             for _ in range(edge_types)])
         self.out = nn.SequentialCell([
             nn.Dense(n_in_node + msg_out, n_hid),
             nn.ReLU(),
-            nn.Dropout(1-do_prob),
+            nn.Dropout(p=do_prob),
             nn.Dense(n_hid, n_hid),
             nn.ReLU(),
-            nn.Dropout(1-do_prob),
+            nn.Dropout(p=do_prob),
             nn.Dense(n_hid, n_in_node)])
         self.gru_edge = GRUCell(n_hid, n_hid)
         self.gru_node = GRUCell(n_hid + n_in_node, n_hid + n_in_node)

@@ -46,7 +46,7 @@ class GPT2LanguageModel(nn.Cell):
                                config.vocab_size,
                                weight_init=TruncatedNormal(config.initializer_range),
                                has_bias=False).to_float(config.compute_type)
-        self.dropout = nn.Dropout(1 - config.hidden_dropout)
+        self.dropout = nn.Dropout(p=config.hidden_dropout)
         self.log_softmax = P.LogSoftmax(axis=-1)
 
     def construct(self, input_ids, input_mask):

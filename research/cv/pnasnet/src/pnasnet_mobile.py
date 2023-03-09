@@ -409,7 +409,7 @@ class PNASNet5_Mobile(nn.Cell):
         self.avg_pool = nn.AvgPool2d(kernel_size=7, stride=1, pad_mode='valid')
 
         if enable_dropout:
-            self.dropout = nn.Dropout(keep_prob=0.5)
+            self.dropout = nn.Dropout(p=0.5)
         else:
             self.dropout = None
 

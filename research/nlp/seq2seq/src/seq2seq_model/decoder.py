@@ -83,7 +83,7 @@ class Seq2seqDecoder(nn.Cell):
             decoder_layers.append(layer)
 
         self.decoder_layers = nn.CellList(decoder_layers)
-        self.dropout = nn.Dropout(keep_prob=1.0 - config.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
         self.classifier = nn.Dense(config.hidden_size,
                                    config.vocab_size,
                                    has_bias=True,

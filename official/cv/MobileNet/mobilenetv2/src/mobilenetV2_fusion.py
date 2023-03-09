@@ -187,7 +187,7 @@ class mobilenetV2(nn.Cell):
                  nn.DenseBnAct(self.out_channels, num_classes, has_bias=True, has_bn=False)
                  ] if not has_dropout else
                 [GlobalAvgPooling(),
-                 nn.Dropout(0.2),
+                 nn.Dropout(p=0.8),
                  nn.DenseBnAct(self.out_channels, num_classes, has_bias=True, has_bn=False)
                  ])
         self.head = nn.SequentialCell(head)

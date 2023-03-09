@@ -54,7 +54,7 @@ class GPT2CBTModel(nn.Cell):
                                 weight_init=TruncatedNormal(config.initializer_range),
                                 has_bias=False).to_float(config.compute_type)
 
-        self.first_dropout = nn.Dropout(1 - config.summary_first_dropout)
+        self.first_dropout = nn.Dropout(p=config.summary_first_dropout)
 
     def construct(self, input_ids, input_mask):
         """

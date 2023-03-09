@@ -40,7 +40,7 @@ class ResidualBlock(nn.Cell):
         self.conv2 = ConvNormReLU(dim, dim, 3, 1, 0, norm_mode, pad_mode, use_relu=False)
         self.dropout = dropout
         if dropout:
-            self.dropout = nn.Dropout(0.5)
+            self.dropout = nn.Dropout(p=0.5)
 
     def construct(self, x):
         out = self.conv1(x)

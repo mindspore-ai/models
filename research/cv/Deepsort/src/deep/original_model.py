@@ -88,7 +88,7 @@ class Net(nn.Cell):
         # 64 32 16
         self.layer3 = make_layers(64, 128, 2, True)
         # 128 16 8
-        self.dp = nn.Dropout(keep_prob=0.6)
+        self.dp = nn.Dropout(p=0.4)
         self.dense = nn.Dense(128*16*8, 128)
         self.bn1 = nn.BatchNorm1d(128, momentum=0.9)
         self.elu = nn.ELU()

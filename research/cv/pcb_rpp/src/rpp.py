@@ -37,7 +37,7 @@ class RPP(nn.Cell):
         resnet = resnet50(1000)
         self.base = resnet
 
-        self.dropout = nn.Dropout(keep_prob=0.5)
+        self.dropout = nn.Dropout(p=0.5)
 
         # self.avg_pool3d = ops.AvgPool3D(kernel_size=(8,1,1),strides=(8,1,1),pad_mode="valid")
         self.avg_pool_2 = ops.AvgPool(kernel_size=(8, 1), strides=(8, 1), pad_mode="valid")

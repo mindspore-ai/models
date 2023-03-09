@@ -47,7 +47,7 @@ class GPT2TranslationModel(nn.Cell):
                                weight_init=TruncatedNormal(config.initializer_range),
                                has_bias=False).to_float(config.compute_type)
         self.log_softmax = P.LogSoftmax(axis=-1)
-        self.dropout = nn.Dropout(1 - config.hidden_dropout)
+        self.dropout = nn.Dropout(p=config.hidden_dropout)
 
     def construct(self, input_ids, input_mask):
         """

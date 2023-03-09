@@ -115,7 +115,7 @@ class DualPathBlock(nn.Cell):
 
         self.layers = BottleBlock(in_chs, num_1x1_a, num_3x3_b, num_1x1_c, inc, G, key_stride)
         self.concat = F.Concat(axis=1)
-        self.add = F.TensorAdd()
+        self.add = F.Add()
 
     def Conv1x1(self, in_chs, out_chs, stride):
         return nn.Conv2d(in_chs, out_chs, kernel_size=1, stride=stride, pad_mode='pad', padding=0)

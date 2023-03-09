@@ -190,7 +190,7 @@ class CRNNV1(nn.Cell):
         self.reverse_seq2 = P.ReverseV2(axis=[0])
         self.seq_length = Tensor(np.ones((self.batch_size), np.int32) * config.num_step, mstype.int32)
         self.concat1 = P.Concat(axis=2)
-        self.rnn_dropout = nn.Dropout(0.9)
+        self.rnn_dropout = nn.Dropout(p=0.1)
         self.use_dropout = config.use_dropout
 
     def construct(self, x):

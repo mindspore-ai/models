@@ -246,7 +246,7 @@ class MobileNetV2Head(nn.Cell):
         super(MobileNetV2Head, self).__init__()
         # mobilenet head
         head = ([GlobalAvgPooling()] if not has_dropout else
-                [GlobalAvgPooling(), nn.Dropout(0.2)])
+                [GlobalAvgPooling(), nn.Dropout(p=0.8)])
         self.head = nn.SequentialCell(head)
         self.dense = nn.Dense(input_channel, num_classes, has_bias=True)
         self.need_activation = True

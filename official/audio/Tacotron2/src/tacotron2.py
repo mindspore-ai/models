@@ -234,7 +234,7 @@ class Prenet(nn.Cell):
         layers = [nn.SequentialCell([LinearNorm(in_size, out_size, bias=False)])
                   for (in_size, out_size) in zip(in_sizes, sizes)]
         self.relu = nn.ReLU()
-        self.dropout = nn.Dropout(keep_prob=0.5)
+        self.dropout = nn.Dropout(p=0.5)
         self.size = sizes[-1]
         self.layers = nn.CellList(layers)
 
@@ -259,7 +259,7 @@ class Postnet(nn.Cell):
                                              nn.BatchNorm2d(hps.postnet_embedding_dim),
                                              Squeeze(),
                                              nn.Tanh(),
-                                             nn.Dropout(keep_prob=0.5)]))
+                                             nn.Dropout(p=0.5)]))
 
         for _ in range(1, hps.postnet_n_convolutions - 1):
             conv_layer.extend(nn.SequentialCell([ConvNorm(hps.postnet_embedding_dim,
@@ -271,7 +271,7 @@ class Postnet(nn.Cell):
                                                  nn.BatchNorm2d(hps.postnet_embedding_dim),
                                                  Squeeze(),
                                                  nn.Tanh(),
-                                                 nn.Dropout(keep_prob=0.5)]))
+                                                 nn.Dropout(p=0.5)]))
 
         conv_layer.extend(nn.SequentialCell([ConvNorm(hps.postnet_embedding_dim,
                                                       hps.num_mels,
@@ -283,7 +283,7 @@ class Postnet(nn.Cell):
                                              ExpandDims(),
                                              nn.BatchNorm2d(hps.num_mels),
                                              Squeeze(),
-                                             nn.Dropout(keep_prob=0.5)]))
+                                             nn.Dropout(p=0.5)]))
         self.convolutions = nn.CellList(conv_layer)
 
     def construct(self, x):
@@ -340,7 +340,7 @@ class Encoder(nn.Cell):
                                                  nn.BatchNorm2d(hps.encoder_embedding_dim),
                                                  Squeeze(),
                                                  nn.ReLU(),
-                                                 nn.Dropout(keep_prob=0.5)]))
+                                                 nn.Dropout(p=0.5)]))
 
         self.convolutions = nn.CellList(conv_layer)
 
@@ -472,8 +472,8 @@ class Decode(nn.Cell):
                                      bias=True,
                                      w_init_gain='sigmoid')
 
-        self.dropout_attention = nn.Dropout(keep_prob=1 - self.p_attention_dropout)
-        self.dropout_decoder = nn.Dropout(keep_prob=1 - self.p_decoder_dropout)
+        self.dropout_attention = nn.Dropout(p=self.p_attention_dropout)
+        self.dropout_decoder = nn.Dropout(p=self.p_decoder_dropout)
 
         self.concat_ = P.Concat(-1)
         self.concat_dim1 = P.Concat(axis=1)

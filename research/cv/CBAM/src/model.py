@@ -143,9 +143,9 @@ class ResNet(nn.Cell):
         self.layer4 = self._make_layer(block, 64, layers[3], stride=2)
         self.avgpool = P.ReduceMean(keep_dims=True)
         self.flatten = nn.Flatten()
-        self.Linear = nn.Dense(64 * block.expansion, num_classes)
+        self.linear = nn.Dense(64 * block.expansion, num_classes)
         dropout_ratio = 0.5
-        self.dropout = nn.Dropout(dropout_ratio)
+        self.dropout = nn.Dropout(p=1 - dropout_ratio)
         self.softmax = nn.Softmax()
         self.print = P.Print()
 
@@ -160,10 +160,26 @@ class ResNet(nn.Cell):
         x = self.layer4(x)
         x = self.avgpool(x, 3)
         x = x.view(32, 256)
-        x = self.Linear(x)
+        x = self.linear(x)
         x = self.softmax(x)
 
         return x
+
+    def custom_init_weight(self):
+        """
+        Init the weight of Conv2d and Batchnorm2D in the net.
+        :return:
+        """
+        for _, cell in self.cells_and_names():
+            if isinstance(cell, nn.Conv2d):
+                n = cell.kernel_size[0] * cell.kernel_size[1] * cell.out_channels
+                cell.weight.set_data(weight_init.initializer(weight_init.Normal(sigma=math.sqrt(2. / n), mean=0),
+                                                             cell.weight.shape,
+                                                             cell.weight.dtype))
+            elif isinstance(cell, nn.BatchNorm2d):
+                cell.weight.set_data(weight_init.initializer(weight_init.One(),
+                                                             cell.weight.shape,
+                                                             cell.weight.dtype))
 
     def _make_layer(self, block, out_channels, blocks, stride=1):
         downsample = None
@@ -181,22 +197,6 @@ class ResNet(nn.Cell):
             layers.append(block(self.in_channels, out_channels))
 
         return nn.SequentialCell(*layers)
-
-    def custom_init_weight(self):
-        """
-        Init the weight of Conv2d and Batchnorm2D in the net.
-        :return:
-        """
-        for _, cell in self.cells_and_names():
-            if isinstance(cell, nn.Conv2d):
-                n = cell.kernel_size[0] * cell.kernel_size[1] * cell.out_channels
-                cell.weight.set_data(weight_init.initializer(weight_init.Normal(sigma=math.sqrt(2. / n), mean=0),
-                                                             cell.weight.shape,
-                                                             cell.weight.dtype))
-            elif isinstance(cell, nn.BatchNorm2d):
-                cell.weight.set_data(weight_init.initializer(weight_init.One(),
-                                                             cell.weight.shape,
-                                                             cell.weight.dtype))
 
 
 def resnet50_cbam(phase="train", **kwargs):

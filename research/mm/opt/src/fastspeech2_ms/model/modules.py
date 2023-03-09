@@ -259,7 +259,7 @@ class VariancePredictor(nn.Cell):
                     ),
                     ("relu_1", nn.ReLU()),
                     ("layer_norm_1", nn.LayerNorm((self.filter_size,))),
-                    ("dropout_1", nn.Dropout(self.dropout)),
+                    ("dropout_1", nn.Dropout(p=1 - self.dropout)),
                     (
                         "conv1d_2",
                         Conv(
@@ -271,7 +271,7 @@ class VariancePredictor(nn.Cell):
                     ),
                     ("relu_2", nn.ReLU()),
                     ("layer_norm_2", nn.LayerNorm((self.filter_size,))),
-                    ("dropout_2", nn.Dropout(self.dropout)),
+                    ("dropout_2", nn.Dropout(p=1 - self.dropout)),
                 ]
             )
         )
@@ -287,9 +287,6 @@ class VariancePredictor(nn.Cell):
 
         # out: batch_size * seq_len
         out = out.squeeze(-1)
-
-        # if mask is not None:
-        #     out = out.masked_fill(mask.to(ms.bool_), 0.0)
 
         return out
 
@@ -321,19 +318,6 @@ class Conv(nn.Cell):
         :param w_init: str. weight inits with xavier initialization.
         """
         super(Conv, self).__init__()
-
-        # in_channels,
-        # out_channels,
-        # kernel_size,
-        # stride = 1,
-        # pad_mode = 'same',
-        # padding = 0,
-        # dilation = 1,
-        # group = 1,
-        # has_bias = False,
-        # weight_init = 'normal',
-        # bias_init = 'zeros'
-
         self.conv = nn.Conv1d(
             in_channels,
             out_channels,

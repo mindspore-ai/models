@@ -36,7 +36,7 @@ class ClassifierHead(nn.Cell):
         super(ClassifierHead, self).__init__()
         self.drop_rate = drop_rate
         self.global_pool = create_pool(pool_type)
-        self.drop_out = nn.Dropout(keep_prob=1 - self.drop_rate) if self.drop_rate > 0. else ops.Identity()
+        self.drop_out = nn.Dropout(p=self.drop_rate) if self.drop_rate > 0. else ops.Identity()
         self.fc = nn.Dense(in_chs, num_classes)
 
     def construct(self, x):

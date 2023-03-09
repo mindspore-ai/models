@@ -161,7 +161,7 @@ class BNInception(nn.Cell):
 
         self.use_dropout = dropout is not None and dropout > 0
         if self.use_dropout:
-            self.dropout_cell = nn.Dropout(dropout)
+            self.dropout_cell = nn.Dropout(p=1 - dropout)
 
         self.fc = nn.Dense(in_channels=1024, out_channels=out_channels, weight_init=Normal(0, 0.001))
 

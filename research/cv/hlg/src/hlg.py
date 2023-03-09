@@ -187,8 +187,8 @@ class Attention(nn.Cell):
         self.to_v = nn.Dense(d_model, inner_dim, has_bias=True, weight_init=initialization)
 
         self.proj = nn.Dense(inner_dim, d_model, has_bias=True, weight_init=initialization)
-        self.attn_drop = nn.Dropout(1 - attn_drop)
-        self.proj_drop = nn.Dropout(1 - proj_drop)
+        self.attn_drop = nn.Dropout(p=attn_drop)
+        self.proj_drop = nn.Dropout(p=proj_drop)
         self.activation = activation
 
         #auxiliary functions
@@ -239,7 +239,7 @@ class FeedForward(nn.Cell):
 
         self.ff1 = nn.Dense(d_model, hidden_dim, weight_init=initialization)
         self.activation = activation
-        self.dropout = nn.Dropout(keep_prob=1.-dropout_rate)
+        self.dropout = nn.Dropout(p=dropout_rate)
         self.ff2 = nn.Dense(hidden_dim, d_model, weight_init=initialization)
 
     def construct(self, x):

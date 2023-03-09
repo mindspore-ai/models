@@ -45,7 +45,7 @@ class CoarseNet(nn.Cell):
         self.concat = P.Concat(axis=1)
         self.flatten = nn.Flatten()
         self.reshape = P.Reshape()
-        self.dropout = nn.Dropout()
+        self.dropout = nn.Dropout(p=0.5)
 
     def construct(self, x):
         x1 = self.conv1(x)

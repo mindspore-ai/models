@@ -68,7 +68,7 @@ class GNMTEncoder(nn.Cell):
             encoder_layers.append(layer)
         self.encoder_layers = nn.CellList(encoder_layers)
         self.reverse_v2 = P.ReverseV2(axis=[0])
-        self.dropout = nn.Dropout(keep_prob=1.0 - config.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
 
     def construct(self, inputs):
         """Encoder."""

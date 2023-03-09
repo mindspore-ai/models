@@ -30,7 +30,7 @@ class DropPath(nn.Cell):
 
     def __init__(self, drop_prob, ndim):
         super(DropPath, self).__init__()
-        self.drop = nn.Dropout(keep_prob=1 - drop_prob)
+        self.drop = nn.Dropout(p=drop_prob)
         shape = (1,) + (1,) * (ndim + 1)
         self.ndim = ndim
         self.mask = Tensor(np.ones(shape), dtype=dtype.float32)
@@ -56,7 +56,7 @@ def _make_divisible(v, divisor, min_value=None):
     This function is taken from the original tf repo.
     It ensures that all layers have a channel number that is divisible by 8
     It can be seen here:
-    https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet/mobilenet.py
+    <https://github.com/tensorflow/models/blob/master/research/slim/nets/mobilenet/mobilenet.py>
     :param v:
     :param divisor:
     :param min_value:
@@ -212,7 +212,7 @@ class EffNetV2(nn.Cell):
         output_channel = _make_divisible(1280 * width_mult, 8) if width_mult > 1.0 else 1280
         self.conv = conv_1x1_bn(input_channel, output_channel, norm_type=norm_type)
         self.avgpool = ops.ReduceMean(keep_dims=False)
-        self.dropout = nn.Dropout(keep_prob=1 - drop_out_rate)
+        self.dropout = nn.Dropout(p=drop_out_rate)
         self.classifier = nn.Dense(in_channels=output_channel, out_channels=num_classes)
         for _, cell in self.cells_and_names():
             if isinstance(cell, nn.Dense):

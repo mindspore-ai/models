@@ -486,7 +486,7 @@ class DropConnect(nn.Cell):
         self.shape = P.Shape()
         self.dtype = P.DType()
         self.keep_prob = 1 - drop_connect_rate
-        self.dropout = P.Dropout(keep_prob=self.keep_prob)
+        self.dropout = P.Dropout(p=1 - self.keep_prob)
         self.keep_prob_tensor = Tensor(self.keep_prob, dtype=mstype.float32)
 
     def construct(self, x):
@@ -681,7 +681,7 @@ class GenEfficientNet(nn.Cell):
         self.classifier = _dense(self.num_features, self.num_classes)
         self.reshape = P.Reshape()
         self.shape = P.Shape()
-        self.drop_out = nn.Dropout(keep_prob=1-self.drop_rate)
+        self.drop_out = nn.Dropout(p=self.drop_rate)
 
     def construct(self, x):
         """efficient net entry point"""

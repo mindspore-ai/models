@@ -164,7 +164,7 @@ class FinalUnit(nn.Cell):
                                         convert_dtype=convert_dtype, use_act=False)
         self.act_fun = P.Tanh()
         self.Mul = P.Mul()
-        self.dropout = Dropout(keep_prob=0.9)
+        self.dropout = Dropout(p=0.1)
         self.BatchNorm = nn.BatchNorm1d(output_dim)
 
     def construct(self, x):

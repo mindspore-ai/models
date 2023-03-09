@@ -54,7 +54,7 @@ class HModel(Cell):
         self.embedding_wordngram = Parameter(emb_wordngram)
         self.config_dropout = config.dropout
         if config.dropout != 0.0:
-            self.dropout = Dropout(config.dropout)
+            self.dropout = Dropout(p=1 - config.dropout)
         self.hyperLinear = MobiusLinear(config.embed,
                                         config.num_classes, c=self.c_seed)
 

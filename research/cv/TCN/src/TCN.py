@@ -52,11 +52,11 @@ class TemporalBlock(nn.Cell):
 
         self.chomp1 = Chomp1d(padding)
         self.relu1 = nn.ReLU()
-        self.dropout1 = nn.Dropout(dropout)
+        self.dropout1 = nn.Dropout(p=1 - dropout)
 
         self.chomp2 = Chomp1d(padding)
         self.relu2 = nn.ReLU()
-        self.dropout2 = nn.Dropout(dropout)
+        self.dropout2 = nn.Dropout(p=1 - dropout)
 
         self.downsample = nn.Conv1d(n_inputs, n_outputs, 1) if n_inputs != n_outputs else None
         self.relu = nn.ReLU()

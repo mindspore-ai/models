@@ -62,7 +62,7 @@ class Mlp(nn.Cell):
         self.fc1 = nn.Dense(in_channels=in_features, out_channels=hidden_features, has_bias=False)
         self.act = act_layer()
         self.fc2 = nn.Dense(in_channels=hidden_features, out_channels=out_features, has_bias=False)
-        self.drop = nn.Dropout(keep_prob=1.0 - drop)
+        self.drop = nn.Dropout(p=drop)
 
     def construct(self, x):
         x = self.fc1(x)
@@ -85,9 +85,9 @@ class Class_Attention(nn.Cell):
         self.q = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.k = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.v = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(keep_prob=1.0 - attn_drop)
+        self.attn_drop = nn.Dropout(p=attn_drop)
         self.proj = nn.Dense(in_channels=dim, out_channels=dim)
-        self.proj_drop = nn.Dropout(keep_prob=1.0 - proj_drop)
+        self.proj_drop = nn.Dropout(p=proj_drop)
         self.softmax = nn.Softmax(axis=-1)
 
     def construct(self, x):
@@ -154,14 +154,14 @@ class Attention_talking_head(nn.Cell):
         self.k = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.v = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
 
-        self.attn_drop = nn.Dropout(keep_prob=1.0 - attn_drop)
+        self.attn_drop = nn.Dropout(p=attn_drop)
 
         self.proj = nn.Dense(in_channels=dim, out_channels=dim, has_bias=False)
 
         self.proj_l = nn.Dense(in_channels=num_heads, out_channels=num_heads, has_bias=False)
         self.proj_w = nn.Dense(in_channels=num_heads, out_channels=num_heads, has_bias=False)
 
-        self.proj_drop = nn.Dropout(keep_prob=1.0 - proj_drop)
+        self.proj_drop = nn.Dropout(p=proj_drop)
         self.softmax = nn.Softmax(axis=-1)
 
     def construct(self, x):
@@ -234,7 +234,7 @@ class cait_models(nn.Cell):
 
         self.cls_token = Parameter(Tensor(np.zeros([1, 1, embed_dim]), mstype.float32))
         self.pos_embed = Parameter(Tensor(np.zeros([1, num_patches, embed_dim]), mstype.float32))
-        self.pos_drop = nn.Dropout(keep_prob=1.0 - drop_rate)
+        self.pos_drop = nn.Dropout(p=drop_rate)
 
         dpr = [drop_path_rate for _ in range(depth)]
         self.blocks = nn.CellList([

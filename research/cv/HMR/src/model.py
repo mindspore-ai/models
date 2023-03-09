@@ -603,7 +603,7 @@ class LinearModel(nn.Cell):
 
             if _ < l_use_drop and self.use_dropout[_]:
 
-                layers.append(nn.Dropout(keep_prob=self.drop_prob[_]))
+                layers.append(nn.Dropout(p=1 - self.drop_prob[_]))
 
         return nn.SequentialCell(layers)
 

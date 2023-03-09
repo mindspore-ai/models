@@ -176,7 +176,7 @@ class PointNetCls(nn.Cell):
         self.fc1 = nn.Dense(1024, 512)
         self.fc2 = nn.Dense(512, 256)
         self.fc3 = nn.Dense(256, k)
-        self.dropout = nn.Dropout(keep_prob=0.7)
+        self.dropout = nn.Dropout(p=0.3)
         self.bn1 = nn.BatchNorm1d(512)
         self.bn2 = nn.BatchNorm1d(256)
         self.relu = ops.ReLU()

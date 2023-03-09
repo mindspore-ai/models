@@ -29,7 +29,7 @@ class ScaledDotProductAttention(nn.Cell):
         self.temperature = temperature
 
         self.softmax = nn.Softmax(axis=2)
-        self.dropout = nn.Dropout(keep_prob=1-attn_dropout)
+        self.dropout = nn.Dropout(p=attn_dropout)
 
         self.bmm = ops.BatchMatMul()
         self.transpose = ops.Transpose()

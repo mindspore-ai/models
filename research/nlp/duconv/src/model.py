@@ -64,7 +64,7 @@ class Retrieval(nn.Cell):
             self.attention = Attention(config.hidden_size, config.hidden_size)
         self.fc = nn.Dense(config.hidden_size, 2,
                            weight_init=TruncatedNormal(config.initializer_range)).to_float(mstype.float16)
-        self.dropout = nn.Dropout(1-config.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
 
     def construct(self, input_ids, segment_ids, position_ids=None, kn_ids=None, seq_length=None):
         """
@@ -83,6 +83,7 @@ class Retrieval(nn.Cell):
         logits = self.fc(cls_feats)
         return logits
 
+
 class RetrievalWithLoss(nn.Cell):
     """
     RetrievalWithLoss
@@ -92,10 +93,12 @@ class RetrievalWithLoss(nn.Cell):
         self.network = Retrieval(config, use_kn)
         self.loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
         self.squeeze = P.Squeeze(1)
+
     def construct(self, *inputs):
         out = self.network(*inputs[:-1])
         labels = self.squeeze(inputs[-1])
         return self.loss(out, labels)
+
 
 class RetrievalWithSoftmax(nn.Cell):
     """

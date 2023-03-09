@@ -142,7 +142,7 @@ class TextCNN(nn.Cell):
         self.concat = ops.Concat(1)
 
         self.fc = nn.Dense(96*3, self.num_classes)
-        self.drop = nn.Dropout(keep_prob=0.5)
+        self.drop = nn.Dropout(p=0.5)
         self.reducemax = ops.ReduceMax(keep_dims=False)
 
     def make_layer(self, kernel_height):

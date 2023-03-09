@@ -24,6 +24,7 @@ import mindspore.ops as op
 from mindspore.common import set_seed
 set_seed(1)
 
+
 def drop_connect(inputs, p, training):
     """ Drop connect. """
     if not training:
@@ -53,7 +54,7 @@ class MBConvBlock(nn.Cell):
 
         self.drop_rate = drop_rate
         if drop_rate != 0:
-            self.drop_layer = nn.Dropout(keep_prob=1.0 - drop_rate)
+            self.drop_layer = nn.Dropout(p=drop_rate)
         self.id_skip = True
         inp = self._block_args["input_filters"]  # number of input channels
         oup = self._block_args["input_filters"] * self._block_args["expand_ratio"]  # number of output channels
@@ -119,6 +120,7 @@ class MBConvBlock(nn.Cell):
     def set_swish(self, memory_efficient=True):
         self._swish = MemoryEfficientSwish() if memory_efficient else Swish()
 
+
 class EfficientNet(nn.Cell):
     """ effnet """
     def __init__(self, blocks_args=None, global_params=None, is_training=False):
@@ -129,9 +131,9 @@ class EfficientNet(nn.Cell):
         bn_eps = 1e-3
 
         self.conv_stem = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=3, stride=2,
-                                   pad_mode="same", has_bias=False)  # change name for pylint, _conv_stem in source code
-        self.bn0 = nn.BatchNorm2d(num_features=32, eps=bn_eps, momentum=0.99) # change name for pylint, _bn0 in source code
-        self.blocks = nn.CellList([])  # change name for pylint, _blocks in source code
+                                   pad_mode="same", has_bias=False)
+        self.bn0 = nn.BatchNorm2d(num_features=32, eps=bn_eps, momentum=0.99)
+        self.blocks = nn.CellList([])
 
         for idx, block_args in enumerate(self._blocks_args):
             self.blocks.append(MBConvBlock(block_args, self._global_params, drop_rate=0.2 * idx / 16,
@@ -147,6 +149,24 @@ class EfficientNet(nn.Cell):
 
         self._bn2 = nn.BatchNorm2d(num_features=1280, eps=bn_eps, momentum=0.99)
         self.relu = op.ReLU()
+
+    @classmethod
+    def from_name(cls, model_name, is_training=False, override_params=None):
+        cls._check_model_name_is_valid(model_name)
+        blocks_args, global_params = get_model_params(model_name, override_params)
+        return cls(blocks_args, global_params, is_training)
+
+    @classmethod
+    def from_pretrained(cls, model_name, load_weights=False, advprop=False, num_classes=1000, in_channels=3):
+        model = cls.from_name(model_name, override_params={'num_classes': num_classes})
+        return model
+
+    @classmethod
+    def _check_model_name_is_valid(cls, model_name):
+        """ Validates model name. """
+        valid_models = ['efficientnet-b'+str(i) for i in range(9)]
+        if model_name not in valid_models:
+            raise ValueError('model_name should be one of: ' + ', '.join(valid_models))
 
     def construct(self, inputs):
         """ effnet forward """
@@ -168,21 +188,3 @@ class EfficientNet(nn.Cell):
         x = self.end_point(x)
 
         return x
-
-    @classmethod
-    def from_name(cls, model_name, is_training=False, override_params=None):
-        cls._check_model_name_is_valid(model_name)
-        blocks_args, global_params = get_model_params(model_name, override_params)
-        return cls(blocks_args, global_params, is_training)
-
-    @classmethod
-    def from_pretrained(cls, model_name, load_weights=False, advprop=False, num_classes=1000, in_channels=3):
-        model = cls.from_name(model_name, override_params={'num_classes': num_classes})
-        return model
-
-    @classmethod
-    def _check_model_name_is_valid(cls, model_name):
-        """ Validates model name. """
-        valid_models = ['efficientnet-b'+str(i) for i in range(9)]
-        if model_name not in valid_models:
-            raise ValueError('model_name should be one of: ' + ', '.join(valid_models))

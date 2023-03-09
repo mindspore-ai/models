@@ -99,7 +99,7 @@ class SqueezeNet(nn.Cell):
                                     num_classes,
                                     kernel_size=1,
                                     has_bias=True)
-        self.dropout = nn.Dropout(keep_prob=0.5)
+        self.dropout = nn.Dropout(p=0.5)
         self.relu = nn.ReLU()
         self.mean = P.ReduceMean(
             keep_dims=True)  # Equal to AvgPool(kernel_size=13, stride=3). It's better than AvgPool, because we don't know the size of representation exactly.

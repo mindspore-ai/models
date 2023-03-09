@@ -136,7 +136,7 @@ class DenseLayer(nn.Cell):
         self.matmul = P.MatMul(transpose_b=False)
         self.bias_add = P.BiasAdd()
         self.cast = P.Cast()  # return a tensor with the new specified data type
-        self.dropout = Dropout(keep_prob=1.0)
+        self.dropout = Dropout(p=0.0)
         self.mul = P.Mul()  # multiplies two tensors element-wise
         self.realDiv = P.RealDiv() # div element-wise
         self.scale_coef = scale_coef

@@ -73,7 +73,7 @@ class DenseLayer(nn.Cell):
         self.matmul = P.MatMul(transpose_b=False)
         self.bias_add = P.BiasAdd()
         self.cast = P.Cast()
-        self.dropout = Dropout(keep_prob=keep_prob)
+        self.dropout = Dropout(p=1 - keep_prob)
         self.use_activation = use_activation
         self.convert_dtype = convert_dtype
         self.drop_out = drop_out
@@ -122,7 +122,7 @@ class CrossLayer(nn.Cell):
         self.cross_bias = init_method(bias_init, [cross_col_dim, 1], name="bias")
         self.matmul = nn.MatMul()
         self.bias_add = P.BiasAdd()
-        self.tensor_add = P.TensorAdd()
+        self.tensor_add = P.Add()
         self.reshape = P.Reshape()
         self.cast = P.Cast()
         self.expand_dims = P.ExpandDims()

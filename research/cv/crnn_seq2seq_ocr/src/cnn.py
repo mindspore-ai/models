@@ -159,7 +159,7 @@ class CNN(nn.Cell):
 
         self.pad = nn.Pad(paddings=((0, 0), (0, 0), (0, 0), (0, 1)))
         self.convBNRelu5 = ConvBNRelu(384, conv_out_dim, (2, 2), pad_mode='valid')
-        self.dropout = nn.Dropout(keep_prob=0.5)
+        self.dropout = nn.Dropout(p=0.5)
 
         self.squeeze = P.Squeeze(2)
         self.cast = P.Cast()

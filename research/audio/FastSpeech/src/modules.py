@@ -140,7 +140,7 @@ class DurationPredictor(nn.Cell):
                 padding=1)),
             ("layer_norm_1", nn.LayerNorm([self.filter_size])),
             ("relu_1", nn.ReLU()),
-            ("dropout_1", nn.Dropout(keep_prob=self.dropout)),
+            ("dropout_1", nn.Dropout(p=1 - self.dropout)),
             ("conv1d_2", Conv(
                 self.filter_size,
                 self.filter_size,
@@ -148,7 +148,7 @@ class DurationPredictor(nn.Cell):
                 padding=1)),
             ("layer_norm_2", nn.LayerNorm([self.filter_size])),
             ("relu_2", nn.ReLU()),
-            ("dropout_2", nn.Dropout(keep_prob=self.dropout))
+            ("dropout_2", nn.Dropout(p=1 - self.dropout))
         ]))
 
         self.linear_layer = nn.Dense(

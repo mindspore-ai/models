@@ -48,7 +48,7 @@ class Last_layer(nn.Cell):
             self.fc = nn.Dense(feature_dim, num_class)
             self.new_fc = None
         else:
-            self.fc = nn.Dropout(keep_prob=self.dropout)
+            self.fc = nn.Dropout(p=1 - self.dropout)
             self.new_fc = nn.Dense(feature_dim, num_class, weight_init=Normal(0.001))
 
     def construct(self, x):

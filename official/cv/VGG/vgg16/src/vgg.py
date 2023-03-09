@@ -86,10 +86,10 @@ class Vgg(nn.Cell):
         self.classifier = nn.SequentialCell([
             nn.Dense(512 * (self.image_h // 32) * (self.image_w // 32), 4096),
             nn.ReLU(),
-            nn.Dropout(dropout_ratio),
+            nn.Dropout(p=1 - dropout_ratio),
             nn.Dense(4096, 4096),
             nn.ReLU(),
-            nn.Dropout(dropout_ratio),
+            nn.Dropout(p=1 - dropout_ratio),
             nn.Dense(4096, num_classes)])
         if args.initialize_mode == "KaimingNormal":
             default_recurisive_init(self)

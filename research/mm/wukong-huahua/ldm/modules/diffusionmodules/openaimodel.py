@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 
-# This file refers to https://github.com/CompVis/stable-diffusion/blob/main/ldm/modules/diffusionmodules/openaimodel.py
+# This file refers to <https://github.com/CompVis/stable-diffusion/blob/main/ldm/modules/diffusionmodules/openaimodel.py>
 import mindspore as ms
 import mindspore.nn as nn
 import mindspore.ops as ops
@@ -158,7 +158,7 @@ class ResBlock(nn.Cell):
 
         self.out_layers_norm = normalization(self.out_channels)
         self.out_layers_silu = nn.SiLU().to_float(self.dtype)
-        self.out_layers_drop = nn.Dropout(keep_prob=self.dropout)
+        self.out_layers_drop = nn.Dropout(p=1 - self.dropout)
         self.out_layers_conv = zero_module(
             conv_nd(dims, self.out_channels, self.out_channels, 3,
                     padding=1, has_bias=True, pad_mode='pad').to_float(self.dtype)

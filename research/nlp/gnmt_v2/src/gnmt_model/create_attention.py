@@ -45,7 +45,7 @@ class RecurrentAttention(nn.Cell):
                  dropout=0.2,
                  initializer_range=0.1):
         super(RecurrentAttention, self).__init__()
-        self.dropout = nn.Dropout(keep_prob=1.0 - dropout)
+        self.dropout = nn.Dropout(p=dropout)
         self.rnn = rnn
         self.attn = BahdanauAttention(is_training=is_training,
                                       query_size=hidden_size,

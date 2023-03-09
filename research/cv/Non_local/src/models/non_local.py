@@ -361,7 +361,7 @@ class I3DResNet(nn.Cell):
 
         self.layer4 = self._make_layer_inflat(block, 512, layers[3], time_kernel=[1, 3, 1], space_stride=2)
         self.avgpool = ops.ReduceMean(keep_dims=True)
-        self.avgdrop = nn.Dropout(0.5)
+        self.avgdrop = nn.Dropout(p=0.5)
         self.fc = nn.Dense(512 * block.expansion, num_classes)
 
     def _make_layer_inflat(self, block, planes, blocks, time_kernel, space_stride=1, non_local=False):

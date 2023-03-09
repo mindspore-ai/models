@@ -126,7 +126,7 @@ class Xception(nn.Cell):
         self.bn4 = nn.BatchNorm2d(2048, momentum=0.9)
 
         self.avg_pool = nn.AvgPool2d(10)
-        self.dropout = nn.Dropout()
+        self.dropout = nn.Dropout(p=0.5)
         self.fc = nn.Dense(2048, num_classes)
 
     def construct(self, x):

@@ -179,7 +179,7 @@ class EmbeddingPostprocessor(nn.Cell):
         self.reshape = P.Reshape()
         self.shape = tuple(embedding_shape)
         self.layernorm = nn.LayerNorm((embedding_size,))
-        self.dropout = nn.Dropout(1 - dropout_prob)
+        self.dropout = nn.Dropout(p=dropout_prob)
         self.gather = P.Gather()
         self.use_relative_positions = use_relative_positions
         self.slice = P.StridedSlice()
@@ -232,7 +232,7 @@ class BertOutput(nn.Cell):
         super(BertOutput, self).__init__()
         self.dense = nn.Dense(in_channels, out_channels,
                               weight_init=TruncatedNormal(initializer_range)).to_float(compute_type)
-        self.dropout = nn.Dropout(1 - dropout_prob)
+        self.dropout = nn.Dropout(p=dropout_prob)
         self.dropout_prob = dropout_prob
         self.add = P.Add()
         self.layernorm = nn.LayerNorm((out_channels,)).to_float(compute_type)
@@ -447,7 +447,7 @@ class BertAttention(nn.Cell):
         self.matmul = P.BatchMatMul()
 
         self.softmax = nn.Softmax()
-        self.dropout = nn.Dropout(1 - attention_probs_dropout_prob)
+        self.dropout = nn.Dropout(p=attention_probs_dropout_prob)
 
         if self.has_attention_mask:
             self.expand_dims = P.ExpandDims()
@@ -778,6 +778,7 @@ class CreateAttentionMaskFromInputMask(nn.Cell):
     def construct(self, input_mask):
         attention_mask = self.cast(self.reshape(input_mask, self.shape), mstype.float32)
         return attention_mask
+
 
 class BertModel(nn.Cell):
     """

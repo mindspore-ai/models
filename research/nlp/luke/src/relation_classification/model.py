@@ -30,7 +30,7 @@ class LukeForRelationClassification(LukeEntityAwareAttentionModel):
         self.args = args
 
         self.num_labels = num_labels
-        self.dropout = nn.Dropout(1 - args.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=args.hidden_dropout_prob)
         self.classifier = nn.Dense(args.hidden_size * 2, num_labels, has_bias=False)
         self.op = ops.Concat(axis=1)
 
@@ -68,7 +68,7 @@ class LukeForRelationClassificationEval(LukeEntityAwareAttentionModel):
         self.args = args
 
         self.num_labels = num_labels
-        self.dropout = nn.Dropout(1 - args.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=args.hidden_dropout_prob)
         self.classifier = nn.Dense(args.hidden_size * 2, num_labels, has_bias=False)
         self.op = ops.Concat(axis=1)
 

@@ -51,7 +51,7 @@ class DynamicRankerModel(nn.Cell):
         self.dtype = config.dtype
         self.dense_1 = nn.Dense(config.hidden_size, 1, weight_init=self.weight_init,
                                 has_bias=True).to_float(config.compute_type)
-        self.dropout = nn.Dropout(1 - dropout_prob)
+        self.dropout = nn.Dropout(p=dropout_prob)
 
     def construct(self, input_ids, input_mask, token_type_id):
         _, pooled_output, _ = \

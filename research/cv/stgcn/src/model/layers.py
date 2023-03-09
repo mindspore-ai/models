@@ -267,7 +267,7 @@ class STConvBlock(nn.Cell):
                                    begin_norm_axis=2, begin_params_axis=2, epsilon=1e-05)
 
         self.relu = nn.ReLU()
-        self.do = nn.Dropout(keep_prob=self.drop_rate)
+        self.do = nn.Dropout(p=1 - self.drop_rate)
         self.transpose = ops.Transpose()
 
     def construct(self, x):

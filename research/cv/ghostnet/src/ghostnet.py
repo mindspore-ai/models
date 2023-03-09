@@ -276,7 +276,7 @@ class GhostBottleneck(nn.Cell):
                 ConvUnit(num_in, num_out, kernel_size=1, stride=1,
                          padding=0, num_groups=1, use_act=False),
             ])
-        self.add = P.TensorAdd()
+        self.add = P.Add()
 
     def construct(self, x):
         """ construct of ghostnet """
@@ -364,7 +364,7 @@ class GhostNet(nn.Cell):
         self.squeeze = P.Flatten()
         self.final_drop = final_drop
         if self.final_drop > 0:
-            self.dropout = nn.Dropout(self.final_drop)
+            self.dropout = nn.Dropout(p=1 - self.final_drop)
 
         self.classifier = nn.Dense(
             model_cfgs['cls_ch_expand'], num_classes, has_bias=True)

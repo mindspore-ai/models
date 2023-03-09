@@ -54,7 +54,7 @@ class RPN(nn.Cell):
             pre_channel = cfg.RPN.CLS_FC[k]
         cls_layers.append(pt_utils.Conv1d(pre_channel, 1, activation=None))
         if cfg.RPN.DP_RATIO >= 0:
-            cls_layers.insert(1, nn.Dropout(1 - cfg.RPN.DP_RATIO))
+            cls_layers.insert(1, nn.Dropout(p=cfg.RPN.DP_RATIO))
         self.rpn_cls_layer = nn.SequentialCell(cls_layers)
 
         # regression branch
@@ -76,7 +76,7 @@ class RPN(nn.Cell):
         reg_layers.append(
             pt_utils.Conv1d(pre_channel, reg_channel, activation=None))
         if cfg.RPN.DP_RATIO >= 0:
-            reg_layers.insert(1, nn.Dropout(1 - cfg.RPN.DP_RATIO))
+            reg_layers.insert(1, nn.Dropout(p=cfg.RPN.DP_RATIO))
 
         self.rpn_reg_layer = nn.SequentialCell(reg_layers)
 

@@ -194,7 +194,7 @@ class EmbeddingPostprocessor(nn.Cell):
         self.scores_mul = Tensor([math.sqrt(float(embedding_size))], dtype=mstype.float32)
         self.multiply = P.Mul()
         self.add = P.Add()
-        self.dropout = nn.Dropout(1 - dropout_prob, dtype=mstype.float32)
+        self.dropout = nn.Dropout(p=dropout_prob)
         self.use_dropout = dropout_prob > 0
         self.expand_dims = P.ExpandDims()
         self.position_embedding_table = Tensor(position_encoding(max_position_embeddings, embedding_size),
@@ -257,7 +257,7 @@ class LayerPostprocess(nn.Cell):
                  dropout_prob=0.1):
         super(LayerPostprocess, self).__init__()
         self.add = P.Add()
-        self.dropout = nn.Dropout(1 - dropout_prob)
+        self.dropout = nn.Dropout(p=dropout_prob)
         self.use_dropout = dropout_prob > 0
 
     def construct(self, hidden_tensor, input_tensor):
@@ -357,7 +357,7 @@ class MultiheadAttention(nn.Cell):
         self.matmul = P.BatchMatMul()
 
         self.softmax = nn.Softmax()
-        self.dropout = nn.Dropout(1 - attention_probs_dropout_prob)
+        self.dropout = nn.Dropout(p=attention_probs_dropout_prob)
         self.use_dropout = attention_probs_dropout_prob > 0
 
         if self.has_attention_mask:
@@ -529,7 +529,7 @@ class FeedForward(nn.Cell):
 
         self.reshape = P.Reshape()
         self.shape = (-1, in_channels)
-        self.dropout = nn.Dropout(1 - hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=hidden_dropout_prob)
         self.use_dropout = hidden_dropout_prob > 0
 
     def construct(self, input_tensor):

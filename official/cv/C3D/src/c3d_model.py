@@ -66,7 +66,7 @@ class C3D(nn.Cell):
         self.fc7 = nn.Dense(in_channels=4096, out_channels=4096)
         self.fc8 = nn.Dense(in_channels=4096, out_channels=num_classes, bias_init=init.Normal(0.02))
 
-        self.dropout = nn.Dropout(keep_prob=0.5)
+        self.dropout = nn.Dropout(p=0.5)
         self.relu = nn.ReLU()
         self.pad = nn.Pad(paddings=((0, 0), (0, 0), (1, 0), (1, 0)), mode="CONSTANT")
 

@@ -70,7 +70,7 @@ class AlexNet_backbone(nn.Cell):
             self.flatten = nn.Flatten()
             self.fc1 = fc_with_initialize(6 * 6 * 256, 4096)
             self.fc2 = fc_with_initialize(4096, 4096)
-            self.dropout = nn.Dropout(dropout_ratio)
+            self.dropout = nn.Dropout(p=1 - dropout_ratio)
 
     def construct(self, x):
         """

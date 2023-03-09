@@ -212,20 +212,20 @@ class DeformableTransformerDecoderLayer(nn.Cell):
 
         # [DET x PATCH] deformable cross-attention
         self.cross_attn = MSDeformAttn(d_model, n_levels, n_heads, n_points)
-        self.dropout1 = nn.Dropout(keep_prob=1.0 - dropout)
+        self.dropout1 = nn.Dropout(p=dropout)
         self.norm1 = nn.LayerNorm(normalized_shape=(d_model,), epsilon=1e-05)
 
         # [DET x DET] self-attention
         self.self_attn = MultiheadAttention(d_model, n_heads, dropout=dropout)
-        self.dropout2 = nn.Dropout(keep_prob=1.0 - dropout)
+        self.dropout2 = nn.Dropout(p=dropout)
         self.norm2 = nn.LayerNorm(normalized_shape=(d_model,), epsilon=1e-05)
 
         # ffn for multi-heaed
         self.linear1 = nn.Dense(in_channels=d_model, out_channels=d_ffn)
         self.activation = _get_activation_fn(activation)
-        self.dropout3 = nn.Dropout(keep_prob=1.0 - dropout)
+        self.dropout3 = nn.Dropout(p=dropout)
         self.linear2 = nn.Dense(in_channels=d_ffn, out_channels=d_model)
-        self.dropout4 = nn.Dropout(keep_prob=1.0 - dropout)
+        self.dropout4 = nn.Dropout(p=dropout)
         self.norm3 = nn.LayerNorm(normalized_shape=(d_model,), epsilon=1e-05)
 
         self.drop_path = DropPath1D(drop_path) if drop_path > 0. else None

@@ -33,7 +33,7 @@ class CustomHead(nn.Cell):
         self._avg_pooling = ops.ReduceMean(keep_dims=False)
         self.use_dropout = dropout > 0
         if self.use_dropout:
-            self._dropout = nn.Dropout(dropout)
+            self._dropout = nn.Dropout(p=1 - dropout)
         self._fc = nn.Dense(out_channels, num_classes)
         if self.last_bn:
             self._bn2 = nn.BatchNorm2d(num_features=num_classes, momentum=0.9, eps=1e-5)

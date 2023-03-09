@@ -176,10 +176,10 @@ class EmbeddingPostprocessor(nn.Cell):
         self.position_embedding_table = Parameter(
             normal_weight([max_position_embeddings, embedding_dim], embedding_dim), name='position_embeddings')
         self.expand_dims = P.ExpandDims()
-        self.add = P.TensorAdd()
+        self.add = P.Add()
         self.gather = P.GatherV2()
         self.input_indices = Tensor(np.array([x for x in range(seq_length)]), mindspore.int32)
-        self.dropout = nn.Dropout(1 - dropout_prob, dtype=mstype.float32)
+        self.dropout = nn.Dropout(p=dropout_prob)
         self.use_dropout = dropout_prob > 0
 
     def construct(self, word_embeddings):
@@ -266,8 +266,8 @@ class ResidualConnection(nn.Cell):
 
     def __init__(self, dropout_prob=0.0):
         super(ResidualConnection, self).__init__()
-        self.add = P.TensorAdd()
-        self.dropout = nn.Dropout(1 - dropout_prob)
+        self.add = P.Add()
+        self.dropout = nn.Dropout(p=dropout_prob)
         self.use_dropout = dropout_prob > 0
 
     def construct(self, hidden_tensor, input_tensor):
@@ -390,7 +390,7 @@ class MaskedSelfAttention(nn.Cell):
         if self.has_attention_mask:
             self.expand_dims = P.ExpandDims()
             self.sub = P.Sub()
-            self.add = P.TensorAdd()
+            self.add = P.Add()
             self.cast = P.Cast()
             self.get_dtype = P.DType()
 
@@ -401,7 +401,7 @@ class MaskedSelfAttention(nn.Cell):
 
         self.softmax = nn.Softmax()
         self.softmax_cast = P.Cast()
-        self.dropout = nn.Dropout(1 - attention_dropout)
+        self.dropout = nn.Dropout(p=attention_dropout)
         self.use_attention_dropout = attention_dropout > 0
 
     def construct(self, input_tensor, attention_mask):
@@ -500,7 +500,7 @@ class FeedForward(nn.Cell):
         self.layernorm = LayerNorm(in_channels=in_channels)
         self.residual_connect = ResidualConnection(dropout_prob=hidden_dropout)
         self.gelu_act = P.GeLU()
-        self.dropout = nn.Dropout(1 - hidden_dropout)
+        self.dropout = nn.Dropout(p=hidden_dropout)
         self.use_dropout = hidden_dropout > 0
         self.reshape = P.Reshape()
 
@@ -852,7 +852,7 @@ class GPT2Model(nn.Cell):
 
         self.cast_compute_type = CastWrapper(dst_type=self.config.compute_type)
         self.layer_norm = LayerNorm(in_channels=self.d_model)
-        self.dropout = nn.Dropout(1 - self.config.hidden_dropout)
+        self.dropout = nn.Dropout(p=self.config.hidden_dropout)
         self._create_attention_mask_from_input_mask = CreateAttentionMaskFromInputMask(self.config)
 
         self.reshape = P.Reshape()

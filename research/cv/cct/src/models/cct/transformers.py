@@ -36,9 +36,9 @@ class Attention(nn.Cell):
         self.q = nn.Dense(in_channels=dim, out_channels=dim, has_bias=False)
         self.k = nn.Dense(in_channels=dim, out_channels=dim, has_bias=False)
         self.v = nn.Dense(in_channels=dim, out_channels=dim, has_bias=False)
-        self.attn_drop = nn.Dropout(keep_prob=1 - attention_dropout)
+        self.attn_drop = nn.Dropout(p=attention_dropout)
         self.proj = nn.Dense(dim, dim)
-        self.proj_drop = nn.Dropout(keep_prob=1 - projection_dropout)
+        self.proj_drop = nn.Dropout(p=projection_dropout)
         self.matmul = ops.BatchMatMul()
         self.softmax = nn.Softmax(axis=-1)
 
@@ -76,10 +76,10 @@ class TransformerEncoderLayer(nn.Cell):
                                    attention_dropout=attention_dropout, projection_dropout=dropout)
 
         self.fc1 = nn.Dense(d_model, dim_feedforward)
-        self.dropout1 = nn.Dropout(keep_prob=1 - dropout)
+        self.dropout1 = nn.Dropout(p=dropout)
         self.norm1 = nn.LayerNorm((d_model,), epsilon=1e-5)
         self.fc2 = nn.Dense(dim_feedforward, d_model)
-        self.dropout2 = nn.Dropout(keep_prob=1 - dropout)
+        self.dropout2 = nn.Dropout(p=dropout)
 
         self.drop_path1 = DropPath1D(drop_path_rate) if drop_path_rate > 0 else Identity()
         self.drop_path2 = DropPath1D(drop_path_rate) if drop_path_rate > 0 else Identity()
@@ -130,7 +130,7 @@ class TransformerClassifier(nn.Cell):
         else:
             self.positional_emb = None
 
-        self.dropout = nn.Dropout(keep_prob=1 - dropout)
+        self.dropout = nn.Dropout(p=dropout)
         dpr = [x for x in np.linspace(0, stochastic_depth, num_layers)]
         self.blocks = nn.CellList([
             TransformerEncoderLayer(d_model=embedding_dim, nhead=num_heads,

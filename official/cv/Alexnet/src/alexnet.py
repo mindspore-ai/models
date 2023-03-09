@@ -77,7 +77,7 @@ class AlexNet(nn.Cell):
             self.fc1 = fc_with_initialize(6 * 6 * 256, 4096)
             self.fc2 = fc_with_initialize(4096, 4096)
             self.fc3 = fc_with_initialize(4096, num_classes)
-            self.dropout = nn.Dropout(dropout_ratio)
+            self.dropout = nn.Dropout(p=1 - dropout_ratio)
 
     def construct(self, x):
         """define network"""

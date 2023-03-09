@@ -169,7 +169,7 @@ class R2Plus1D(nn.Cell):
                                            layer_name='layer4_')
 
         self.avgpool = ops.ReduceMean(keep_dims=True)
-        self.dropout = nn.Dropout(1-self.dropout_ratio)
+        self.dropout = nn.Dropout(p=self.dropout_ratio)
         self.fc = nn.Dense(in_channels=self.feat_dim, out_channels=num_classes)
 
     def _make_res_layer(self,

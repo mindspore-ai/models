@@ -283,9 +283,9 @@ class Inception_resnet_v2(nn.Cell):
         self.softmax = nn.DenseBnAct(
             1536, classes, weight_init="XavierUniform", has_bias=True, has_bn=False)
         if is_train:
-            self.dropout = nn.Dropout(0.8)
+            self.dropout = nn.Dropout(p=0.2)
         else:
-            self.dropout = nn.Dropout(1.0)
+            self.dropout = nn.Dropout(p=0.0)
 
     def construct(self, x):
         x = self.features(x)

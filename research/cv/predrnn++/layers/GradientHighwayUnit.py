@@ -60,7 +60,7 @@ class GHU(nn.Cell):
         self.layer_norm_z = LayerNorm(self.num_features*2)
         self.layer_norm_x = LayerNorm(self.num_features*2)
 
-        self.add = P.TensorAdd()
+        self.add = P.Add()
 
         self.split = P.Split(1, 2)
 

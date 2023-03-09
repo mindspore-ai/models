@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 
-# This file refers to https://github.com/CompVis/stable-diffusion/blob/main/ldm/modules/attention.py
+# This file refers to <https://github.com/CompVis/stable-diffusion/blob/main/ldm/modules/attention.py>
 from inspect import isfunction
 import numpy as np
 import mindspore as ms
@@ -65,7 +65,7 @@ class FeedForward(nn.Cell):
 
         self.net = nn.SequentialCell(
             project_in,
-            nn.Dropout(dropout),
+            nn.Dropout(p=1 - dropout),
             nn.Dense(inner_dim, dim_out).to_float(dtype)
         )
 
@@ -115,7 +115,7 @@ class CrossAttention(nn.Cell):
 
         self.to_out = nn.SequentialCell(
             nn.Dense(inner_dim, query_dim).to_float(dtype),
-            nn.Dropout(dropout)
+            nn.Dropout(p=1 - dropout)
         )
 
 

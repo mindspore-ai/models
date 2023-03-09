@@ -134,7 +134,7 @@ class RobertaGenerationEmbeddings(nn.Cell):
         # self.token_type_embeddings = nn.Embedding(config.type_vocab_size, config.hidden_size)
         self.LayerNorm = nn.LayerNorm(
             tuple((config.hidden_size,)), epsilon=config.layer_norm_eps)
-        self.dropout = nn.Dropout(1 - config.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
         self.padding_idx = config.pad_token_id
         self.position_embeddings = nn.Embedding(
             config.max_position_embeddings, config.hidden_size, padding_idx=self.padding_idx
@@ -224,7 +224,7 @@ class RobertaSelfAttention(nn.Cell):
         self.key = nn.Dense(config.hidden_size, self.all_head_size).to_float(config.compute_type)
         self.value = nn.Dense(config.hidden_size, self.all_head_size).to_float(config.compute_type)
         self.dropout = nn.Dropout(
-            1 - config.attention_probs_dropout_prob).to_float(config.compute_type)
+            p=config.attention_probs_dropout_prob).to_float(config.compute_type)
         self.is_decoder = config.is_decoder
         self.matmul = ops.BatchMatMul()
         self.Softmax = nn.Softmax(axis=-1)
@@ -357,7 +357,7 @@ class RobertaSelfOutput(nn.Cell):
         self.dense = nn.Dense(config.hidden_size, config.hidden_size)
         self.LayerNorm = nn.LayerNorm(
             (config.hidden_size,), epsilon=config.layer_norm_eps)
-        self.dropout = nn.Dropout(1 - config.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
         self.add = ops.Add()
 
     def construct(self, hidden_states, input_tensor):
@@ -453,7 +453,7 @@ class RobertaOutput(nn.Cell):
                               config.hidden_size)
         self.LayerNorm = nn.LayerNorm(
             (config.hidden_size,), epsilon=config.layer_norm_eps)
-        self.dropout = nn.Dropout(1 - config.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
         self.add = ops.Add()
 
     def construct(self, hidden_states, input_tensor):

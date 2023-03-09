@@ -161,7 +161,7 @@ class JasperBlock(nn.Cell):
 
     def _act_dropout(self, dropout=0.2, activation=None):
         return [activation,
-                nn.Dropout(keep_prob=1-dropout)]
+                nn.Dropout(p=dropout)]
 
     def construct(self, xs, xs_lens=None):
         if not self.use_conv_masks:

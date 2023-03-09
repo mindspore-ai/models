@@ -16,7 +16,7 @@
 ResNet based ResNext
 """
 import mindspore.nn as nn
-from mindspore.ops.operations import TensorAdd, Split, Concat
+from mindspore.ops.operations import Add, Split, Concat
 from mindspore.ops import operations as P
 from mindspore.common.initializer import TruncatedNormal
 
@@ -70,6 +70,7 @@ class _DownSample(nn.Cell):
         out = self.bn(out)
         return out
 
+
 class BasicBlock(nn.Cell):
     """
     ResNet basic block definition.
@@ -105,7 +106,7 @@ class BasicBlock(nn.Cell):
             self.down_sample = down_sample
             self.down_sample_flag = True
 
-        self.add = TensorAdd()
+        self.add = Add()
 
     def construct(self, x):
         identity = x
@@ -124,6 +125,7 @@ class BasicBlock(nn.Cell):
         out = self.add(out, identity)
         out = self.relu(out)
         return out
+
 
 class Bottleneck(nn.Cell):
     """
@@ -176,7 +178,7 @@ class Bottleneck(nn.Cell):
             self.down_sample_flag = True
 
         self.cast = P.Cast()
-        self.add = TensorAdd()
+        self.add = Add()
 
     def construct(self, x):
         identity = x
@@ -247,6 +249,9 @@ class ResNet(nn.Cell):
 
         return x
 
+    def get_out_channels(self):
+        return self.out_channels
+
     def _make_layer(self, block, out_channels, blocks_num, stride=1, use_se=False, platform="Ascend"):
         """_make_layer"""
         down_sample = None
@@ -271,12 +276,10 @@ class ResNet(nn.Cell):
 
         return nn.SequentialCell(layers)
 
-    def get_out_channels(self):
-        return self.out_channels
-
 
 def resnext50(platform="Ascend"):
     return ResNet(Bottleneck, [3, 4, 6, 3], width_per_group=4, groups=32, platform=platform)
+
 
 def resnext101(platform="Ascend"):
     if platform == "Ascend":

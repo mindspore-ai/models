@@ -256,7 +256,7 @@ class ResNet(nn.Cell):
         self.dsn = nn.SequentialCell([
             nn.Conv2d(1024, 512, kernel_size=3, stride=1, pad_mode='pad', padding=1, has_bias=True),
             nn.BatchNorm2d(512, use_batch_statistics=True),
-            nn.Dropout(0.9),
+            nn.Dropout(p=0.1),
             nn.Conv2d(512, num_classes, kernel_size=1, stride=1, pad_mode='pad', padding=0, has_bias=True)
         ])
 

@@ -146,7 +146,7 @@ class DenseLayer(nn.Cell):
             self.cast = P.Cast()
         else:
             self.cast = None
-        self.dropout = Dropout(keep_prob=keep_prob)
+        self.dropout = Dropout(p=1 - keep_prob)
         self.mul = P.Mul()
         self.realDiv = P.RealDiv()
         self.scale_coef = scale_coef

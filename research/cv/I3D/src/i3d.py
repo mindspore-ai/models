@@ -1035,7 +1035,7 @@ class InceptionI3D(nn.Cell):
         self.layers[end_point] = UseMaxPool3D_replace_AvgPool3D((int(self._sample_duration / 8), 7, 7), (1, 1, 1))
 
         end_point = 'Dropout_5'
-        self.layers[end_point] = nn.Dropout(self._dropout_keep_prob)
+        self.layers[end_point] = nn.Dropout(p=1 - self._dropout_keep_prob)
 
         end_point = 'logits'
         self.layers[end_point] = Unit3D_logits(self.is_train, self.amp_level, in_channels=384 + 384 + 128 + 128,

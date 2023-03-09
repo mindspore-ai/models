@@ -145,7 +145,7 @@ class IResNet(nn.Cell):
                                        stride=2,
                                        dilate=replace_stride_with_dilation[2])
         self.bn2 = nn.BatchNorm2d(512 * block.expansion, eps=1e-05,)
-        self.dropout = nn.Dropout(keep_prob=1.0-dropout)
+        self.dropout = nn.Dropout(p=dropout)
         self.fc = nn.Dense(512 * block.expansion * self.fc_scale,
                            num_features)
         self.features = nn.BatchNorm1d(num_features, eps=1e-05)

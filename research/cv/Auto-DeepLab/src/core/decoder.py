@@ -41,10 +41,10 @@ class Decoder(nn.Cell):
         self.last_conv = nn.SequentialCell(
             nn.Conv2d(c_cat, 256, 3, 1, pad_mode='same', has_bias=False, weight_init='HeNormal'),
             NormReLU(256, momentum, eps, parallel=parallel),
-            nn.Dropout(0.5),
+            nn.Dropout(p=0.5),
             nn.Conv2d(256, 256, 3, 1, pad_mode='same', has_bias=False, weight_init='HeNormal'),
             NormReLU(256, momentum, eps, parallel=parallel),
-            nn.Dropout(0.9),
+            nn.Dropout(p=0.1),
             nn.Conv2d(256, num_classes, 1, 1, weight_init='HeNormal'))
 
     def construct(self, high_level_feat, low_level_feat):

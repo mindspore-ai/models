@@ -111,7 +111,7 @@ class Focalnet(nn.Cell):
             nn.BatchNorm2d(num_features=128, affine=False),
             nn.ReLU(),
 
-            nn.Dropout(keep_prob=0.7),
+            nn.Dropout(p=0.3),
             nn.Conv2d(in_channels=128,
                       out_channels=128,
                       kernel_size=8,

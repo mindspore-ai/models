@@ -45,13 +45,13 @@ class PointTransformerLayer(nn.Cell):
                                             nn.ReLU(),
                                             Dense16(3 * share_planes, in_planes, weight_init='he_uniform')])
         self.pos_norm = batch_norm(in_planes, momentum=0.1)
-        self.pos_drop = nn.Dropout(pos_drop_rate)
+        self.pos_drop = nn.Dropout(p=1 - pos_drop_rate)
 
         self.attn_mlp = nn.SequentialCell([Dense16(in_planes, self.mid_planes, weight_init='he_uniform'),
                                            nn.ReLU(),
                                            Dense16(self.mid_planes, out_planes, weight_init='he_uniform')])
         self.attn_norm = batch_norm(out_planes, momentum=0.1)
-        self.attn_drop = nn.Dropout(attn_drop_rate)
+        self.attn_drop = nn.Dropout(p=1 - attn_drop_rate)
 
     def construct(self, x, pos):
         n, num_neighbors = x.shape[1], self.num_neighbors

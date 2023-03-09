@@ -220,7 +220,7 @@ class ASPP(nn.Cell):
         self.relu = nn.ReLU()
         self.conv2 = nn.Conv2d(out_channels, num_classes, kernel_size=1, weight_init='xavier_uniform', has_bias=True)
         self.concat = P.Concat(axis=1)
-        self.drop = nn.Dropout(0.3)
+        self.drop = nn.Dropout(p=0.7)
 
     def construct(self, x):
         """construct"""

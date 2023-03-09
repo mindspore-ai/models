@@ -48,7 +48,7 @@ class CTRL(nn.Cell):
         self.bn1 = nn.BatchNorm1d(num_features=semantic_dim)
         self.bn2 = nn.BatchNorm1d(num_features=semantic_dim)
         self.relu = nn.ReLU()
-        self.dropout = nn.Dropout(keep_prob=dropout_rate)
+        self.dropout = nn.Dropout(p=1 - dropout_rate)
 
         self.tile = ops.Tile()
         self.reshape = ops.Reshape()

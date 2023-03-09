@@ -22,7 +22,7 @@ class MPC(nn.Cell):
         super(MPC).__init__()
         self.l1 = nn.SequentialCell(nn.Dense(input_size + 1, input_size),
                                     nn.LeakyReLU(),
-                                    nn.Dropout(dropout))
+                                    nn.Dropout(p=1 - dropout))
         self.embed = nn.Embedding(skill_num, input_size)
         self.encoder = nn.LSTM(input_size, hidden_size, batch_first=True)
         self.decoder = MLP(hidden_size, pre_hidden_sizes + [1], dropout=dropout, norm_layer=None)

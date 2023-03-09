@@ -129,7 +129,7 @@ class VGG16Classfier(nn.Cell):
         self.fc1 = _fc(in_channels=7*7*512, out_channels=4096)
         self.fc2 = _fc(in_channels=4096, out_channels=4096)
         self.reshape = P.Reshape()
-        self.dropout = nn.Dropout(0.5)
+        self.dropout = nn.Dropout(p=0.5)
 
     def construct(self, x):
         """

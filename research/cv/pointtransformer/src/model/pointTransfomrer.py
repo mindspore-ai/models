@@ -41,11 +41,11 @@ class PointTransformerCls(nn.Cell):
             Dense16(planes[4], 256, weight_init='he_uniform'),
             batch_norm(256, momentum=0.1),
             nn.ReLU(),
-            nn.Dropout(0.5),
+            nn.Dropout(p=0.5),
             Dense16(256, 64, weight_init='he_uniform'),
             batch_norm(64, momentum=0.1),
             nn.ReLU(),
-            nn.Dropout(0.5),
+            nn.Dropout(p=0.5),
             Dense16(64, num_classes, weight_init='he_uniform')
         )
         self._initialize_weights()
@@ -129,10 +129,10 @@ class PointTransformerSeg(nn.Cell):
         self.head = nn.SequentialCell(
             Dense16(dims[0], 512, weight_init='he_uniform'),
             nn.ReLU(),
-            nn.Dropout(0.5),
+            nn.Dropout(p=0.5),
             Dense16(512, 256, weight_init='he_uniform'),
             nn.ReLU(),
-            nn.Dropout(0.5),
+            nn.Dropout(p=0.5),
             Dense16(256, num_classes, weight_init='he_uniform')
         )
         self._initialize_weights()

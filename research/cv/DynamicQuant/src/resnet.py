@@ -23,6 +23,7 @@ from src.quant import DymQuanConv as MyConv
 from src.quant import QuanConv
 from src.gumbelsoftmax import GumbleSoftmax
 
+
 class LambdaLayer(nn.Cell):
     """ lambdalayer """
     def __init__(self, lambd):
@@ -116,6 +117,7 @@ class BasicCell(nn.Cell):
         out = self.relu(out)
         return out
 
+
 class QuanBasicCell(nn.Cell):
     """
     ResNet basic cell definition.
@@ -180,7 +182,6 @@ class ResNet(nn.Cell):
         self.pad = nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)))
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode='valid')
 
-        # self.ap = P.ReduceMean(keep_dims=True)
         self.layer1 = self._make_layer(QuanBasicCell, 64, num_blocks[0], name_w, name_a, nbit_w, nbit_a, stride=1)
         self.layer2 = self._make_layer(block, 128, num_blocks[1], name_w, name_a, nbit_w, nbit_a, stride=2)
         self.layer3 = self._make_layer(block, 256, num_blocks[2], name_w, name_a, nbit_w, nbit_a, stride=2)
@@ -188,47 +189,14 @@ class ResNet(nn.Cell):
 
         self.ap = P.ReduceMean(keep_dims=True)
         self.flatten = nn.Flatten()
-        self.drop1 = nn.Dropout(0.8)
+        self.drop1 = nn.Dropout(p=0.2)
         self.fc = _fc(512 * block.expansion, num_classes)
 
         self.avgpool_policy = nn.AvgPool2d(kernel_size=7, stride=7)
         self.fc1 = _fc(64*8*8, 64)
-        self.drop2 = nn.Dropout(0.8)
+        self.drop2 = nn.Dropout(p=0.2)
         self.fc2 = _fc(64, num_bits)
         self.gumbelsoftmax = GumbleSoftmax()
-
-    def _make_layer(self, block, planes, num_blocks, name_w, name_a, nbit_w, nbit_a, stride):
-        """
-        Make stage network of ResNet.
-
-        Args:
-            block (Cell): Resnet block.
-            layer_num (int): Layer number.
-            in_planes (int): Input channel.
-            planes (int): Output channel.
-            stride (int): Stride size for the first convolutional layer.
-
-        Returns:
-            SequentialCell, the output layer.
-
-        Examples:
-            >>> _make_layer(ResidualBlock, 3, 128, 256, 2)
-        """
-        downsample = None
-        if stride != 1 or self.in_planes != planes * block.expansion:
-            downsample = []
-            downsample.append(MyConv(self.in_planes, planes * block.expansion, 1, name_w,
-                                     name_a, nbit_w, nbit_a, stride=stride, bias=False))
-            downsample.append(_bn(planes * block.expansion))
-            downsample = nn.CellList(downsample)
-
-        layers = []
-        layers.append(block(self.in_planes, planes, name_w, name_a, nbit_w, nbit_a, stride, downsample))
-        self.in_planes = planes * block.expansion
-        for _ in range(1, num_blocks):
-            layers.append(block(self.in_planes, planes, name_w, name_a, nbit_w, nbit_a))
-
-        return nn.CellList(layers)
 
     def construct(self, x):
         """construct"""
@@ -262,6 +230,39 @@ class ResNet(nn.Cell):
         x = self.drop1(x)
         x = self.fc(x)
         return x, middle
+
+    def _make_layer(self, block, planes, num_blocks, name_w, name_a, nbit_w, nbit_a, stride):
+        """
+        Make stage network of ResNet.
+
+        Args:
+            block (Cell): Resnet block.
+            layer_num (int): Layer number.
+            in_planes (int): Input channel.
+            planes (int): Output channel.
+            stride (int): Stride size for the first convolutional layer.
+
+        Returns:
+            SequentialCell, the output layer.
+
+        Examples:
+            >>> _make_layer(ResidualBlock, 3, 128, 256, 2)
+        """
+        downsample = None
+        if stride != 1 or self.in_planes != planes * block.expansion:
+            downsample = []
+            downsample.append(MyConv(self.in_planes, planes * block.expansion, 1, name_w,
+                                     name_a, nbit_w, nbit_a, stride=stride, bias=False))
+            downsample.append(_bn(planes * block.expansion))
+            downsample = nn.CellList(downsample)
+
+        layers = []
+        layers.append(block(self.in_planes, planes, name_w, name_a, nbit_w, nbit_a, stride, downsample))
+        self.in_planes = planes * block.expansion
+        for _ in range(1, num_blocks):
+            layers.append(block(self.in_planes, planes, name_w, name_a, nbit_w, nbit_a))
+
+        return nn.CellList(layers)
 
 
 def resnet18(name_w='dorefa', name_a='dorefa', nbit_w=4, nbit_a=4, num_bits=3, num_classes=1000):

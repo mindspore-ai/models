@@ -37,11 +37,11 @@ class Extractor(nn.Cell):
         super(Extractor, self).__init__()
         self.conv1 = nn.Conv2d(1, 10, kernel_size=5, pad_mode='valid')
         self.conv2 = nn.Conv2d(10, 20, kernel_size=5, pad_mode='valid')
-        self.conv2_drop = nn.Dropout()
+        self.conv2_drop = nn.Dropout(p=0.5)
         self.fc1 = nn.Dense(320, 50)
         self.relu = mindspore.ops.ReLU()
         self.max_pool2d = nn.MaxPool2d(kernel_size=2, stride=2)
-        self.dropout = mindspore.nn.Dropout()
+        self.dropout = mindspore.nn.Dropout(p=0.5)
         self.log_softmax = mindspore.nn.LogSoftmax()
 
     def construct(self, x):

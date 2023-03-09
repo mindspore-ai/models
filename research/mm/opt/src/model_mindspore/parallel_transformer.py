@@ -240,10 +240,10 @@ class LayerNorm2(Cell):
         self.sqrt = P.Sqrt().shard(((dp, 1),))
         self.sub1 = P.Sub().shard(((dp, 1), (dp, 1)))
         self.sub2 = P.Sub().shard(((dp, 1), (dp, 1)))
-        self.add = P.TensorAdd().shard(((dp, 1), ()))
+        self.add = P.Add().shard(((dp, 1), ()))
         self.eps = eps
         self.mul = P.Mul().shard(((dp, 1), (1,)))
-        self.add2 = P.TensorAdd().shard(((dp, 1), (1,)))
+        self.add2 = P.Add().shard(((dp, 1), (1,)))
         self.real_div = P.RealDiv().shard(((dp, 1), (dp, 1)))
 
     def construct(self, x):
@@ -283,10 +283,10 @@ class LayerNorm(Cell):
         self.sqrt = P.Sqrt().shard(((dp, 1, 1),))
         self.sub1 = P.Sub().shard(((dp, 1, 1), (dp, 1, 1)))
         self.sub2 = P.Sub().shard(((dp, 1, 1), (dp, 1, 1)))
-        self.add = P.TensorAdd().shard(((dp, 1, 1), ()))
+        self.add = P.Add().shard(((dp, 1, 1), ()))
         self.eps = eps
         self.mul = P.Mul().shard(((dp, 1, 1), (1,)))
-        self.add2 = P.TensorAdd().shard(((dp, 1, 1), (1,)))
+        self.add2 = P.Add().shard(((dp, 1, 1), (1,)))
         self.real_div = P.RealDiv().shard(((dp, 1, 1), (dp, 1, 1)))
 
     def construct(self, x):
@@ -386,11 +386,11 @@ class Linear(Dense):
             self.bias.parallel_optimizer = False
         if shard_output:
             self.matmul = P.MatMul(transpose_b=True).shard(((parallel_config.dp, 1), (parallel_config.mp, 1)))
-            self.add = P.TensorAdd().shard(((parallel_config.dp, parallel_config.mp), (parallel_config.mp,)))
+            self.add = P.Add().shard(((parallel_config.dp, parallel_config.mp), (parallel_config.mp,)))
         else:
             self.matmul = P.MatMul(transpose_b=True).shard(
                 ((parallel_config.dp, parallel_config.mp), (1, parallel_config.mp)))
-            self.add = P.TensorAdd().shard(((parallel_config.dp, 1), (1,)))
+            self.add = P.Add().shard(((parallel_config.dp, 1), (1,)))
         if self.activation_flag:
             getattr(self.activation, self.act_name).shard(((parallel_config.dp, 1, parallel_config.mp),))
 
@@ -708,7 +708,7 @@ class MultiHeadAttention(Cell):
             ((1,), (parallel_config.dp, 1, 1, 1)))
         self.mul = P.Mul().shard(
             ((parallel_config.dp, 1, 1, 1), (1,)))
-        self.add = P.TensorAdd().shard(
+        self.add = P.Add().shard(
             ((parallel_config.dp, 1, 1, 1), (parallel_config.dp, parallel_config.mp, 1, 1)))
         # Normalize factor for attention, sqrt(dk) as widely used
         self.scale_factor = Tensor(math.sqrt(self.size_per_head))
@@ -937,7 +937,7 @@ class TransformerEncoderCell(Cell):
                                           hidden_act=hidden_act,
                                           parallel_config=parallel_config)
         self.post_layernorm_residual = post_layernorm_residual
-        self.add = P.TensorAdd().shard(((parallel_config.dp, 1, 1), (parallel_config.dp, 1, 1)))
+        self.add = P.Add().shard(((parallel_config.dp, 1, 1), (parallel_config.dp, 1, 1)))
         self.dtype = mstype.float16
 
     def construct(self, x, input_mask, layer_past=None):
@@ -1051,7 +1051,7 @@ class TransformerDecoderCell(Cell):
                                           parallel_config=parallel_config)
 
         self.post_layernorm_residual = post_layernorm_residual
-        self.add = P.TensorAdd().shard(((parallel_config.dp, 1, 1), (parallel_config.dp, 1, 1)))
+        self.add = P.Add().shard(((parallel_config.dp, 1, 1), (parallel_config.dp, 1, 1)))
         self.dtype = mstype.float16
 
     def construct(self, hidden_stats,
@@ -1442,7 +1442,7 @@ class CumSum(nn.Cell):
         self.start = Tensor(0, mstype.int32)
         self.limit = Tensor(0, mstype.int32)
         self.delta = Tensor(1, mstype.int32)
-        self.add = P.TensorAdd().shard(((1,), ()))
+        self.add = P.Add().shard(((1,), ()))
 
     def construct(self, expert_mask, tokens_per_device):
         """Construct method"""

@@ -155,7 +155,7 @@ class TSM(nn.Cell):
                                  bias_init=constant_initializer))
                 self.new_fc = None
             else:
-                setattr(self.base_model, self.base_model.last_layer_name, nn.Dropout(keep_prob=self.dropout))
+                setattr(self.base_model, self.base_model.last_layer_name, nn.Dropout(p=1 - self.dropout))
                 self.new_fc = nn.Dense(feature_dim, num_class, weight_init=normal_initializer,
                                        bias_init=constant_initializer)
                 # if hasattr(self.new_fc, 'weight'):
@@ -165,7 +165,7 @@ class TSM(nn.Cell):
                         nn.Dense(feature_dim, num_class, bias_init=constant_initializer))
                 self.new_fc = None
             else:
-                setattr(self.base_model, self.base_model.last_layer_name, nn.Dropout(keep_prob=self.dropout))
+                setattr(self.base_model, self.base_model.last_layer_name, nn.Dropout(p=1 - self.dropout))
                 self.new_fc = nn.Dense(feature_dim, num_class, bias_init=constant_initializer)
 
         return feature_dim

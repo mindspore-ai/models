@@ -70,7 +70,7 @@ class BiLSTM(nn.Cell):
         self.concat = P.Concat()
         self.transpose = P.Transpose()
         self.concat1 = P.Concat(axis=2)
-        self.dropout = nn.Dropout(0.7)
+        self.dropout = nn.Dropout(p=0.3)
         self.use_dropout = config.use_dropout
         self.reshape = P.Reshape()
         self.transpose = P.Transpose()

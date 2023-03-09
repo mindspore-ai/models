@@ -36,7 +36,7 @@ class MLP(nn.SequentialCell):
                 layers.append(norm_layer(hidden_dim))
             layers.append(activation_layer())
             if dropout > 0:
-                layers.append(nn.Dropout(1 - dropout))
+                layers.append(nn.Dropout(p=dropout))
             in_dim = hidden_dim
 
         layers.append(nn.Dense(in_dim, hidden_channels[-1], has_bias=bias))
@@ -66,7 +66,7 @@ class MultiHeadedAttention(nn.Cell):
         self.d_k = math.sqrt(hidden_sizes[0] // head)
         self.linear_s = nn.CellList(
             [nn.Dense(input_size, hidden_size) for (input_size, hidden_size) in zip(input_sizes, hidden_sizes)])
-        self.dropout = nn.Dropout(1 - dropout_rate)
+        self.dropout = nn.Dropout(p=dropout_rate)
         self.batch_matmul = ops.BatchMatMul(transpose_b=True)
 
     @ms_function
@@ -90,8 +90,8 @@ class FeedForward(nn.Cell):
     def __init__(self, head, input_size, dropout_rate):
         super(FeedForward, self).__init__()
         self.mh = MultiHeadedAttention(head, input_size, dropout_rate)
-        self.dropout1 = nn.Dropout(1 - dropout_rate)
-        self.dropout2 = nn.Dropout(1 - dropout_rate)
+        self.dropout1 = nn.Dropout(p=dropout_rate)
+        self.dropout2 = nn.Dropout(p=dropout_rate)
         self.activate = nn.LeakyReLU()
         self.ln1 = nn.LayerNorm((input_size,))
         self.ln2 = nn.LayerNorm((input_size,))
@@ -141,7 +141,7 @@ class PositionalEncoding(nn.Cell):
 
     def __init__(self, d_model, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()
-        self.dropout = nn.Dropout(1 - dropout)
+        self.dropout = nn.Dropout(p=dropout)
 
         pe = mnp.zeros((max_len, d_model))
         position = mnp.arange(0, max_len).expand_dims(1)

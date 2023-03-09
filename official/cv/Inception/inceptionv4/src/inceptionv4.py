@@ -287,9 +287,9 @@ class Inceptionv4(nn.Cell):
         self.softmax = nn.DenseBnAct(
             1536, classes, weight_init="XavierUniform", has_bias=True, has_bn=True, activation="logsoftmax")
         if is_train:
-            self.dropout = nn.Dropout(0.20)
+            self.dropout = nn.Dropout(p=0.8)
         else:
-            self.dropout = nn.Dropout(1)
+            self.dropout = nn.Dropout(p=0.0)
         self.bn0 = nn.BatchNorm1d(1536, eps=0.001, momentum=0.1)
 
 

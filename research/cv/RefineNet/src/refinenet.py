@@ -132,9 +132,9 @@ class RefineNet(nn.Cell):
     def __init__(self, block, layers, num_classes=21, use_batch_statistics=False):
         self.inplanes = 64
         super(RefineNet, self).__init__()
-        self.do4 = nn.Dropout(keep_prob=1.0)
-        self.do3 = nn.Dropout(keep_prob=1.0)
-        self.do = nn.Dropout(keep_prob=1.0)
+        self.do4 = nn.Dropout(p=0.0)
+        self.do3 = nn.Dropout(p=0.0)
+        self.do = nn.Dropout(p=0.0)
         self.use_batch_statistics = use_batch_statistics
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, pad_mode='pad', padding=3,
                                has_bias=False)

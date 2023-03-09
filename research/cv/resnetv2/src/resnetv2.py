@@ -41,7 +41,7 @@ class PreActBottleNeck(nn.Cell):
             self.shortcut = nn.SequentialCell([nn.Conv2d(in_planes, self.expansion*planes,
                                                          kernel_size=1, stride=stride)])
 
-        self.add = P.TensorAdd()
+        self.add = P.Add()
 
     def construct(self, x):
         """ construct network """

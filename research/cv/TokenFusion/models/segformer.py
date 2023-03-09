@@ -70,7 +70,7 @@ class SegFormerHead(nn.Cell):
         self.linear_c3 = MLP(input_dim=c3_in_channels, embed_dim=embedding_dim)
         self.linear_c2 = MLP(input_dim=c2_in_channels, embed_dim=embedding_dim)
         self.linear_c1 = MLP(input_dim=c1_in_channels, embed_dim=embedding_dim)
-        self.dropout = nn.Dropout(0.1)
+        self.dropout = nn.Dropout(p=0.9)
 
         self.linear_fuse_conv = nn.Conv2d(
             embedding_dim * 4, embedding_dim, kernel_size=1

@@ -103,7 +103,7 @@ class Network9Layers(nn.Cell):
         self.fc1 = Mfm(8 * 8 * 128, 256, mode=0)
         self.fc2 = nn.Dense(256, num_classes, weight_init=Normal(0.02))
         self.flatten = nn.Flatten()
-        self.dropout = nn.Dropout(keep_prob=0.5)
+        self.dropout = nn.Dropout(p=0.5)
 
     def construct(self, x):
         """network construct"""

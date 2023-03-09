@@ -89,7 +89,7 @@ class Cnet(nn.Cell):
             nn.BatchNorm2d(num_features=128, momentum=0.9, affine=False),
             CBAM(128, reduction_ratio=4),
             nn.ReLU(),
-            nn.Dropout(keep_prob=0.7),
+            nn.Dropout(p=0.3),
             # Global Pooling
             nn.Conv2d(in_channels=128,
                       out_channels=128,

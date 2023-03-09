@@ -227,7 +227,7 @@ class _RNNBase(Cell):
         self.batch_first = batch_first
         self.num_layers = num_layers
         self.dropout = dropout
-        self.dropout_op = nn.Dropout(float(1 - dropout))
+        self.dropout_op = nn.Dropout(p=dropout)
         self.bidirectional = bidirectional
         self.has_bias = has_bias
         self.rnn = _DynamicRNN(mode)
@@ -794,7 +794,7 @@ class _RNNBaseAUGRU(Cell):
         self.batch_first = batch_first
         self.num_layers = num_layers
         self.dropout = dropout
-        self.dropout_op = nn.Dropout(float(1 - dropout))
+        self.dropout_op = nn.Dropout(p=dropout)
         self.bidirectional = bidirectional
         self.has_bias = has_bias
         self.rnn = _DynamicRNNAUGRU(mode)

@@ -296,7 +296,7 @@ class MobileNetV3(nn.Cell):
                                        has_bias=False, pad_mode='pad'))
         self.features.append(Activation('hswish'))
         if final_drop > 0:
-            self.features.append((nn.Dropout(final_drop)))
+            self.features.append((nn.Dropout(p=1 - final_drop)))
 
         # make it nn.CellList
         self.features = nn.SequentialCell(self.features)

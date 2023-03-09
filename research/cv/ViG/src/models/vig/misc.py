@@ -56,7 +56,7 @@ class DropPath(nn.Cell):
 
     def __init__(self, drop_prob, ndim):
         super(DropPath, self).__init__()
-        self.drop = nn.Dropout(keep_prob=1 - drop_prob)
+        self.drop = nn.Dropout(p=drop_prob)
         shape = (1,) + (1,) * (ndim + 1)
         self.ndim = ndim
         self.mask = Tensor(np.ones(shape), dtype=mstype.float32)

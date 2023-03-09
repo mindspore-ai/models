@@ -142,7 +142,7 @@ class ShuffleNetV2(nn.Cell):
         ])
         self.globalpool = nn.AvgPool2d(kernel_size=7, stride=7, pad_mode='valid')
         if self.model_size == '2.0x':
-            self.dropout = nn.Dropout(keep_prob=0.8)
+            self.dropout = nn.Dropout(p=0.2)
         self.classifier = nn.SequentialCell([nn.Dense(in_channels=self.stage_out_channels[-1],
                                                       out_channels=n_class, has_bias=False)])
         ## init weights

@@ -32,11 +32,11 @@ class Head0(Cell):
 
         if args is not None:
             if args.use_drop == 1:
-                self.drop = nn.Dropout(keep_prob=0.4)
+                self.drop = nn.Dropout(p=0.6)
             else:
                 self.drop = Cut()
         else:
-            self.drop = nn.Dropout(keep_prob=0.4)
+            self.drop = nn.Dropout(p=0.6)
 
         self.fc1 = fc_with_initialize(512 * 7 * 7, emb_size)
         if args.inference == 1:

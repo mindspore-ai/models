@@ -146,13 +146,13 @@ class TransformerEncoderLayer(nn.Cell):
         self.self_attn = MultiheadAttention(model_dim, heads, dropout)
         # Implementation of Feedforward model
         self.linear1 = nn.Dense(model_dim, dim_feedforward)
-        self.dropout = nn.Dropout(1 - dropout)
+        self.dropout = nn.Dropout(p=dropout)
         self.linear2 = nn.Dense(dim_feedforward, model_dim)
 
         self.norm1 = nn.LayerNorm([model_dim])
         self.norm2 = nn.LayerNorm([model_dim])
-        self.dropout1 = nn.Dropout(1 - dropout)
-        self.dropout2 = nn.Dropout(1 - dropout)
+        self.dropout1 = nn.Dropout(p=dropout)
+        self.dropout2 = nn.Dropout(p=dropout)
 
         self.activation = _get_activation_fn(activation)
         self.normalize_before = normalize_before
@@ -207,15 +207,15 @@ class TransformerDecoderLayer(nn.Cell):
         self.multihead_attn = MultiheadAttention(model_dim, heads, dropout)
         # Implementation of Feedforward model
         self.linear1 = nn.Dense(model_dim, dim_feedforward)
-        self.dropout = nn.Dropout(1 - dropout)
+        self.dropout = nn.Dropout(p=dropout)
         self.linear2 = nn.Dense(dim_feedforward, model_dim)
 
         self.norm1 = nn.LayerNorm([model_dim])
         self.norm2 = nn.LayerNorm([model_dim])
         self.norm3 = nn.LayerNorm([model_dim])
-        self.dropout1 = nn.Dropout(1 - dropout)
-        self.dropout2 = nn.Dropout(1 - dropout)
-        self.dropout3 = nn.Dropout(1 - dropout)
+        self.dropout1 = nn.Dropout(p=dropout)
+        self.dropout2 = nn.Dropout(p=dropout)
+        self.dropout3 = nn.Dropout(p=dropout)
 
         self.activation = _get_activation_fn(activation)
         self.normalize_before = normalize_before
@@ -313,7 +313,7 @@ class MultiheadAttention(nn.Cell):
                                                     mindspore.float32))
 
         self.out_proj = nn.Dense(embed_dim, embed_dim, weight_init=KaimingUniform())
-        self.drop = nn.Dropout(1 - dropout)
+        self.drop = nn.Dropout(p=dropout)
         self.BatchMatMul = ops.BatchMatMul()
         self.Tile = ops.Tile()
         self.expand_dims = ops.ExpandDims()

@@ -109,7 +109,7 @@ class PoseNet(nn.Cell):
         self.conv1x1_2 = Conv2dBlock(528, 128, kernel_size=1, stride=1)
         self.fc2048 = nn.Dense(2048, 1024)
         self.relu = nn.ReLU()
-        self.dropout7 = nn.Dropout(0.7)
+        self.dropout7 = nn.Dropout(p=0.3)
         self.cls_fc_pose_xyz_1024 = nn.Dense(1024, 512)
         self.cls_fc_pose_xyz_512 = nn.Dense(512, 3)
         self.cls_fc_pose_wpqr_1024 = nn.Dense(1024, 4)
@@ -117,7 +117,7 @@ class PoseNet(nn.Cell):
         self.avgpool7x7 = nn.AvgPool2d(kernel_size=7, stride=1, pad_mode="valid")
         self.flatten = nn.Flatten()
         self.fc = nn.Dense(1024, 2048)
-        self.dropout5 = nn.Dropout(0.5)
+        self.dropout5 = nn.Dropout(p=0.5)
         self.cls_fc_pose_xyz = nn.Dense(2048, 3)
         self.cls_fc_pose_wpqr = nn.Dense(2048, 4)
 

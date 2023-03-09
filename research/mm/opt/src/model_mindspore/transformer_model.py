@@ -142,7 +142,7 @@ class EmbeddingPostprocessor(nn.Cell):
         self.scores_mul = Tensor([math.sqrt(float(embedding_size))], dtype=mstype.float32)
         self.multiply = P.Mul().shard(((parallel_config.dp, 1, 1), (1,)))
         self.add = P.Add().shard(((parallel_config.dp, 1, 1), (1, 1, 1)))
-        self.dropout = Dropout(1 - dropout_prob, dtype=mstype.float32).shard(((parallel_config.dp, 1, 1),))
+        self.dropout = Dropout(p=dropout_prob).shard(((parallel_config.dp, 1, 1),))
         self.use_dropout = dropout_prob > 0
         self.expand_dims = P.ExpandDims().shard(((1, 1),))
         self.slice = P.StridedSlice().shard(((1, 1),))
@@ -355,11 +355,7 @@ class TransformerDecoderStep(nn.Cell):
         input_mask = self._create_attention_mask_from_input_mask(input_mask)
         input_mask = self.multiply(input_mask, self.expand(future_mask, 0))
         input_mask = self.expand(input_mask, 1)
-        # input_mask = self.tile(input_mask, (1, input_ids.shape[1], 1, 1))
         input_mask = self.cast_compute_type(input_mask)
-        # print(enc_attention_mask.shape)
-        # enc_attention_mask = enc_attention_mask[::, 0:1:1, 0:input_len:1]
-        # enc_attention_mask = source_mask.view(source_mask.shape[0], 1, 1, seq_length)
         enc_attention_mask = source_mask.view(source_mask.shape[0], 1, 1, source_mask.shape[1])
         enc_attention_mask = self.tile(enc_attention_mask, (1, 1, input_len, 1))
 
@@ -367,7 +363,6 @@ class TransformerDecoderStep(nn.Cell):
         beam_enc_attention_mask = self.cast_compute_type(beam_enc_attention_mask)
 
         # call TransformerDecoder
-        # print(input_embedding.shape, input_mask.shape, enc_states.shape, enc_attention_mask.shape)
         decoder_output, _, _ = self.tfm_decoder(input_embedding, input_mask, enc_states, beam_enc_attention_mask)
 
         # take the last step

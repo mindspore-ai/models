@@ -52,7 +52,7 @@ class EntityEmbeddings(nn.Cell):
         self.token_type_embeddings = nn.Embedding(config.type_vocab_size, config.hidden_size,
                                                   embedding_table=TruncatedNormal(config.initializer_range))
         self.LayerNorm = nn.LayerNorm((config.hidden_size,), epsilon=config.layer_norm_eps)
-        self.dropout = nn.Dropout(1 - config.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
         self.zerosLike = ops.ZerosLike()
         self.unsqueeze = ops.ExpandDims()
         self.sum = ops.ReduceSum()
@@ -191,7 +191,7 @@ class EntityAwareSelfAttention(nn.Cell):
         self.w2e_query = nn.Dense(config.hidden_size, self.all_head_size)
         self.e2w_query = nn.Dense(config.hidden_size, self.all_head_size)
         self.e2e_query = nn.Dense(config.hidden_size, self.all_head_size)
-        self.dropout = nn.Dropout(1 - config.attention_probs_dropout_prob)
+        self.dropout = nn.Dropout(p=config.attention_probs_dropout_prob)
         self.softmax = nn.Softmax()
         self.permute = ops.Transpose()
         self.cat1 = ops.Concat(1)

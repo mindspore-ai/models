@@ -75,7 +75,7 @@ class RCNNNet(nn.Cell):
         cls_layers.append(
             pt_utils.Conv1d(pre_channel, cls_channel, activation=None))
         if cfg.RCNN.DP_RATIO >= 0:
-            cls_layers.insert(1, nn.Dropout(1 - cfg.RCNN.DP_RATIO))
+            cls_layers.insert(1, nn.Dropout(p=cfg.RCNN.DP_RATIO))
         self.cls_layer = nn.SequentialCell(cls_layers)
 
         if cfg.RCNN.LOSS_CLS == 'SigmoidFocalLoss':
@@ -111,7 +111,7 @@ class RCNNNet(nn.Cell):
         reg_layers.append(
             pt_utils.Conv1d(pre_channel, reg_channel, activation=None))
         if cfg.RCNN.DP_RATIO >= 0:
-            reg_layers.insert(1, nn.Dropout(1 - cfg.RCNN.DP_RATIO))
+            reg_layers.insert(1, nn.Dropout(p=cfg.RCNN.DP_RATIO))
         self.reg_layer = nn.SequentialCell(*reg_layers)
 
         self.proposal_target_layer = ProposalTargetLayer()
