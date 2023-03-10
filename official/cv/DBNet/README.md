@@ -68,34 +68,58 @@ GPU v100 PCIE 32G 8 devices; Operating system: Ubuntu 18.04; Memory: 502 G; x86 
 ## Quickly Start
 
 ```text
-Take the training ICDAR2015 data as an example
-config/config_base.yaml Configure training and reasoning dataset path and backbone_ckpt path
+Parameter file description:
+    config/config_base.yaml: Common parameter file, data set path, optimizer, training strategy and other parameters are usually set in this file
+    config/dbnet/*.yaml: backbone training policy profile
+    config/dbnet++/*.yaml: backbone training policy profile with dcn
+
+notice：dbnet/*.yaml and /dbnet++/*.yaml parameters will cover config_base.yaml，Users can reasonably configure according to their needs
+
+Single train backbone resnet18 with ICDAR2015 as an example
+config/config_base.yaml configure training and reasoning data set path
 train:
-    img_dir:
-    gt_dir:
+    img_dir: ICDAR2015/ch4_training_images
+    gt_dir: ICDAR2015/ch4_training_localization_transcription_gt
 eval:
-    img_dir:
-    gt_dir:
+    img_dir: ICDAR2015/ch4_test_images
+    gt_dir: ICDAR2015/Challenge4_Test_Task1_GT
+
+config/dbnet/config_resnet18_1p.yaml configure backone_ckpt pre-training path
 backbone:
-    backbone_ckpt:
+    backbone_ckpt: ""
 ```
 
 Run standalone:
 
 ```shell
 bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [PLATFORM]
+
+# Ascend standalone train resnet18
+bash run_standalone_train.sh ../config/dbnet/config_resnet18_1p.yaml 0 Ascend
+
+# Ascend standalone train resnet50
+bash run_standalone_train.sh ../config/dbnet/config_resnet50_1p.yaml 0 Ascend
 ```
 
 Run distribution:
 
 ```shell
 bash run_distribution_train_ascend.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
+
+# Ascend distribute train resnet18
+bash run_standalone_train.sh hccl_8p.json 8 ../config/dbnet/config_resnet18_8p.yaml
+
+# Ascend distribute train resnet50
+bash run_standalone_train.sh hccl_8p.json 8 ../config/dbnet/config_resnet50_8p.yaml
 ```
 
 Evaluation:
 
 ```shell
 bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
+
+# Ascend eval resnet18
+bash run_eval.sh ../config/dbnet/config_resnet18_8p.yaml your_ckpt_path 0
 ```
 
 If you need to modify the device or other configurations, please modify the corresponding items in the configuration file.

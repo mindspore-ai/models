@@ -82,7 +82,6 @@ fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=0
 export RANK_ID=0
 export RANK_SIZE=1
 
@@ -96,7 +95,7 @@ cp ../*.py ./train
 cp *.sh ./train
 cp -r ../src ./train
 cd ./train || exit
-echo "start training for device $DEVICE_ID"
+echo "start training"
 env > env.log
 if [ $# == 2 ]
 then

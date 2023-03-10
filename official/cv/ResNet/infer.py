@@ -56,7 +56,7 @@ def infer_net():
     # init context
     ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=False)
     if target == "Ascend":
-        device_id = int(os.getenv('DEVICE_ID'))
+        device_id = int(os.getenv('DEVICE_ID', '0'))
         ms.set_context(device_id=device_id)
 
     # create dataset

@@ -70,34 +70,58 @@ GPU v100 PCIE 32G 8卡；系统： Ubuntu 18.04；内存：502 G；x86 72核 CPU
 ## 快速入门
 
 ```text
-以训练ICDAR2015数据为例
-config/config_base.yaml配置训练、推理数据集路径以及backbone_ckpt路径
+参数文件说明:
+    config/config_base.yaml: 公共参数文件，数据集路径、优化器、训练策略等参数通常在该文件设置
+    config/dbnet/*.yaml: backbone训练策略配置文件
+    config/dbnet++/*.yaml: 带dcn的backbone训练策略配置文件
+
+注意：dbnet/*.yaml和/dbnet++/*.yaml的参数会覆盖config_base.yaml的参数，用户可根据需求合理配置
+
+单卡resnet18为backbone训练ICDAR2015数据为例
+config/config_base.yaml配置训练、推理数据集路径
 train:
-    img_dir:
-    gt_dir:
+    img_dir: ICDAR2015/ch4_training_images
+    gt_dir: ICDAR2015/ch4_training_localization_transcription_gt
 eval:
-    img_dir:
-    gt_dir:
+    img_dir: ICDAR2015/ch4_test_images
+    gt_dir: ICDAR2015/Challenge4_Test_Task1_GT
+
+config/dbnet/config_resnet18_1p.yaml配置backbone_ckpt预训练路径
 backbone:
-    backbone_ckpt:
+    backbone_ckpt: ""
 ```
 
 单卡训练：
 
 ```shell
 bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [PLATFORM]
+
+# Ascend 单卡训练resnet18
+bash run_standalone_train.sh ../config/dbnet/config_resnet18_1p.yaml 0 Ascend
+
+# Ascend 单卡训练resnet50
+bash run_standalone_train.sh ../config/dbnet/config_resnet50_1p.yaml 0 Ascend
 ```
 
 多卡训练：
 
 ```shell
 bash run_distribution_train_ascend.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
+
+# Ascend 8卡训练resnet18
+bash run_standalone_train.sh hccl_8p.json 8 ../config/dbnet/config_resnet18_8p.yaml
+
+# Ascend 8卡训练resnet50
+bash run_standalone_train.sh hccl_8p.json 8 ../config/dbnet/config_resnet50_8p.yaml
 ```
 
 推理评估：
 
 ```shell
 bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
+
+# Ascend 推理resnet18
+bash run_eval.sh ../config/dbnet/config_resnet18_8p.yaml your_ckpt_path 0
 ```
 
 如需修改device或者其他配置，请对应修改配置文件里的对应项。

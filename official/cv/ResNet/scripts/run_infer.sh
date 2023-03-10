@@ -47,7 +47,6 @@ fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=0
 export RANK_SIZE=$DEVICE_NUM
 export RANK_ID=0
 
@@ -62,6 +61,6 @@ cp *.sh ./infer
 cp -r ../src ./infer
 cd ./infer || exit
 env > env.log
-echo "start evaluation for device $DEVICE_ID"
+echo "start evaluation"
 python infer.py --data_path=$PATH1 --checkpoint_file_path=$PATH2 --config_path=$CONFIG_FILE &> log &
 cd ..

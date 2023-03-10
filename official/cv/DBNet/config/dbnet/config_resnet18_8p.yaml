@@ -8,7 +8,7 @@ optimizer:
     lr:
         base_lr: 0.02
 dataset:
-    num_workers: 7
+    num_workers: 4
     prefetch_size: 42
 train:
     total_epochs: 2000

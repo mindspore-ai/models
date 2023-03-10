@@ -98,7 +98,8 @@ class IC15DataLoader():
         self.isTrain = isTrain
 
         self.ra = RandomAugment(max_tries=config.dataset.random_crop.max_tries,
-                                min_crop_side_ratio=config.dataset.random_crop.min_crop_side_ratio)
+                                min_crop_side_ratio=config.dataset.random_crop.min_crop_side_ratio,
+                                crop_size=self.config.train.train_size)
         self.ms = MakeSegDetectionData(config.train.min_text_size,
                                        config.train.shrink_ratio)
         self.mb = MakeBorderMap(config.train.shrink_ratio,

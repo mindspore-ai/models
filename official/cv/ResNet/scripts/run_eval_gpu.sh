@@ -47,7 +47,6 @@ fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=0
 export RANK_SIZE=$DEVICE_NUM
 export RANK_ID=0
 
@@ -62,7 +61,7 @@ cp -r ../config/*.yaml ./eval
 cp -r ../src ./eval
 cd ./eval || exit
 env > env.log
-echo "start evaluation for device $DEVICE_ID"
+echo "start evaluation"
 python eval.py --data_path=$PATH1 --checkpoint_file_path=$PATH2 --device_target="GPU" \
 --config_path=$CONFIG_FILE &> log.txt &
 cd ..
