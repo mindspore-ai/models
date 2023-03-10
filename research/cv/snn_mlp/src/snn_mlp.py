@@ -71,7 +71,7 @@ class Mlp(nn.Cell):
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
         self.act = act_layer()
-        self.drop = nn.Dropout(1. - drop)
+        self.drop = nn.Dropout(p=drop)
         self.fc1 = nn.Conv2d(in_features, hidden_features, 1, 1, has_bias=True)
         self.fc2 = nn.Conv2d(hidden_features, out_features, 1, 1, has_bias=True)
 
@@ -260,7 +260,7 @@ class SNNMLP(nn.Cell):
             patch_size=patch_size, in_chans=in_chans, embed_dim=embed_dim,
             norm_layer=norm_layer if self.patch_norm else None)
 
-        self.pos_drop = nn.Dropout(1. - drop_rate)
+        self.pos_drop = nn.Dropout(p=drop_rate)
 
         # stochastic depth
         dpr = [x for x in numpy.linspace(0, drop_path_rate, sum(depths))]

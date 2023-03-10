@@ -98,7 +98,7 @@ class BasicBlock(nn.Cell):
         if self.down_sample:
             self.down_sample_layer = nn.SequentialCell([_conv1x1(in_channel, out_channel, stride),
                                                         _bn(out_channel)])
-        self.add = P.TensorAdd()
+        self.add = P.Add()
 
     def construct(self, x):
         """forward function"""
@@ -164,7 +164,7 @@ class ResidualBlock(nn.Cell):
         if self.down_sample:
             self.down_sample_layer = nn.SequentialCell([_conv1x1(in_channel, out_channel, stride),
                                                         _bn(out_channel)])
-        self.add = P.TensorAdd()
+        self.add = P.Add()
 
     def construct(self, x):
         """forward function"""
@@ -269,6 +269,33 @@ class ResNet(nn.Cell):
         self.mlp_layer1 = _fc(block.expansion * 512, block.expansion * 512)
         self.mlp_layer2 = _fc(block.expansion * 512, low_dims)
 
+    def construct(self, x):
+        """forward function"""
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        c1 = self.maxpool(x)
+        c2 = self.layer1(c1)
+        c3 = self.layer2(c2)
+        c4 = self.layer3(c3)
+        c5 = self.layer4(c4)
+
+        out = self.mean(c5, (2, 3))
+        out = self.flatten(out)
+
+        if self.pretrain:
+            if self.use_MLP:
+                out = self.mlp_layer1(out)
+                out = self.mlp_layer2(out)
+            else:
+                out = self.end_point(out)
+            out = self.l2norm(out)
+            out1, out2, out3 = self.split(out)
+            return out1, out2, out3
+        out = self.end_point_class(out)
+        out = self.sigmoid(out)
+        return out
+
     def _make_layer(self, block, layer_num, in_channel, out_channel, stride):
         """
         Make stage network of ResNet.
@@ -298,33 +325,6 @@ class ResNet(nn.Cell):
             layers.append(resnet_block)
 
         return nn.SequentialCell(layers)
-
-    def construct(self, x):
-        """forward function"""
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.relu(x)
-        c1 = self.maxpool(x)
-        c2 = self.layer1(c1)
-        c3 = self.layer2(c2)
-        c4 = self.layer3(c3)
-        c5 = self.layer4(c4)
-
-        out = self.mean(c5, (2, 3))
-        out = self.flatten(out)
-
-        if self.pretrain:
-            if self.use_MLP:
-                out = self.mlp_layer1(out)
-                out = self.mlp_layer2(out)
-            else:
-                out = self.end_point(out)
-            out = self.l2norm(out)
-            out1, out2, out3 = self.split(out)
-            return out1, out2, out3
-        out = self.end_point_class(out)
-        out = self.sigmoid(out)
-        return out
 
 
 def resnet50(low_dims=128, pretrain=True, use_MLP=False, classes=10):

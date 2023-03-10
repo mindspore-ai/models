@@ -105,10 +105,10 @@ class ADNet(nn.Cell):
         self.fc4_5 = nn.SequentialCell([
             nn.Dense(18432, 512),
             nn.ReLU(),
-            nn.Dropout(0.5),
+            nn.Dropout(p=0.5),
             nn.Dense(512, 512),  # [3]
             nn.ReLU(),
-            nn.Dropout(0.5)
+            nn.Dropout(p=0.5)
         ])
 
         # -1 to differentiate between action '0' and haven't been explored

@@ -44,7 +44,7 @@ class BertCLSModel(nn.Cell):
         self.num_labels = num_labels
         self.dense_1 = nn.Dense(config.hidden_size, self.num_labels, weight_init=self.weight_init,
                                 has_bias=True).to_float(config.compute_type)
-        self.dropout = nn.Dropout(1 - dropout_prob)
+        self.dropout = nn.Dropout(p=dropout_prob)
         self.assessment_method = assessment_method
 
     def construct(self, input_ids, input_mask, token_type_id):
@@ -123,7 +123,7 @@ class BertNERModel(nn.Cell):
         if with_lstm:
             self.lstm_hidden_size = config.hidden_size // 2
             self.lstm = nn.LSTM(config.hidden_size, self.lstm_hidden_size, batch_first=True, bidirectional=True)
-        self.dropout = nn.Dropout(1 - dropout_prob)
+        self.dropout = nn.Dropout(p=dropout_prob)
         self.reshape = P.Reshape()
         self.shape = (-1, config.hidden_size)
         self.use_crf = use_crf

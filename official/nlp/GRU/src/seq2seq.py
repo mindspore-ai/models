@@ -139,7 +139,7 @@ class Decoder(nn.Cell):
                            weight_init=weight, bias_init=bias).to_float(config.compute_type)
         self.attention = Attention(config)
         self.bmm = P.BatchMatMul()
-        self.dropout = nn.Dropout(0.7)
+        self.dropout = nn.Dropout(p=0.3)
         self.expandims = P.ExpandDims()
         self.dtype = config.dtype
 
@@ -194,7 +194,7 @@ class Seq2Seq(nn.Cell):
         self.encoder = Encoder(config, is_training=is_training)
         self.decoder = Decoder(config, is_training=is_training)
         self.expandims = P.ExpandDims()
-        self.dropout = nn.Dropout()
+        self.dropout = nn.Dropout(p=0.5)
         self.shape = P.Shape()
         self.concat = P.Concat(axis=0)
         self.argmax = P.ArgMaxWithValue(axis=1, keep_dims=True)

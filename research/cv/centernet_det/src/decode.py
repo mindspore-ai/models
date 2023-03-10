@@ -127,7 +127,7 @@ class DetectionDecode(nn.Cell):
         self.shape = ops.Shape()
         self.gather_topk = GatherTopK()
         self.half = ops.Split(axis=-1, output_num=2)
-        self.add = ops.TensorAdd()
+        self.add = ops.Add()
         self.concat_a2 = ops.Concat(axis=2)
         self.trans_gather_feature = TransposeGatherFeature()
         self.expand_dims = ops.ExpandDims()

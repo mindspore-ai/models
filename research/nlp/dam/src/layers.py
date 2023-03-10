@@ -106,7 +106,7 @@ class Attention(nn.Cell):
         self.drop_prob = drop_prob
         if self.drop_prob is not None:
             print('use attention dropout')
-            self.dropout = nn.Dropout(drop_prob)
+            self.dropout = nn.Dropout(p=1 - drop_prob)
         self.softmax = P.Softmax(axis=-1)
         self.weighted_sum = op.BatchMatMulCell()
 

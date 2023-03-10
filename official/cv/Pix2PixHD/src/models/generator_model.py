@@ -43,7 +43,7 @@ class ResnetBlock(nn.Cell):
                        norm_layer(dim),
                        activation]
         if use_dropout:
-            conv_block += [nn.Dropout(0.5)]
+            conv_block += [nn.Dropout(p=0.5)]
 
         if padding_type in ('REFLECT', 'SYMMETRIC', 'CONSTANT'):
             paddings = ((0, 0), (0, 0), (1, 1), (1, 1))
@@ -165,9 +165,9 @@ class Encoder(nn.Cell):
     def __init__(self, input_nc, output_nc, ngf=32, n_downsampling=4, norm_layer=nn.BatchNorm2d):
         super(Encoder, self).__init__()
         self.output_nc = output_nc
-        self.LogicalNot = ops.LogicalNot()
-        self.ReduceSum = ops.ReduceSum()
-        self.Div = ops.Div()
+        self.logical_not = ops.LogicalNot()
+        self.reduce_sum = ops.ReduceSum()
+        self.div = ops.Div()
         self.shape = ops.TensorShape()
 
         paddings = ((0, 0), (0, 0), (3, 3), (3, 3))
@@ -208,13 +208,13 @@ class Encoder(nn.Cell):
                 outputs_mean_temp = outputs[b:b + 1, j:j + 1, :, :]
                 while index_i < inst_unique_shape[0]:
                     inst_index_mask = (inst[b:b + 1] == inst_unique[index_i])
-                    inst_index_mask_not = self.LogicalNot(inst_index_mask)
+                    inst_index_mask_not = self.logical_not(inst_index_mask)
                     outputs_mean_temp_mul = outputs_mean_temp * inst_index_mask
-                    outputs_mean_temp_sum = self.ReduceSum(outputs_mean_temp_mul)
+                    outputs_mean_temp_sum = self.reduce_sum(outputs_mean_temp_mul)
                     inst_index_mask_to_int = inst_index_mask.astype(ms.int32)
                     count_nonzero_num = ops.count_nonzero(inst_index_mask_to_int)
                     if count_nonzero_num > 0:
-                        mean = self.Div(outputs_mean_temp_sum, count_nonzero_num)
+                        mean = self.div(outputs_mean_temp_sum, count_nonzero_num)
                         outputs_mean_temp = mean * inst_index_mask + outputs_mean_temp * inst_index_mask_not
                     index_i += 1
                 if j == 0:

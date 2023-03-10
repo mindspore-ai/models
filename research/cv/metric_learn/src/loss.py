@@ -116,7 +116,7 @@ class Quadrupletloss(LossBase):
         self.reduce_max = P.ReduceMax()
         self.reduce_min = P.ReduceMin()
         self.matmul = nn.MatMul(False, True)
-        self.tensoradd = P.TensorAdd()
+        self.tensoradd = P.Add()
         self.assign = P.Assign()
         self.gather = P.GatherV2()
         self.index = generate_index(self.train_batch_size, self.samples_each_class)

@@ -28,7 +28,7 @@ class MLP(nn.Cell):
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
         self.fc1 = nn.Dense(in_features, hidden_features)
-        self.dropout = nn.Dropout(1. - dropout)
+        self.dropout = nn.Dropout(p=dropout)
         self.fc2 = nn.Dense(hidden_features, out_features)
         self.act = nn.GELU()
 
@@ -57,10 +57,10 @@ class Attention(nn.Cell):
         self.qkv = nn.Dense(dim, hidden_dim * 3, has_bias=qkv_bias)
         self.softmax = nn.Softmax(axis=-1)
         self.batmatmul_trans_b = P.BatchMatMul(transpose_b=True)
-        self.attn_drop = nn.Dropout(1. - attn_drop)
+        self.attn_drop = nn.Dropout(p=attn_drop)
         self.batmatmul = P.BatchMatMul()
         self.proj = nn.Dense(hidden_dim, dim)
-        self.proj_drop = nn.Dropout(1. - proj_drop)
+        self.proj_drop = nn.Dropout(p=proj_drop)
 
         self.transpose = P.Transpose()
         self.reshape = P.Reshape()
@@ -182,7 +182,7 @@ class AugVIT(nn.Cell):
                                           mstype.float32), requires_grad=True)
         self.pos_embed = Parameter(Tensor(np.zeros((1, self.num_patches + 1, embedding_dim)),
                                           mstype.float32), name='pos_embed', requires_grad=True)
-        self.pos_drop = nn.Dropout(1. - dropout)
+        self.pos_drop = nn.Dropout(p=dropout)
         dpr = [x.item() for x in np.linspace(0, drop_path_rate, depth)]
         layers = []
         for i in range(depth):

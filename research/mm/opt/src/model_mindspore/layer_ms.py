@@ -57,7 +57,7 @@ class RegionFeatureRegression(nn.Cell):
 
         self.weight = img_linear_weight
         self.bias = Parameter(Tensor(np.zeros(feat_dim), mstype.float32), parallel_optimizer=False)
-        self.add = P.TensorAdd().shard(((parallel_config.dp, 1), (1,)))
+        self.add = P.Add().shard(((parallel_config.dp, 1), (1,)))
         self.matmul = P.MatMul().shard(((parallel_config.dp, 1), (1, 1)))
 
     def construct(self, input_):
@@ -88,7 +88,7 @@ class AudioFeatureRegression(nn.Cell):
         self.weight = img_linear_weight
         self.bias = Parameter(Tensor(np.zeros(feat_dim), mstype.float32), parallel_optimizer=False)
 
-        self.add = P.TensorAdd().shard(((parallel_config.dp, 1), (1,)))
+        self.add = P.Add().shard(((parallel_config.dp, 1), (1,)))
         self.matmul = P.MatMul().shard(((parallel_config.dp, 1), (1, 1)))
 
     def construct(self, input_):

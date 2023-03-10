@@ -375,7 +375,7 @@ class EmbeddingPostprocessor(nn.Cell):
         self.reshape = P.Reshape()
         self.shape = tuple(embedding_shape)
         self.layernorm = nn.LayerNorm((embedding_size,))
-        self.dropout = nn.Dropout(1 - dropout_prob)
+        self.dropout = nn.Dropout(p=dropout_prob)
         self.gather = P.Gather()
         self.use_relative_positions = use_relative_positions
         self.slice = P.StridedSlice()
@@ -438,7 +438,7 @@ class BertOutput(nn.Cell):
         else:
             self.dense = nn.Dense(in_channels, out_channels,
                                   weight_init=Normal(initializer_range)).to_float(compute_type)
-        self.dropout = nn.Dropout(1 - dropout_prob)
+        self.dropout = nn.Dropout(p=dropout_prob)
         self.add = P.Add()
         self.is_gpu = context.get_context('device_target') == "GPU"
         if self.is_gpu:
@@ -682,7 +682,7 @@ class BertAttention(nn.Cell):
         self.trans_shape_position = (1, 2, 0, 3)
         self.multiply_data = Tensor([-10000.0,], dtype=compute_type)
         self.softmax = nn.Softmax()
-        self.dropout = nn.Dropout(1 - attention_probs_dropout_prob)
+        self.dropout = nn.Dropout(p=attention_probs_dropout_prob)
         if self.has_attention_mask:
             self.expand_dims = P.ExpandDims()
             self.sub = P.Sub()
@@ -1173,7 +1173,7 @@ class BertModelCLS(nn.Cell):
         self.relu = nn.ReLU()
         self.is_training = is_training
         if is_training:
-            self.dropout = nn.Dropout(1 - dropout_prob)
+            self.dropout = nn.Dropout(p=dropout_prob)
         self.export = config.export
 
     def construct(self, input_ids, token_type_id, input_mask):

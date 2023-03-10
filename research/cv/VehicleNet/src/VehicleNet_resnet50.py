@@ -380,7 +380,7 @@ class ClassBlock(nn.Cell):
             init.initializer(Tensor(np.random.normal(1, 0.02, self.bn1.gamma.shape), mindspore.float32),
                              self.bn1.gamma.shape))
         self.bn1.beta.set_data(init.initializer('zeros', self.bn1.beta.shape))
-        self.dropout = nn.Dropout(keep_prob=droprate)
+        self.dropout = nn.Dropout(p=1 - droprate)
         self.classifier = nn.Dense(num_bottleneck, class_num, weight_init=init.Normal(0.02), bias_init="Zeros")
 
     def construct(self, x):

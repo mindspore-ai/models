@@ -73,7 +73,7 @@ class AttnDecoderRNN(nn.Cell):
         self.attn = nn.Dense(in_channels=self.hidden_size * 2, out_channels=self.max_length).to_float(mstype.float16)
         self.attn_combine = nn.Dense(in_channels=self.hidden_size * 2,
                                      out_channels=self.hidden_size).to_float(mstype.float16)
-        self.dropout = nn.Dropout(keep_prob=1.0 - self.dropout_p)
+        self.dropout = nn.Dropout(p=self.dropout_p)
         self.gru = GRU(hidden_size, hidden_size).to_float(mstype.float16)
         self.out = nn.Dense(in_channels=self.hidden_size, out_channels=self.output_size).to_float(mstype.float16)
         self.transpose = P.Transpose()

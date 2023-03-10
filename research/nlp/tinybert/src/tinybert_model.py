@@ -86,6 +86,7 @@ class BertConfig:
         self.dtype = dtype
         self.compute_type = compute_type
 
+
 class EmbeddingPostprocessor(nn.Cell):
     """
     Postprocessors apply positional and token type embeddings to word embeddings.
@@ -128,7 +129,7 @@ class EmbeddingPostprocessor(nn.Cell):
         self.array_mul = P.MatMul()
         self.reshape = P.Reshape()
         self.shape = tuple(embedding_shape)
-        self.dropout = nn.Dropout(1 - dropout_prob)
+        self.dropout = nn.Dropout(p=dropout_prob)
         self.gather = P.Gather()
         self.use_relative_positions = use_relative_positions
         self.slice = P.StridedSlice()
@@ -175,7 +176,7 @@ class BertOutput(nn.Cell):
         super(BertOutput, self).__init__()
         self.dense = nn.Dense(in_channels, out_channels,
                               weight_init=TruncatedNormal(initializer_range)).to_float(compute_type)
-        self.dropout = nn.Dropout(1 - dropout_prob)
+        self.dropout = nn.Dropout(p=dropout_prob)
         self.add = P.Add()
         self.is_gpu = context.get_context('device_target') == "GPU"
         if self.is_gpu:
@@ -391,7 +392,7 @@ class BertAttention(nn.Cell):
         self.multiply_data = Tensor([-10000.0,], dtype=compute_type)
         self.matmul = P.BatchMatMul()
         self.softmax = nn.Softmax()
-        self.dropout = nn.Dropout(1 - attention_probs_dropout_prob)
+        self.dropout = nn.Dropout(p=attention_probs_dropout_prob)
         if self.has_attention_mask:
             self.expand_dims = P.ExpandDims()
             self.sub = P.Sub()
@@ -490,6 +491,7 @@ class BertAttention(nn.Cell):
         context_layer = self.transpose(context_layer, self.trans_shape)
         context_layer = self.reshape(context_layer, self.shape_return)
         return context_layer, attention_scores
+
 
 class BertSelfAttention(nn.Cell):
     """
@@ -602,6 +604,7 @@ class BertEncoderCell(nn.Cell):
                                  initializer_range=initializer_range,
                                  dropout_prob=hidden_dropout_prob,
                                  compute_type=compute_type)
+
     def construct(self, hidden_states, attention_mask):
         """bert encoder cell"""
         # self-attention
@@ -667,6 +670,7 @@ class BertTransformer(nn.Cell):
         self.reshape = P.Reshape()
         self.shape = (-1, hidden_size)
         self.out_shape = (-1, seq_length, hidden_size)
+
     def construct(self, input_tensor, attention_mask):
         """bert transformer"""
         prev_output = self.reshape(input_tensor, self.shape)
@@ -705,6 +709,7 @@ class CreateAttentionMaskFromInputMask(nn.Cell):
     def construct(self, input_mask):
         attention_mask = self.cast(self.reshape(input_mask, self.shape), mstype.float32)
         return attention_mask
+
 
 class BertModel(nn.Cell):
     """
@@ -926,6 +931,7 @@ class BertModelCLS(nn.Cell):
         if self._phase == 'train' or self.phase_type == "teacher":
             return seq_output, att_output, logits, log_probs
         return log_probs
+
 
 class BertModelNER(nn.Cell):
     """

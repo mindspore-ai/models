@@ -70,7 +70,7 @@ class Dropout2d(nn.Cell):
         super(Dropout2d, self).__init__()
         if keep_prob <= 0 or keep_prob > 1:
             raise ValueError("dropout probability should be a number in range (0, 1], but got {}".format(keep_prob))
-        self.dropout = nn.Dropout(keep_prob)
+        self.dropout = nn.Dropout(p=1 - keep_prob)
 
     def construct(self, x):
         """construct method"""

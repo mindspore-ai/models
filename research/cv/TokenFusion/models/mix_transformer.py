@@ -67,7 +67,7 @@ class Mlp(nn.Cell):
         self.dwconv = DWConv(hidden_features)
         self.act = ModuleParallel(nn.GELU(False))
         self.fc2 = ModuleParallel(nn.Dense(hidden_features, out_features))
-        self.drop = ModuleParallel(nn.Dropout(drop))
+        self.drop = ModuleParallel(nn.Dropout(p=1 - drop))
 
     def construct(self, x, H, W):
         x = self.fc1(x)
@@ -102,9 +102,9 @@ class Attention(nn.Cell):
 
         self.q = ModuleParallel(nn.Dense(dim, dim, has_bias=qkv_bias))
         self.kv = ModuleParallel(nn.Dense(dim, dim * 2, has_bias=qkv_bias))
-        self.attn_drop = ModuleParallel(nn.Dropout(attn_drop))
+        self.attn_drop = ModuleParallel(nn.Dropout(p=1 - attn_drop))
         self.proj = ModuleParallel(nn.Dense(dim, dim))
-        self.proj_drop = ModuleParallel(nn.Dropout(proj_drop))
+        self.proj_drop = ModuleParallel(nn.Dropout(p=1 - proj_drop))
 
         self.sr_ratio = sr_ratio
         if sr_ratio > 1:

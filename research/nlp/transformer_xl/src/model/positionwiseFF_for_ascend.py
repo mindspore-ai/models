@@ -34,9 +34,9 @@ class PositionwiseFF(Cell):
         else:
             self.CoreNet = nn.SequentialCell(
                 Dense(d_model, d_inner), nn.ReLU(),
-                nn.Dropout(1 - dropout, dtype=ms.float16),
+                nn.Dropout(p=dropout),
                 Dense(d_inner, d_model),
-                nn.Dropout(1 - dropout, dtype=ms.float16),
+                nn.Dropout(p=dropout),
             ).to_float(ms.float16)
         self.layer_norm = nn.LayerNorm([d_model])
         self.pre_lnorm = pre_lnorm

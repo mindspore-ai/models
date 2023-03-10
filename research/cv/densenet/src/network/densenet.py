@@ -85,7 +85,7 @@ class _DenseLayer(nn.Cell):
 
         # nn.Dropout in MindSpore use keep_prob, diff from Pytorch
         self.keep_prob = 1.0 - drop_rate
-        self.dropout = nn.Dropout(keep_prob=self.keep_prob)
+        self.dropout = nn.Dropout(p=1 - self.keep_prob)
 
     def construct(self, features):
         bottleneck = self.conv1(self.relu1(self.norm1(features)))

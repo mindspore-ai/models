@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 
-# This file refers to https://github.com/CompVis/stable-diffusion/blob/main/ldm/modules/diffusionmodules/model.py
+# This file refers to <https://github.com/CompVis/stable-diffusion/blob/main/ldm/modules/diffusionmodules/model.py>
 import numpy as np
 import mindspore as ms
 import mindspore.nn as nn
@@ -72,7 +72,7 @@ class ResnetBlock(nn.Cell):
                                       out_channels,
                                       bias_init='normal').to_float(dtype)
         self.norm2 = Normalize(out_channels)
-        self.dropout = nn.Dropout(1. - dropout)
+        self.dropout = nn.Dropout(p=1 - dropout)
         self.conv2 = nn.Conv2d(out_channels,
                                out_channels,
                                kernel_size=3,
@@ -118,6 +118,7 @@ class ResnetBlock(nn.Cell):
                 x = self.nin_shortcut(x)
 
         return x+h
+
 
 class AttnBlock(nn.Cell):
     def __init__(self, in_channels, dtype=ms.float32):
@@ -176,6 +177,7 @@ class AttnBlock(nn.Cell):
 
         return x+h_
 
+
 def make_attn(in_channels, attn_type="vanilla", dtype=ms.float32):
     assert attn_type == "vanilla", f'attn_type {attn_type} not supported'
     print(f"making attention of type '{attn_type}' with {in_channels} in_channels")
@@ -183,13 +185,15 @@ def make_attn(in_channels, attn_type="vanilla", dtype=ms.float32):
         return AttnBlock(in_channels, dtype=dtype)
     return None
 
+
 class Decoder(nn.Cell):
     def __init__(self, *, ch, out_ch, ch_mult=(1, 2, 4, 8), num_res_blocks,
                  attn_resolutions, dropout=0.0, resamp_with_conv=True, in_channels,
                  resolution, z_channels, give_pre_end=False, tanh_out=False, use_linear_attn=False,
                  attn_type="vanilla", dtype=ms.float32, **ignorekwargs):
         super().__init__()
-        if use_linear_attn: attn_type = "linear"
+        if use_linear_attn:
+            attn_type = "linear"
         self.ch = ch
         self.temb_ch = 0
         self.num_resolutions = len(ch_mult)
@@ -268,9 +272,6 @@ class Decoder(nn.Cell):
                                   has_bias=True).to_float(self.dtype)
 
     def construct(self, z):
-        #assert z.shape[1:] == self.z_shape[1:]
-        # self.last_z_shape = z.shape
-
         # timestep embedding
         temb = None
 

@@ -87,7 +87,7 @@ class DenseLayer(nn.Cell):
         self.matmul = ops.MatMul(transpose_b=False)
         self.bias_add = ops.BiasAdd()
         self.cast = ops.Cast()
-        self.dropout = Dropout(keep_prob=keep_prob)
+        self.dropout = Dropout(p=1 - keep_prob)
         self.use_activation = use_activation
         self.convert_dtype = convert_dtype
         self.drop_out = drop_out

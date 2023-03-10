@@ -69,7 +69,7 @@ class ResidualConv1dGLU(nn.Cell):
                  dropout=1 - 0.95, dilation=1, cin_channels=-1, gin_channels=-1, padding=None, causal=True):
         super(ResidualConv1dGLU, self).__init__()
         self.dropout = dropout
-        self.dropout_op = nn.Dropout(keep_prob=1. - self.dropout)
+        self.dropout_op = nn.Dropout(p=self.dropout)
         self.eval_split_op = P.Split(axis=-1, output_num=2)
         self.train_split_op = P.Split(axis=1, output_num=2)
         self.tanh = P.Tanh()

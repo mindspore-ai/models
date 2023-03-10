@@ -68,7 +68,7 @@ class Mlp(nn.Cell):
         self.fc1 = nn.Dense(in_channels=in_features, out_channels=hidden_features)
         self.act = act_layer()
         self.fc2 = nn.Dense(in_channels=hidden_features, out_channels=out_features, has_bias=False)
-        self.drop = nn.Dropout(keep_prob=1.0 - drop) if drop > 0. else Identity()
+        self.drop = nn.Dropout(p=drop) if drop > 0. else Identity()
 
     def construct(self, x):
         x = self.fc1(x)
@@ -119,9 +119,9 @@ class Attention(nn.Cell):
         self.q = nn.Dense(in_channels=dim, out_channels=hidden_dim, has_bias=qkv_bias)
         self.k = nn.Dense(in_channels=dim, out_channels=hidden_dim, has_bias=qkv_bias)
         self.v = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(keep_prob=1.0 - attn_drop)
+        self.attn_drop = nn.Dropout(p=attn_drop)
         self.proj = nn.Dense(in_channels=dim, out_channels=dim, has_bias=False)
-        self.proj_drop = nn.Dropout(keep_prob=1.0 - proj_drop)
+        self.proj_drop = nn.Dropout(p=proj_drop)
         self.softmax = nn.Softmax(axis=-1)
         self.matmul = P.BatchMatMul()
 
@@ -264,7 +264,7 @@ class TNT(nn.Cell):
         self.outer_pos = Parameter(Tensor(trunc_array([1, num_patches + 1, outer_dim]), dtype=mstype.float32),
                                    name="outer_pos")
         self.inner_pos = Parameter(Tensor(trunc_array([1, num_words, inner_dim]), dtype=mstype.float32))
-        self.pos_drop = nn.Dropout(keep_prob=1.0 - drop_rate)
+        self.pos_drop = nn.Dropout(p=drop_rate)
 
         dpr = [x for x in np.linspace(0, drop_path_rate, depth)]  # stochastic depth decay rule
         vanilla_idxs = []

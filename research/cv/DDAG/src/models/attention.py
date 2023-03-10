@@ -124,7 +124,7 @@ class GraphAttentionBlock(nn.Cell):
     def __init__(self, in_features, out_features, dropout, alpha=0.3, concat=True):
         super(GraphAttentionBlock, self).__init__()
         self.dropout = dropout
-        self.drop = nn.Dropout(keep_prob=1-dropout)
+        self.drop = nn.Dropout(p=dropout)
         self.in_features = in_features
         self.out_features = out_features
         self.alpha = alpha
@@ -170,7 +170,7 @@ class GraphAttentionLayer(nn.Cell):
     """
     def __init__(self, class_num, nheads, pool_dim, low_dim, dropout=0.2, alpha=0.3):
         super().__init__()
-        self.drop = nn.Dropout(keep_prob=1-dropout)
+        self.drop = nn.Dropout(p=dropout)
         self.nheads = nheads
         self.attentions = [GraphAttentionBlock(pool_dim, low_dim, dropout=dropout, alpha=alpha, concat=True)
                            for _ in range(nheads)]

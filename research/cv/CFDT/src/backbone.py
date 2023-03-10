@@ -61,7 +61,7 @@ class Mlp(nn.Cell):
         self.act = act_layer(approximate=False)
         self.fc2 = nn.Dense(in_channels=hidden_features,
                             out_channels=out_features)
-        self.drop = nn.Dropout(keep_prob=1.0 - drop)
+        self.drop = nn.Dropout(p=drop)
 
     def construct(self, x):
         x = self.fc1(x)
@@ -178,9 +178,9 @@ class Attention(nn.Cell):
         self.q = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.kv = nn.Dense(
             in_channels=dim, out_channels=dim * 2, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(keep_prob=1.0 - attn_drop)
+        self.attn_drop = nn.Dropout(p=attn_drop)
         self.proj = nn.Dense(in_channels=dim, out_channels=dim)
-        self.proj_drop = nn.Dropout(keep_prob=1.0 - proj_drop)
+        self.proj_drop = nn.Dropout(p=proj_drop)
 
         self.sr_ratio = sr_ratio
         if sr_ratio > 1:
@@ -279,9 +279,9 @@ class InnercrossAttention(nn.Cell):
         self.q = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.kv = nn.Dense(
             in_channels=dim, out_channels=dim * 2, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(keep_prob=1.0 - attn_drop)
+        self.attn_drop = nn.Dropout(p=attn_drop)
         self.proj = nn.Dense(in_channels=dim, out_channels=dim)
-        self.proj_drop = nn.Dropout(keep_prob=1.0 - proj_drop)
+        self.proj_drop = nn.Dropout(p=proj_drop)
         self.softmax = ops.Softmax(-1)
 
     def construct(self, x_det, x_inner):
@@ -628,7 +628,7 @@ class PyramidTNT(nn.Cell):
             (1, num_patches, outer_dims[0]), mindspore.float32))
         self.inner_pos = mindspore.Parameter(ops.Zeros()(
             (1, num_words, inner_dims[0]), mindspore.float32))
-        self.pos_drop = nn.Dropout(keep_prob=(1 - drop_rate))
+        self.pos_drop = nn.Dropout(p=drop_rate)
         self.pos_embed = self.outer_pos
         self.num_channels = outer_dims
 

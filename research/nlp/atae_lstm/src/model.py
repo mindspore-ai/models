@@ -40,7 +40,7 @@ class AttentionLstm(nn.Cell):
         self.dropout_prob = config.dropout_prob
         self.batch_size = config.batch_size
 
-        self.dropout = nn.Dropout(keep_prob=1 - self.dropout_prob)
+        self.dropout = nn.Dropout(p=self.dropout_prob)
         self.mask = Tensor(np.random.uniform(size=(1, self.dimh)) > self.dropout_prob)
 
         self.embedding_word = nn.Embedding(vocab_size=self.vocab_size,
@@ -76,16 +76,16 @@ class AttentionLstm(nn.Cell):
         u = lambda x: 1 / np.sqrt(x)
         e = u(self.dimh)
         self.w = Parameter(Tensor(np.zeros((self.dimh + self.dim_aspect, 1)).astype(np.float32)))
-        self.Ws = Parameter(Tensor(np.random.uniform(-e, e, (self.dimh, self.grained)).astype(np.float32)))
+        self.ws = Parameter(Tensor(np.random.uniform(-e, e, (self.dimh, self.grained)).astype(np.float32)))
         self.bs = Parameter(Tensor(np.zeros((1, self.grained)).astype(np.float32)))
-        self.Wh = Parameter(Tensor(np.random.uniform(-e, e, (self.dimh, self.dimh)).astype(np.float32)))
-        self.Wv = Parameter(Tensor(np.random.uniform(-e, e, (self.dim_aspect, self.dim_aspect)).astype(np.float32)))
-        self.Wp = Parameter(Tensor(np.random.uniform(-e, e, (self.dimh, self.dimh)).astype(np.float32)))
-        self.Wx = Parameter(Tensor(np.random.uniform(-e, e, (self.dimh, self.dimh)).astype(np.float32)))
+        self.wh = Parameter(Tensor(np.random.uniform(-e, e, (self.dimh, self.dimh)).astype(np.float32)))
+        self.wv = Parameter(Tensor(np.random.uniform(-e, e, (self.dim_aspect, self.dim_aspect)).astype(np.float32)))
+        self.wp = Parameter(Tensor(np.random.uniform(-e, e, (self.dimh, self.dimh)).astype(np.float32)))
+        self.wx = Parameter(Tensor(np.random.uniform(-e, e, (self.dimh, self.dimh)).astype(np.float32)))
 
         self.lstm = LSTM(self.dim_lstm_para, self.dimh, batch_first=True, has_bias=True)
 
-        self.params = ParameterTuple((self.Wv, self.Wh, self.Ws, self.bs, self.w, self.Wp, self.Wx))
+        self.params = ParameterTuple((self.wv, self.wh, self.ws, self.bs, self.w, self.wp, self.wx))
 
     def construct(self, x, x_len, aspect):
         """
@@ -112,57 +112,50 @@ class AttentionLstm(nn.Cell):
 
         output, (h_n, _) = self.lstm(lstm_input, (h_0, c_0), x_len)
 
-        # H: [B, N, 300]  h_n [B, 1, 300]
+        # h: [B, N, 300]  h_n [B, 1, 300]
         if self.batch_size == 1:
-            H = self.squeeze_0(output)
+            h = self.squeeze_0(output)
             h_n = self.reshape(h_n, (1, 300))
         else:
-            H = output
+            h = output
 
-        # Wh_H.size = (B, N, 300)
-        # a_Wv.size = (B, N, 300)
         if self.batch_size == 1:
-            H_Wh = self.matmul(H, self.Wh)
-            a_Wv = self.matmul(self.reshape(aspect_vector, (-1, self.dim_aspect)), self.Wv)
+            h_wh = self.matmul(h, self.wh)
+            a_wv = self.matmul(self.reshape(aspect_vector, (-1, self.dim_aspect)), self.wv)
         else:
-            H_Wh = P.matmul(H, self.Wh)
-            a_Wv = P.matmul(aspect_vector, self.Wv)
+            h_wh = P.matmul(h, self.wh)
+            a_wv = P.matmul(aspect_vector, self.wv)
 
-        # M.size = (B, N, 600)
-        H_Wh = self.cast(H_Wh, mindspore.float32)
-        a_Wv = self.cast(a_Wv, mindspore.float32)
+        h_wh = self.cast(h_wh, mindspore.float32)
+        a_wv = self.cast(a_wv, mindspore.float32)
         if self.batch_size == 1:
-            M = self.tanh(self.concat_1((H_Wh, a_Wv)))
+            m = self.tanh(self.concat_1((h_wh, a_wv)))
         else:
-            M = self.tanh(self.concat_2((H_Wh, a_Wv)))
+            m = self.tanh(self.concat_2((h_wh, a_wv)))
 
-        # tmp.size = (B, 1, N)
-        M = self.cast(M, mindspore.float32)
+        m = self.cast(m, mindspore.float32)
         if self.batch_size == 1:
-            tmp = self.matmul(M, self.w)
+            tmp = self.matmul(m, self.w)
             tmp = self.reshape(tmp, (1, -1))
         else:
-            tmp = P.matmul(M, self.w)
+            tmp = P.matmul(m, self.w)
             tmp = self.squeeze_2(tmp)
             tmp = self.expand(tmp, 1)
 
-        # alpha.size = (B, N)
         tmp = self.cast(tmp, mindspore.float32)
         alpha = self.softmax_1(tmp)
-        # r.size = (B, 1, 300)
         alpha = self.cast(alpha, mindspore.float32)
         if self.batch_size == 1:
-            r = self.matmul(alpha, H)
-            r_Wp = self.matmul(r, self.Wp)
-            h_Wx = self.matmul(h_n, self.Wx)
+            r = self.matmul(alpha, h)
+            r_wp = self.matmul(r, self.wp)
+            h_wx = self.matmul(h_n, self.wx)
         else:
-            r = P.matmul(alpha, H)
-            r_Wp = P.matmul(r, self.Wp)
-            h_Wx = P.matmul(h_n, self.Wx)
-        # h_star.size = (B, 1, 300)
-        r_Wp = self.cast(r_Wp, mindspore.float32)
-        h_Wx = self.cast(h_Wx, mindspore.float32)
-        h_star = self.tanh(r_Wp + h_Wx)
+            r = P.matmul(alpha, h)
+            r_wp = P.matmul(r, self.wp)
+            h_wx = P.matmul(h_n, self.wx)
+        r_wp = self.cast(r_wp, mindspore.float32)
+        h_wx = self.cast(h_wx, mindspore.float32)
+        h_star = self.tanh(r_wp + h_wx)
         # dropout
         if self.is_train:
             h_star = self.dropout(h_star)
@@ -171,12 +164,11 @@ class AttentionLstm(nn.Cell):
 
         h_star = self.cast(h_star, mindspore.float32)
         if self.batch_size == 1:
-            y_hat = self.matmul(h_star, self.Ws) + self.bs
+            y_hat = self.matmul(h_star, self.ws) + self.bs
         else:
-            y_hat = P.matmul(h_star, self.Ws) + self.bs
+            y_hat = P.matmul(h_star, self.ws) + self.bs
         y_hat = self.cast(y_hat, mindspore.float32)
         if self.batch_size != 1:
             y_hat = self.squeeze_1(y_hat)
         y = self.softmax_1(y_hat)
-        # y.size = (B, self.grained)
         return y

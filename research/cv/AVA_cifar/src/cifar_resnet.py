@@ -101,7 +101,7 @@ class BasicBlock(nn.Cell):
         if self.down_sample:
             self.down_sample_layer = nn.SequentialCell([_conv1x1(in_channel, out_channel, stride),
                                                         _bn(out_channel, training)])
-        self.add = P.TensorAdd()
+        self.add = P.Add()
 
     def construct(self, x):
         """forward function"""
@@ -170,7 +170,7 @@ class ResidualBlock(nn.Cell):
         if self.down_sample:
             self.down_sample_layer = nn.SequentialCell([_conv1x1(in_channel, out_channel, stride),
                                                         _bn(out_channel, training)])
-        self.add = P.TensorAdd()
+        self.add = P.Add()
 
     def construct(self, x):
         """forward function"""

@@ -152,7 +152,7 @@ class AuxLayer(nn.Cell):
             kernel_size=3,
             padding=1,
             **kwargs)
-        self.dropout = nn.Dropout(keep_prob=dropout_prob)
+        self.dropout = nn.Dropout(p=1 - dropout_prob)
         self.conv = nn.Conv2d(
             in_channels=inter_channels,
             out_channels=out_channels,

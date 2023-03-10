@@ -87,7 +87,7 @@ class ResNetRoIHead(nn.Cell):
 
         self.dropout_rate = dropout_rate
         if self.dropout_rate > 0.0:
-            self.dropout = nn.Dropout(dropout_rate)
+            self.dropout = nn.Dropout(p=1 - dropout_rate)
 
         # Perform FC in a fully convolutional manner. The FC layer will be
         # initialized with a different std comparing to convolutional layers.

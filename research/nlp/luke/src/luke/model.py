@@ -43,9 +43,9 @@ class EntityEmbeddings(nn.Cell):
                                                 embedding_table=TruncatedNormal(config.initializer_range))
         self.token_type_embeddings = nn.Embedding(config.type_vocab_size, config.hidden_size,
                                                   embedding_table=TruncatedNormal(config.initializer_range))
-        self.LayerNorm = nn.LayerNorm((config.hidden_size,), epsilon=config.layer_norm_eps).to_float(mindspore.float16)
-        self.dropout = nn.Dropout(1 - config.hidden_dropout_prob)
-        self.zerosLike = ops.ZerosLike()
+        self.layernorm = nn.LayerNorm((config.hidden_size,), epsilon=config.layer_norm_eps).to_float(mindspore.float16)
+        self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
+        self.zeros_like = ops.ZerosLike()
         self.unsqueeze = ops.ExpandDims()
         self.sum = ops.ReduceSum()
         self.min1 = Tensor(0, mindspore.int32)
@@ -60,7 +60,7 @@ class EntityEmbeddings(nn.Cell):
     def construct(self, entity_ids, position_ids, token_type_ids=None):
         """construct fun"""
         if token_type_ids is None:
-            token_type_ids = self.zerosLike(entity_ids)
+            token_type_ids = self.zeros_like(entity_ids)
         entity_embeddings = self.entity_embeddings(entity_ids)
         entity_embeddings = self.cast(entity_embeddings, mindspore.float16)
         if self.entity_emb_size != self.hidden_size:
@@ -73,7 +73,7 @@ class EntityEmbeddings(nn.Cell):
                                                                self.min2, self.max2)
         token_type_embeddings = self.token_type_embeddings(token_type_ids)
         embeddings = entity_embeddings + position_embeddings + token_type_embeddings
-        embeddings = self.LayerNorm(embeddings)
+        embeddings = self.layernorm(embeddings)
         embeddings = self.dropout(embeddings)
         return embeddings
 
@@ -184,7 +184,7 @@ class EntityAwareSelfAttention(nn.Cell):
         self.w2e_query = nn.Dense(config.hidden_size, self.all_head_size).to_float(mindspore.float16)
         self.e2w_query = nn.Dense(config.hidden_size, self.all_head_size).to_float(mindspore.float16)
         self.e2e_query = nn.Dense(config.hidden_size, self.all_head_size).to_float(mindspore.float16)
-        self.dropout = nn.Dropout(1 - config.attention_probs_dropout_prob)
+        self.dropout = nn.Dropout(p=config.attention_probs_dropout_prob)
         self.softmax = nn.Softmax()
         self.permute = ops.Transpose()
         self.cat1 = ops.Concat(1)

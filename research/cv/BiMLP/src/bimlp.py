@@ -153,7 +153,7 @@ class Mlp(nn.Cell):
             nbit_a=1,
             bias=False,
         )
-        self.drop = nn.Dropout(keep_prob=1 - drop)
+        self.drop = nn.Dropout(p=drop)
         self.norm1 = nn.BatchNorm2d(num_features=hidden_features)
         self.norm2 = nn.BatchNorm2d(num_features=out_features)
         self.norm0 = nn.BatchNorm2d(num_features=hidden_features)
@@ -246,7 +246,7 @@ class PATM(nn.Cell):
         self.proj = QuanConv(dim, dim, kernel_size=1, quan_name_w='xnor', quan_name_a='xnor',
                              nbit_w=1, nbit_a=1, bias=False)
         self.move_proj = LearnableBias(dim)
-        self.proj_drop = nn.Dropout(keep_prob=1 - proj_drop)
+        self.proj_drop = nn.Dropout(p=proj_drop)
         self.mode = mode
 
         if mode == "fc":

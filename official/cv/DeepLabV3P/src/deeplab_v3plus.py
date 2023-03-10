@@ -190,7 +190,7 @@ class ASPP(nn.Cell):
         self.bn1 = nn.BatchNorm2d(out_channels, use_batch_statistics=use_batch_statistics)
         self.relu = nn.ReLU()
         self.concat = P.Concat(axis=1)
-        self.drop = nn.Dropout(0.3)
+        self.drop = nn.Dropout(p=0.7)
 
     def construct(self, x):
         """ASPP.construct"""

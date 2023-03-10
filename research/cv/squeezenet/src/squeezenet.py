@@ -95,7 +95,7 @@ class SqueezeNet(nn.Cell):
                                     num_classes,
                                     kernel_size=1,
                                     has_bias=True)
-        self.dropout = nn.Dropout(keep_prob=0.5)
+        self.dropout = nn.Dropout(p=0.5)
         self.relu = nn.ReLU()
         self.mean = P.ReduceMean(keep_dims=True)
         self.flatten = nn.Flatten()
@@ -171,7 +171,7 @@ class SqueezeNet_Residual(nn.Cell):
         self.relu = nn.ReLU()
         self.max_pool2d = nn.MaxPool2d(kernel_size=3, stride=2)
         self.add = P.Add()
-        self.dropout = nn.Dropout(keep_prob=0.5)
+        self.dropout = nn.Dropout(p=0.5)
         self.mean = P.ReduceMean(keep_dims=True)
         self.flatten = nn.Flatten()
         self.custom_init_weight()

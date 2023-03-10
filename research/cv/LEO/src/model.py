@@ -38,7 +38,7 @@ class Encoder(nn.Cell):
             shape=[2*self.latent_size, 2*self.latent_size],
             dtype=mindspore.float32)
 
-        self.dropout = nn.Dropout(self.dropout_r)
+        self.dropout = nn.Dropout(p=1 - self.dropout_r)
         self.encoder = self.encoder = nn.Dense(self.input_size,
                                                self.latent_size,
                                                weight_init=weight_initializer_enc,

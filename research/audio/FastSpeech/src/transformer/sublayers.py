@@ -73,7 +73,7 @@ class MultiHeadAttention(nn.Cell):
 
         self.attention = ScaledDotProductAttention(temperature=np.power(d_k, 0.5))
         self.layer_norm = nn.LayerNorm([d_model])
-        self.dropout = nn.Dropout(keep_prob=1-dropout)
+        self.dropout = nn.Dropout(p=dropout)
 
         self.transpose = ops.Transpose()
         self.reshape = ops.Reshape()
@@ -132,7 +132,7 @@ class PositionwiseFeedForward(nn.Cell):
             has_bias=True,
         )
 
-        self.dropout = nn.Dropout(keep_prob=1-dropout)
+        self.dropout = nn.Dropout(p=dropout)
         self.layer_norm = nn.LayerNorm([d_in])
         self.relu = nn.ReLU()
 

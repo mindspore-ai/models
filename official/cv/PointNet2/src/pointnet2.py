@@ -43,10 +43,10 @@ class PointNet2(nn.Cell):
 
         self.fc1 = Dense(1024, 512)
         self.bn1 = nn.BatchNorm1d(512)
-        self.drop1 = nn.Dropout(0.6)
+        self.drop1 = nn.Dropout(p=0.4)
         self.fc2 = Dense(512, 256)
         self.bn2 = nn.BatchNorm1d(256)
-        self.drop2 = nn.Dropout(0.5)
+        self.drop2 = nn.Dropout(p=0.5)
         self.fc3 = Dense(256, num_class)
 
         self.relu = P.ReLU()

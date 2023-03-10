@@ -34,14 +34,14 @@ class FastSCNN(nn.Cell):
                 [nn.Conv2d(64, 32, 3, pad_mode='pad', padding=1, has_bias=False),
                  nn.BatchNorm2d(32),
                  nn.ReLU(),
-                 nn.Dropout(0.9),#1-0.9=0.1
+                 nn.Dropout(p=0.1),
                  nn.Conv2d(32, num_classes, 1, has_bias=True)]
                 )
             self.auxlayer2 = nn.SequentialCell(
                 [nn.Conv2d(128, 32, 3, pad_mode='pad', padding=1, has_bias=False),
                  nn.BatchNorm2d(32),
                  nn.ReLU(),
-                 nn.Dropout(0.9),#1-0.9=0.1
+                 nn.Dropout(p=0.1),
                  nn.Conv2d(32, num_classes, 1, has_bias=True)]
                 )
         self.ResizeBilinear = nn.ResizeBilinear()
@@ -241,7 +241,7 @@ class Classifier(nn.Cell):
         self.dsconv1 = _DSConv(dw_channels, dw_channels, stride)
         self.dsconv2 = _DSConv(dw_channels, dw_channels, stride)
         self.conv = nn.SequentialCell([
-            nn.Dropout(0.9), # 1-0.9=0.1
+            nn.Dropout(p=0.1),
             nn.Conv2d(dw_channels, num_classes, 1)])
 
     def construct(self, x):

@@ -29,7 +29,7 @@ class TokenLearnerModule(nn.Cell):
         ])
         self.feat_conv = nn.Conv2d(self.in_channels, self.in_channels, 1, group=self.num_groups)
         self.softmax = nn.Softmax()
-        self.dropout = nn.Dropout(1.0 - dropout_rate)
+        self.dropout = nn.Dropout(p=dropout_rate)
 
     def construct(self, x):
         bs, h, w, _ = x.shape

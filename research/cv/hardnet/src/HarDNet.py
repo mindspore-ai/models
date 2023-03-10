@@ -182,7 +182,7 @@ class _CommenHead(nn.Cell):
         super(_CommenHead, self).__init__()
         self.avgpool = GlobalAvgpooling()
         self.flat = nn.Flatten()
-        self.drop = nn.Dropout(keep_prob=keep_rate)
+        self.drop = nn.Dropout(p=1 - keep_rate)
         self.dense = nn.Dense(out_channels, num_classes, has_bias=True)
 
     def construct(self, x):
@@ -251,7 +251,7 @@ class HarDNet(nn.Cell):
             self.layers.append(blk)
 
             if i == blks - 1 and arch == 85:
-                self.layers.append(nn.Dropout(keep_prob=0.9))
+                self.layers.append(nn.Dropout(p=0.1))
 
             self.layers.append(_ConvLayer(ch, ch_list[i], kernel=1))
             ch = ch_list[i]

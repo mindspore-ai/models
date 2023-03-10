@@ -41,8 +41,8 @@ class Attention(nn.Cell):
         self.value = nn.Dense(config.hidden_size, self.all_head_size)
 
         self.out = nn.Dense(config.hidden_size, config.hidden_size)
-        self.attn_dropout = nn.Dropout(config.transformer_attention_dropout_rate)
-        self.proj_dropout = nn.Dropout(config.transformer_attention_dropout_rate)
+        self.attn_dropout = nn.Dropout(p=1 - config.transformer_attention_dropout_rate)
+        self.proj_dropout = nn.Dropout(p=1 - config.transformer_attention_dropout_rate)
 
         self.softmax = nn.Softmax(axis=-1)
 
@@ -85,7 +85,7 @@ class Mlp(nn.Cell):
         self.fc2 = nn.Dense(config.transformer_mlp_dim, config.hidden_size,
                             weight_init='XavierUniform', bias_init='Normal')
         self.act_fn = nn.GELU()
-        self.dropout = nn.Dropout(config.transformer_dropout_rate)
+        self.dropout = nn.Dropout(p=1 - config.transformer_dropout_rate)
 
     def construct(self, x):
         """construct"""
@@ -126,7 +126,7 @@ class Embeddings(nn.Cell):
         self.cls_token = Parameter(P.Zeros()((1, 1, config.hidden_size), mindspore.float32), name="q2",
                                    requires_grad=True)
 
-        self.dropout = nn.Dropout(config.transformer_dropout_rate)
+        self.dropout = nn.Dropout(p=1 - config.transformer_dropout_rate)
 
     def construct(self, x):
         """construct"""

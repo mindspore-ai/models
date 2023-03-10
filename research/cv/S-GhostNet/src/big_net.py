@@ -92,7 +92,7 @@ class DropConnect(nn.Cell):
         self.shape = P.Shape()
         self.dtype = P.DType()
         self.keep_prob = 1 - drop_connect_rate
-        self.dropout = P.Dropout(keep_prob=self.keep_prob)
+        self.dropout = P.Dropout(p=1 - self.keep_prob)
 
     def construct(self, x):
         shape = self.shape(x)
@@ -390,7 +390,7 @@ class GhostNet(nn.Cell):
         self.squeeze = P.Flatten()
         self.final_drop = 1-final_drop
         if self.final_drop > 0:
-            self.dropout = nn.Dropout(self.final_drop)
+            self.dropout = nn.Dropout(p=1 - self.final_drop)
 
         self.classifier = nn.Dense(head_output_channel, num_classes, has_bias=True)
 

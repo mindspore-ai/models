@@ -273,8 +273,8 @@ class MIMOUNetPlus(nn.Cell):
         self.FAM2 = FAM(base_channel * 2)
         self.SCM2 = SCM(base_channel * 2)
 
-        self.drop1 = nn.Dropout(0.1)
-        self.drop2 = nn.Dropout(0.1)
+        self.drop1 = nn.Dropout(p=0.9)
+        self.drop2 = nn.Dropout(p=0.9)
 
         self.cat = ops.Stack(axis=1)
         self.interpolate = nn.ResizeBilinear()

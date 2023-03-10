@@ -359,7 +359,7 @@ class ResNet(nn.Cell):
         self.mean = P.ReduceMean(keep_dims=True)
         self.flatten = nn.Flatten()
         self.end_point = _fc(out_channels[3], 1000, use_se=self.use_se)
-        self.out = nn.SequentialCell([nn.Dense(1000, num_classes),# nn.Dropout(0.75),
+        self.out = nn.SequentialCell([nn.Dense(1000, num_classes),# nn.Dropout(p=0.25),
                                       nn.Softmax()
                                      ])
 

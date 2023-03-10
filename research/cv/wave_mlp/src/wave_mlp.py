@@ -73,7 +73,7 @@ class Mlp(nn.Cell):
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
         self.act = act_layer()
-        self.drop = nn.Dropout(1. - drop)
+        self.drop = nn.Dropout(p=drop)
         self.fc1 = nn.Conv2d(in_features, hidden_features, 1, 1, has_bias=True)
         self.fc2 = nn.Conv2d(hidden_features, out_features, 1, 1, has_bias=True)
 
@@ -99,7 +99,7 @@ class PATM(nn.Cell):
                                has_bias=False, pad_mode='pad')
         self.reweight = Mlp(dim, dim // 4, dim * 3)
         self.proj = nn.Conv2d(dim, dim, 1, 1, has_bias=True)
-        self.proj_drop = nn.Dropout(1. - proj_drop)
+        self.proj_drop = nn.Dropout(p=1 - proj_drop)
         self.mode = mode
 
         if mode == 'fc':

@@ -104,7 +104,7 @@ class GoogleNet(nn.Cell):
         self.block5a = Inception(832, 256, 160, 320, 32, 128, 128)
         self.block5b = Inception(832, 384, 192, 384, 48, 128, 128)
 
-        self.dropout = nn.Dropout(keep_prob=0.8)
+        self.dropout = nn.Dropout(p=0.2)
         self.include_top = include_top
         if self.include_top:
             self.mean = P.ReduceMean(keep_dims=True)

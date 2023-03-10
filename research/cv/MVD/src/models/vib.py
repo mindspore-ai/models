@@ -138,7 +138,7 @@ class VIB(nn.Cell):
         classifier += [nn.Dense(self.out_ch, self.out_ch // 2)]
         classifier += [nn.BatchNorm1d(self.out_ch // 2)]
         classifier += [nn.LeakyReLU(0.1)]
-        classifier += [nn.Dropout(0.5)]
+        classifier += [nn.Dropout(p=0.5)]
         classifier += [nn.Dense(self.out_ch // 2, self.num_class)]
         classifier = nn.SequentialCell(classifier)
         weights_init_classifier(classifier)

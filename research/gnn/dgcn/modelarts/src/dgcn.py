@@ -51,7 +51,7 @@ class GraphConvolution(nn.Cell):
         self.dropout_ratio = dropout_ratio
         if self.dropout_ratio is not None:
             self.dropout_flag = self.dropout_ratio
-            self.dropout = nn.Dropout(keep_prob=1-self.dropout_ratio)
+            self.dropout = nn.Dropout(p=self.dropout_ratio)
         self.activation = get_activation(activation)
         self.activation_flag = self.activation is not None
         self.matmul = P.MatMul()

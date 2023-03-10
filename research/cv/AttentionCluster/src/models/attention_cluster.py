@@ -96,7 +96,7 @@ class AttentionCluster(nn.Cell):
             self.att.append(att)
             self.inch += input_dim*cluster_num
 
-        self.drop = nn.Dropout(0.5)
+        self.drop = nn.Dropout(p=0.5)
 
         self.fc = nn.Dense(self.inch, nclass)
 

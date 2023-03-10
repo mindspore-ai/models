@@ -101,10 +101,10 @@ class UniterTextEmbeddings(nn.Cell):
         # self.LayerNorm is not snake-cased to stick with TensorFlow model
         # variable name and be able to load any TensorFlow checkpoint file
         self.layernorm = LayerNorm((config.hidden_size,), parallel_config.dp)
-        self.dropout = Dropout(config.hidden_dropout_prob).shard(((parallel_config.dp, 1, 1),))
+        self.dropout = Dropout(p=1 - config.hidden_dropout_prob).shard(((parallel_config.dp, 1, 1),))
         self.zeros_like = P.ZerosLike().shard(((parallel_config.dp, 1),))
-        self.add = P.TensorAdd().shard(((parallel_config.dp, 1, 1), (parallel_config.dp, 1, 1)))
-        self.add1 = P.TensorAdd().shard(((parallel_config.dp, 1, 1), (1, 1, 1)))
+        self.add = P.Add().shard(((parallel_config.dp, 1, 1), (parallel_config.dp, 1, 1)))
+        self.add1 = P.Add().shard(((parallel_config.dp, 1, 1), (1, 1, 1)))
         self.full_batch = config.full_batch
         self.stride_slice_1 = P.StridedSlice().shard(((1, 1, 1),))
 
@@ -151,11 +151,11 @@ class UniterImageEmbeddings(nn.Cell):
         self.mask_embedding.gather.shard(((1, 1), (parallel_config.dp,)))
         self.mask_embedding.expand.shard(((parallel_config.dp, 1),))
         self.mask_embedding.embedding_table.parallel_optimizer = False
-        self.add = P.TensorAdd().shard(((parallel_config.dp, 1, 1), (parallel_config.dp, 1, 1)))
+        self.add = P.Add().shard(((parallel_config.dp, 1, 1), (parallel_config.dp, 1, 1)))
 
         # tf naming convention for layer norm
         self.LayerNorm = LayerNorm((config.hidden_size,), parallel_config.dp)
-        self.dropout = Dropout(config.hidden_dropout_prob).shard(((parallel_config.dp, 1, 1),))
+        self.dropout = Dropout(p=1 - config.hidden_dropout_prob).shard(((parallel_config.dp, 1, 1),))
         self.cast = P.Cast()
 
     def construct(self, img_feat, img_pos_feat, type_embeddings, img_masks=None):
@@ -199,9 +199,9 @@ class UniterAudioEmbeddings(nn.Cell):
 
         # tf naming convention for layer norm
         self.LayerNorm = LayerNorm((config.hidden_size,), parallel_config.dp)
-        self.dropout = Dropout(config.hidden_dropout_prob).shard(((parallel_config.dp, 1, 1),))
-        self.add = P.TensorAdd().shard(((parallel_config.dp, 1, 1), (parallel_config.dp, 1, 1)))
-        self.add1 = P.TensorAdd().shard(((1, 1, 1), (parallel_config.dp, 1, 1)))
+        self.dropout = Dropout(p=1 - config.hidden_dropout_prob).shard(((parallel_config.dp, 1, 1),))
+        self.add = P.Add().shard(((parallel_config.dp, 1, 1), (parallel_config.dp, 1, 1)))
+        self.add1 = P.Add().shard(((1, 1, 1), (parallel_config.dp, 1, 1)))
         self.cast = P.Cast()
         self.full_batch = config.full_batch
         self.stride_slice_1 = P.StridedSlice().shard(((1, 1, 1),))

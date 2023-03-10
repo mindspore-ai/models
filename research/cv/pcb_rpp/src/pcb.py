@@ -37,7 +37,7 @@ class PCB(nn.Cell):
         resnet = resnet50(1000)
         self.base = resnet
         self.avgpool = ops.AvgPool(pad_mode="valid", kernel_size=(4, 8), strides=(4, 8))
-        self.dropout = nn.Dropout(keep_prob=0.5)
+        self.dropout = nn.Dropout(p=0.5)
 
         self.local_conv = nn.Conv2d(2048, 256, kernel_size=1, has_bias=False, pad_mode="valid",
                                     weight_init=HeNormal(mode="fan_out"))

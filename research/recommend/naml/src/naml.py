@@ -90,9 +90,9 @@ class NewsEncoder(nn.Cell):
             nn.ReLU()
         ]
         if args.phase == "train":
-            word_embedding.append(nn.Dropout(keep_prob=(1-args.dropout_ratio)))
-            title_CNN.append(nn.Dropout(keep_prob=(1-args.dropout_ratio)))
-            abstract_CNN.append(nn.Dropout(keep_prob=(1-args.dropout_ratio)))
+            word_embedding.append(nn.Dropout(p=args.dropout_ratio))
+            title_CNN.append(nn.Dropout(p=args.dropout_ratio))
+            abstract_CNN.append(nn.Dropout(p=args.dropout_ratio))
         self.word_embedding = nn.SequentialCell(word_embedding)
         self.title_CNN = nn.SequentialCell(title_CNN)
         self.abstract_CNN = nn.SequentialCell(abstract_CNN)

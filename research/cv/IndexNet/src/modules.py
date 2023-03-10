@@ -299,7 +299,7 @@ class ASPP(nn.Cell):
                 ]
         )
 
-        self.dropout = nn.Dropout(0.5)
+        self.dropout = nn.Dropout(p=0.5)
         self.concat = ops.Concat(axis=1)
 
     def construct(self, x):

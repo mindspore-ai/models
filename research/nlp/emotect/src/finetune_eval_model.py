@@ -42,7 +42,7 @@ class ErnieCLSModel(nn.Cell):
         self.num_labels = num_labels
         self.dense_1 = nn.Dense(config.hidden_size, self.num_labels, weight_init=self.weight_init,
                                 has_bias=True).to_float(config.compute_type)
-        self.dropout = nn.Dropout(1 - dropout_prob)
+        self.dropout = nn.Dropout(p=dropout_prob)
         self.assessment_method = assessment_method
 
     def construct(self, input_ids, input_mask, token_type_id):

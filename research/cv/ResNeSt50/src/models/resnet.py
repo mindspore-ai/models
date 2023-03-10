@@ -21,22 +21,25 @@ from mindspore.train.serialization import load_param_into_net
 from src.models.splat import SplAtConv2d
 from src.models.utils import Resume
 
+
 class GlobalAvgPool2d(nn.Cell):
     """Global average pooling layer"""
     def __init__(self, input_size):
         """Global average pooling over the input's spatial dimensions"""
         super(GlobalAvgPool2d, self).__init__()
-        self.AvgPool2d = nn.AvgPool2d(input_size, stride=1)
+        self.avgpool = nn.AvgPool2d(input_size, stride=1)
         self.reshape = P.Reshape()
 
     def construct(self, x):
-        output = self.AvgPool2d(x)
+        output = self.avgpool(x)
         output = self.reshape(output, ((x.shape)[0], -1))
         return output
+
 
 class Bottleneck(nn.Cell):
     """ResNet Bottleneck"""
     expansion = 4
+
     def __init__(self, inplanes, planes, stride=1, downsample=None,
                  radix=0, cardinality=1, bottleneck_width=64,
                  avd=False, avd_first=False, dilation=1, is_first=None,
@@ -105,6 +108,7 @@ class Bottleneck(nn.Cell):
         out = self.relu(out)
 
         return out
+
 
 class ResNet(nn.Cell):
     """
@@ -189,7 +193,7 @@ class ResNet(nn.Cell):
                                            norm_layer=norm_layer)
             self.layer4 = self._make_layer(block, 512, layers[3], stride=2,
                                            norm_layer=norm_layer)
-        self.drop = nn.Dropout(final_drop) if final_drop > 0.0 else None
+        self.drop = nn.Dropout(p=1 - final_drop) if final_drop > 0.0 else None
         self.fc = nn.Dense(512 * block.expansion, num_classes)
         self.out_channels = 512 * block.expansion
 
@@ -200,6 +204,29 @@ class ResNet(nn.Cell):
             elif isinstance(m, (norm_layer, nn.BatchNorm2d)):
                 m.weight.data.fill_(1)
                 m.bias.data.zero_()
+
+    def construct(self, x):
+        """ResNeSt construct"""
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.pad(x)
+        x = self.maxpool(x)
+
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+
+        avgpool = GlobalAvgPool2d(x.shape[-2])
+        x = avgpool(x)
+        flatten = P.Flatten()
+        x = flatten(x)
+        if self.drop:
+            x = self.drop(x)
+        x = self.fc(x)
+
+        return x
 
     def _make_layer(self, block, planes, blocks, stride=1, dilation=1,
                     norm_layer=None, is_first=True):
@@ -253,28 +280,6 @@ class ResNet(nn.Cell):
 
         return nn.SequentialCell(*layers)
 
-    def construct(self, x):
-        """ResNeSt construct"""
-        x = self.conv1(x)
-        x = self.bn1(x)
-        x = self.relu(x)
-        x = self.pad(x)
-        x = self.maxpool(x)
-
-        x = self.layer1(x)
-        x = self.layer2(x)
-        x = self.layer3(x)
-        x = self.layer4(x)
-
-        avgpool = GlobalAvgPool2d(x.shape[-2])
-        x = avgpool(x)
-        flatten = P.Flatten()
-        x = flatten(x)
-        if self.drop:
-            x = self.drop(x)
-        x = self.fc(x)
-
-        return x
 
 def resnet50(pretrained=False, root='~/.encoding/models', **kwargs):
     """
@@ -288,6 +293,7 @@ def resnet50(pretrained=False, root='~/.encoding/models', **kwargs):
         load_param_into_net(model, param)
     return model
 
+
 def resnet101(pretrained=False, root='~/.encoding/models', **kwargs):
     """
     Construct a ResNet-101 model
@@ -299,6 +305,7 @@ def resnet101(pretrained=False, root='~/.encoding/models', **kwargs):
         param = Resume(model, root)
         load_param_into_net(model, param)
     return model
+
 
 def resnet152(pretrained=False, root='~/.encoding/models', **kwargs):
     """

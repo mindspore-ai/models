@@ -41,7 +41,7 @@ class ResidualConnection(nn.Cell):
 
     def __init__(self, dropout_prob=0.0):
         super(ResidualConnection, self).__init__()
-        self.add = P.TensorAdd()
+        self.add = P.Add()
 
     def construct(self, hidden_tensor, input_tensor):
         # hidden_tensor is the output of sublayer
@@ -93,10 +93,10 @@ class LayerNorm(nn.Cell):
         self.square = P.Square().shard(((config.dp, 1),))
         self.sqrt = P.Sqrt().shard(((config.dp, 1),))
         self.sub1 = P.Sub().shard(((config.dp, 1), (config.dp, 1)))
-        self.add = P.TensorAdd().shard(((config.dp, 1), ()))
+        self.add = P.Add().shard(((config.dp, 1), ()))
         self.eps = epsilon
         self.mul = P.Mul().shard(((config.dp, 1), (1,)))
-        self.add2 = P.TensorAdd().shard(((config.dp, 1), (1,)))
+        self.add2 = P.Add().shard(((config.dp, 1), (1,)))
         self.real_div = P.RealDiv().shard(((config.dp, 1), (config.dp, 1)))
 
     def construct(self, x):
@@ -203,7 +203,7 @@ class Dropout(nn.Cell):
         self.dropout_do_mask = P.DropoutDoMask()
         self.cast = P.Cast()
         self.is_ascend = context.get_context('device_target') in ["Ascend"]
-        self.dropout = P.Dropout(keep_prob)
+        self.dropout = P.Dropout(p=1 - keep_prob)
 
     def construct(self, x):
         r"""

@@ -30,7 +30,7 @@ class RPP(nn.Cell):
         self.num_classes = num_classes
         resnet = resnet50(1000)
         self.base = resnet
-        self.dropout = nn.Dropout(keep_prob=0.5)
+        self.dropout = nn.Dropout(p=0.5)
         self.avg_pool3d = ops.AvgPool3D(kernel_size=(8, 1, 1), strides=(8, 1, 1), pad_mode="valid")
         self.local_mask = nn.Conv2d(256, 6, kernel_size=1, pad_mode="valid", \
 has_bias=True, weight_init=HeNormal(mode="fan_out"), bias_init=Constant(0))

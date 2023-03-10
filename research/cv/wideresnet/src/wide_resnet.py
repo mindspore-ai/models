@@ -33,7 +33,7 @@ class WideBasic(nn.Cell):
                                stride=stride,
                                has_bias=True)
         self.bn2 = nn.BatchNorm2d(out_channels)
-        self.dropout = nn.Dropout(keep_prob=0.7)
+        self.dropout = nn.Dropout(p=0.3)
         self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, has_bias=True)
 
         self.shortcut = nn.SequentialCell()

@@ -44,8 +44,8 @@ class RelMultiHeadAttn(nn.Cell):
 
         self.qkv_net = nn.Dense(d_model, 3 * n_head * d_head, has_bias=False)
 
-        self.drop = nn.Dropout(1 - dropout, dtype=ms.float32)
-        self.dropatt = nn.Dropout(1 - dropout, dtype=ms.float32)
+        self.drop = nn.Dropout(p=dropout)
+        self.dropatt = nn.Dropout(p=dropout)
 
         self.o_net = nn.Dense(n_head * d_head, d_model, has_bias=False)
 

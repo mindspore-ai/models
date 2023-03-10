@@ -14,7 +14,8 @@
 # ============================================================================
 """
 ZFNet
-Original paper: 'Visualizing and Understanding Convolutional Networks,' https://arxiv.org/abs/1311.2901.
+Original paper: 'Visualizing and Understanding Convolutional Networks,' https://arxiv.org/abs/1311.2901
+
 input size should be : (3 x 224 x 224)
 """
 import mindspore.nn as nn
@@ -68,7 +69,7 @@ class SppNet(nn.Cell):
         if phase == 'test':
             dropout_ratio = 1.0
 
-        self.dropout = nn.Dropout(dropout_ratio)
+        self.dropout = nn.Dropout(p=1 - dropout_ratio)
 
     def construct(self, x):
         """

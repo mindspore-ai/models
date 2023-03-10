@@ -39,7 +39,7 @@ class MultiHeadAttention(nn.Cell):
 
         self.fc = nn.Dense(n_head * d_v, d_model)
 
-        self.dropout = nn.Dropout(dropout)
+        self.dropout = nn.Dropout(p=1 - dropout)
 
         self.transpose = ops.Transpose()
 
@@ -100,7 +100,7 @@ class PositionwiseFeedForward(nn.Cell):
         )
 
         self.layer_norm = nn.LayerNorm((d_in,))
-        self.dropout = nn.Dropout(dropout)
+        self.dropout = nn.Dropout(p=1 - dropout)
         self.relu = ops.ReLU()
         self.transpose = ops.Transpose()
 

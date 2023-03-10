@@ -38,7 +38,7 @@ class _DenseLayer(nn.Cell):
                       kernel_size=3, stride=1, padding=1, pad_mode='pad', bias_init=False)
         ]
         self.cells_list = nn.SequentialCell(cell_list)
-        self.dropout = nn.Dropout(1 - drop_rate)
+        self.dropout = nn.Dropout(p=drop_rate)
 
     def construct(self, x):
         """DenseLayer construct"""

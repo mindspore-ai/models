@@ -21,6 +21,7 @@ from mindspore.nn import Embedding
 from module import LightSE
 import model_config as cfg
 
+
 class IntTower(nn.Cell):
     """
     IntTower Model Structure
@@ -37,8 +38,8 @@ class IntTower(nn.Cell):
 
         self.item_embedding_dim = cfg.item_embedding_dim
         self.sparse_embedding_dim = cfg.sparse_embedding_dim
-        self.dropout = nn.Dropout(cfg.keep_rate)
-        self.User_SE = LightSE(cfg.user_sparse_field)
+        self.dropout = nn.Dropout(p=1 - cfg.keep_rate)
+        self.user_se = LightSE(cfg.user_sparse_field)
         self.user_fe_embedding = None
         self.item_fe_embedding = None
 
@@ -113,7 +114,7 @@ class IntTower(nn.Cell):
         item_dense_list.append(item_mean_rating)
 
         user_sparse_embedding = concat(user_list, axis=1)
-        user_sparse_embedding = self.User_SE(user_sparse_embedding)
+        user_sparse_embedding = self.user_se(user_sparse_embedding)
 
         user_sparse_input = ops.flatten(user_sparse_embedding)
 

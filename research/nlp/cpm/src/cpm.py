@@ -59,7 +59,7 @@ class MLPLayer(nn.Cell):
         self.residual_connect = ResidualConnection()
         self.residual_connect.add.shard(((config.dp, 1), (config.dp, 1))).add_prim_attr("recompute", False)
         self.gelu = P.Gelu().shard(((config.dp, config.mp),))
-        self.dropout = Dropout(1 - dropout_prob)
+        self.dropout = Dropout(p=dropout_prob)
         self.dropout.dropout_gen_mask.shard(((config.dp, 1),))
         self.dropout.dropout_do_mask.shard(((config.dp, 1),))
 
@@ -329,13 +329,13 @@ class CPMModel(nn.Cell):
                                           hidden_dropout=self.hidden_dropout,
                                           is_training=self.is_training,
                                           compute_type=self.compute_type)
-        self.dropout = Dropout(1 - self.hidden_dropout)
+        self.dropout = Dropout(p=self.hidden_dropout)
         self.dropout.dropout_gen_mask.shard(((config.dp, 1, 1),))
         self.dropout.dropout_do_mask.shard(((config.dp, 1, 1),))
 
         self.matmul = P.MatMul(transpose_b=True).shard(((config.dp, 1), (1, 1)))
         self.reshape = P.Reshape()
-        self.add = P.TensorAdd().shard(((config.dp, 1, config.mp), (config.dp, 1, config.mp)))
+        self.add = P.Add().shard(((config.dp, 1, config.mp), (config.dp, 1, config.mp)))
         self.cast = P.Cast()
         self.out_shape = (-1, self.seq_length, self.vocab_size)
 

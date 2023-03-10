@@ -33,9 +33,9 @@ class BasicBlock(nn.Cell):
         self.conv2 = _conv3x3(out_planes, out_planes, stride=1, bias=False)
         self.droprate = dropRate
         self.equalInOut = (in_planes == out_planes)
-        self.convShortcut = (_conv1x1(in_planes, out_planes, stride=stride, bias=False)
+        self.conv_shortcut = (_conv1x1(in_planes, out_planes, stride=stride, bias=False)
                              if not self.equalInOut else None)
-        self.dropout = nn.Dropout(1-self.droprate)
+        self.dropout = nn.Dropout(p=self.droprate)
         self.add = ops.Add()
 
     def construct(self, x):
@@ -47,7 +47,7 @@ class BasicBlock(nn.Cell):
         if self.droprate > 0:
             out = self.dropout(out)
         out = self.conv2(out)
-        return self.add(x if self.equalInOut else self.convShortcut(x), out)
+        return self.add(x if self.equalInOut else self.conv_shortcut(x), out)
 
 
 class NetworkBlock(nn.Cell):

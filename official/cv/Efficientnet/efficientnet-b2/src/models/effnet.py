@@ -114,7 +114,7 @@ class EfficientNet(nn.Cell):
         self.head = nn.SequentialCell([
             *conv_bn_act(renew_ch(320), renew_ch(1280), kernel_size=1, bias=False),
             AdaptiveAvgPool2d(),
-            nn.Dropout(dropout_rate),
+            nn.Dropout(p=1 - dropout_rate),
             Flatten(),
             nn.Dense(renew_ch(1280), num_classes)
         ])

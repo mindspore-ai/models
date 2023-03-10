@@ -12,6 +12,8 @@
 # limitations under the License.
 # ============================================================================
 from mindspore import ops, nn
+
+
 class DownsamplerBlock(nn.Cell):
     def __init__(self, in_feature_num, out_feature_num, weight_init):
         super(DownsamplerBlock, self).__init__()
@@ -31,9 +33,10 @@ class DownsamplerBlock(nn.Cell):
         output = self.relu(output)
         return output
 
-class non_bottleneck_1d(nn.Cell):
+
+class NonBottleneck1d(nn.Cell):
     def __init__(self, chann, dropprob, dilated, weight_init):
-        super(non_bottleneck_1d, self).__init__()
+        super(NonBottleneck1d, self).__init__()
         self.dropprob = dropprob
         self.conv3x1_1 = nn.Conv2d(chann, chann, (3, 1), stride=1, \
             padding=(1, 1, 0, 0), pad_mode='pad', has_bias=True, \
@@ -51,7 +54,7 @@ class non_bottleneck_1d(nn.Cell):
         self.bn1 = nn.BatchNorm2d(chann, eps=1e-03)
         self.bn2 = nn.BatchNorm2d(chann, eps=1e-03)
         if dropprob > 0:
-            self.dropout = ops.Dropout(keep_prob=1-dropprob)
+            self.dropout = ops.Dropout(p=dropprob)
         self.relu = nn.ReLU()
         self.dilated = dilated
 
@@ -70,6 +73,7 @@ class non_bottleneck_1d(nn.Cell):
             output, _ = self.dropout(output)
         return self.relu(output + x)
 
+
 class Encoder(nn.Cell):
     def __init__(self, weight_init, run_distribute, train=True):
         super(Encoder, self).__init__()
@@ -85,23 +89,23 @@ class Encoder(nn.Cell):
         self.down1 = DownsamplerBlock(3, 16, weight_init)
         self.down2 = DownsamplerBlock(16, 64, weight_init)
 
-        self.bottleneck1 = non_bottleneck_1d(64, drop_prob[0], 1, weight_init)
-        self.bottleneck2 = non_bottleneck_1d(64, drop_prob[0], 1, weight_init)
-        self.bottleneck3 = non_bottleneck_1d(64, drop_prob[0], 1, weight_init)
-        self.bottleneck4 = non_bottleneck_1d(64, drop_prob[0], 1, weight_init)
-        self.bottleneck5 = non_bottleneck_1d(64, drop_prob[0], 1, weight_init)
+        self.bottleneck1 = NonBottleneck1d(64, drop_prob[0], 1, weight_init)
+        self.bottleneck2 = NonBottleneck1d(64, drop_prob[0], 1, weight_init)
+        self.bottleneck3 = NonBottleneck1d(64, drop_prob[0], 1, weight_init)
+        self.bottleneck4 = NonBottleneck1d(64, drop_prob[0], 1, weight_init)
+        self.bottleneck5 = NonBottleneck1d(64, drop_prob[0], 1, weight_init)
 
         self.down3 = DownsamplerBlock(64, 128, weight_init)
 
-        self.bottleneck6 = non_bottleneck_1d(128, drop_prob[1], 2, weight_init)
-        self.bottleneck7 = non_bottleneck_1d(128, drop_prob[1], 4, weight_init)
-        self.bottleneck8 = non_bottleneck_1d(128, drop_prob[1], 8, weight_init)
-        self.bottleneck9 = non_bottleneck_1d(128, drop_prob[1], 16, weight_init)
+        self.bottleneck6 = NonBottleneck1d(128, drop_prob[1], 2, weight_init)
+        self.bottleneck7 = NonBottleneck1d(128, drop_prob[1], 4, weight_init)
+        self.bottleneck8 = NonBottleneck1d(128, drop_prob[1], 8, weight_init)
+        self.bottleneck9 = NonBottleneck1d(128, drop_prob[1], 16, weight_init)
 
-        self.bottleneck10 = non_bottleneck_1d(128, drop_prob[1], 2, weight_init)
-        self.bottleneck11 = non_bottleneck_1d(128, drop_prob[1], 4, weight_init)
-        self.bottleneck12 = non_bottleneck_1d(128, drop_prob[1], 8, weight_init)
-        self.bottleneck13 = non_bottleneck_1d(128, drop_prob[1], 16, weight_init)
+        self.bottleneck10 = NonBottleneck1d(128, drop_prob[1], 2, weight_init)
+        self.bottleneck11 = NonBottleneck1d(128, drop_prob[1], 4, weight_init)
+        self.bottleneck12 = NonBottleneck1d(128, drop_prob[1], 8, weight_init)
+        self.bottleneck13 = NonBottleneck1d(128, drop_prob[1], 16, weight_init)
 
     def construct(self, x):
         x = self.down1(x)
@@ -138,17 +142,18 @@ class UpsamplerBlock(nn.Cell):
         x = self.relu(x)
         return  x
 
+
 class Decoder(nn.Cell):
     def __init__(self, num_classes, weight_init):
         super(Decoder, self).__init__()
 
         self.up1 = UpsamplerBlock(128, 64, weight_init)
-        self.bottleneck1 = non_bottleneck_1d(64, 0, 1, weight_init)
-        self.bottleneck2 = non_bottleneck_1d(64, 0, 1, weight_init)
+        self.bottleneck1 = NonBottleneck1d(64, 0, 1, weight_init)
+        self.bottleneck2 = NonBottleneck1d(64, 0, 1, weight_init)
 
         self.up2 = UpsamplerBlock(64, 16, weight_init)
-        self.bottleneck3 = non_bottleneck_1d(16, 0, 1, weight_init)
-        self.bottleneck4 = non_bottleneck_1d(16, 0, 1, weight_init)
+        self.bottleneck3 = NonBottleneck1d(16, 0, 1, weight_init)
+        self.bottleneck4 = NonBottleneck1d(16, 0, 1, weight_init)
 
         self.pred = nn.Conv2dTranspose(16, num_classes, 2, stride=2, has_bias=True, \
                            weight_init=weight_init)
@@ -165,22 +170,26 @@ class Decoder(nn.Cell):
         x = self.pred(x)
         return x
 
+
 class Encoder_pred(nn.Cell):
     def __init__(self, num_class, weight_init, run_distribute, train=True):
         super(Encoder_pred, self).__init__()
         self.encoder = Encoder(weight_init, run_distribute, train)
-        self.pred = nn.Conv2d(128, num_class, 1, stride=1, pad_mode='valid', \
-                                  has_bias=True, weight_init=weight_init)
+        self.pred = nn.Conv2d(128, num_class, 1, stride=1, pad_mode='valid',
+                              has_bias=True, weight_init=weight_init)
+
     def construct(self, x):
         x = self.encoder(x)
         x = self.pred(x)
         return x
+
 
 class ERFNet(nn.Cell):
     def __init__(self, num_class, init_conv, run_distribute, train=True):
         super(ERFNet, self).__init__()
         self.encoder = Encoder(init_conv, run_distribute, train)
         self.decoder = Decoder(num_class, init_conv)
+
     def construct(self, x):
         x1 = self.encoder(x)
         x2 = self.decoder(x1)

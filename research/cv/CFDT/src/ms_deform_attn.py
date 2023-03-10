@@ -118,9 +118,9 @@ class Attention(nn.Cell):
         self.q = nn.Dense(in_channels=dim, out_channels=dim, has_bias=qkv_bias)
         self.kv = nn.Dense(
             in_channels=dim, out_channels=dim * 2, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(keep_prob=1.0 - attn_drop)
+        self.attn_drop = nn.Dropout(p=attn_drop)
         self.proj = nn.Dense(in_channels=dim, out_channels=dim)
-        self.proj_drop = nn.Dropout(keep_prob=1.0 - proj_drop)
+        self.proj_drop = nn.Dropout(p=proj_drop)
         self.norm1 = nn.LayerNorm(normalized_shape=[self.dim], epsilon=1e-05)
         self.norm2 = nn.LayerNorm(normalized_shape=[self.dim], epsilon=1e-05)
 

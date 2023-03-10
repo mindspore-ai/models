@@ -302,7 +302,7 @@ class ECONet(nn.Cell):
             self.base_model.dense1 = nn.Dense(feature_dim, num_class)
             self.new_fc = None
         else:
-            self.base_model.dense1 = nn.Dropout(keep_prob=self.dropout)
+            self.base_model.dense1 = nn.Dropout(p=1 - self.dropout)
 
             self.new_fc = nn.Dense(feature_dim, num_class)
 

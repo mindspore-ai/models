@@ -85,7 +85,7 @@ class Mlp(nn.Cell):
             nn.Conv2d(hidden_features, out_features, 1, 1, has_bias=True),
             nn.BatchNorm2d(out_features),
         ])
-        self.drop = nn.Dropout(1. - drop)
+        self.drop = nn.Dropout(p=drop)
 
     def construct(self, x, H, W):
         B, _, C = x.shape
@@ -113,9 +113,9 @@ class Attention(nn.Cell):
         self.q = nn.Dense(dim, self.qk_dim, has_bias=qkv_bias)
         self.k = nn.Dense(dim, self.qk_dim, has_bias=qkv_bias)
         self.v = nn.Dense(dim, dim, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(1. - attn_drop)
+        self.attn_drop = nn.Dropout(p=attn_drop)
         self.proj = nn.Dense(dim, dim)
-        self.proj_drop = nn.Dropout(1. - proj_drop)
+        self.proj_drop = nn.Dropout(p=proj_drop)
 
         self.sr_ratio = sr_ratio
         # Exactly same as PVTv1
@@ -316,7 +316,7 @@ class CMT(nn.Cell):
         self._fc = nn.Conv2d(
             embed_dims[-1], fc_dim, kernel_size=1, has_bias=True)
         self._bn = nn.BatchNorm2d(fc_dim)
-        self._drop = nn.Dropout(1. - dp)
+        self._drop = nn.Dropout(p=dp)
         self.head = nn.Dense(
             fc_dim, num_classes) if num_classes > 0 else ops.Identity()
 

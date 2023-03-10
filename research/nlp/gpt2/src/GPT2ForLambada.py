@@ -46,7 +46,7 @@ class GPT2LambadaModel(nn.Cell):
         self.dense1 = nn.Dense(config.d_model,
                                config.vocab_size,
                                weight_init=TruncatedNormal(config.initializer_range)).to_float(mstype.float16)
-        self.dropout = nn.Dropout(1 - config.hidden_dropout)
+        self.dropout = nn.Dropout(p=config.hidden_dropout)
 
     def construct(self, input_ids, input_mask):
         """

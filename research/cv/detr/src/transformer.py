@@ -171,9 +171,9 @@ class TransformerEncoderLayer(nn.Cell):
         self.norm1 = nn.LayerNorm([d_model], epsilon=1e-5)
         self.norm2 = nn.LayerNorm([d_model], epsilon=1e-5)
         self.activation = _get_activation_fn(activation)
-        self.drop0 = nn.Dropout(1 - dropout)
-        self.drop1 = nn.Dropout(1 - dropout)
-        self.drop2 = nn.Dropout(1 - dropout)
+        self.drop0 = nn.Dropout(p=dropout)
+        self.drop1 = nn.Dropout(p=dropout)
+        self.drop2 = nn.Dropout(p=dropout)
 
     def construct(self, src, src_key_padding_mask=None, pos=None):
         """construct"""
@@ -209,10 +209,10 @@ class TransformerDecoderLayer(nn.Cell):
         self.norm1 = nn.LayerNorm([d_model], epsilon=1e-5)
         self.norm2 = nn.LayerNorm([d_model], epsilon=1e-5)
         self.norm3 = nn.LayerNorm([d_model], epsilon=1e-5)
-        self.drop0 = nn.Dropout(1 - dropout)
-        self.drop1 = nn.Dropout(1 - dropout)
-        self.drop2 = nn.Dropout(1 - dropout)
-        self.drop3 = nn.Dropout(1 - dropout)
+        self.drop0 = nn.Dropout(p=dropout)
+        self.drop1 = nn.Dropout(p=dropout)
+        self.drop2 = nn.Dropout(p=dropout)
+        self.drop3 = nn.Dropout(p=dropout)
         self.activation = _get_activation_fn(activation)
 
     def construct(self, tgt, memory,
@@ -269,7 +269,7 @@ class MultiheadAttention(nn.Cell):
                                                     mstype.float32))
 
         self.out_proj = nn.Dense(embed_dim, embed_dim, weight_init=KaimingUniform())
-        self.drop = nn.Dropout(1 - dropout)
+        self.drop = nn.Dropout(p=dropout)
 
     def construct(self,
                   query: Tensor,

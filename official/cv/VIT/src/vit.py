@@ -81,7 +81,7 @@ class DropPath(Cell):
 
         self.shape = ops.Shape()
         self.ones = ops.Ones()
-        self.dropout = Dropout(self.keep_prob)
+        self.dropout = Dropout(p=1 - self.keep_prob)
 
     def construct(self, x):
         if self.training:
@@ -139,7 +139,7 @@ def pretrain_head(vit_config):
         normalization,
         dense1,
         activation,
-        Dropout(keep_prob=(1. - dropout_rate)),
+        Dropout(p=dropout_rate),
         dense2])
 
 
@@ -219,7 +219,7 @@ class ViT(Cell):
             self.mean = ops.ReduceMean(keep_dims=False)
         self.pool = pool
 
-        self.dropout = Dropout(keep_prob=(1. - dropout_rate))
+        self.dropout = Dropout(p=dropout_rate)
         self.stem = stem
         self.body = body
         self.head = head
@@ -280,7 +280,7 @@ class Attention(Cell):
 
         self.to_out = Dense(inner_dim, d_model, has_bias=True)
         self.to_out.weight.set_data(initializer(initialization, [inner_dim, d_model]))
-        self.dropout = Dropout(1 - dropout_rate)
+        self.dropout = Dropout(p=dropout_rate)
 
         self.activation = activation
 
@@ -356,7 +356,7 @@ class FeedForward(Cell):
 
         self.ff1 = BatchDense(d_model, hidden_dim, initialization)
         self.activation = activation
-        self.dropout = Dropout(keep_prob=1.-dropout_rate)
+        self.dropout = Dropout(p=dropout_rate)
         self.ff2 = BatchDense(hidden_dim, d_model, initialization)
 
     def construct(self, x):

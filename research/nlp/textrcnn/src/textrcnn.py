@@ -103,7 +103,7 @@ class textrcnn(nn.Cell):
         self.concat1 = P.Concat(1)
         self.text_rep_dense = nn.Dense(2 * self.num_hiddens + self.embed_size, self.num_hiddens)
         self.mydense = nn.Dense(self.num_hiddens, 2)
-        self.drop_out = nn.Dropout(keep_prob=0.7)
+        self.drop_out = nn.Dropout(p=0.3)
         self.tanh = P.Tanh()
         self.sigmoid = P.Sigmoid()
         self.slice = P.Slice()

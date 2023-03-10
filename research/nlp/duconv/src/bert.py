@@ -68,7 +68,7 @@ class ScaledDotProductAttention(nn.Cell):
         self.masked_fill = MaskedFill(-1e9)
 
         if dropout > 0.0:
-            self.dropout = nn.Dropout(1-dropout)
+            self.dropout = nn.Dropout(p=dropout)
         else:
             self.dropout = None
 
@@ -182,7 +182,7 @@ class PoswiseFeedForwardNet(nn.Cell):
         self.fc2 = nn.Dense(d_ff, d_model).to_float(mstype.float16)
         self.activation = activation_map.get(activation, nn.GELU())
         self.layer_norm = nn.LayerNorm((d_model,), epsilon=1e-6).to_float(mstype.float16)
-        self.dropout = nn.Dropout(1-dropout)
+        self.dropout = nn.Dropout(p=dropout)
     def construct(self, inputs):
         residual = inputs
         outputs = self.fc1(inputs)
@@ -202,7 +202,7 @@ class BertEmbeddings(nn.Cell):
         self.pos_embed = nn.Embedding(config.max_position_embeddings, config.hidden_size)
         self.seg_embed = nn.Embedding(config.type_vocab_size, config.hidden_size)
         self.norm = nn.LayerNorm((config.hidden_size,), epsilon=1e-6)
-        self.dropout = nn.Dropout(1-config.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
 
         self.expand_dims = P.ExpandDims()
 

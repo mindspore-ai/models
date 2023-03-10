@@ -56,7 +56,7 @@ class MLP(nn.Cell):
         self.fc2 = nn.Dense(n_hid, n_out)
         self.bn1 = MyBatchNorm1d(n_hid)
         self.bn2 = MyBatchNorm1d(n_out)
-        self.dropout = nn.Dropout(1-do_prob)
+        self.dropout = nn.Dropout(p=do_prob)
         self.elu = nn.ELU()
 
     def construct(self, x: Tensor) -> Tensor:
@@ -91,7 +91,7 @@ class LinAct(nn.Cell):
         self.model = nn.SequentialCell([
             nn.Dense(n_in, n_out),
             act,
-            nn.Dropout(1-do_prob)])
+            nn.Dropout(p=do_prob)])
 
     def construct(self, x: Tensor) -> Tensor:
         return self.model(x)
@@ -161,7 +161,7 @@ class CNN(nn.Cell):
                       bias_init=init.Constant(0.1)),
             nn.ReLU(),
             MyBatchNorm1d(n_hid, dim=1),
-            nn.Dropout(1-do_prob),
+            nn.Dropout(p=do_prob),
             nn.MaxPool1d(kernel_size=2, stride=2),
             nn.Conv1d(n_hid, n_hid, kernel_size=5, pad_mode="valid", has_bias=True,
                       weight_init=init.Normal(math.sqrt(2./(5*n_hid))),

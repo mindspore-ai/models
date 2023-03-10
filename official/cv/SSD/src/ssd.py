@@ -703,10 +703,10 @@ class SSD300VGG16(nn.Cell):
 
         # SSD blocks: block6~7
         self.b6_1 = nn.Conv2d(in_channels=512, out_channels=1024, kernel_size=3, padding=6, dilation=6, pad_mode='pad')
-        self.b6_2 = nn.Dropout(0.5)
+        self.b6_2 = nn.Dropout(p=0.5)
 
         self.b7_1 = nn.Conv2d(in_channels=1024, out_channels=1024, kernel_size=1)
-        self.b7_2 = nn.Dropout(0.5)
+        self.b7_2 = nn.Dropout(p=0.5)
 
         # Extra Feature Layers: block8~11
         self.b8_1 = nn.Conv2d(in_channels=1024, out_channels=256, kernel_size=1, padding=1, pad_mode='pad')

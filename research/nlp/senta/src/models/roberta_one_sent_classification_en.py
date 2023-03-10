@@ -58,9 +58,9 @@ class Model(nn.Cell):
         self.is_training = is_training
         self.bert = BertModel(model_params, is_training)
         if self.is_training:
-            self.dropout = nn.Dropout(keep_prob=0.9, dtype=mindspore.float32)
+            self.dropout = nn.Dropout(p=0.1)
         else:
-            self.dropout = nn.Dropout(keep_prob=1.0, dtype=mindspore.float32)
+            self.dropout = nn.Dropout(p=0.0)
         self.dense = Dense(model_params.hidden_size, 2).to_float(mindspore.float16)
         self.cast = P.Cast()
 

@@ -77,7 +77,7 @@ class Mlp(nn.Cell):
         self.fc1 = nn.Dense(in_features, hidden_features)
         self.act = act_layer()
         self.fc2 = nn.Dense(hidden_features, out_features)
-        self.drop = nn.Dropout(1.0-drop)
+        self.drop = nn.Dropout(p=drop)
 
     def construct(self, x):
         x = self.fc1(x)
@@ -131,10 +131,10 @@ class WindowAttention(nn.Cell):
         self.relative_position_index = relative_position_index
 
         self.qkv = nn.Dense(dim, dim * 3, has_bias=qkv_bias)
-        self.attn_drop = nn.Dropout(1.0-attn_drop)
+        self.attn_drop = nn.Dropout(p=attn_drop)
         self.proj = nn.Dense(dim, dim)
 
-        self.proj_drop = nn.Dropout(1.0-proj_drop)
+        self.proj_drop = nn.Dropout(p=proj_drop)
 
         self.softmax = nn.Softmax(axis=-1)
 
@@ -566,7 +566,7 @@ class HDRTransformer(nn.Cell):
             self.absolute_pos_embed = mindspore.Parameter(ops.Zeros(1, num_patches, embed_dim))
             trunc_normal_(self.absolute_pos_embed, std=.02)
 
-        self.pos_drop = nn.Dropout(keep_prob=1.0-drop_rate)
+        self.pos_drop = nn.Dropout(p=drop_rate)
 
         # stochastic depth
         dpr = [x.asnumpy() for x in ops.LinSpace()(Tensor(0.), Tensor(drop_path_rate), sum(depths))]  # stochastic depth decay rule

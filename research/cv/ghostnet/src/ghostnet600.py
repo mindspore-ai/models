@@ -358,7 +358,7 @@ class GhostNet(nn.Cell):
         self.squeeze = P.Squeeze(axis=(2, 3))
         self.final_drop = final_drop
         if self.final_drop > 0:
-            self.dropout = nn.Dropout(self.final_drop)
+            self.dropout = nn.Dropout(p=1 - self.final_drop)
 
         self.classifier = nn.Dense(
             model_cfgs['cls_ch_expand'], num_classes, has_bias=True)

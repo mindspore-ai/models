@@ -166,7 +166,7 @@ class PointNetInstanceSeg(nn.Cell):
                                  kernel_size=1,
                                  BN=True,
                                  use_activity=True)
-        self.dropout = nn.Dropout(keep_prob=0.5)
+        self.dropout = nn.Dropout(p=0.5)
         self.dconv5 = WarpConv1d(128,
                                  2,
                                  kernel_size=1,

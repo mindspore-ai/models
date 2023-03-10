@@ -134,7 +134,7 @@ class PostNet(nn.Cell):
             ])
         )
         self.tanh = nn.Tanh()
-        self.dropout = nn.Dropout(0.5)
+        self.dropout = nn.Dropout(p=0.5)
 
     # x : (88, 1289, 80)
     def construct(self, x):

@@ -95,7 +95,7 @@ class LSTM(nn.Cell):
             if dropout == 1:
                 self.dropout_op = P.ZerosLike()
             else:
-                self.dropout_op = nn.Dropout(float(1 - dropout))
+                self.dropout_op = nn.Dropout(p=dropout)
             b0 = np.zeros(gate_size, dtype=np.float32)
             self.w_list = []
             self.b_list = []

@@ -92,7 +92,7 @@ class GNMTDecoder(nn.Cell):
                                           num_layers=1,
                                           dropout=config.attention_dropout_prob)
 
-        self.dropout = nn.Dropout(keep_prob=1.0 - config.hidden_dropout_prob)
+        self.dropout = nn.Dropout(p=config.hidden_dropout_prob)
 
         self.classifier = nn.Dense(config.hidden_size,
                                    config.vocab_size,

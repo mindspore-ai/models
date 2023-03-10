@@ -74,7 +74,7 @@ class Vit(MAEModule):
                                       in_features=channels, out_features=encoder_dim)
         if dropout:
             self.is_dropout = True
-            self.dropout = nn.Dropout(keep_prob=(1. - dropout))
+            self.dropout = nn.Dropout(p=dropout)
         self.encoder_input_mask = Tensor(np.ones((batch_size, seq_length, seq_length)),
                                          mstype.float32)
 
