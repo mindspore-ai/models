@@ -86,7 +86,7 @@ def load_pretrained(network, backbone_names, other_names, ckpt_url):
         ckpt_url (str): Path to pretrained backbone checkpoint.
     """
     model_inited_params = dict(network.parameters_and_names())
-    mobilenet_params = load_checkpoint(ckpt_url, filter_prefix=['moments', 'head'])
+    mobilenet_params = load_checkpoint(ckpt_url, choice_func=lambda x: not x.startswith(('moments', 'head')))
     mobilenet_names = list(mobilenet_params.keys())[:-3]
     clear_names = []
     for name in mobilenet_names:

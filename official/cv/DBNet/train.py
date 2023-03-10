@@ -67,7 +67,8 @@ def train():
         config.logger.info("load pretrained checkpoint: %s", config.train.pretrained_ckpt)
 
     if config.train.resume_ckpt:
-        resume_param = ms.load_checkpoint(config.train.resume_ckpt, filter_prefix=['learning_rate', 'global_step'])
+        resume_param = ms.load_checkpoint(config.train.resume_ckpt,
+                                          choice_func=lambda x: not x.startswith(('learning_rate', 'global_step')))
         config.train.start_epoch_num = int(resume_param.get('epoch_num', ms.Tensor(0, ms.int32)).asnumpy().item())
 
     lr = ms.Tensor(warmup_polydecay(base_lr=config.optimizer.lr.base_lr,

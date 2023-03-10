@@ -53,10 +53,12 @@ def apply_eval(eval_param):
 def modelarts_pre_process():
     pass
 
+
 def set_default():
     config.rank_id = int(os.getenv('RANK_ID', '0'))
     config.log_dir = os.path.join(config.output_dir, 'log', 'rank_%s' % config.rank_id)
     config.save_ckpt_dir = os.path.join(config.output_dir, 'ckpt')
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train():
@@ -93,7 +95,8 @@ def train():
         rank = 0
 
     if config.resume_ckpt:
-        resume_param = load_checkpoint(config.resume_ckpt, filter_prefix=['learning_rate', 'global_step'])
+        resume_param = load_checkpoint(config.resume_ckpt,
+                                       choice_func=lambda x: not x.startswith(('learning_rate', 'global_step')))
         config.train_start_epoch = int(resume_param.get('epoch_num', 0).asnumpy().item())
         config.logger.info("train_start_epoch: %d", config.train_start_epoch)
     max_text_length = config.max_text_length

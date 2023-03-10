@@ -97,7 +97,7 @@ if __name__ == '__main__':
         model_filename = args.ckpt_path
         print(model_filename)
         load_checkpoint(net=net, ckpt_file_name=model_filename,
-                        filter_prefix=['mems', 'valid_mems', 'empty_valid_mems'])
+                        choice_func=lambda x: not x.startswith(('mems', 'valid_mems', 'empty_valid_mems')))
 
         test_loss = doEval(net, test_dataset, config.tgt_len, config.ext_len, config.mem_len, config.eval_tgt_len)
 

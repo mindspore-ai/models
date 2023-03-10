@@ -39,6 +39,7 @@ from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id
 
+
 class TrainOneStepCellCPU(nn.Cell):
     """
     Network training package class.
@@ -145,7 +146,7 @@ def load_ckpt_to_network(net):
                               "rcnn.reg_scores.bias", "accum.rcnn.cls_scores.weight", "accum.rcnn.cls_scores.bias",
                               "accum.rcnn.reg_scores.weight", "accum.rcnn.reg_scores.bias"
                               ]
-            param_dict = ms.load_checkpoint(load_path, filter_prefix=param_not_load)
+            param_dict = ms.load_checkpoint(load_path, choice_func=lambda x: not x.startswith(tuple(param_not_load)))
             for key, val in param_dict.items():
                 # Correct previous misspellings
                 key = key.replace("ncek", "neck")

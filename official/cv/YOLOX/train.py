@@ -235,7 +235,9 @@ def set_resume_config(cfg):
     if not os.path.isfile(cfg.resume_yolox):
         raise TypeError('resume_yolox should be checkpoint path')
     resume_param = load_checkpoint(cfg.resume_yolox,
-                                   filter_prefix=['learning_rate', 'global_step', 'best_result', 'best_epoch'])
+                                   choice_func=lambda x: not x.startswith(
+                                       ('learning_rate', 'global_step', 'best_result',
+                                        'best_epoch')))
     ckpt_name = os.path.basename(cfg.resume_yolox)
     resume_epoch = ckpt_name.split('-')[1].split('_')[0]
     cfg.start_epoch = int(resume_epoch)
