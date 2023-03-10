@@ -133,7 +133,7 @@ def set_parameter():
     # init context
     if config.mode_name == 'GRAPH':
         if target == "Ascend":
-            rank_save_graphs_path = os.path.join(config.save_graphs_path, "soma", str(os.getenv('DEVICE_ID')))
+            rank_save_graphs_path = os.path.join(config.save_graphs_path, "soma", str(os.getenv('DEVICE_ID', '0')))
             ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=config.save_graphs,
                            save_graphs_path=rank_save_graphs_path)
         else:
@@ -146,7 +146,7 @@ def set_parameter():
         ms.set_ps_context(enable_ps=True)
     if config.run_distribute:
         if target == "Ascend":
-            device_id = int(os.getenv('DEVICE_ID'))
+            device_id = int(os.getenv('DEVICE_ID', '0'))
             ms.set_context(device_id=device_id)
             ms.set_auto_parallel_context(device_num=config.device_num, parallel_mode=ms.ParallelMode.DATA_PARALLEL,
                                          gradients_mean=True)

@@ -13,6 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """Calculate cpp infer result."""
+
 from src.model_utils.config import config
 from src.utils.eval_utils import Evaluate310
 
@@ -26,6 +27,7 @@ def main():
           f"Fmeasure: {metrics['fmeasure'].avg}\n")
 
     print("finished")
+
 
 if __name__ == '__main__':
     main()

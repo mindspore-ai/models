@@ -45,7 +45,7 @@ class RandomCropData:
     """Random crop class, include many crop relevant functions."""
 
     def __init__(self, max_tries=10, min_crop_side_ratio=0.1, crop_size=(640, 640)):
-        self.size = crop_size
+        self.size = [crop_size[1], crop_size[0]]
         self.min_crop_side_ratio = min_crop_side_ratio
         self.max_tries = max_tries
 
@@ -197,8 +197,8 @@ class RandomCropData:
 
 
 class RandomAugment:
-    def __init__(self, max_tries=10, min_crop_side_ratio=0.1):
-        self.random_crop_data = RandomCropData(max_tries, min_crop_side_ratio)
+    def __init__(self, max_tries=10, min_crop_side_ratio=0.1, crop_size=(640, 640)):
+        self.random_crop_data = RandomCropData(max_tries, min_crop_side_ratio, crop_size=crop_size)
 
     def augment_poly(self, aug, img_shape, poly):
         keypoints = [imgaug.Keypoint(p[0], p[1]) for p in poly]

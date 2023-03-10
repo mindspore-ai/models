@@ -165,7 +165,7 @@ def init_context(target):
         ms.set_ps_context(enable_ps=True)
     if args_opt.run_distribute:
         if target == "Ascend":
-            device_id = int(os.getenv('DEVICE_ID'))
+            device_id = int(os.getenv('DEVICE_ID', '0'))
             ms.set_context(device_id=device_id)
             ms.set_auto_parallel_context(
                 device_num=args_opt.device_num,

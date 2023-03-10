@@ -49,11 +49,10 @@ fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=0
 export RANK_SIZE=$DEVICE_NUM
 export RANK_ID=0
 
-echo "start evaluation for device $DEVICE_ID"
+echo "start evaluation"
 
 python eval_onnx.py \
     --net_name=$NETWORK \

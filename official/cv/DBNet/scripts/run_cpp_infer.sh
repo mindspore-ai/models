@@ -22,6 +22,7 @@ exit 1
 fi
 
 BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
+export PYTHONPATH=${BASE_PATH}/../:$PYTHONPATH
 
 get_real_path(){
     if [ "${1:0:1}" == "/" ]; then
