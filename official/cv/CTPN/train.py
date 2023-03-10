@@ -41,8 +41,7 @@ from src.model_utils.device_adapter import get_device_id
 set_seed(1)
 
 
-context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, \
-    device_id=get_device_id(), save_graphs=True)
+context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
 
 # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
 if context.get_context("mode") == context.PYNATIVE_MODE:
