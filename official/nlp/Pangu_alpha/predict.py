@@ -132,7 +132,7 @@ def load_model(args_opt):
     pangu_alpha = PanguAlphaModel(config)
     if args_opt.eval_task:
         from src.pangu_alpha import PanGUAlphaLossWithPrompt
-        from mindformers.common import CrossEntropyLoss
+        from mindformers import CrossEntropyLoss
         loss = CrossEntropyLoss()
         eval_net = PanGUAlphaLossWithPrompt(config, pangu_alpha, loss)
     else:
