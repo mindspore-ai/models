@@ -27,7 +27,7 @@ class DiscriminatorLoss(nn.Cell):
         super(DiscriminatorLoss, self).__init__()
         self.discriminator = discriminator
         self.generator = generator
-        self.adversarial_criterion = nn.BCELoss()
+        self.adversarial_criterion = nn.BCELoss(reduction="none")
         ones = ops.Ones()
         zeros = ops.Zeros()
         self.real_lable = ones((16, 1), mstype.float32)
@@ -55,7 +55,7 @@ class GeneratorLoss(nn.Cell):
         self.discriminator = discriminator
         self.generator = generator
         self.mse_loss = nn.MSELoss()
-        self.adversarial_criterion = nn.BCELoss()
+        self.adversarial_criterion = nn.BCELoss(reduction="none")
         ones = ops.Ones()
         self.real_lable = ones((16, 1), mstype.float32)
         self.meanshif = MeanShift()
