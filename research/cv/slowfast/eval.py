@@ -24,6 +24,8 @@ from src.utils.parser import load_config, parse_args
 from src.utils import logging
 from src.datasets.build import build_dataset
 from src.models.video_model_builder import SlowFast
+
+
 def run_eval():
     """Entrance method."""
     args = parse_args()
@@ -36,7 +38,6 @@ def run_eval():
     # setup context
     device_id = int(os.getenv('DEVICE_ID', '0'))
     context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target=args.device_target)
-    context.set_context(save_graphs=True, save_graphs_path='irs_eval')
     # build dataset
     dataset = build_dataset(cfg, "test")
     # build network

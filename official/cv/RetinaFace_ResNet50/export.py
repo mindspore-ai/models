@@ -24,7 +24,7 @@ from src.config import cfg_res50
 def export_ONNX_model():
     cfg = cfg_res50
 
-    ms.set_context(mode=ms.GRAPH_MODE, device_target=cfg['device'], save_graphs=True)
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=cfg.get('device'))
 
     # build network
     backbone = resnet50(1001)

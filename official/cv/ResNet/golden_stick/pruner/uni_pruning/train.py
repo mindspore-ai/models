@@ -72,8 +72,7 @@ def init_env(args):
         device_num = int(os.getenv('RANK_SIZE'))
         device_id = int(os.getenv('DEVICE_ID'))
         rank = int(os.getenv('RANK_ID'))
-        context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target,
-                            save_graphs=True)
+        context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
         context.set_context(max_call_depth=2000)
         if device_num > 1:
             os.environ['MINDSPORE_HCCL_CONFIG_PATH'] = os.getenv('RANK_TABLE_FILE')
@@ -151,6 +150,7 @@ def init_loss_scale():
         loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
     return loss
 
+
 def load_pretrained_ckpt(net):
     """load checkpoint"""
     if config.pre_trained:
@@ -169,6 +169,7 @@ def load_pretrained_ckpt(net):
             ms.load_param_into_net(net, ckpt)
         else:
             print(f"Invalid pre_trained {config.pre_trained} parameter.")
+
 
 def train_net():
     """train net"""

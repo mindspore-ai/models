@@ -39,6 +39,7 @@ logger.info("Training configuration:\n\v%s\n\v", (cfg.__str__()))
 
 logger.setLevel(cfg.log_level)
 
+
 def run_evaluation(ground_truth_filename, proposal_filename,
                    max_avg_nr_proposals=100,
                    tiou_thresholds=np.linspace(0.5, 0.95, 10),
@@ -56,6 +57,7 @@ def run_evaluation(ground_truth_filename, proposal_filename,
     auc_ = anet_proposal.auc
 
     return (average_nr_proposals, average_recall, recall, auc_)
+
 
 def plot_metric(cfg_, average_nr_proposals, average_recall, recall, tiou_thresholds=np.linspace(0.5, 0.95, 10)):
     import matplotlib.pyplot as plt
@@ -90,10 +92,7 @@ def plot_metric(cfg_, average_nr_proposals, average_recall, recall, tiou_thresho
     plt.savefig(cfg_.postprocessing.save_fig_path)
 
 if __name__ == '__main__':
-    context.set_context(mode=context.GRAPH_MODE, \
-                        device_target=cfg.platform, \
-                        save_graphs=True, \
-                        save_graphs_path=cfg.summary_save_dir)
+    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.platform)
 
     #datasets
     eval_dataset, tem_train_dict = createDataset(cfg, mode='eval')

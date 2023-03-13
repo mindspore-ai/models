@@ -35,6 +35,7 @@ from src.model_utils.device_adapter import get_device_id, get_device_num, get_ra
 
 set_seed(1)
 
+
 class Monitor(Callback):
     """
     Monitor loss and time.
@@ -58,10 +59,11 @@ class Monitor(Callback):
         cb_params = run_context.original_args()
         print("lr:[{:8.6f}]".format(self.lr_init[cb_params.cur_step_num-1]), flush=True)
 
+
 def set_parameter():
     """set_parameter"""
     if config.device_target == "Ascend":
-        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")#  , save_graphs=True, save_graphs_path="./IR"
+        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
         if config.distribute:
             if os.getenv("DEVICE_ID", "not_set").isdigit():
                 context.set_context(device_id=get_device_id())
@@ -79,6 +81,8 @@ def set_parameter():
             context.set_auto_parallel_context(device_num=get_device_num(),
                                               parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
+
+
 def modelarts_pre_process():
     '''modelarts pre process function.'''
     def unzip(zip_file, save_dir):
@@ -129,6 +133,7 @@ def modelarts_pre_process():
             time.sleep(1)
 
         print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def main():

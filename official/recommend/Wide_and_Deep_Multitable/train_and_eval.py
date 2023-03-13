@@ -63,6 +63,7 @@ class ModelBuilder():
     def get_net(self, config):
         return get_WideDeep_net(config)
 
+
 def train_and_eval(config):
     """
     train_and_eval.
@@ -104,6 +105,5 @@ if __name__ == "__main__":
     wide_and_deep_config = WideDeepConfig()
     wide_and_deep_config.argparse_init()
     compute_emb_dim(wide_and_deep_config)
-    context.set_context(mode=context.GRAPH_MODE, device_target="Davinci",
-                        save_graphs=True)
+    context.set_context(mode=context.GRAPH_MODE, device_target="Davinci")
     train_and_eval(wide_and_deep_config)

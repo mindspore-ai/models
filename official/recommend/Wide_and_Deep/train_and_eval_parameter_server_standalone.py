@@ -120,8 +120,9 @@ def train_and_eval(config):
 def modelarts_pre_process():
     cfg.ckpt_path = cfg.output_path
 
-context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target, save_graphs=True)
+context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target)
 cache_enable = cfg.vocab_cache_size > 0
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_wide_and_deep():

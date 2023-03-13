@@ -38,6 +38,7 @@ parser.add_argument("--mode", type=str, default='train')
 parser.add_argument("--device_id", type=int, default=0, help="device id, default: 0.")
 parser.add_argument('--platform', type=str, default='GPU', choices=('Ascend', 'GPU', 'CPU'))
 
+
 def to_image(x):
     x = np.clip(x, -1.0, 1.0)
     x = (x + 1.0) / 2.0
@@ -48,7 +49,7 @@ i = 0
 
 if __name__ == '__main__':
     args = parser.parse_args()
-    context.set_context(mode=context.GRAPH_MODE, device_id=args.device_id, save_graphs=True)
+    context.set_context(mode=context.GRAPH_MODE, device_id=args.device_id)
     test_ds = create_testdataset(1, args.test_LR_path, args.test_GT_path)
     test_data_loader = test_ds.create_dict_iterator()
     generator = Generator(4)
