@@ -29,7 +29,7 @@ Face Detection uses a modified-DarkNet53 network for performing feature extracti
 
 # [Dataset](#contents)
 
-We use about 13K images as training dataset and 3K as evaluating dataset in this example, and you can also use your own datasets or open source datasets (e.g. WiderFace)
+We use about 13K images as training dataset and 3K as evaluating dataset in this example, and you can also use your own datasets or open source datasets (e.g. [WiderFace](http://shuoyang1213.me/WIDERFACE/))
 
 - step 1: The dataset should follow the Pascal VOC data format for object detection. The directory structure is as follows:(Because of the small input shape of network, we remove the face lower than 50*50 at 1080P in evaluating dataset )
 
@@ -47,6 +47,14 @@ We use about 13K images as training dataset and 3K as evaluating dataset in this
           └─ ImageSets
             └─ Main
               └─ train.txt or test.txt
+    ```
+
+    The txt file contains the following contents(The name of the image is stored):
+
+    ```python
+    img1
+    img2
+    ...
     ```
 
 - step 2: Convert the dataset to mindrecord:
