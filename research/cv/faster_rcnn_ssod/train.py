@@ -71,7 +71,8 @@ def train_combine():
     net_student = net_student.set_train(mode=True)
 
     if cfg.pre_trained:
-        param_dict = load_checkpoint(ckpt_file_name=cfg.pre_trained, filter_prefix=cfg.filter_prefix)
+        param_dict = load_checkpoint(ckpt_file_name=cfg.pre_trained,
+                                     choice_func=lambda x: not x.startswith(tuple(cfg.filter_prefix)))
         param_not_load, _ = load_param_into_net(net_student, param_dict, strict_load=True)
         logging.info("load %s to net_student, params not load: %s", cfg.pre_trained, param_not_load)
 

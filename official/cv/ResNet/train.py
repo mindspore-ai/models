@@ -151,7 +151,8 @@ def train_net():
     init_weight(net, config)
 
     if config.resume_ckpt:
-        resume_param = ms.load_checkpoint(config.resume_ckpt, filter_prefix=['learning_rate', 'global_step'])
+        resume_param = ms.load_checkpoint(config.resume_ckpt,
+                                          choice_func=lambda x: not x.startswith(('learning_rate', 'global_step')))
         config.start_epoch = int(resume_param.get('epoch_num', ms.Tensor(0, ms.int32)).asnumpy().item())
 
     lr = ms.Tensor(init_lr(step_size=step_size))

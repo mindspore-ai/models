@@ -19,13 +19,11 @@ import time
 import os
 import numpy as np
 
-
 import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore.common import set_seed
 from mindspore import context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-
 
 from src.dataset import dataset_creator
 from src.osnet import create_osnet
@@ -34,8 +32,8 @@ from model_utils.metrics import distance, rank
 from model_utils.device_adapter import get_device_id, get_device_num
 from model_utils.moxing_adapter import moxing_wrapper
 
-
 set_seed(1)
+
 
 class CustomWithEvalCell(nn.Cell):
     def __init__(self, network):
@@ -49,6 +47,7 @@ class CustomWithEvalCell(nn.Cell):
 
 def modelarts_pre_process():
     '''modelarts pre process function.'''
+
     def unzip(zip_file, save_dir):
         import zipfile
         s_time = time.time()
@@ -121,7 +120,7 @@ def eval_net(net=None):
                                                          mode='gallery')
     if net is None:
         net = create_osnet(num_train_classes)
-        param_dict = load_checkpoint(config.checkpoint_file_path, filter_prefix='epoch_num')
+        param_dict = load_checkpoint(config.checkpoint_file_path, choice_func=lambda x: not x.startswith('epoch_num'))
         load_param_into_net(net, param_dict)
 
     net.set_train(False)
@@ -177,6 +176,7 @@ def eval_net(net=None):
     for r in ranks:
         print('Rank-{:<3}: {:.1%}'.format(r, cmc[i]))
         i += 1
+
 
 if __name__ == '__main__':
     if config.target == 'msmt17' or config.target == 'cuhk03 ':

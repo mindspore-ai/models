@@ -47,7 +47,7 @@ def main(ckpt_url):
     filter_prefix = ['moment1', 'moment2', 'step', 'learning_rate', 'beta1_power', 'beta2_power']
     lstm_old_names = ['RNN.weight0', 'RNN.weight1', 'RNN.weight2', 'RNN.weight3', 'RNN.weight4']
     new_params = model.trainable_params()
-    old_params = load_checkpoint(ckpt_url, filter_prefix=filter_prefix)
+    old_params = load_checkpoint(ckpt_url, choice_func=lambda x: not x.startswith(tuple(filter_prefix)))
     names_and_shapes = {param.name: param.shape for param in new_params}
 
     lstm_weights = {}

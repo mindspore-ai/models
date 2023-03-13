@@ -55,7 +55,8 @@ if __name__ == '__main__':
         args.file_name = args.file_name + '_' + gpu
     else:
         args.file_name = args.file_name + '_' + ascend
-    load_checkpoint(net=net, ckpt_file_name=model_filename, filter_prefix=['mems', 'valid_mems', 'empty_valid_mems'])
+    load_checkpoint(net=net, ckpt_file_name=model_filename,
+                    choice_func=lambda x: not x.startswith(('mems', 'valid_mems', 'empty_valid_mems')))
     data = Tensor(np.ones((80, config.batch_size), np.int32))
     target = Tensor(np.ones((80, config.batch_size), np.int32))
     export(net, data, target, file_name=args.file_name, file_format=args.file_format)
