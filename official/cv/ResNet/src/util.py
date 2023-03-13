@@ -71,7 +71,7 @@ def init_weight(net, cfg):
         if not os.path.isfile(cfg.pre_trained):
             cfg.logger.warning("There is not ckpt file: %s", cfg.pre_trained)
         else:
-            param_dict, _ = ms.load_param_into_net(cfg.pre_trained)
+            param_dict = ms.load_checkpoint(cfg.pre_trained)
             if cfg.filter_weight:
                 filter_list = [x.name for x in net.end_point.get_parameters()]
                 filter_checkpoint_parameter_by_list(param_dict, filter_list)
