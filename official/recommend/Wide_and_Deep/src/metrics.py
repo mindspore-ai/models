@@ -19,6 +19,7 @@ Area under cure metric
 
 from sklearn.metrics import roc_auc_score
 from mindspore.nn.metrics import Metric
+from mindspore import log as logger
 
 class AUCMetric(Metric):
     """
@@ -46,7 +47,12 @@ class AUCMetric(Metric):
             raise RuntimeError(
                 'true_labels.size is not equal to pred_probs.size()')
 
-        auc = roc_auc_score(self.true_labels, self.pred_probs)
+        try:
+            auc = roc_auc_score(self.true_labels, self.pred_probs)
+        except (ValueError, RuntimeError) as e:
+            auc = None
+            logger.warning(e.__str__())
+
         print("====" * 20 + " auc_metric  end")
         print("====" * 20 + " auc: {}".format(auc))
         return auc
