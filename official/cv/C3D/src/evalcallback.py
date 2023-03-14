@@ -36,6 +36,8 @@ class EvalCallBack(Callback):
         self.save_ckpt_path = save_ckpt_path
         self.eval_dataset, self.eval_dataset_len = classification_dataset(config.batch_size, 1, shuffle=True,
                                                                           repeat_num=1, drop_remainder=True)
+        self.eval_iter = self.eval_dataset.create_tuple_iterator()
+        self.batch_num = self.eval_dataset.get_dataset_size()
         self.network = C3D(config.num_classes)
 
         self.best_ckpt = 0
@@ -51,13 +53,12 @@ class EvalCallBack(Callback):
         # pre_trained
         param_dict = load_checkpoint(save_ckpt_path)
         param_not_load, _ = load_param_into_net(self.network, param_dict)
-        batch_num = self.eval_dataset.get_dataset_size()
         print('ckpt:', save_ckpt_path)
         print('param_not_load', param_not_load)
         if cur_epoch % self.eval_per_epoch == 0:
             self.network.set_train(mode=False)
             acc_sum, sample_num = 0, 0
-            for idnum, (input_data, label) in enumerate(self.eval_dataset):
+            for idnum, (input_data, label) in enumerate(self.eval_iter):
                 predictions = self.network(Tensor(input_data))
                 predictions, label = predictions.asnumpy(), label.asnumpy()
                 acc = np.sum(np.argmax(predictions, 1) == label[:, -1])
@@ -65,7 +66,7 @@ class EvalCallBack(Callback):
                 acc_sum += acc
                 sample_num += batch_size
                 if idnum % 20 == 0:
-                    print("setep: {}/{}, acc: {}".format(idnum + 1, batch_num, acc / batch_size))
+                    print("setep: {}/{}, acc: {}".format(idnum + 1, self.batch_num, acc / batch_size))
 
             top_1 = acc_sum / sample_num
             print('eval result: top_1 {:.3f}%'.format(top_1 * 100))

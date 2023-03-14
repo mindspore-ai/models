@@ -110,7 +110,8 @@ class video_Dataset():
 
         # Load the information for each video and process it into clips
         for video_info in json_data:
-            clips = self._extractClips(video_info['frames'])
+            frames = sorted(video_info['frames'], key=lambda x: int(x["img_path"].split(".")[0]))
+            clips = self._extractClips(frames)
 
             # Each clip is a list of dictionaries per frame containing information
             # Example info: object bbox annotations, object classes, frame img path
