@@ -65,6 +65,8 @@ We use about 122K face images as training dataset and 2K as evaluating dataset i
     ```python
     [YAW] [PITCH] [ROLL] [LEFT_EYE_CENTER_X] [LEFT_EYE_CENTER_Y] [RIGHT_EYE_CENTER_X] [RIGHT_EYE_CENTER_Y] [NOSE_TIP_X] [NOSE_TIP_Y] [MOUTH_LEFT_CORNER_X] [MOUTH_LEFT_CORNER_Y] [MOUTH_RIGHT_CORNER_X] [MOUTH_RIGHT_CORNER_Y]
 
+    e.g. -34.07  -8.533774  -8.285695  228.802368  257.432800  288.186188  261.831543  270.241638  302.224426  219.571747  321.097321  272.498291  329.260376
+
     The label info are separated by ' '.
     Set -1 when the keypoint is not visible.
     ```
