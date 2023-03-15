@@ -70,9 +70,10 @@ do
     env > env$i.log
     if [ -f ${DATA_CFG} ]
     then
-        python train.py --device Ascend --run_distribute True --data_cfg ${DATA_CFG} --load_pre_model ${LOAD_PRE_MODEL} --is_modelarts False > train$i.log 2>&1 &
+        python train.py --device Ascend --run_distribute True --data_cfg ${DATA_CFG} \
+                        --load_pre_model ${LOAD_PRE_MODEL} --is_modelarts False --batch_size 4 > train$i.log 2>&1 &
     else
-        python train.py --device Ascend --run_distribute True --is_modelarts False > train$i.log 2>&1 &
+        python train.py --device Ascend --run_distribute True --is_modelarts False --batch_size 4 > train$i.log 2>&1 &
     fi
     echo "$i finish"
     cd ../
