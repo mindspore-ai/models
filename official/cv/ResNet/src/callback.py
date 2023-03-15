@@ -39,7 +39,7 @@ class LossCallBack(Callback):
         self.step_start_time = time.time()
         self.epoch_start_time = time.time()
 
-    def step_end(self, run_context):
+    def on_train_step_end(self, run_context):
         cb_params = run_context.original_args()
         loss = cb_params.net_outputs
         data_sink_mode = cb_params.get('dataset_sink_mode', False)
@@ -67,11 +67,11 @@ class LossCallBack(Callback):
                 self.step_start_time = time.time()
         self.global_steps += 1
 
-    def epoch_begin(self, run_context):
+    def on_train_epoch_begin(self, run_context):
         self.epoch_start_time = time.time()
         self.step_start_time = time.time()
 
-    def epoch_end(self, run_context):
+    def on_train_epoch_end(self, run_context):
         cb_params = run_context.original_args()
         loss = cb_params.net_outputs
         cur_epoch_num = cb_params.cur_epoch_num
@@ -93,7 +93,7 @@ class ResumeCallback(Callback):
         super(ResumeCallback, self).__init__()
         self.start_epoch = start_epoch
 
-    def epoch_begin(self, run_context):
+    def on_train_epoch_begin(self, run_context):
         run_context.original_args().cur_epoch_num += self.start_epoch
 
 
@@ -146,7 +146,7 @@ class EvalCallBack(Callback):
         except ValueError:
             self.logger.warning("ValueError, failed to remove the older ckpt file %s.", file_name)
 
-    def epoch_end(self, run_context):
+    def on_train_epoch_end(self, run_context):
         """Callback when epoch end."""
         cb_params = run_context.original_args()
         cur_epoch = cb_params.cur_epoch_num
@@ -165,6 +165,6 @@ class EvalCallBack(Callback):
                     save_checkpoint(cb_params.train_network, self.bast_ckpt_path)
                     self.logger.info("update best checkpoint at: %s", self.bast_ckpt_path)
 
-    def end(self, run_context):
+    def on_train_end(self, run_context):
         self.logger.info("End training, the best %s is: %s, the best %s epoch is %s" % (
             self.metrics_name, self.best_res, self.metrics_name, self.best_epoch))
