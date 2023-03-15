@@ -70,7 +70,8 @@ def parse_args():
     parser.add_argument('--device_id', required=False, default=None, type=int, help='Location of training outputs.')
     parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"], default="Ascend",
                         help="device target")
-    parser.add_argument('--run_distribute', required=False, default=False, help='Location of training outputs.')
+    parser.add_argument('--run_distribute', type=ast.literal_eval, required=False,
+                        default=False, help='Location of training outputs.')
     parser.add_argument('--is_model_arts', type=ast.literal_eval, default=False, help='Location of training outputs.')
     args = parser.parse_args()
     return args
