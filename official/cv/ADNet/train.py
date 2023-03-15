@@ -78,7 +78,7 @@ if args.run_online == 'True':
 if args.distributed:
     context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=int(os.environ["DEVICE_ID"]))
     init()
-    context.set_auto_parallel_context(parallel_mode=ParallelMode.AUTO_PARALLEL, gradients_mean=True)
+    context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
 else:
     context.set_context(device_target=args.device_target, mode=context.GRAPH_MODE, device_id=args.target_device)
 # Supervised Learning part
