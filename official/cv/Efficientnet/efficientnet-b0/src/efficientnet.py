@@ -445,7 +445,7 @@ class DropConnect(nn.Cell):
         self.shape = P.Shape()
         self.dtype = P.DType()
         self.keep_prob = 1 - drop_connect_rate
-        self.dropout = P.Dropout(p=1 - self.keep_prob)
+        self.dropout = P.Dropout(keep_prob=self.keep_prob)
 
     def construct(self, x):
         shape = self.shape(x)

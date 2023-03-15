@@ -81,7 +81,7 @@ python eval.py \
 
 ```bash
 # 通过shell脚本运行评估，请将配置文件中的`device_target`更改为在Ascend或GPU上运行。
-bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
+bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID]
 ```
 
 请注意，default_config.yaml是8卡上yolov5s的默认参数。Ascend和GPU上的`batchsize`和`lr`不同，请参考`scripts/run_distribute_train.sh`或`scripts/run_distribute_train_gpu.sh`中的设置。
@@ -258,7 +258,7 @@ python eval.py \
     --eval_shape=640 > log.txt 2>&1 &
 或
 # 运行shell脚本进行评估
-bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
+bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID]
 ```
 
 上述python命令将在后台运行。您可以通过"log.txt"文件查看结果。测试数据集的mAP如下：

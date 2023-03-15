@@ -135,14 +135,14 @@ MaskRCNN是一个两阶段目标检测网络，通过添加与现有边界框平
 
     ```bash
     # 在Ascend上运行评估
-    bash run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
-    # 示例：bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-5_7393.ckpt /home/DataSet/cocodataset/ "Ascend"
+    bash run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET] [DEVICE_ID]
+    # 示例：bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-5_7393.ckpt /home/DataSet/cocodataset/ "Ascend" 0
 
     # 在CPU上运行评估
     bash run_eval_cpu.sh [ANN_FILE] [CHECKPOINT_PATH]
 
     # 在GPU上运行评估
-    bash run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
+    bash run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET] [DEVICE_ID]
     ```
 
     注：
@@ -584,8 +584,8 @@ test_batch_size": 2,                                                          # 
 
     ```bash
     # 推理
-    bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
-    # 示例：bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-5_7393.ckpt /home/DataSet/cocodataset/ "Ascend"
+    bash run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET] [DEVICE_ID]
+    # 示例：bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-5_7393.ckpt /home/DataSet/cocodataset/ "Ascend" 0
     ```
 
 > 对于COCO2017数据集，VALIDATION_ANN_FILE_JSON指的是数据集目录中的annotations/instances_val2017.json。
@@ -595,8 +595,8 @@ test_batch_size": 2,                                                          # 
 
     ```bash
     # 推理
-    bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
-    # 示例：bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-12_7393.ckpt /home/DataSet/cocodataset/ "GPU"
+    bash run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET] [DEVICE_ID]
+    # 示例：bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-12_7393.ckpt /home/DataSet/cocodataset/ "GPU" 0
     ```
 
 ### [评估结果](#目录)

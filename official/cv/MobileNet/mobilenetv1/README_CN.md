@@ -300,11 +300,11 @@ Epoch time: 320744.265, per step time: 256.390
 
 您可以使用Python或Shell脚本开始训练。如果是训练或微调，则不要设置`[CHECKPOINT_PATH]`Sshell脚本的用法如下：
 
-- Ascend：bash run_eval.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
+- Ascend：bash run_eval.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID]
 
-  示例：bash run_eval.sh cifar10 /home/DataSet/cifar10/cifar-10-verify-bin/ /home/model/mobilenetv1/ckpt/cifar10/mobilenetv1-90_1562.ckpt
+  示例：bash run_eval.sh cifar10 /home/DataSet/cifar10/cifar-10-verify-bin/ /home/model/mobilenetv1/ckpt/cifar10/mobilenetv1-90_1562.ckpt 0
 
-  示例：bash run_eval.sh imagenet2012 /home/DataSet/ImageNet_Original/ /home/model/mobilenetv1/ckpt/imagenet2012/mobilenetv1-90_625.ckpt
+  示例：bash run_eval.sh imagenet2012 /home/DataSet/ImageNet_Original/ /home/model/mobilenetv1/ckpt/imagenet2012/mobilenetv1-90_625.ckpt 0
 
 - CPU：bash run_eval_CPU.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
 
@@ -318,9 +318,9 @@ Epoch time: 320744.265, per step time: 256.390
       GPU：python eval.py --dataset [cifar10|imagenet2012] --dataset_path [VAL_DATASET_PATH] --checkpoint_path [CHECKPOINT_PATH] --config_path [CONFIG_PATH] --device_target GPU
 
   Shell：
-      Ascend：bash run_eval.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
-      # 示例：bash run_eval.sh cifar10 /home/DataSet/cifar10/cifar-10-verify-bin/ /home/model/mobilenetv1/ckpt/cifar10/mobilenetv1-90_1562.ckpt
-      # 示例：bash run_eval.sh imagenet2012 /home/DataSet/ImageNet_Original/ /home/model/mobilenetv1/ckpt/imagenet2012/mobilenetv1-90_625.ckpt
+      Ascend：bash run_eval.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID]
+      # 示例：bash run_eval.sh cifar10 /home/DataSet/cifar10/cifar-10-verify-bin/ /home/model/mobilenetv1/ckpt/cifar10/mobilenetv1-90_1562.ckpt 0
+      # 示例：bash run_eval.sh imagenet2012 /home/DataSet/ImageNet_Original/ /home/model/mobilenetv1/ckpt/imagenet2012/mobilenetv1-90_625.ckpt 0
 
       CPU：bash run_eval_CPU.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
 ```

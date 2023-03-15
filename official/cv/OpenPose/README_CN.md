@@ -99,8 +99,8 @@ OpenPose网络提出了一种利用部分亲和场（PAF）自下而上的人体
   # 运行评估示例
   python eval.py --model_path /home/model/openpose/ckpt/0-8_663.ckpt --imgpath_val /home/DataSet/coco/val2017 --ann /home/DataSet/coco/annotations/person_keypoints_val2017.json > eval.log 2>&1 &
   或
-  bash scripts/run_eval_ascend.sh [MODEL_PATH] [IMGPATH_VAL] [ANN]
-  # 示例：bash scripts/run_eval_ascend.sh /home/model/openpose/ckpt/0-8_663.ckpt /home/DataSet/coco/val2017 /home/DataSet/coco/annotations/person_keypoints_val2017.json
+  bash scripts/run_eval_ascend.sh [MODEL_PATH] [IMPATH_VAL] [ANN] [DEVICE_ID]
+  # 示例：bash scripts/run_eval_ascend.sh /home/model/openpose/ckpt/0-8_663.ckpt /home/DataSet/coco/val2017 /home/DataSet/coco/annotations/person_keypoints_val2017.json 0
   ```
 
 [RANK_table_FILE]为多卡信息配置表在环境中的路径。配置表可以由工具[hccl_tool](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)自动生成。
@@ -253,8 +253,8 @@ OpenPose网络提出了一种利用部分亲和场（PAF）自下而上的人体
   # 运行评估示例
   python eval.py --model_path /home/model/openpose/ckpt/0-8_663.ckpt --imgpath_val /home/DataSet/coco/val2017 --ann /home/DataSet/coco/annotations/person_keypoints_val2017.json > eval.log 2>&1 &
   或
-  bash scripts/run_eval_ascend.sh [MODEL_PATH] [IMGPATH_VAL] [ANN]
-  # bash scripts/run_eval_ascend.sh /home/model/openpose/ckpt/0-8_663.ckpt /home/DataSet/coco/val2017 /home/DataSet/coco/annotations/person_keypoints_val2017.json
+  bash scripts/run_eval_ascend.sh [MODEL_PATH] [IMPATH_VAL] [ANN] [DEVICE_ID]
+  # bash scripts/run_eval_ascend.sh /home/model/openpose/ckpt/0-8_663.ckpt /home/DataSet/coco/val2017 /home/DataSet/coco/annotations/person_keypoints_val2017.json 0
   ```
 
   上述Python命令将在后台运行，您可以通过文件"eval.log"查看结果。测试数据集的准确率如下：

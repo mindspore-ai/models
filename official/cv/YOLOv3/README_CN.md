@@ -149,7 +149,7 @@ YOLOv3使用DarkNet53执行特征提取，这是YOLOv2中的Darknet-19和残差�
       --testing_shape=416 > log.txt 2>&1 &
 
   # 通过shell脚本运行评估
-  bash run_eval.sh dataset/coco2014/ train_parallel0/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0/0-99_31680.ckpt
+  bash run_eval.sh dataset/coco2014/ train_parallel0/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0/0-99_31680.ckpt 0
   ```
 
 - 在 [ModelArts](https://support.huaweicloud.com/modelarts/) 上训练
@@ -379,7 +379,7 @@ python eval.py \
 或者
 
 ```shell script
-bash run_eval.sh dataset/coco2014/ train_parallel0/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0/0-99_31680.ckpt
+bash run_eval.sh dataset/coco2014/ train_parallel0/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0/0-99_31680.ckpt 0
 ```
 
 上述python命令将在后台运行，您可以通过log.txt文件查看结果。测试数据集的mAP如下：
