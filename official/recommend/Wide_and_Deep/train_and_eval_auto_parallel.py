@@ -147,6 +147,7 @@ def train_and_eval(config):
 def modelarts_pre_process():
     cfg.ckpt_path = cfg.output_path
 
+
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_wide_and_deep():
     """ train_wide_and_deep """
@@ -156,7 +157,6 @@ def train_wide_and_deep():
         context.set_context(enable_graph_kernel=True)
     context.set_context(variable_memory_max_size="24GB")
     init()
-    context.set_context(save_graphs_path='./graphs_of_device_id_' + str(get_rank()), save_graphs=True)
     if cfg.sparse:
         if cfg.use_sp:
             context.set_auto_parallel_context(parallel_mode=ParallelMode.AUTO_PARALLEL, enable_alltoall=True,

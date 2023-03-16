@@ -24,7 +24,7 @@ from mindspore import context
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
 from src.model_utils.config import config
 
-context.set_context(mode=context.GRAPH_MODE, save_graphs=True)
+context.set_context(mode=context.GRAPH_MODE)
 time_stamp_init = False
 time_stamp_first = 0
 grad_scale = C.MultitypeFuncGraph("grad_scale")
@@ -35,6 +35,7 @@ GRADIENT_CLIP_TYPE = config.GRADIENT_CLIP_TYPE
 GRADIENT_CLIP_VALUE = config.GRADIENT_CLIP_VALUE
 
 clip_grad = C.MultitypeFuncGraph("clip_grad")
+
 
 @clip_grad.register("Number", "Number", "Tensor")
 def _clip_grad(clip_type, clip_value, grad):
@@ -58,6 +59,7 @@ def _clip_grad(clip_type, clip_value, grad):
     else:
         new_grad = nn.ClipByNorm()(grad, F.cast(F.tuple_to_array((clip_value,)), dt))
     return new_grad
+
 
 class MyLoss(Cell):
     """
@@ -110,6 +112,7 @@ class MyLoss(Cell):
     def construct(self, base, target):
         raise NotImplementedError
 
+
 class openpose_loss(MyLoss):
     def __init__(self):
         super(openpose_loss, self).__init__()
@@ -155,6 +158,7 @@ class openpose_loss(MyLoss):
 
         return total_loss, heatmaps_loss, pafs_loss
 
+
 class BuildTrainNetwork(nn.Cell):
     def __init__(self, network, criterion):
         super(BuildTrainNetwork, self).__init__()
@@ -165,6 +169,7 @@ class BuildTrainNetwork(nn.Cell):
         logit_pafs, logit_heatmap = self.network(input_data)
         loss, _, _ = self.criterion(logit_pafs, logit_heatmap, gt_paf, gt_heatmap, mask)
         return loss
+
 
 class TrainOneStepWithClipGradientCell(nn.Cell):
     '''TrainOneStepWithClipGradientCell'''

@@ -106,8 +106,7 @@ def test():
     """
     config.image_size = list(map(int, config.image_size.split(',')))
 
-    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target,
-                        save_graphs=True)
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
     if config.device_target == 'Ascend':
         devid = get_device_id()
         context.set_context(device_id=devid)

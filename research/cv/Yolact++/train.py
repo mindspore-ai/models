@@ -60,6 +60,7 @@ parser.add_argument("--data_url", type=str, default="obs://xxx", help="mindrecor
 parser.add_argument('--is_modelarts', type=str, default="False", help='is train on modelarts')
 args_opt = parser.parse_args()
 
+
 class TransferCallback(Callback):
     """Callback"""
     def __init__(self, local_train_path, obs_train_path):
@@ -72,6 +73,7 @@ class TransferCallback(Callback):
         current_epoch = cb_params.cur_epoch_num
         if current_epoch % 10 == 0 and current_epoch != 0:
             mox.file.copy_parallel(self.local_train_path, self.obs_train_path)
+
 
 def init_weights(module):
 
@@ -116,7 +118,7 @@ if __name__ == '__main__':
             else:
                 rank = 0
                 device_num = 1
-                context.set_context(device_id=int(args_opt.device_id), save_graphs=True)
+                context.set_context(device_id=int(args_opt.device_id))
     else:
         raise ValueError("Unsupported platform.")
 

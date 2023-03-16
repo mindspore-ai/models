@@ -30,6 +30,7 @@ from src.metrics import AUCMetric
 from src.config import WideDeepConfig
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 def get_WideDeep_net(config):
     """
     get_WideDeep_net
@@ -64,6 +65,7 @@ class ModelBuilder():
 
     def get_net(self, config):
         return get_WideDeep_net(config)
+
 
 def train_and_eval(config):
     """
@@ -111,8 +113,7 @@ if __name__ == "__main__":
     wide_and_deep_config = WideDeepConfig()
     wide_and_deep_config.argparse_init()
     compute_emb_dim(wide_and_deep_config)
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend",
-                        save_graphs=True)
+    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
     init()
     context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
                                       device_num=get_group_size())

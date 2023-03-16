@@ -37,6 +37,7 @@ from src.logging import get_logger
 from src.crossentropy import CrossEntropy
 from src.eval_callback import EvalCallBack
 
+
 class ProgressMonitor(Callback):
     """monitor loss and time"""
     def __init__(self, args_, config_):
@@ -86,6 +87,7 @@ class ProgressMonitor(Callback):
     def end(self, run_context):
         self.logger.info('end network train...')
 
+
 def apply_eval(eval_param):
     """apply evaluation"""
     eval_model = eval_param["model"]
@@ -94,7 +96,8 @@ def apply_eval(eval_param):
     res = eval_model.eval(eval_ds)
     return res[metrics_name]
 
-def Parse(arguments=None):
+
+def parse(arguments=None):
     """parameters"""
     parser = argparse.ArgumentParser('mindspore resnest training')
     # path arguments
@@ -126,6 +129,7 @@ def Parse(arguments=None):
     return arguments
 
 set_seed(1)
+
 
 class LossCallBack(LossMonitor):
     """
@@ -159,9 +163,9 @@ class LossCallBack(LossMonitor):
 if __name__ == "__main__":
     print("================Start training================")
 
-    args = Parse()
+    args = parse()
     target = args.device_target
-    context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=True)
+    context.set_context(mode=context.GRAPH_MODE, device_target=target)
     context.set_context(enable_graph_kernel=True)
     config.lr = config.lr*args.device_num
     if args.run_distribute:

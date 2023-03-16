@@ -31,9 +31,10 @@ from src.models import optimizer as optim
 
 set_seed(42)
 
-class LossMonitor_Standalone(LossMonitor):
+
+class LossMonitorStandalone(LossMonitor):
     def __init__(self, per_print_times=1):
-        super(LossMonitor_Standalone, self).__init__(per_print_times=1)
+        super(LossMonitorStandalone, self).__init__(per_print_times=1)
         self._per_print_times = per_print_times
         self._last_print_time = 0
 
@@ -65,6 +66,7 @@ class LossMonitor_Standalone(LossMonitor):
             self._last_print_time = cb_params.cur_step_num
             print("epoch: %s step: %s, loss is %s" % (cb_params.cur_epoch_num, cur_step_in_epoch, loss), flush=True)
 
+
 class NetWithLoss(nn.Cell):
     """Construct Loss Net."""
     def __init__(self, net):
@@ -82,6 +84,7 @@ class NetWithLoss(nn.Cell):
         loss = loss.astype(dtype.float32).sum() / mask.astype(dtype.float32).sum() / preds.shape[2]
         return loss
 
+
 def train():
     """Train entrance."""
     args = parse_args()
@@ -96,7 +99,6 @@ def train():
     device_id = int(os.getenv('DEVICE_ID', '0'))
     device_num = int(os.getenv('DEVICE_NUM', '1'))
     context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target=args.device_target)
-    context.set_context(save_graphs=True, save_graphs_path='irs')
     if device_num > 1:
         init()
         context.set_auto_parallel_context(device_num=device_num,
@@ -120,7 +122,7 @@ def train():
     if device_num > 1:
         callbacks = [TimeMonitor(), LossMonitor()]
     else:
-        callbacks = [TimeMonitor(), LossMonitor_Standalone()]
+        callbacks = [TimeMonitor(), LossMonitorStandalone()]
     if rank_id == 0:
         ckpt_cfg = CheckpointConfig(save_checkpoint_steps=steps_per_epoch, keep_checkpoint_max=cfg.SOLVER.MAX_EPOCH)
         ckpt_cb = ModelCheckpoint(prefix="slowfast", directory='checkpoints', config=ckpt_cfg)

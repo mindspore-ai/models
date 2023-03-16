@@ -18,11 +18,12 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.ops import operations as P
 from mindspore import context
 
-context.set_context(mode=context.GRAPH_MODE, save_graphs=True)
+context.set_context(mode=context.GRAPH_MODE)
 
 time_stamp_init = False
 time_stamp_first = 0
 loadvgg = 1
+
 
 class OpenPoseNet(nn.Cell):
     insize = 368
@@ -72,6 +73,7 @@ class OpenPoseNet(nn.Cell):
         heatmaps.append(h2)
         return pafs, heatmaps
 
+
 class Vgg(nn.Cell):
     def __init__(self, cfg, batch_norm=False):
         # Important: When choose vgg, batch_size should <=64, otherwise will cause unknown error
@@ -101,6 +103,7 @@ class Vgg(nn.Cell):
                     layers += [conv2d, nn.ReLU()]
                 in_channels = v
         return nn.SequentialCell(layers)
+
 
 class VGG_Base(nn.Cell):
     def __init__(self):
@@ -147,6 +150,7 @@ class VGG_Base(nn.Cell):
         x = self.relu(self.conv4_2(x))
         return x
 
+
 class VGG_Base_MS(nn.Cell):
     def __init__(self):
         super(VGG_Base_MS, self).__init__()
@@ -192,6 +196,7 @@ class VGG_Base_MS(nn.Cell):
         x = self.relu(self.Layer4_2(x))
         return x
 
+
 class Base_model(nn.Cell):
     def __init__(self, vgg_with_bn=False):
         super(Base_model, self).__init__()
@@ -209,6 +214,7 @@ class Base_model(nn.Cell):
         x = self.relu(self.conv4_3_CPM(x))
         x = self.relu(self.conv4_4_CPM(x))
         return x
+
 
 class Stage_1(nn.Cell):
     def __init__(self):
@@ -251,6 +257,7 @@ class Stage_1(nn.Cell):
         h2 = self.relu(self.conv4_CPM_L2(h2))
         h2 = self.conv5_CPM_L2(h2)
         return h1, h2
+
 
 class Stage_x(nn.Cell):
     def     __init__(self):

@@ -43,8 +43,8 @@ from src.model_utils.device_adapter import get_device_id
 cur_path = os.path.abspath(os.path.dirname(__file__))
 sys.path.insert(0, cur_path + "/..")
 
-time_stamp_init = False
-time_stamp_first = 0
+TIME_STAMP_INIT = False
+TIME_STAMP_FIRST = 0
 
 
 class LossCallBack(Callback):
@@ -57,10 +57,10 @@ class LossCallBack(Callback):
         self.loss_sum = 0
         self.rank_id = rank_id
 
-        global time_stamp_init, time_stamp_first
-        if not time_stamp_init:
-            time_stamp_first = time.time()
-            time_stamp_init = True
+        global TIME_STAMP_INIT, TIME_STAMP_FIRST
+        if not TIME_STAMP_INIT:
+            TIME_STAMP_FIRST = time.time()
+            TIME_STAMP_INIT = True
 
     def step_end(self, run_context):
         cb_params = run_context.original_args()
@@ -71,13 +71,13 @@ class LossCallBack(Callback):
         self.loss_sum += float(loss)
 
         if self.count >= 1:
-            global time_stamp_first
+            global TIME_STAMP_FIRST
             time_stamp_current = time.time()
             total_loss = self.loss_sum / self.count
 
             loss_file = open("./loss_{}.log".format(self.rank_id), "a+")
             loss_file.write("%lu s | epoch: %s step: %s total_loss: %.5f" %
-                            (time_stamp_current - time_stamp_first, cb_params.cur_epoch_num, cur_step_in_epoch,
+                            (time_stamp_current - TIME_STAMP_FIRST, cb_params.cur_epoch_num, cur_step_in_epoch,
                              total_loss))
             loss_file.write("\n")
             loss_file.close()
@@ -97,13 +97,13 @@ class WithLossCell(nn.Cell):
         self._backbone = backbone
         self._loss_fn = loss_fn
 
-    def construct(self, x, img_shape, gt_bboxe, gt_label, gt_num):
-        loss1, loss2, loss3, loss4, loss5, loss6 = self._backbone(x, img_shape, gt_bboxe, gt_label, gt_num)
-        return self._loss_fn(loss1, loss2, loss3, loss4, loss5, loss6)
-
     @property
     def backbone_network(self):
         return self._backbone
+
+    def construct(self, x, img_shape, gt_bboxe, gt_label, gt_num):
+        loss1, loss2, loss3, loss4, loss5, loss6 = self._backbone(x, img_shape, gt_bboxe, gt_label, gt_num)
+        return self._loss_fn(loss1, loss2, loss3, loss4, loss5, loss6)
 
 
 class TrainOneStepCell(nn.Cell):
@@ -200,12 +200,6 @@ def train_pva_fasterrcnn(rank):
         print(f"\n[{rank}]", "===> Loading from checkpoint:", load_path)
         param_dict = ms.load_checkpoint(load_path)
 
-        # key_mapping = {'down_sample_layer.1.beta': 'bn_down_sample.beta',
-        #                'down_sample_layer.1.gamma': 'bn_down_sample.gamma',
-        #                'down_sample_layer.0.weight': 'conv_down_sample.weight',
-        #                'down_sample_layer.1.moving_mean': 'bn_down_sample.moving_mean',
-        #                'down_sample_layer.1.moving_variance': 'bn_down_sample.moving_variance',
-        #                }
         for oldkey in list(param_dict.keys()):
             if oldkey.startswith(('rcnn.cls', 'rcnn.reg', 'accum', 'stat', 'end_point', 'global_step',
                                   'learning_rate', 'moments', 'momentum')):
@@ -215,19 +209,6 @@ def train_pva_fasterrcnn(rank):
                 data = param_dict.pop(oldkey)
                 newkey = 'backbone.' + oldkey
                 param_dict[newkey] = data
-                # oldkey = newkey
-            # for k, v in key_mapping.items():
-            #     if k in oldkey:
-            #         newkey = oldkey.replace(k, v)
-            #         param_dict[newkey] = param_dict.pop(oldkey)
-            #         break
-        # for item in list(param_dict.keys()):
-        #     if not item.startswith('backbone'):
-        #         param_dict.pop(item)
-
-        # for key, value in param_dict.items():
-        #     tensor = value.asnumpy().astype(np.float32)
-        #     param_dict[key] = Parameter(tensor, key)
         ms.load_param_into_net(net, param_dict)
     print(f"[{rank}]", "\tDone!\n")
 
@@ -296,8 +277,7 @@ def train_pva_fasterrcnn(rank):
 
 if __name__ == '__main__':
     set_seed(1024)
-    ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id(),
-                   save_graphs=True, save_graphs_path='./graph_path')
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
 
     local_path = '/'.join(os.path.realpath(__file__).split('/')[:-1])
     summary_dir = local_path + "/../train/summary/"

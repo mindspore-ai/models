@@ -14,8 +14,6 @@
 # ============================================================================
 """Evaluation api."""
 import os
-# os.system("pip3 install subword-nmt")
-# os.system("pip3 install sacremoses")
 import ast
 import argparse
 import pickle
@@ -59,15 +57,16 @@ if args.is_modelarts:
 
 context.set_context(
     mode=context.GRAPH_MODE,
-    save_graphs=True,
     device_target="Ascend",
     reserve_class_name_in_scope=True)
+
 
 def get_config(config):
     config = Seq2seqConfig.from_json_file(config)
     config.compute_type = mstype.float16
     config.dtype = mstype.float32
     return config
+
 
 def _check_args(config):
     if not os.path.exists(config):

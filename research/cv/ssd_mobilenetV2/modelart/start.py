@@ -82,10 +82,7 @@ def get_ckpt_epoch(ckpt_dir):
 def training_env_set(run_platform):
     """Set training env"""
 
-    context.set_context(
-        mode=context.GRAPH_MODE,
-        device_target=run_platform,
-        save_graphs=True)
+    context.set_context(mode=context.GRAPH_MODE, device_target=run_platform)
     if rank_size > 1:
         context.reset_auto_parallel_context()
         init()

@@ -43,11 +43,10 @@ warnings.filterwarnings('ignore')
 random.seed(1)
 np.random.seed(1)
 
+
 def init_argument():
     """init config argument."""
-    graph_path = os.path.join('./graphs_graphmode', datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
-    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=True,
-                        save_graphs_path=graph_path)
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
 
     if config.device_target == 'Ascend':
         devid = int(os.getenv('DEVICE_ID'))
@@ -78,6 +77,7 @@ def init_argument():
     # Show config
     config.logger.save_args(config)
     return config
+
 
 def modelarts_pre_process():
     '''modelarts pre process function.'''

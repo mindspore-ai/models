@@ -66,7 +66,7 @@ class Monitor(Callback):
 def set_parameter():
     """set_parameter"""
     if config.device_target == "Ascend":
-        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")#  , save_graphs=True, save_graphs_path="./IR"
+        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
         if config.distribute:
             if os.getenv("DEVICE_ID", "not_set").isdigit():
                 context.set_context(device_id=get_device_id())

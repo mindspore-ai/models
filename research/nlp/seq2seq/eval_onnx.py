@@ -58,15 +58,16 @@ if args.is_modelarts:
 
 context.set_context(
     mode=context.GRAPH_MODE,
-    save_graphs=True,
     device_target="CPU",
     reserve_class_name_in_scope=True)
+
 
 def get_config(config):
     config = Seq2seqConfig.from_json_file(config)
     config.compute_type = np.float16
     config.dtype = np.float32
     return config
+
 
 def _check_args(config):
     if not os.path.exists(config):

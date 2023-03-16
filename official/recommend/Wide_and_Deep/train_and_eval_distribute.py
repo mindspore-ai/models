@@ -120,10 +120,11 @@ def train_and_eval(config):
 def modelarts_pre_process():
     cfg.ckpt_path = cfg.output_path
 
+
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_wide_and_deep():
     """ train_wide_and_deep """
-    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target, save_graphs=True)
+    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target)
 
     _enable_graph_kernel = cfg.device_target == "GPU"
     if _enable_graph_kernel:
