@@ -137,10 +137,10 @@ class CenterNetMultiPoseLossCell(nn.Cell):
 
         # define id
         self.emb_dim = opt.reid_dim  # dataset.reid_dim = 128
-        self.nID = opt.nID  # nId = 14455
-        self.classifier = nn.Dense(self.emb_dim, self.nID).to_float(ms.float16)
-        self.IDLoss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
-        self.emb_scale = math.sqrt(2) * math.log(self.nID - 1)  # fix np
+        self.nid = opt.nID  # nId = 14455
+        self.classifier = nn.Dense(self.emb_dim, self.nid).to_float(ms.float16)
+        self.idloss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+        self.emb_scale = math.sqrt(2) * math.log(self.nid - 1)  # fix np
         self.s_det = Parameter(Tensor(-1.85 * np.ones(1), ms.float32))
         self.s_id = Parameter(Tensor(-1.05 * np.ones(1), ms.float32))
 
@@ -189,7 +189,7 @@ class CenterNetMultiPoseLossCell(nn.Cell):
         id_output = self.classifier(c_out)  # id_output=[1,500,14455]
         id_output = self.cast(id_output, ms.float32)
 
-        id_loss = self.IDLoss(id_output, id_target)
+        id_loss = self.idloss(id_output, id_target)
         self.scalar_summary("id_loss", id_loss)
 
         output_wh = feature["wh"]  # Regl1Loss
@@ -204,6 +204,99 @@ class CenterNetMultiPoseLossCell(nn.Cell):
 
         det_loss = self.hm_weight * hm_loss + self.wh_weight * wh_loss + self.off_weight * off_loss
         self.scalar_summary("det_loss", det_loss)
+        loss = self.exp(-self.s_det) * det_loss + self.exp(-self.s_id) * id_loss + (self.s_det + self.s_id)
+        loss *= 0.5
+        return loss
+
+
+
+class MultiPoseLoss(nn.Cell):
+    """
+    Provide pose estimation network losses.
+
+    Args:
+        net_config: The config info of CenterNet network.
+
+    Returns:
+        Tensor, total loss.
+    """
+
+    def __init__(self, opt):
+        super(MultiPoseLoss, self).__init__()
+        self.crit = FocalLoss()
+        self.crit_wh = RegLoss(opt.reg_loss)
+        # wh
+        self.crit_reg = RegLoss(opt.reg_loss)  # reg_loss = 'l1'
+        self.hm_weight = opt.hm_weight  # hm_weight = 1 :loss weight for keypoint heatmaps
+        self.wh_weight = opt.wh_weight  # wh_weight = 0.1 : loss weight for bounding box size
+        self.off_weight = opt.off_weight  # off_weight = 1 : loss weight for keypoint local offsets
+        self.reg_offset = opt.reg_offset  # reg_offset = True : regress local offset
+
+        self.reg_ind = "reg" if self.reg_offset else "wh"
+
+        # define id
+        self.emb_dim = opt.reid_dim  # dataset.reid_dim = 128
+        self.nid = opt.nID  # nId = 14455
+        self.classifier = nn.Dense(self.emb_dim, self.nid).to_float(ms.float16)
+        self.idloss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+        self.emb_scale = math.sqrt(2) * math.log(self.nid - 1)  # fix np
+        self.s_det = Parameter(Tensor(-1.85 * np.ones(1), ms.float32))
+        self.s_id = Parameter(Tensor(-1.05 * np.ones(1), ms.float32))
+
+        self.normalize = ops.L2Normalize(axis=1)
+        self.greater = ops.Greater()
+        self.expand_dims = ops.ExpandDims()
+        self.tile = ops.Tile()
+        self.multiples_1 = (1, 1, 128)
+        self.select = ops.Select()
+        self.zeros = ops.Zeros()
+        self.exp = ops.Exp()
+        self.squeeze = ops.Squeeze(0)
+        self.transposegatherfeature = TransposeGatherFeature()
+        self.reshape = ops.Reshape()
+        self.reshape_mul = opt.batch_size * 500
+        self.cast = ops.Cast()
+        self.sigmoid = Sigmoid()
+
+    def construct(self, feature, hm, reg_mask, ind, wh, reg, ids):
+        """Defines the computation performed."""
+        output_hm = feature["hm"]  # FocalLoss()
+        output_hm = self.sigmoid(output_hm)
+
+        hm_loss = self.crit(output_hm, hm)
+
+        output_id = feature["feature_id"]  # SoftmaxCrossEntropyWithLogits()
+        id_head = self.transposegatherfeature(output_id, ind)  # id_head=[1,500,128]
+
+        cond = self.greater(reg_mask, 0)  # cond=[1,500]
+        cond_cast = self.cast(cond, ms.int32)
+        expand_output = self.expand_dims(cond_cast, 2)
+        tile_out = self.tile(expand_output, self.multiples_1)
+        tile_cast = self.cast(tile_out, ms.bool_)
+        fill_zero = self.zeros(id_head.shape, ms.float32)  # fill_zero=[1,500,128]
+        id_head = self.select(tile_cast, id_head, fill_zero)  # id_head=[1,500,128]
+
+        id_head = self.emb_scale * self.normalize(id_head)  # id_head=[1,500,128]
+
+        zero_input = self.zeros(ids.shape, ms.int32)
+        id_target = self.select(cond, ids, zero_input)  # id_target=[1,500]
+        id_target_out = self.reshape(id_target, (self.reshape_mul,))
+
+        c_out = self.reshape(id_head, (self.reshape_mul, 128))
+        c_out = self.cast(c_out, ms.float16)
+        id_output = self.classifier(c_out)  # id_output=[1,500,14455]
+        id_output = self.cast(id_output, ms.float32)
+        id_loss = self.idloss(id_output, id_target_out)
+
+        output_wh = feature["wh"]  # Regl1Loss
+        wh_loss = self.crit_reg(output_wh, reg_mask, ind, wh)
+
+        off_loss = 0
+        if self.reg_offset and self.off_weight > 0:  # Regl1Loss
+            output_reg = feature[self.reg_ind]
+            off_loss = self.crit_reg(output_reg, reg_mask, ind, reg)
+
+        det_loss = self.hm_weight * hm_loss + self.wh_weight * wh_loss + self.off_weight * off_loss
         loss = self.exp(-self.s_det) * det_loss + self.exp(-self.s_id) * id_loss + (self.s_det + self.s_id)
         loss *= 0.5
 
