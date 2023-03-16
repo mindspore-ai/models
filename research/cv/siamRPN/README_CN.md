@@ -68,10 +68,14 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 # 快速入门
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
+首先我们需要先下载训练时使用的[预训练模型](https://drive.google.com/drive/folders/1HJOvl_irX3KFbtfj88_FVLtukMI1GTCR)
 
 - Ascend处理器环境运行
 
   ```python
+  #模型转换
+  python src/pth2ckpt.py --model_path /path/to/pth
+
   # 运行训练示例
   bash scripts/run.sh DATA_PATH DEVICE_ID
 
