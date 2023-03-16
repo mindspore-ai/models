@@ -40,6 +40,7 @@ Dataset used:
 [UCF101](https://www.crcv.ucf.edu/data/UCF101/UCF101.rar)和[标签信息](https://www.crcv.ucf.edu/data/UCF101/UCF101TrainTestSplits-RecognitionTask.zip)
 
 数据处理：对于Flow类型数据提取方法，使用dense_flow进行提取，[dense_flow安装方法](https://github.com/open-mmlab/mmaction/blob/master/INSTALL.md)。
+因为数据处理过程复杂，我们提供已经处理好的数据集[下载链接](https://pan.baidu.com/s/1TMU9PHqmaaOmlV2YCsynQA) 提取码: xfff
 
 # [环境要求](#contents)
 
@@ -54,8 +55,19 @@ Dataset used:
 # [快速开始](#contents)
 
 在通过官方网站安装MindSpore之后，你可以通过如下步骤开始训练以及评估：
+首先需要下载训练所需的[预训练模型](https://download.openmmlab.com/pretrain/third_party/bn_inception_caffe-ed2e8665.pth)
 
 - running on Ascend with default parameters
+
+  ```python
+  进行训练之前，首先进行预训练模型转换
+  # 生成flow的预训练模型
+  python src/pth2ckpt.py --model_path /PTH/PATH --modality Flow
+
+  #生成RGB的预训练模型
+  python src/pth2ckpt.py --model_path /PTH/PATH --modality RGB
+
+  ```
 
   ```bash
   # 单卡训练

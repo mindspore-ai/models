@@ -31,7 +31,7 @@ from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 from src.config import Opts
-from src.losses import CenterNetMultiPoseLossCell
+from src.losses import CenterNetMultiPoseLossCell, MultiPoseLoss
 from src.backbone_dla_conv import DLASegConv
 from src.fairmot_pose import WithLossCell
 from src.utils.lr_schedule import dynamic_lr
@@ -113,20 +113,20 @@ def train(opt):
         print("\nCheck the above configuration\n\n")
 
     if opt.is_modelarts or opt.run_distribute:
-        Ms_dataset = ds.GeneratorDataset(dataset, ['input', 'hm', 'reg_mask', 'ind', 'wh', 'reg', 'ids'],
+        ms_dataset = ds.GeneratorDataset(dataset, ['input', 'hm', 'reg_mask', 'ind', 'wh', 'reg', 'ids'],
                                          shuffle=True, num_parallel_workers=opt.workers,
                                          num_shards=device_num, shard_id=device_id,
                                          max_rowsize=8,
                                         )
     else:
-        Ms_dataset = ds.GeneratorDataset(dataset, ['input', 'hm', 'reg_mask', 'ind', 'wh', 'reg', 'ids'],
+        ms_dataset = ds.GeneratorDataset(dataset, ['input', 'hm', 'reg_mask', 'ind', 'wh', 'reg', 'ids'],
                                          shuffle=True, num_parallel_workers=opt.workers,
                                          max_rowsize=8,
                                         )
 
-    Ms_dataset = Ms_dataset.batch(batch_size=opt.batch_size, drop_remainder=True)
+    ms_dataset = ms_dataset.batch(batch_size=opt.batch_size, drop_remainder=True)
 
-    batch_dataset_size = Ms_dataset.get_dataset_size()
+    batch_dataset_size = ms_dataset.get_dataset_size()
     net = DLASegConv(opt.heads,
                      down_ratio=4,
                      final_kernel=1,
@@ -135,7 +135,10 @@ def train(opt):
     net = net.set_train()
     param_dict = load_checkpoint(load_path)
     load_param_into_net(net, param_dict)
-    loss = CenterNetMultiPoseLossCell(opt)
+    if opt.device == "GPU":
+        loss = CenterNetMultiPoseLossCell(opt)
+    else:
+        loss = MultiPoseLoss(opt)
     lr = Tensor(dynamic_lr(20, opt.num_epochs, batch_dataset_size),
                 mstype.float32)
     optimizer = nn.Adam(net.trainable_params(), learning_rate=lr)
@@ -159,7 +162,7 @@ def train(opt):
 
     # train
     model = Model(fairmot_net)
-    model.train(opt.num_epochs, Ms_dataset, callbacks=callbacks, dataset_sink_mode=True)
+    model.train(opt.num_epochs, ms_dataset, callbacks=callbacks, dataset_sink_mode=True)
     if opt.is_modelarts:
         mox.file.copy_parallel(local_data_path + "/output", opt.train_url)
 

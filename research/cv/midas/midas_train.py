@@ -94,11 +94,11 @@ def train(mixdata_path):
                                               )
             init()
         local_data_path = config.train_data_dir
-        mixdata_path = config.train_json_data_dir
+        mixdata_path = os.path.join(local_data_path, mixdata_path)
         load_path = config.model_weights
     else:
         local_data_path = config.train_data_dir
-        mixdata_path = config.train_json_data_dir
+        mixdata_path = os.path.join(local_data_path, mixdata_path)
         load_path = config.model_weights
         device_id = config.device_id
         context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target,
