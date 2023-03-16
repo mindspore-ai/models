@@ -19,7 +19,7 @@ import mindspore as ms
 import mindspore.nn as nn
 from mindspore.train.train_thor import ConvertModelUtils
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank
 from mindspore.parallel import set_algo_parameters
 
 from src.logger import get_logger
@@ -30,7 +30,7 @@ from src.util import eval_callback, init_weight, init_group_params, set_output_d
 from src.metric import DistAccuracy, ClassifyCorrectCell
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
-from src.model_utils.device_adapter import get_rank_id, get_device_num
+from src.model_utils.device_adapter import get_device_num
 
 ms.set_seed(1)
 
@@ -102,6 +102,7 @@ def set_parameter():
                                          gradients_mean=True)
             if config.net_name == "resnet50":
                 ms.set_auto_parallel_context(all_reduce_fusion_config=config.all_reduce_fusion_config)
+    config.rank_id = get_rank() if config.run_distribute else 0
 
 
 def init_lr(step_size):
@@ -138,7 +139,6 @@ def train_net():
     target = config.device_target
     set_parameter()
     set_output_dir(config)
-    config.rank_id = get_rank_id()
     config.logger = get_logger(config.log_dir, config.rank_id)
     dataset = create_dataset(dataset_path=config.data_path, do_train=True,
                              batch_size=config.batch_size, train_image_size=config.train_image_size,
