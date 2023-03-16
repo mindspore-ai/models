@@ -22,7 +22,6 @@ from mindspore import Parameter
 from mindspore.ops import Zeros, Ones
 from mindspore.ops import ExpandDims, Concat
 from mindspore.ops import clip_by_value
-from mindspore.nn import Tril, Triu
 from src.loss_fn.ProjectedAdaptiveLogSoftmaxLoss import ProjectedAdaptiveLogSoftmaxLoss
 from src.model.embedding import AdaptiveEmbedding, PositionalEmbedding
 from src.model.layer import RelPartialLearnableDecoderLayer
@@ -44,7 +43,6 @@ class MemTransformerLM(nn.Cell):
         self.assign = P.Assign()
         self.zeros, self.ones = Zeros(), Ones()
         self.expandDims, self.concat_0, self.concat_1 = ExpandDims(), Concat(0), Concat(1)
-        self.tril, self.triu = Tril(), Triu()
 
         self.n_token = n_token
 

@@ -21,12 +21,31 @@ from mindspore.nn.loss.loss import LossBase
 import mindspore.nn as nn
 
 
+class ImageGradients(nn.Cell):
+    def construct(self, images):
+        batch_size, depth, height, width = images.shape
+        if height == 1:
+            dy = ops.fill(images.dtype, (batch_size, depth, 1, width), 0)
+        else:
+            dy = images[:, :, 1:, :] - images[:, :, :height - 1, :]
+            dy_last = ops.fill(images.dtype, (batch_size, depth, 1, width), 0)
+            dy = ops.concat((dy, dy_last), 2)
+
+        if width == 1:
+            dx = ops.fill(images.dtype, (batch_size, depth, height, 1), 0)
+        else:
+            dx = images[:, :, :, 1:] - images[:, :, :, :width - 1]
+            dx_last = ops.fill(images.dtype, (batch_size, depth, height, 1), 0)
+            dx = ops.concat((dx, dx_last), 3)
+        return dy, dx
+
+
 class CustomLoss(LossBase):
     def __init__(self):
         super(CustomLoss, self).__init__()
         self.power = ops.Pow()
         self.sum = ops.ReduceSum()
-        self.get_grad = nn.ImageGradients()
+        self.get_grad = ImageGradients()
 
     def construct(self, output, target):
         n = (target.shape[-1] * target.shape[-2])
@@ -54,7 +73,7 @@ class CustomLossOriginal(LossBase):
         super().__init__()
         self.power = ops.Pow()
         self.sum = ops.ReduceSum()
-        self.get_grad = nn.ImageGradients()
+        self.get_grad = ImageGradients()
 
     def construct(self, output, target):
         n = (target.shape[-1] * target.shape[-2])

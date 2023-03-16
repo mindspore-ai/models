@@ -20,7 +20,7 @@ import mindspore.ops as P
 from mindspore import Parameter, Tensor
 from mindspore.ops import Zeros, Ones, clip_by_value
 from mindspore.ops import ExpandDims, Concat
-from mindspore.nn import Tril, Triu, Dense
+from mindspore.nn import Dense
 
 from src.loss_fn.ProjectedAdaptiveLogSoftmaxLoss import ProjectedAdaptiveLogSoftmaxLoss
 from src.model.embedding import AdaptiveEmbedding, PositionalEmbedding
@@ -43,7 +43,6 @@ class MemTransformerLM(nn.Cell):
         self.assign = P.Assign()
         self.zeros, self.ones = Zeros(), Ones()
         self.expandDims, self.concat_0, self.concat_1 = ExpandDims(), Concat(0), Concat(1)
-        self.tril, self.triu = Tril(), Triu()
 
         self.n_token = n_token
 
