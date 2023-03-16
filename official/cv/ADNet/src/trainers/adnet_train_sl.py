@@ -35,7 +35,6 @@ from mindspore import save_checkpoint
 from mindspore.common.initializer import initializer
 from mindspore import dtype as mstype
 from mindspore.nn import TrainOneStepCell
-import mindspore.numpy as nps
 
 
 def adnet_train_sl(args, opts):
@@ -199,16 +198,17 @@ def init_net(net, scal, args):
     # fc 4
     net.fc4_5[0].weight.set_data(initializer('Normal', net.fc4_5[0].weight.shape, mstype.float32))
     net.fc4_5[0].weight.data.set_data(net.fc4_5[0].weight.data * scal.expand_as(net.fc4_5[0].weight.data))
-    net.fc4_5[0].bias.set_data(nps.full(shape=net.fc4_5[0].bias.shape, fill_value=0.1))
+    net.fc4_5[0].bias.set_data(initializer(0.1, shape=net.fc4_5[0].bias.shape))
+
     # fc 5
     net.fc4_5[3].weight.set_data(initializer('Normal', net.fc4_5[3].weight.shape, mstype.float32))
     net.fc4_5[3].weight.set_data(net.fc4_5[3].weight.data * scal.expand_as(net.fc4_5[3].weight.data))
-    net.fc4_5[3].bias.set_data(nps.full(shape=net.fc4_5[3].bias.shape, fill_value=0.1))
+    net.fc4_5[3].bias.set_data(initializer(0.1, shape=net.fc4_5[3].bias.shape))
     # fc 6
     net.fc6.weight.set_data(initializer('Normal', net.fc6.weight.shape, mstype.float32))
     net.fc6.weight.set_data(net.fc6.weight.data * scal.expand_as(net.fc6.weight.data))
-    net.fc6.bias.set_data(nps.full(shape=net.fc6.bias.shape, fill_value=0))
+    net.fc6.bias.set_data(initializer('Zero', shape=net.fc6.bias.shape))
     # fc 7
     net.fc7.weight.set_data(initializer('Normal', net.fc7.weight.shape, mstype.float32))
     net.fc7.weight.set_data(net.fc7.weight.data * scal.expand_as(net.fc7.weight.data))
-    net.fc7.bias.set_data(nps.full(shape=net.fc7.bias.shape, fill_value=0))
+    net.fc7.bias.set_data(initializer('Zero', shape=net.fc7.bias.shape))

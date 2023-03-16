@@ -295,13 +295,13 @@ def adnet(opts, base_network='vggm', trained_file=None, random_initialize_domain
                 initializer('Normal', domain_nets[idx].fc6.weight.shape, mstype.float32))
             domain_nets[idx].fc6.weight.set_data(
                 domain_nets[idx].fc6.weight.data * scal.expand_as(domain_nets[idx].fc6.weight.data))
-            domain_nets[idx].fc6.bias.set_data(nps.full(shape=domain_nets[idx].fc6.bias.shape, fill_value=0.))
+            domain_nets[idx].fc6.bias.set_data(initializer('Zero', domain_nets[idx].fc6.bias.shape, mstype.float32))
             # fc 7
             domain_nets[idx].fc7.weight.set_data(
                 initializer('Normal', domain_nets[idx].fc7.weight.shape, mstype.float32))
             domain_nets[idx].fc7.weight.set_data(
                 domain_nets[idx].fc7.weight.data * scal.expand_as(domain_nets[idx].fc7.weight.data))
-            domain_nets[idx].fc7.bias.set_data(nps.full(shape=domain_nets[idx].fc7.bias.shape, fill_value=0.))
+            domain_nets[idx].fc7.bias.set_data(initializer('Zero', domain_nets[idx].fc7.bias.shape, mstype.float32))
 
     return adnet_model, domain_nets
 
