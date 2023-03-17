@@ -13,9 +13,7 @@
 # limitations under the License.
 # ============================================================================
 
-import mindspore as ms
 import mindspore.nn as nn
-from mindspore.nn import Tril, Triu
 from mindspore.ops import Zeros, Ones
 from mindspore.ops import ExpandDims, Concat, Split
 from mindspore.ops import Transpose, BatchMatMul, Tile
@@ -29,7 +27,6 @@ class RelMultiHeadAttn(nn.Cell):
         self.zeros, self.ones = Zeros(), Ones()
         self.expandDims, self.concat_0, self.concat_1 = ExpandDims(), Concat(0), Concat(1)
         self.split_n_1_2, self.split_n_1_3 = Split(-1, 2), Split(-1, 3)
-        self.tril, self.triu = Tril(), Triu()
         self.transpose = Transpose()
         self.batchMatMul = BatchMatMul()
         self.tile = Tile()
@@ -67,7 +64,7 @@ class RelMultiHeadAttn(nn.Cell):
 
         if zero_triu:
             _ones = self.ones((x.shape[0], x.shape[1]))
-            x = x * self.tril(_ones, x.shape[1] - x.shape[0])[:, :, None, None]
+            x = x * _ones.tril(x.shape[1] - x.shape[0])[:, :, None, None]
 
         return x
 

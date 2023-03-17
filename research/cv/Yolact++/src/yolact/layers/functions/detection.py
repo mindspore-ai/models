@@ -46,7 +46,6 @@ class Detectx(nn.Cell):
         self.cast = P.Cast()
         self.mul = P.Mul()
         self.sort = P.TopK(sorted=True)
-        self.tril = nn.Tril()
         self.range = nn.Range(80)
         self.expanddims = P.ExpandDims()
         shape = (80, 200)
@@ -144,7 +143,7 @@ class Detectx(nn.Cell):
         masks = masks[idx.view(-1), :].view(num_classes, num_dets, -1)
 
         iou = jaccard(boxes, boxes)
-        x = self.tril(iou)
+        x = iou.tril()
         iou = iou - x
 
         _, iou_max = self.y_max(iou)

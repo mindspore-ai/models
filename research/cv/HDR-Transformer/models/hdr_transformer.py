@@ -278,7 +278,7 @@ class ContextAwareTransformer(nn.Cell):
 
         # cyclic shift
         if self.shift_size > 0:
-            shifted_x = nn.Roll(shift=(-self.shift_size, -self.shift_size), axis=(1, 2))(x)
+            shifted_x = ops.roll(x, (-self.shift_size, -self.shift_size), (1, 2))
         else:
             shifted_x = x
 
@@ -298,7 +298,7 @@ class ContextAwareTransformer(nn.Cell):
 
         # reverse cyclic shift
         if self.shift_size > 0:
-            x = nn.Roll(shift=(self.shift_size, self.shift_size), axis=(1, 2))(shifted_x)
+            x = ops.roll(shifted_x, (self.shift_size, self.shift_size), (1, 2))
         else:
             x = shifted_x
         x = x.view(B, H * W, C)
