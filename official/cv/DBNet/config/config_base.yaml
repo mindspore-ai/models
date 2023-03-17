@@ -19,7 +19,7 @@ data_path: "/cache/data"
 backbone:
     initializer: resnet18
     pretrained: True
-    backbone_ckpt: "" # If on modelarts, set the name of checkpoint saved in data_url
+    backbone_ckpt: "./pretrained/resnet18-5c106cde.ckpt" # If on modelarts, set the name of checkpoint saved in data_url
 segdetector:
     in_channels: [64, 128, 256, 512]  #R50: [256, 512, 1024, 2048]  R18: [64, 128, 256, 512]
     inner_channels: 256
@@ -55,8 +55,8 @@ dataset:
         min_crop_side_ratio: 0.1
 train:
     img_format: ['.jpg', '.png', '.JPG', '.PNG']
-    img_dir: ""  # use abspath
-    gt_dir: ""  # use abspath
+    img_dir: "~/ICDAR2015/ch4_training_images"  # use abspath
+    gt_dir: "~/ICDAR2015/ch4_training_localization_transcription_gt"  # use abspath
     log_filename: train
     pretrained_ckpt: ""
     resume_ckpt: ""  # use abspath
@@ -74,8 +74,8 @@ train:
     dataset_sink_mode: True
 eval:
     img_format: ['.jpg', '.png', '.JPG', '.PNG']
-    img_dir: ""  # use abspath
-    gt_dir: ""  # use abspath
+    img_dir: "~/ICDAR2015/ch4_test_images"  # use abspath
+    gt_dir: "~/ICDAR2015/Challenge4_Test_Task1_GT"  # use abspath
     show_images: False
     image_dir: './outputs_test/'
     thresh: 0.3

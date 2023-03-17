@@ -115,7 +115,7 @@ def train():
         ms.load_param_into_net(train_net, resume_param)
         cb_default.append(ResumeCallback(config.train.start_epoch_num))
         config.logger.info("Resume train from epoch: %s", config.train.start_epoch_num)
-    cb_default.append(DBNetMonitor(config, train_net, lr.asnumpy(), per_print_times=config.per_print_times))
+    cb_default.append(DBNetMonitor(config, net, lr.asnumpy(), per_print_times=config.per_print_times))
     model = ms.Model(train_net)
     config.logger.save_args(config)
     model.train(config.train.total_epochs - config.train.start_epoch_num, train_dataset, callbacks=cb_default,

@@ -73,6 +73,6 @@ class LOGGER(logging.Logger):
 
 def get_logger(path, rank):
     """Get Logger."""
-    logger = LOGGER('yolox', rank)
+    logger = LOGGER('DBNet', rank)
     logger.setup_logging_file(os.path.join(path, 'rank_' + str(rank)))
     return logger

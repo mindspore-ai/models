@@ -86,7 +86,7 @@ eval:
 
 config/dbnet/config_resnet18_1p.yaml configure backone_ckpt pre-training path
 backbone:
-    backbone_ckpt: ""
+    backbone_ckpt: "./pretrained/resnet18-5c106cde.ckpt"
 ```
 
 Run standalone:

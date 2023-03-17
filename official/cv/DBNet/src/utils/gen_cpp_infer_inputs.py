@@ -14,11 +14,14 @@
 # ============================================================================
 """Generate bin file as cpp infer inputs."""
 import os
+import sys
 import numpy as np
 from tqdm import tqdm
 
 from src.datasets.load import create_dataset
 from src.model_utils.config import config
+
+sys.path.insert(0, os.path.join("../..", os.path.dirname(os.path.abspath(__file__))))
 
 
 def main():
