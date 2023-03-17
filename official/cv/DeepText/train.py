@@ -40,7 +40,7 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 np.set_printoptions(threshold=np.inf)
 
-set_seed(1)
+set_seed(1001)
 
 context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
 
