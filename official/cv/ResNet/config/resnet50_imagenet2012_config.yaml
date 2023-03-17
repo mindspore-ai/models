@@ -19,7 +19,7 @@ checkpoint_file_path: ""
 optimizer: "Momentum"
 infer_label: ""
 class_num: 1001
-batch_size: 512
+batch_size: 256
 loss_scale: 1024
 momentum: 0.9
 weight_decay: 0.0001
