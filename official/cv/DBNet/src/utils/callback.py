@@ -80,7 +80,9 @@ class DBNetMonitor(Callback):
     def load_parameter(self):
         param_dict = dict()
         for name, param in self.train_net.parameters_and_names():
-            param_dict[name] = param
+            if name.startswith('backbone') or name.startswith('segdetector'):
+                new_name = '.'.join(name.split('.')[1:])
+                param_dict[new_name] = param
         ms.load_param_into_net(self.eval_net.model, param_dict)
 
     def handle_loss(self, net_outputs):
@@ -158,7 +160,8 @@ class DBNetMonitor(Callback):
             self.eval_net.model.set_train(False)
             metrics, fps = self.eval_net.eval(self.val_dataset, show_imgs=self.config.eval.show_images)
 
-            cur_f = metrics['fmeasure'].avg
+            cur_f = metrics.get('fmeasure', None)
+            cur_f = cur_f.avg if cur_f else 0.0
             self.config.logger.info('current epoch is: %s \n FPS: %s \n Recall: %s \n Precision: %s \n Fmeasure: %s' % (
                 cur_epoch, fps, metrics['recall'].avg, metrics['precision'].avg, metrics['fmeasure'].avg))
             if cur_f >= self.max_f and self.rank_id == 0:

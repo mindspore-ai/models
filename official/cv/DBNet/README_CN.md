@@ -88,7 +88,7 @@ eval:
 
 config/dbnet/config_resnet18_1p.yaml配置backbone_ckpt预训练路径
 backbone:
-    backbone_ckpt: ""
+    backbone_ckpt: "./pretrained/resnet18-5c106cde.ckpt"
 ```
 
 单卡训练：
