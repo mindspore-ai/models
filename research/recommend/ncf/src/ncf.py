@@ -15,7 +15,7 @@
 """Neural Collaborative Filtering Model"""
 from mindspore import nn, context
 from mindspore import Tensor, Parameter, ParameterTuple
-from mindspore._checkparam import Validator as validator
+from mindspore import _checkparam as validator
 from mindspore.nn.layer.activation import get_activation
 import mindspore.common.dtype as mstype
 from mindspore.ops import operations as P

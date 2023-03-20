@@ -22,8 +22,7 @@ from mindspore.ops import functional as F
 from mindspore.common.initializer import initializer
 from mindspore.common.tensor import Tensor
 from mindspore.common.parameter import Parameter, ParameterTuple
-from mindspore._checkparam import Validator as validator
-from mindspore._checkparam import Rel
+from mindspore import _checkparam as validator
 from mindspore.nn.optim.optimizer import Optimizer
 
 _adam_opt = C.MultitypeFuncGraph("adam_opt")
@@ -55,8 +54,8 @@ def _check_param_value(beta1, beta2, eps, prim_name):
     validator.check_value_type("beta1", beta1, [float], prim_name)
     validator.check_value_type("beta2", beta2, [float], prim_name)
     validator.check_value_type("eps", eps, [float], prim_name)
-    validator.check_float_range(beta1, 0.0, 1.0, Rel.INC_NEITHER, "beta1", prim_name)
-    validator.check_float_range(beta2, 0.0, 1.0, Rel.INC_NEITHER, "beta2", prim_name)
+    validator.check_float_range(beta1, 0.0, 1.0, validator.INC_NEITHER, "beta1", prim_name)
+    validator.check_float_range(beta2, 0.0, 1.0, validator.INC_NEITHER, "beta2", prim_name)
     validator.check_positive_float(eps, "eps", prim_name)
 
 

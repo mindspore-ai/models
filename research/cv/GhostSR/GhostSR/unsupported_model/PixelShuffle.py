@@ -15,7 +15,7 @@
 
 import mindspore.ops as ops
 from mindspore import nn
-from mindspore._checkparam import Validator as validator
+from mindspore import _checkparam as validator
 from mindspore.ops.primitive import constexpr
 
 

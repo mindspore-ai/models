@@ -26,7 +26,7 @@ from mindspore.ops import composite as C
 from mindspore.common.tensor import Tensor
 from mindspore.common.parameter import Parameter
 from mindspore.ops.primitive import Primitive
-from mindspore._checkparam import Validator
+from mindspore import _checkparam as Validator
 from mindspore._extends import cell_attr_register
 
 
