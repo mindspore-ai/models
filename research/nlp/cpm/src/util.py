@@ -22,7 +22,7 @@ from mindspore.common.tensor import Tensor
 from mindspore.common.parameter import Parameter
 from mindspore.communication.management import get_group_size
 from mindspore.common.seed import _get_graph_seed
-from mindspore._checkparam import Validator
+from mindspore import _checkparam as Validator
 from mindspore import context
 
 from src.weight_init import normal_weight, zero_weight, one_weight

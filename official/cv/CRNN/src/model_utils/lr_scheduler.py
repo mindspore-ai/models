@@ -14,7 +14,7 @@
 # ============================================================================
 """crnn lr scheduler."""
 import math
-from mindspore._checkparam import Validator as validator
+from mindspore import _checkparam  as validator
 
 def cosine_decay_lr_with_start_step(min_lr, max_lr, total_step, step_per_epoch, decay_epoch, start_step):
     r"""

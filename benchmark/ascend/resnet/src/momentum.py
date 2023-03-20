@@ -17,7 +17,7 @@ import mindspore as ms
 import mindspore.ops as ops
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
-from mindspore._checkparam import Validator
+from mindspore import _checkparam as Validator
 from mindspore.nn.optim.optimizer import Optimizer
 
 _momentum_opt = ops.MultitypeFuncGraph("momentum_opt")
