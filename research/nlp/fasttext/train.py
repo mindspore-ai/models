@@ -39,7 +39,7 @@ def get_ms_timestamp():
     t = time.time()
     return int(round(t * 1000))
 
-set_seed(2)
+set_seed(1001)
 time_stamp_init = False
 time_stamp_first = 0
 context.set_context(mode=context.GRAPH_MODE, save_graphs=False, device_target=config.device_target)
