@@ -51,13 +51,9 @@ class MyTimeMonitor(Callback):
         if isinstance(loss, ms.Tensor) and isinstance(loss.asnumpy(), np.ndarray):
             loss = np.mean(loss.asnumpy())
 
-        cur_epoch_num = int(cb_params.cur_epoch_num / (self.data_size / self.size) +1)
-        cur_step_in_epoch = int(self.size * (cb_params.cur_epoch_num % (self.data_size / self.size)))
-        total_epochs = int((cb_params.epoch_num - 1) / (self.data_size / self.size) + 1)
-        if self.mode == ms.PYNATIVE_MODE:
-            cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
-            cur_epoch_num = cb_params.cur_epoch_num
-            total_epochs = cb_params.epoch_num
+        cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
+        cur_epoch_num = cb_params.cur_epoch_num
+        total_epochs = cb_params.epoch_num
 
         if isinstance(loss, float) and (np.isnan(loss) or np.isinf(loss)):
             raise ValueError("epoch: {} step: {}. Invalid loss, terminating training.".format(
@@ -226,7 +222,7 @@ def train():
     # train model
     print("========START RESNET50 GPU BENCHMARK========")
     if mode == ms.GRAPH_MODE:
-        model.train(int(epoch_size * step_size / print_per_steps), dataset, callbacks=cb, sink_size=print_per_steps)
+        model.train(epoch_size, dataset, callbacks=cb, sink_size=print_per_steps, dataset_sink_mode=True)
     else:
         model.train(epoch_size, dataset, callbacks=cb)
 
