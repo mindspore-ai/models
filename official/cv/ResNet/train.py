@@ -139,7 +139,7 @@ def train_net():
     target = config.device_target
     set_parameter()
     set_output_dir(config)
-    config.logger = get_logger(config.log_dir, config.rank_id)
+    config.logger = get_logger(config.log_dir, config.rank_id, config.parameter_server)
     dataset = create_dataset(dataset_path=config.data_path, do_train=True,
                              batch_size=config.batch_size, train_image_size=config.train_image_size,
                              eval_image_size=config.eval_image_size, target=target,

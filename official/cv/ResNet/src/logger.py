@@ -26,10 +26,10 @@ class LOGGER(logging.Logger):
          logger_name: String. Logger name.
          rank: Integer. Rank id.
     """
-    def __init__(self, logger_name, rank=0):
+    def __init__(self, logger_name, rank=0, param_server=False):
         super(LOGGER, self).__init__(logger_name)
         self.rank = rank
-        if rank % 8 == 0:
+        if rank % 8 == 0 or param_server:
             console = logging.StreamHandler(sys.stdout)
             console.setLevel(logging.INFO)
             formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
@@ -71,8 +71,8 @@ class LOGGER(logging.Logger):
             self.info(important_msg, *args, **kwargs)
 
 
-def get_logger(path, rank):
+def get_logger(path, rank, param_server=False):
     """Get Logger."""
-    logger = LOGGER('resnet', rank)
+    logger = LOGGER('resnet', rank, param_server=param_server)
     logger.setup_logging_file(os.path.join(path, 'rank_' + str(rank)))
     return logger
