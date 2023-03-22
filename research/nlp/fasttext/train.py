@@ -35,14 +35,19 @@ from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper
 from model_utils.device_adapter import get_device_id, get_device_num
 
+
 def get_ms_timestamp():
     t = time.time()
     return int(round(t * 1000))
 
-set_seed(1001)
+if config.data_name == "ag":
+    set_seed(2)
+else:
+    set_seed(1001)
 time_stamp_init = False
 time_stamp_first = 0
 context.set_context(mode=context.GRAPH_MODE, save_graphs=False, device_target=config.device_target)
+
 
 class LossCallBack(Callback):
     """
@@ -168,6 +173,7 @@ def set_parallel_env():
     context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
                                       device_num=MultiDevice.get_group_size(),
                                       gradients_mean=True)
+
 
 def train_paralle(input_file_path):
     """
