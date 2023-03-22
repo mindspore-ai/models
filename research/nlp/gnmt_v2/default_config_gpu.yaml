@@ -15,7 +15,7 @@ modelarts_dataset_unzip_name: ""
 
 # ==============================================================================
 # dataset_config
-random_seed: 50
+random_seed: 1001
 epochs: 8
 batch_size: 128
 pre_train_dataset: "/home/workspace/dataset_menu/train.tok.clean.bpe.32000.en.mindrecord"

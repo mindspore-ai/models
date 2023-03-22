@@ -57,22 +57,25 @@ def _train(model, config,
         callbacks (list): A list of callbacks.
     """
     callbacks = callbacks if callbacks else []
+    sink_size = 100
 
     if pre_training_dataset is not None:
         print(" | Start pre-training job.")
-        epoch_size = pre_training_dataset.get_repeat_count()
-        print("epoch size ", epoch_size)
+        data_size = pre_training_dataset.get_dataset_size()
+        epoch_count = config.epochs * data_size // sink_size
+        print("pre-train epoch count is", epoch_count, ", sink_size is", sink_size)
         if os.getenv("RANK_SIZE") is not None and int(os.getenv("RANK_SIZE")) > 1:
             print(f" | Rank {MultiDevice.get_rank()} Call model train.")
-        model.train(config.epochs, pre_training_dataset,
-                    callbacks=callbacks, dataset_sink_mode=config.dataset_sink_mode)
+        model.train(epoch_count, pre_training_dataset,
+                    callbacks=callbacks, dataset_sink_mode=config.dataset_sink_mode, sink_size=sink_size)
 
     if fine_tune_dataset is not None:
         print(" | Start fine-tuning job.")
-        epoch_size = fine_tune_dataset.get_repeat_count()
-
-        model.train(config.epochs, fine_tune_dataset,
-                    callbacks=callbacks, dataset_sink_mode=config.dataset_sink_mode)
+        data_size = fine_tune_dataset.get_dataset_size()
+        epoch_count = config.epochs * data_size // sink_size
+        print("fine_tune epoch count is", epoch_count, ", sink_size is", sink_size)
+        model.train(epoch_count, fine_tune_dataset,
+                    callbacks=callbacks, dataset_sink_mode=config.dataset_sink_mode, sink_size=sink_size)
 
 
 def _load_checkpoint_to_net(config, network):
