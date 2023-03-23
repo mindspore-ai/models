@@ -55,6 +55,7 @@ parser.add_argument("--is_modelarts", type=ast.literal_eval, default=True, help=
 
 args, _ = parser.parse_known_args()
 
+
 class SaveCallback(Callback):
     """
     define savecallback, save best model while training.
@@ -162,7 +163,7 @@ if __name__ == '__main__':
     cb.append(save_cb)
 
     print("start train")
-    model.train(epoch_size, dataset_train, callbacks=cb)
+    model.train(epoch_size, dataset_train, callbacks=cb, dataset_sink_mode=True)
     print("train success!")
 
     # frozen to air file

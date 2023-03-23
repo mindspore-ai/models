@@ -36,6 +36,7 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 _cur_dir = os.getcwd()
 
+
 def do_train(dataset=None, network=None, load_checkpoint_path="", save_checkpoint_path="", epoch_num=1):
     """ do train """
     if load_checkpoint_path == "":
@@ -74,7 +75,8 @@ def do_train(dataset=None, network=None, load_checkpoint_path="", save_checkpoin
     netwithgrads = ErnieFinetuneCell(network, optimizer=optimizer, scale_update_cell=update_cell)
     model = Model(netwithgrads)
     callbacks = [TimeMonitor(dataset.get_dataset_size()), LossCallBack(dataset.get_dataset_size()), ckpoint_cb]
-    model.train(epoch_num, dataset, callbacks=callbacks)
+    model.train(epoch_num, dataset, callbacks=callbacks, dataset_sink_mode=True)
+
 
 def do_eval(dataset=None, network=None, num_class=2, load_checkpoint_path=""):
     """ do eval """
@@ -105,6 +107,7 @@ def do_eval(dataset=None, network=None, num_class=2, load_checkpoint_path=""):
     print("(w/o first and last) elapsed time: {}, per step time : {}".format(
         sum(evaluate_times[1:-1]), sum(evaluate_times[1:-1])/(len(evaluate_times) - 2)))
     print("==============================================================")
+
 
 def run_classifier():
     """run classifier task"""

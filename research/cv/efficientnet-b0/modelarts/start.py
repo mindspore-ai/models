@@ -153,7 +153,7 @@ if __name__ == '__main__':
                                   config=config_ck)
         cb += [ckpt_cb]
 
-    model.train(config.epoch_size, dataset, callbacks=cb)
+    model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
 
     if args_opt.device_id == 0:
         net.set_train(False)

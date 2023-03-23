@@ -211,4 +211,4 @@ if __name__ == '__main__':
         ckpt_cb = ModelCheckpoint(prefix="mobilenetV3", directory=ckpt_save_dir, config=config_ck)
         cb += [ckpt_cb]
     # begine train
-    model.train(epoch_size, dataset, callbacks=cb)
+    model.train(epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)

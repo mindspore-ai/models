@@ -50,6 +50,7 @@ from model_utils.device_adapter import get_device_id, get_rank_id, get_device_nu
 
 set_seed(1)
 
+
 def modelarts_pre_process():
     '''modelarts pre process function.'''
     def unzip(zip_file, save_dir):
@@ -113,6 +114,7 @@ def modelarts_pre_process():
 
     config.ckpt_path = os.path.join(config.output_path, config.ckpt_path)
 
+
 def _get_last_ckpt(ckpt_dir):
     ckpt_files = [ckpt_file for ckpt_file in os.listdir(ckpt_dir)
                   if ckpt_file.endswith('.ckpt')]
@@ -122,9 +124,9 @@ def _get_last_ckpt(ckpt_dir):
 
     return os.path.join(ckpt_dir, sorted(ckpt_files)[-1])
 
+
 def run_export(ckpt_dir):
     ckpt_file = _get_last_ckpt(ckpt_dir)
-#   config.image_size = list(map(int, config.image_size.split(',')))
 
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
     if config.device_target == "Ascend":
@@ -143,8 +145,8 @@ def run_export(ckpt_dir):
     export(net, input_data, file_name=config.file_name, file_format=config.file_format)
     mox.file.copy_parallel(os.getcwd(), config.train_url)
 
-@moxing_wrapper(pre_process=modelarts_pre_process)
 
+@moxing_wrapper(pre_process=modelarts_pre_process)
 def run_train():
     '''run train'''
     config.lr_epochs = list(map(int, config.lr_epochs.split(',')))
@@ -265,7 +267,7 @@ def run_train():
                                   prefix='{}'.format(config.rank))
         callbacks.append(ckpt_cb)
 
-    model.train(config.max_epoch, dataset, callbacks=callbacks)
+    model.train(config.max_epoch, dataset, callbacks=callbacks, dataset_sink_mode=True)
     run_export(save_ckpt_path)
 
 if __name__ == '__main__':

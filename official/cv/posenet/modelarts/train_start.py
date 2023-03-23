@@ -144,7 +144,7 @@ if __name__ == '__main__':
                 cb += [ckpt_cb]
 
     epoch_size = args_opt.max_steps // args_opt.device_num // step_per_epoch
-    model.train(1, dataset, callbacks=cb)
+    model.train(1, dataset, callbacks=cb, dataset_sink_mode=True)
 
     net = PoseNet()
     file_name1 = "train_posenet_KingsCollege-1_16.ckpt"

@@ -36,8 +36,10 @@ config.rank_size = get_device_num()
 
 set_seed(config.random_seed)
 
+
 def modelarts_pre_process():
     pass
+
 
 @moxing_wrapper()
 def train_dlrm():
@@ -112,7 +114,7 @@ def train_dlrm():
         eval_callback = EvalCallBack(model, ds_eval, acc_metric, eval_file_path=config.eval_file_name)
         callback_list.append(eval_callback)
 
-    model.train(config.train_epochs, ds_train, callbacks=callback_list)
+    model.train(config.train_epochs, ds_train, callbacks=callback_list, dataset_sink_mode=True)
 
 if __name__ == '__main__':
     train_dlrm()

@@ -686,7 +686,7 @@ python export.py --config_path [CONFIG_PATH]
   loss_cb = LossMonitor()
 
   # 开始训练
-  model.train(cfg.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb])
+  model.train(cfg.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb], dataset_sink_mode=True)
   print("train success")
   ```
 
@@ -720,7 +720,7 @@ python export.py --config_path [CONFIG_PATH]
   loss_cb = LossMonitor()
 
   # 开始训练
-  model.train(cfg.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb])
+  model.train(cfg.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb], dataset_sink_mode=True)
   print("train success")
   ```
 

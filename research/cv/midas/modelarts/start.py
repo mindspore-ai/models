@@ -149,11 +149,12 @@ def train(mixdata_path):
     callbacks = [loss_cb, time_cb, ckpoint_cb]
     print("Starting Training:per_step_size={},batchsize={},epoch={}".format(per_step_size, batch_size,
                                                                             epoch_number_total))
-    model.train(epoch_number_total, mix_dataset, callbacks=callbacks)
+    model.train(epoch_number_total, mix_dataset, callbacks=callbacks, dataset_sink_mode=True)
     if config.is_modelarts:
         export_AIR(local_data_path + "/output/ckpt")
         mox.file.copy_parallel(local_data_path + "/output", output_path)
         mox.file.copy(src_url='midas.air', dst_url=output_path+'/midas.air')
+
 
 def export_AIR(ckpt_path):
     """start modelarts export"""

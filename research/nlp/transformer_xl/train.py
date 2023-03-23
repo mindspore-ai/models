@@ -315,7 +315,7 @@ def main():
                                       eval_tgt_len=config.eval_tgt_len)
 
     model = Model(network=net, loss_fn=None, optimizer=optimizer, metrics=None)
-    model.train(config.max_step, train_dataset, sink_size=1,
+    model.train(config.max_step, train_dataset, dataset_sink_mode=True, sink_size=1,
                 callbacks=[flagModifiedCallback, train_log, evalDuringTrain])
 
     # Test #

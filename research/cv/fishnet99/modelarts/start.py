@@ -226,7 +226,7 @@ if __name__ == '__main__':
     cbs = [time_cb, ckpoint_cb, loss_cb]
     if device_num > 1 and device_id != 0:
         cbs = [time_cb, loss_cb]
-    model.train(cfg.epoch_size, dataset, callbacks=cbs)
+    model.train(cfg.epoch_size, dataset, callbacks=cbs, dataset_sink_mode=True)
     print("train success.")
 
     ckpt_list = glob.glob(ckpt_save_dir + "train_fishnet99_imagenet*.ckpt")

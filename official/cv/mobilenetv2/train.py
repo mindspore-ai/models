@@ -106,7 +106,7 @@ def train_mobilenetv2():
                              boost_level=config.boost_mode)
         cb = config_ckpoint(config, lr, step_size, model, eval_dataset)
         print("============== Starting Training ==============")
-        model.train(epoch_size, dataset, callbacks=cb)
+        model.train(epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
         print("============== End Training ==============")
 
     else:
