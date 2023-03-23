@@ -235,8 +235,7 @@ def train_net():
 
     optimizer = nn.Momentum(filter(lambda p: p.requires_grad, net.get_parameters()),
                             learning_rate=lr,
-                            momentum=config.momentum,
-                            loss_scale=config.loss_scale
+                            momentum=config.momentum
                             )
 
     kf_loss_fn = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')

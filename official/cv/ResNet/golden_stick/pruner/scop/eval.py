@@ -56,7 +56,8 @@ def eval_net():
     for _, (_, module) in enumerate(net.cells_and_names()):
         if isinstance(module, KfConv2d):
             module.out_index = out_index.pop(0)
-    net = PrunerFtCompressAlgo({'prune_rate': config.prune_rate}).apply(net)
+    ft_algo = PrunerFtCompressAlgo({'prune_rate': config.prune_rate})
+    net = ft_algo._recover_conv(net)
 
     # load checkpoint
     ms.load_param_into_net(net, param_dict)
