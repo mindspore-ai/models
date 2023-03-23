@@ -33,6 +33,7 @@ from src.autoslim_resnet import AutoSlimModel
 
 set_seed(1)
 
+
 def preLauch():
     """parse the console argument"""
     parser = argparse.ArgumentParser(description='AutoSlim MindSpore Training')
@@ -74,6 +75,7 @@ def preLauch():
     args = parser.parse_args()
 
     return args
+
 
 def main():
     """train model"""
@@ -160,7 +162,7 @@ def main():
         callbacks += [ckpt_cb]
 
     print('Initialization may take a long time, please wait patiently...')
-    model.train(args.epoch_size, train_set, callbacks)
+    model.train(args.epoch_size, train_set, callbacks, dataset_sink_mode=True)
     print("Finish training.")
 
     if args.run_modelarts and args.is_save_checkpoint and (device_num == 1 or rank_id == 0):

@@ -82,7 +82,7 @@ def do_train(dataset=None, network=None, load_checkpoint_path="", save_checkpoin
     netwithgrads = BertSquadCell(network, optimizer=optimizer, scale_update_cell=update_cell)
     model = Model(netwithgrads)
     callbacks = [TimeMonitor(dataset.get_dataset_size()), LossCallBack(dataset.get_dataset_size()), ckpoint_cb]
-    model.train(epoch_num, dataset, callbacks=callbacks)
+    model.train(epoch_num, dataset, callbacks=callbacks, dataset_sink_mode=True)
 
 
 def do_eval(dataset=None, load_checkpoint_path="", eval_batch_size=1):

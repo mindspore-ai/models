@@ -47,6 +47,7 @@ from model_utils.device_adapter import get_device_id, get_rank_id, get_device_nu
 
 set_seed(1)
 
+
 def modelarts_pre_process():
     '''modelarts pre process function.'''
     def unzip(zip_file, save_dir):
@@ -234,7 +235,7 @@ def run_train():
                                   prefix='{}'.format(config.rank))
         callbacks.append(ckpt_cb)
 
-    model.train(config.max_epoch, dataset, callbacks=callbacks)
+    model.train(config.max_epoch, dataset, callbacks=callbacks, dataset_sink_mode=True)
 
 if __name__ == '__main__':
     run_train()

@@ -37,6 +37,7 @@ from src.lr_generator import lr_steps, lr_steps_2
 
 set_seed(1)
 
+
 def get_base_param(load_ckpt_path):
     """filter parameters"""
     par_dict = load_checkpoint(load_ckpt_path)
@@ -208,7 +209,7 @@ if __name__ == '__main__':
                                           config=config_ck)
                 cb += [ckpt_cb]
 
-    model.train(VehicleNet_cfg.epoch_size, dataset, callbacks=cb)
+    model.train(VehicleNet_cfg.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
     time.sleep(120)
 
     if args_opt.is_modelarts:
@@ -235,7 +236,6 @@ if __name__ == '__main__':
 
     first_trained_file = '/cache/train_output/checkpoint/first_train_vehiclenet-1_' + \
                       str(step_per_epoch_first)  + '.ckpt'
-    # first_trained_file = '../../checkpoint/first_train_vehiclenet-80_' + str(step_per_epoch_first) + '.ckpt'
 
     param_dict = get_base_param(first_trained_file)
     load_param_into_net(net, param_dict)
@@ -297,7 +297,7 @@ if __name__ == '__main__':
                                           config=config_ck)
                 cb += [ckpt_cb]
 
-    model.train(VeRi_cfg.epoch_size, dataset, callbacks=cb)
+    model.train(VeRi_cfg.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
     cfg = common_config
     dataset_cfg = VeRi_test
     save_checkpoint_path = '/cache/train_output/checkpoint'

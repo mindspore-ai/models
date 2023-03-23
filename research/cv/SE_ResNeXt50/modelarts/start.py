@@ -191,7 +191,6 @@ if __name__ == '__main__':
     device_target = cfg.device_target
 
     context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target)
-    # context.set_context(enable_graph_kernel=True)
     device_num = int(os.getenv('RANK_SIZE', '1'))
 
     if device_target == "Ascend":
@@ -231,7 +230,6 @@ if __name__ == '__main__':
     batch_num = dataset.get_dataset_size()
 
     net = senets.se_resnext50_32x4d(cfg.num_classes)
-    # save_checkpoint(net,"./net,ckpt")
     # Continue training if set pre_trained to be True
     if cfg.pre_trained:
         param_dict = load_checkpoint(cfg.checkpoint_path)
@@ -301,7 +299,7 @@ if __name__ == '__main__':
     cbs = [time_cb, ckpoint_cb, loss_cb]
     if device_num > 1 and device_id != 0:
         cbs = [time_cb, loss_cb]
-    model.train(cfg.epoch_size, dataset, callbacks=cbs)
+    model.train(cfg.epoch_size, dataset, callbacks=cbs, dataset_sink_mode=True)
     print("train success")
     if device_id == 0:
         net.set_train(False)

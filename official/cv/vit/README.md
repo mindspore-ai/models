@@ -513,7 +513,7 @@ If you need to use the trained model to perform inference on multiple hardware p
                           eval_engine=eval_engine,
                           logger=args.logger.info)
   cb = [state_cb, ]
-  model.train(epoch_size, dataset, callbacks=cb, sink_size=step_size)
+  model.train(epoch_size, dataset, callbacks=cb, sink_size=step_size, dataset_sink_mode=True)
   print("train success")
   ```
 

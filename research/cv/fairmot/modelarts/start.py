@@ -104,7 +104,7 @@ def train(opt):
 
     # train
     model = Model(fairmot_net)
-    model.train(opt.num_epochs, Ms_dataset, callbacks=callbacks)
+    model.train(opt.num_epochs, Ms_dataset, callbacks=callbacks, dataset_sink_mode=True)
     export_AIR(local_data_path + "/output/ckpt", opt)
     mox.file.copy_parallel(local_data_path + "/output", output_path)
     mox.file.copy(src_url='fairmot.air', dst_url=output_path+'/fairmot.air')

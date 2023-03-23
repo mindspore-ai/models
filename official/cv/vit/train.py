@@ -54,6 +54,7 @@ except TypeError:
     device_num = 1  # world_size
     print("standalone training")
 
+
 def add_static_args(args):
     """add_static_args"""
     args.weight_decay = float(args.weight_decay)
@@ -74,6 +75,7 @@ def add_static_args(args):
     args.dataset_name = 'imagenet'
 
     return args
+
 
 def modelarts_pre_process():
     '''modelarts pre process function.'''
@@ -98,6 +100,7 @@ def modelarts_pre_process():
 
     end_t = time.time()
     print('tar cost time {:.2f} sec'.format(end_t-start_t))
+
 
 def train_setcontext():
 
@@ -124,6 +127,7 @@ def train_setcontext():
         init()
 
     return args
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_net():
@@ -227,7 +231,7 @@ def train_net():
         cb += [ckpt_cb]
 
     t0 = time.time()
-    model.train(epoch_size, dataset, callbacks=cb, sink_size=step_size)
+    model.train(epoch_size, dataset, callbacks=cb, dataset_sink_mode=True, sink_size=step_size)
     t1 = time.time()
     args.logger.info('training time used={:.2f}s'.format(t1 - t0))
     last_metric = 'last_metric[{}]'.format(state_cb.best_acc)

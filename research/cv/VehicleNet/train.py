@@ -211,7 +211,7 @@ if __name__ == '__main__':
                                           config=config_ck)
                 cb += [ckpt_cb]
 
-    model.train(VehicleNet_cfg.epoch_size, dataset, callbacks=cb)
+    model.train(VehicleNet_cfg.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
     param_dict = get_base_param(net)
 
     time.sleep(120)
@@ -296,7 +296,7 @@ if __name__ == '__main__':
                                           config=config_ck)
                 cb += [ckpt_cb]
 
-    model.train(VeRi_cfg.epoch_size, dataset, callbacks=cb)
+    model.train(VeRi_cfg.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
 
     if args_opt.is_modelarts:
         mox.file.copy_parallel(src_url='/cache/train_output', dst_url=args_opt.train_url)

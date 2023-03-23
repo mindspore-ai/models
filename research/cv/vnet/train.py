@@ -116,7 +116,7 @@ def main():
         ckpoint_cb = ModelCheckpoint(prefix="checkpoint_vnet", directory=ckpt_dir, config=config_ck)
         cb.append(ckpoint_cb)
     print("============== Starting Training fold {} ==============".format(str(cfg.fold)))
-    model.train(cfg.epochs, ds_train, callbacks=cb)
+    model.train(cfg.epochs, ds_train, callbacks=cb, dataset_sink_mode=True)
 
 
 if __name__ == '__main__':

@@ -114,7 +114,7 @@ def run_train():
                                          rank_id if rank_id is not None else 0),
                                      eval_file_path=config.eval_file_name)
         callback_list.append(eval_callback)
-    model.train(train_config.train_epochs, ds_train, callbacks=callback_list)
+    model.train(train_config.train_epochs, ds_train, callbacks=callback_list, dataset_sink_mode=True)
 
 
 if __name__ == '__main__':

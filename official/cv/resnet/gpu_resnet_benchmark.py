@@ -29,6 +29,7 @@ from src.model_utils.moxing_adapter import moxing_wrapper
 
 ms.set_seed(1)
 
+
 class MyTimeMonitor(Callback):
     def __init__(self, batch_size, sink_size, dataset_size, mode):
         super(MyTimeMonitor, self).__init__()
@@ -224,7 +225,8 @@ def train():
     if mode == ms.GRAPH_MODE:
         model.train(epoch_size, dataset, callbacks=cb, sink_size=print_per_steps, dataset_sink_mode=True)
     else:
-        model.train(epoch_size, dataset, callbacks=cb)
+        model.train(epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
+
 
 @moxing_wrapper()
 def eval_():

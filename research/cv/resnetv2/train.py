@@ -43,7 +43,6 @@ parser.add_argument('--dataset_path', type=str, default="../cifar-10/cifar-10-ba
                     help='Dataset path.')
 args_opt = parser.parse_args()
 
-# import net
 if args_opt.net == "resnetv2_50":
     from src.resnetv2 import PreActResNet50 as resnetv2
 elif args_opt.net == 'resnetv2_101':
@@ -51,13 +50,11 @@ elif args_opt.net == 'resnetv2_101':
 elif args_opt.net == 'resnetv2_152':
     from src.resnetv2 import PreActResNet152 as resnetv2
 
-# import dataset
 if args_opt.dataset == "cifar10":
     from src.dataset import create_dataset1 as create_dataset
 elif args_opt.dataset == "cifar100":
     from src.dataset import create_dataset2 as create_dataset
 
-# import config
 if args_opt.net == "resnetv2_50" or args_opt.net == "resnetv2_101" or args_opt.net == "resnetv2_152":
     if args_opt.dataset == "cifar10":
         from src.config import config1 as config
@@ -138,4 +135,4 @@ if __name__ == '__main__':
     else:
         callbacks = [time_cb, loss_cb, ckpoint_cb]
 
-    model.train(epoch_size, dataset, callbacks=callbacks)
+    model.train(epoch_size, dataset, callbacks=callbacks, dataset_sink_mode=True)

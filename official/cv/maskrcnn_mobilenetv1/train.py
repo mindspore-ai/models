@@ -39,6 +39,7 @@ from src.lr_schedule import dynamic_lr
 
 set_seed(1)
 
+
 def modelarts_pre_process():
     def unzip(zip_file, save_dir):
         import zipfile
@@ -95,6 +96,7 @@ def modelarts_pre_process():
     config.save_checkpoint_path = config.output_path
     config.pre_trained = os.path.join(config.output_path, config.pre_trained)
 
+
 def create_mindrecord_files(rank, mindrecord_file, mindrecord_dir, prefix):
     if rank == 0 and not os.path.exists(mindrecord_file):
         if not os.path.isdir(mindrecord_dir):
@@ -123,6 +125,7 @@ if config.device_target == "Ascend":
 # Set mempool block size for improving memory utilization, which will not take effect in GRAPH_MODE
 if context.get_context("mode") == context.PYNATIVE_MODE:
     context.set_context(mempool_block_size="28GB")
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_maskrcnn_mobilenetv1():
@@ -197,7 +200,7 @@ def train_maskrcnn_mobilenetv1():
             cb += [ckpoint_cb]
 
         model = Model(net)
-        model.train(config.epoch_size, dataset, callbacks=cb)
+        model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
 
 if __name__ == '__main__':
     train_maskrcnn_mobilenetv1()

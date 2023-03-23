@@ -77,7 +77,7 @@ def do_train(dataset=None, network=None, load_checkpoint_path="base-BertCLS-111.
     netwithgrads = BertFinetuneCell(network, optimizer=optimizer, scale_update_cell=update_cell)
     model = Model(netwithgrads)
     callbacks = [TimeMonitor(dataset.get_dataset_size()), LossCallBack(dataset.get_dataset_size()), ckpoint_cb]
-    model.train(epoch_num, dataset, callbacks=callbacks)
+    model.train(epoch_num, dataset, callbacks=callbacks, dataset_sink_mode=True)
 
 def eval_result_print(eval_metric, result):
     if args_opt.task_name.lower() in ['atis_intent', 'mrda', 'swda']:
