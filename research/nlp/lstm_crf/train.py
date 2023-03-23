@@ -36,6 +36,7 @@ from mindspore.train.serialization import load_param_into_net, load_checkpoint
 
 set_seed(1000)
 
+
 def modelarts_pre_process():
     config.ckpt_path = os.path.join(config.output_path, config.ckpt_path)
 
@@ -195,7 +196,7 @@ def train_lstm_crf():
     if config.device_target == "CPU":
         model.train(config.num_epochs, ds_train, callbacks=callbacks, dataset_sink_mode=False)
     else:
-        model.train(config.num_epochs, ds_train, callbacks=callbacks)
+        model.train(config.num_epochs, ds_train, callbacks=callbacks, dataset_sink_mode=True)
     print("============== Training Success ==============")
 
 

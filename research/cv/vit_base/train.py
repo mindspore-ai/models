@@ -316,5 +316,5 @@ if __name__ == '__main__':
                 cbs = [loss_cb]
             else:
                 cbs = [time_cb, loss_cb]
-    model.train(cfg.epoch_size, dataset, callbacks=cbs)
+    model.train(cfg.epoch_size, dataset, callbacks=cbs, dataset_sink_mode=True)
     print("train success")

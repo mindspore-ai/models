@@ -41,6 +41,7 @@ import src.fishnet as net_ms
 
 set_seed(1)
 
+
 def lr_steps_imagenet(_cfg, steps_per_epoch):
     """lr step for imagenet"""
     if _cfg.lr_scheduler == 'cosine_annealing':
@@ -210,5 +211,5 @@ if __name__ == '__main__':
     cbs = [time_cb, ckpoint_cb, loss_cb]
     if device_num > 1 and device_id != 0:
         cbs = [time_cb, loss_cb]
-    model.train(cfg.epoch_size, dataset, callbacks=cbs)
+    model.train(cfg.epoch_size, dataset, callbacks=cbs, dataset_sink_mode=True)
     print("train success")

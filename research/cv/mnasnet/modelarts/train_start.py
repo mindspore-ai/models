@@ -155,7 +155,7 @@ if __name__ == '__main__':
             ckpt_cb = ModelCheckpoint(f"Mnasnet-rank{device_id}", directory=save_ckpt_path, config=config_ck)
         cb += [ckpt_cb]
     # begin train
-    model.train(args_opt.epoch_size, dataset, callbacks=cb)
+    model.train(args_opt.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
     if args_opt.run_modelarts and config.save_checkpoint and (device_num == 1 or device_id == 0):
         mox.file.copy_parallel(local_train_url, args_opt.train_url)
 

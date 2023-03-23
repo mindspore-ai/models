@@ -41,6 +41,7 @@ from src.model import models, metric
 
 set_seed(1)
 
+
 def export_stgcn(config, vertex, checkpoint_path, s_prefix, file_name, file_format):
     """ export_stgcn """
     # load checkpoint
@@ -155,7 +156,6 @@ local_train_url = '/cache/train'
 mox.file.copy_parallel(args.data_url, local_data_url)
 if device_num > 1:
     init()
-    #context.set_auto_parallel_context(parameter_broadcast=True)
     context.set_auto_parallel_context(device_num=device_num, \
         parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
 data_dir = local_data_url + '/'
@@ -219,7 +219,7 @@ if __name__ == "__main__":
     network = metric.LossCellWithNetwork(net)
     model = Model(network, optimizer=optimizer, amp_level='O3')
 
-    model.train(args.epochs, dataset, callbacks=callbacks)
+    model.train(args.epochs, dataset, callbacks=callbacks, dataset_sink_mode=True)
     print("train success")
     export_stgcn(cfg, n_vertex, local_train_url, prefix, args.file_name, args.file_format)
     # export

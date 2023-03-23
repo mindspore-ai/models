@@ -22,7 +22,6 @@ import moxing as mox
 import numpy as np
 import mindspore.nn as nn
 import mindspore.common.initializer as weight_init
-# from ast import literal_eval
 from mindspore import context
 from mindspore import Tensor
 from mindspore import export
@@ -43,17 +42,21 @@ from src.callbacks import SaveCallback
 
 set_seed(1)
 
+
 def get_device_id():
     device_id = os.getenv('DEVICE_ID', '0')
     return int(device_id)
+
 
 def get_device_num():
     device_num = os.getenv('RANK_SIZE', '1')
     return int(device_num)
 
+
 def get_rank_id():
     global_rank_id = os.getenv('RANK_ID', '0')
     return int(global_rank_id)
+
 
 def _parse_args():
     parser = argparse.ArgumentParser('dpn training args')
@@ -145,9 +148,9 @@ def _parse_args():
                         help='export file name')
     parser.add_argument('--file_format', type=str, default='AIR',
                         help='export file format')
-    # args, _ = parser.parse_known_args()
     _args = parser.parse_args()
     return _args
+
 
 def filter_weight_by_list(origin_dict, param_filter):
     """remove useless parameters according to filter_list"""
@@ -157,6 +160,7 @@ def filter_weight_by_list(origin_dict, param_filter):
                 print("Delete parameter from checkpoint: ", key)
                 del origin_dict[key]
                 break
+
 
 def dpn_train(config_args, ma_config):
     ma_config["training_data"] = config_args.data_path + "/train"
@@ -263,8 +267,9 @@ def dpn_train(config_args, ma_config):
             ckpoint_cb = ModelCheckpoint(prefix="dpn", directory=ma_config["checkpoint_path"], config=config_ck)
             cb.append(ckpoint_cb)
     # train model
-    model.train(config_args.epoch_size, train_dataset, callbacks=cb)
+    model.train(config_args.epoch_size, train_dataset, callbacks=cb, dataset_sink_mode=True)
     return 0
+
 
 def dpn_export(config_args, ma_config):
     backbone = config_args.backbone

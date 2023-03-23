@@ -352,7 +352,7 @@ def main():
 
         model = Model(network=net, loss_fn=None, optimizer=optimizer, metrics=None,
                       loss_scale_manager=loss_scale_manager)
-        model.train(config.max_step, train_dataset, sink_size=1, callbacks=callbacks)
+        model.train(config.max_step, train_dataset, sink_size=1, callbacks=callbacks, dataset_sink_mode=True)
     else:
         evalDuringTrain = EvalDuringTrain(dataset=valid_dataset, per_print_times=config.eval_interval,
                                           tgt_len=config.tgt_len, ext_len=config.ext_len, mem_len=config.mem_len,

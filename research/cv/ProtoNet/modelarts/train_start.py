@@ -99,6 +99,7 @@ config = parser.parse_args()
 set_seed(1)
 _global_sync_count = 0
 
+
 def frozen_to_air(net, args):
     param_dict = load_checkpoint(args.get("ckpt_file"))
     load_param_into_net(net, param_dict)
@@ -152,6 +153,7 @@ def wrapped_func(config_name):
                 sync_data(config_name.train_url, config_name.output_path)
                 print("Workspace downloaded: ", os.listdir(config_name.output_path))
 
+
 def train_protonet_model():
     '''
     train protonet model
@@ -204,7 +206,8 @@ def train_protonet_model():
 
     print("============== Starting Training ==============")
     starttime = datetime.datetime.now()
-    model.train(config.epoch_size, train_data, callbacks=[ckpoint_cb, eval_cb, TimeMonitor()],)
+    model.train(config.epoch_size, train_data, callbacks=[ckpoint_cb, eval_cb, TimeMonitor()],
+                dataset_sink_mode=True)
     endtime = datetime.datetime.now()
     print('epoch time: ', (endtime - starttime).seconds / 10, 'per step time:', (endtime - starttime).seconds / 1000)
 

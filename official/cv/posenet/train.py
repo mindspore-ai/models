@@ -146,7 +146,7 @@ if __name__ == '__main__':
                 cb += [ckpt_cb]
 
     epoch_size = cfg.max_steps // args_opt.device_num // step_per_epoch
-    model.train(epoch_size, dataset, callbacks=cb)
+    model.train(epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
     print("Train success!")
 
     if args_opt.is_modelarts:

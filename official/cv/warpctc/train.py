@@ -151,7 +151,7 @@ def train():
         save_ckpt_path = os.path.join(config.save_checkpoint_path, str(rank))
         ckpt_cb = ModelCheckpoint(prefix="warpctc", directory=save_ckpt_path, config=config_ck)
         callbacks.append(ckpt_cb)
-    model.train(config.epoch_size, dataset, callbacks=callbacks)
+    model.train(config.epoch_size, dataset, callbacks=callbacks, dataset_sink_mode=True)
 
 
 if __name__ == '__main__':

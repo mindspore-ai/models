@@ -246,7 +246,7 @@ def run_train():
                                   prefix='{}'.format(config.rank))
         callbacks.append(ckpt_cb)
 
-    model.train(config.max_epoch, dataset, callbacks=callbacks)
+    model.train(config.max_epoch, dataset, callbacks=callbacks, dataset_sink_mode=True)
 
     # output model
     output_model(network)

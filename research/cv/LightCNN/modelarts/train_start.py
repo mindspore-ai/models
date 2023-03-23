@@ -186,7 +186,7 @@ if __name__ == '__main__':
         callbacks.append(ckpoint_cb)
 
     print("============== Starting Training ==============")
-    model.train(args.epochs, ds_train, callbacks=callbacks)
+    model.train(args.epochs, ds_train, callbacks=callbacks, dataset_sink_mode=True)
     print('start export')
     file_list = []
     for root, _, files in os.walk(args.ckpt_path):

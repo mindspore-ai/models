@@ -152,7 +152,7 @@ def main():
         cb.append(eval_cb)
     # begine train
     epoch_size = config.end_epoch - config.begin_epoch
-    model.train(epoch_size, dataset, callbacks=cb)
+    model.train(epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
 
 
 if __name__ == "__main__":

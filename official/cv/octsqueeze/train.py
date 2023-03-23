@@ -117,6 +117,6 @@ if __name__ == '__main__':
     print("============== Starting Training ==============")
     epoch_max = args.max_epochs
     if (args.is_distributed == 0) or (args.rank == 0):
-        train_net.train(epoch_max, dataset, callbacks=[time_cb, LossMonitor(), ckpt_cb])
+        train_net.train(epoch_max, dataset, callbacks=[time_cb, LossMonitor(), ckpt_cb], dataset_sink_mode=True)
     else:
-        train_net.train(epoch_max, dataset, callbacks=[time_cb, LossMonitor()])
+        train_net.train(epoch_max, dataset, callbacks=[time_cb, LossMonitor()], dataset_sink_mode=True)

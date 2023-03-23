@@ -30,23 +30,25 @@ from mindspore.common import set_seed
 from src.model import get_pose_net
 from src.network_define import JointsMSELoss, WithLossCell
 from src.dataset import keypoint_dataset
-#from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.config import config
-#from src.model_utils.device_adapter import get_device_id, get_device_num, get_rank_id
 
 set_seed(1)
+
 
 def get_device_id():
     device_id = os.getenv('DEVICE_ID', '0')
     return int(device_id)
 
+
 def get_device_num():
     device_num = os.getenv('RANK_SIZE', '1')
     return int(device_num)
 
+
 def get_rank_id():
     global_rank_id = os.getenv('RANK_ID', '0')
     return int(global_rank_id)
+
 
 def get_args():
     parser = argparse.ArgumentParser(description="simple_pose training")
@@ -59,6 +61,8 @@ def get_args():
 
     reargs_opt = parser.parse_args()
     return reargs_opt
+
+
 def get_lr(begin_epoch,
            total_epochs,
            steps_per_epoch,
@@ -91,6 +95,7 @@ def get_lr(begin_epoch,
     learning_rate = lr_each_step[current_step:]
     return learning_rate
 
+
 def simple_pose_export(args_opt):
     # define net
     net = get_pose_net(config, True, ckpt_path=config.MODEL.PRETRAINED)
@@ -119,6 +124,7 @@ def simple_pose_export(args_opt):
     print('Freezing model success!')
     return 0
 
+
 def modelarts_pre_process(args_opt):
     if not os.path.exists(config.data_path):
         os.makedirs(config.data_path)
@@ -136,7 +142,6 @@ def modelarts_pre_process(args_opt):
                 data_num = len(fz.namelist())
                 print("Extract Start...")
                 print("unzip file num: {}".format(data_num))
-                #data_print = int(data_num / 100) if data_num > 100 else 1
                 i = 0
                 for files in fz.namelist():
                     i += 1
@@ -175,9 +180,8 @@ def modelarts_pre_process(args_opt):
     config.ckpt_save_dir = os.path.join(config.output_path, config.ckpt_save_dir)
     config.DATASET.ROOT = config.data_path
     config.MODEL.PRETRAINED = os.path.join(config.data_path, config.MODEL.PRETRAINED)
-    #args_opt.MODEL_PRETRAINED = os.path.join(os.path.abspath(os.path.dirname(__file__)), args_opt.MODEL_PRETRAINED)
 
-#@moxing_wrapper(pre_process=modelarts_pre_process)
+
 def run_train(args_opt):
     print('batch size :{}'.format(args_opt.batch_size))
     # distribution and context
@@ -238,7 +242,7 @@ def run_train(args_opt):
     model = Model(net_with_loss, loss_fn=None, optimizer=opt, amp_level="O2")
     epoch_size = config.TRAIN.END_EPOCH - config.TRAIN.BEGIN_EPOCH
     print('start training, epoch size = %d' % epoch_size)
-    model.train(epoch_size, dataset, callbacks=cb)
+    model.train(epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
 
     #export air
     if args_opt.air_path is not None:

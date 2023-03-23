@@ -153,7 +153,7 @@ def main():
     epoch_size = config.TRAIN.END_EPOCH - config.TRAIN.BEGIN_EPOCH
     print("************ Start training now ************")
     print('start training, epoch size = %d' % epoch_size)
-    model.train(1, dataset, callbacks=cb)
+    model.train(1, dataset, callbacks=cb, dataset_sink_mode=True)
     m = createModel()
     if config.GENERAL.RUN_DISTRIBUTE:
         pred = config.MODELARTS.CACHE_OUTPUT + 'device_' + os.getenv('DEVICE_ID') + '/multi_' + 'train_fastpose_' + \
