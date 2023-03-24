@@ -34,11 +34,12 @@ fi
 if [ $# != 4 ]; then
   DEVICE_ID=0
 else
-  DEVICE_ID=`expr $4 + 0`
+  expr $4 + 1 &> /dev/null
   if [ $? != 0 ]; then
     echo "DEVICE_ID=$4 is not an integer"
     exit 1
   fi
+  DEVICE_ID=$4
 fi
 
 export CUDA_VISIBLE_DEVICES=$DEVICE_ID
