@@ -21,6 +21,7 @@ RANK_SIZE=$1
 HOSTFILE=$2
 DATASET=$3
 EPOCH_SIZE=$4
+EMB_DIM=${5:-64}
 
 mpirun --allow-run-as-root -x PATH -x NCCL_IB_HCA -x NCCL_SOCKET_IFNAME -x LD_LIBRARY_PATH -x PYTHONPATH -x NCCL_DEBUG -x GLOG_v -n $RANK_SIZE --hostfile $HOSTFILE --output-filename log_output --merge-stderr-to-stdout \
-    python -s ${self_path}/../train_and_eval_auto_parallel.py --data_path=$DATASET --epochs=$EPOCH_SIZE --sparse=True > train_log.txt 2>&1 &
+    python -s ${self_path}/../train_and_eval_auto_parallel.py --data_path=$DATASET --epochs=$EPOCH_SIZE --emb_dim=$EMB_DIM --dropout_flag=True --sparse=True > train_log.txt 2>&1 &
