@@ -145,6 +145,6 @@ if __name__ == '__main__':
         cb += [ckpt_cb]
 
     # begine train
-    model.train(config.epoch_size, dataset, callbacks=cb)
+    model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
     if args_opt.run_modelarts and config.save_checkpoint and (device_num == 1 or device_id == 0):
         mox.file.copy_parallel(local_train_url, args_opt.train_url)

@@ -41,4 +41,4 @@ if __name__ == '__main__':
     eval_param = {"model": net_with_loss, "valid_data": bsde.sample(config.valid_size)}
     cb = [LossMonitor(), TimeMonitor(), EvalCallBack(eval_param, config.ckpt_path, config.logging_frequency)]
     epoch = dataset.get_dataset_size() // config.logging_frequency
-    model.train(epoch, dataset, callbacks=cb, sink_size=config.logging_frequency)
+    model.train(epoch, dataset, callbacks=cb, dataset_sink_mode=True, sink_size=config.logging_frequency)

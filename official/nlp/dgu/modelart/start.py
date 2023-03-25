@@ -46,6 +46,7 @@ CACHE_TRAINING_URL = "/cache/training/"
 if not os.path.isdir(CACHE_TRAINING_URL):
     os.makedirs(CACHE_TRAINING_URL)
 
+
 def parse_args():
     """Parse args."""
     parser = argparse.ArgumentParser(__doc__)
@@ -128,6 +129,7 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+
 def set_default_args(args):
     """set default args."""
     args.task_name = args.task_name.lower()
@@ -165,6 +167,7 @@ def set_default_args(args):
     if not args.eval_batch_size:
         args.eval_batch_size = args.train_batch_size
 
+
 def do_train(dataset=None, network=None, load_checkpoint_path="base-BertCLS-111.ckpt",
              save_checkpoint_path="", epoch_num=1):
     """ do train """
@@ -200,7 +203,8 @@ def do_train(dataset=None, network=None, load_checkpoint_path="base-BertCLS-111.
     netwithgrads = BertFinetuneCell(network, optimizer=optimizer, scale_update_cell=update_cell)
     model = Model(netwithgrads)
     callbacks = [TimeMonitor(dataset.get_dataset_size()), LossCallBack(dataset.get_dataset_size()), ckpoint_cb]
-    model.train(epoch_num, dataset, callbacks=callbacks)
+    model.train(epoch_num, dataset, callbacks=callbacks, dataset_sink_mode=True)
+
 
 def eval_result_print(eval_metric, result):
     if args_opt.task_name.lower() in ['atis_intent', 'mrda', 'swda']:
@@ -212,6 +216,7 @@ def eval_result_print(eval_metric, result):
         print("R1@10: ", result[0])
         print("R2@10: ", result[1])
         print("R5@10: ", result[2])
+
 
 def do_eval(dataset=None, network=None, num_class=5, eval_metric=None, load_checkpoint_path=""):
     """ do eval """
@@ -312,6 +317,7 @@ def run_dgu(args_input):
 
     mox.file.copy_parallel(CACHE_TRAINING_URL, args_input.train_url)
 
+
 def frozen_to_air(net, args):
     load_checkpoint(args.get("ckpt_file"), net=net)
     net.set_train(False)
@@ -323,11 +329,13 @@ def frozen_to_air(net, args):
     input_data = [input_ids, input_mask, token_type_id]
     export(net.bert, *input_data, file_name=args.get("file_name"), file_format=args.get("file_format"))
 
+
 def print_args_input(args_input):
     print('-----------  Configuration Arguments -----------')
     for arg, value in sorted(vars(args_input).items()):
         print('%s: %s' % (arg, value))
     print('------------------------------------------------')
+
 
 def set_bert_cfg():
     """set bert cfg"""

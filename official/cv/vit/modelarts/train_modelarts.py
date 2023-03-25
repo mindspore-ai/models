@@ -55,6 +55,7 @@ except TypeError:
     device_num = 1  # world_size
     print("standalone training")
 
+
 def add_static_args(args):
     """add_static_args"""
     args.weight_decay = float(args.weight_decay)
@@ -72,6 +73,7 @@ def add_static_args(args):
     args.local_rank = local_rank
     args.device_num = device_num
     return args
+
 
 def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
     """remove useless parameters according to filter_list"""
@@ -228,7 +230,7 @@ if __name__ == '__main__':
         cb += [ckpt_cb]
 
     t0 = time.time()
-    model.train(epoch_size, dataset, callbacks=cb, sink_size=step_size)
+    model.train(epoch_size, dataset, callbacks=cb, dataset_sink_mode=True, sink_size=step_size)
     t1 = time.time()
     args_opt.logger.info('training time used={:.2f}s'.format(t1 - t0))
     last_metric = 'last_metric[{}]'.format(state_cb.best_acc)

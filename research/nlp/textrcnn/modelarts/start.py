@@ -42,6 +42,7 @@ set_seed(2)
 os.system("pip3 install gensim==4.0.1 python-Levenshtein urllib3==1.26.5 chardet==3.0.4")
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
+
 def convert_encoding(path_name, file_name):
     """convert encoding method"""
     f = open(file_name, 'r', encoding='iso-8859-1')
@@ -151,7 +152,7 @@ def run_train():
     config_ck = CheckpointConfig(save_checkpoint_steps=cfg.save_checkpoint_steps,
                                  keep_checkpoint_max=cfg.keep_checkpoint_max)
     ckpoint_cb = ModelCheckpoint(prefix=cfg.cell, directory=cfg.ckpt_folder_path, config=config_ck)
-    model.train(num_epochs, ds_train, callbacks=[ckpoint_cb, loss_cb, time_cb])
+    model.train(num_epochs, ds_train, callbacks=[ckpoint_cb, loss_cb, time_cb], dataset_sink_mode=True)
     print("train success")
 
 
@@ -169,7 +170,6 @@ def run_eval():
                        cell=cfg.cell, batch_size=cfg.batch_size)
     loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True)
     eval_net = nn.WithEvalCell(network, loss, True)
-    # loss_cb = LossMonitor()
     print("============== Starting Testing ==============")
     ds_eval = create_dataset(cfg.preprocess_path, cfg.batch_size, False)
 

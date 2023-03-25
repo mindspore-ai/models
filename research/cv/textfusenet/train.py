@@ -39,6 +39,7 @@ from mindspore.communication.management import get_rank, get_group_size
 
 set_seed(1)
 
+
 def modelarts_pre_process():
     """model arts pre process"""
     def unzip(zip_file, save_dir):
@@ -99,6 +100,7 @@ def modelarts_pre_process():
 
 context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=get_device_id())
 
+
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_textfusenet():
     """train textfusenet"""
@@ -143,7 +145,6 @@ def train_textfusenet():
         time.sleep(5)
 
     if not config.only_create_dataset:
-        # loss_scale = float(config.loss_scale)
         # When create MindDataset, using the fitst mindrecord file, such as TextFuseNet.mindrecord0.
         dataset = create_textfusenet_dataset(mindrecord_file, batch_size=config.batch_size,
                                              device_num=device_num, rank_id=rank)
@@ -188,7 +189,7 @@ def train_textfusenet():
             cb += [ckpoint_cb]
 
         model = Model(net)
-        model.train(config.epoch_size, dataset, callbacks=cb)
+        model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
 
 
 if __name__ == '__main__':

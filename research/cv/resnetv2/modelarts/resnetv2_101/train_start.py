@@ -59,7 +59,6 @@ parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"]
 
 args, _ = parser.parse_known_args()
 
-# import net
 if args.net == "resnetv2_50":
     from src.resnetv2 import PreActResNet50 as resnetv2
 elif args.net == 'resnetv2_101':
@@ -69,7 +68,6 @@ elif args.net == 'resnetv2_152':
 else:
     raise ValueError("network is not support.")
 
-# import dataset and config
 if args.dataset == "cifar10":
     from src.dataset import create_dataset1 as create_dataset
     from src.config import config1 as config
@@ -81,6 +79,7 @@ elif args.dataset == 'imagenet2012':
     from src.config import config3 as config
 else:
     raise ValueError("dataset is not support.")
+
 
 def _train():
     """ train """
@@ -153,7 +152,8 @@ def _train():
             callbacks = [time_cb, loss_cb, ckpoint_cb]
     else:
         callbacks = [time_cb, loss_cb, ckpoint_cb]
-    model.train(epoch_size, dataset, callbacks=callbacks)
+    model.train(epoch_size, dataset, callbacks=callbacks, dataset_sink_mode=True)
+
 
 def _get_last_ckpt(ckpt_dir):
     """ get ckpt """
@@ -165,6 +165,7 @@ def _get_last_ckpt(ckpt_dir):
         return None
 
     return os.path.join(ckpt_dir, max(ckpt_files)[1])
+
 
 def _export_air():
     """ export air """

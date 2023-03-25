@@ -30,6 +30,7 @@ from src.loss import MultiBoxLoss
 from src.dataset import create_dataset
 from src.lr_schedule import adjust_learning_rate, warmup_cosine_annealing_lr
 
+
 def train_with_resnet(cfg):
     """train_with_resnet"""
     mindspore.common.seed.set_seed(cfg['seed'])
@@ -122,7 +123,7 @@ def train_with_resnet(cfg):
     callback_list = [LossMonitor(), time_cb, ckpoint_cb]
 
     print("============== Starting Training ==============")
-    model.train(max_epoch, ds_train, callbacks=callback_list)
+    model.train(max_epoch, ds_train, callbacks=callback_list, dataset_sink_mode=True)
 
 
 def train_with_mobilenet(cfg):

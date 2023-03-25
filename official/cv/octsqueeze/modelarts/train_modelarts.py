@@ -72,6 +72,7 @@ def parallel_init(argv):
     context.set_auto_parallel_context(parallel_mode=parallel_mode, gradients_mean=True,
                                       device_num=degree, parameter_broadcast=True)
 
+
 class OctSqueezeNet(nn.Cell):
     def __init__(self):
         super().__init__()
@@ -188,9 +189,9 @@ if __name__ == '__main__':
     print("============== Starting Training ==============")
     epoch_max = args.max_epochs
     if (args.is_distributed == 0) or (args.rank == 0):
-        train_net.train(epoch_max, dataset, callbacks=[time_cb, LossMonitor(), ckpt_cb])
+        train_net.train(epoch_max, dataset, callbacks=[time_cb, LossMonitor(), ckpt_cb], dataset_sink_mode=True)
     else:
-        train_net.train(epoch_max, dataset, callbacks=[time_cb, LossMonitor()])
+        train_net.train(epoch_max, dataset, callbacks=[time_cb, LossMonitor()], dataset_sink_mode=True)
 
     checkpoint_path = sorted([file for file in os.listdir(args.train_url) if '.ckpt' in file])[-1]
     """ export_octsqueeze """

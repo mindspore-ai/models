@@ -91,7 +91,6 @@ if __name__ == '__main__':
     device_target = args_opt.device_target
 
     # We enabling the graph kernel only for the Ascend device.
-    # enable_graph_kernel = (device_target == 'Ascend')
     enable_graph_kernel = False
 
     context.set_context(mode=context.GRAPH_MODE, device_target=device_target,
@@ -198,5 +197,5 @@ if __name__ == '__main__':
                                  config=config_ck)
     loss_cb = LossMonitor()
 
-    model.train(cfg.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb])
+    model.train(cfg.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb], dataset_sink_mode=True)
     print("train success")

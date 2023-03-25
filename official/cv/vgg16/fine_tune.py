@@ -209,7 +209,7 @@ def finetune_train(model_config,
     callbacks = [time_cb, loss_cb]
 
     # do training
-    model.train(num_epochs, dataset_train, callbacks=callbacks)
+    model.train(num_epochs, dataset_train, callbacks=callbacks, dataset_sink_mode=True)
     ms.save_checkpoint(net, save_checkpoint_path)
 
 

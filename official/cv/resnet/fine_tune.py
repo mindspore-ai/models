@@ -157,7 +157,7 @@ def finetune_train():
     run_eval(model, "./", data_val, cb)
 
     num_epochs = config.epoch_size
-    model.train(num_epochs, dataset_train, callbacks=cb)
+    model.train(num_epochs, dataset_train, callbacks=cb, dataset_sink_mode=True)
 
     eval_net(net, data_val)
 

@@ -40,6 +40,7 @@ from src.model_utils.device_adapter import get_device_id, get_device_num
 
 set_seed(1)
 
+
 def lr_steps_imagenet(_cfg, steps_per_epoch):
     """lr step for imagenet"""
     from src.lr_scheduler.warmup_step_lr import warmup_step_lr
@@ -63,6 +64,7 @@ def lr_steps_imagenet(_cfg, steps_per_epoch):
         raise NotImplementedError(_cfg.lr_scheduler)
 
     return _lr
+
 
 def modelarts_pre_process():
     '''modelarts pre process function.'''
@@ -117,6 +119,7 @@ def modelarts_pre_process():
     config.ckpt_save_dir = os.path.join(config.output_path, config.ckpt_save_dir)
     config.train_data_dir = config.data_path
     config.checkpoint_path = config.load_path
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_train():
@@ -216,7 +219,7 @@ def run_train():
     ckpoint_cb = ModelCheckpoint(prefix="train_tinydarknet_" + config.dataset_name, directory=ckpt_save_dir,
                                  config=config_ck)
     loss_cb = LossMonitor()
-    model.train(config.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb])
+    model.train(config.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb], dataset_sink_mode=True)
     print("train success")
 
 if __name__ == '__main__':

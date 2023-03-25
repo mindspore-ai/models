@@ -44,6 +44,7 @@ import src.senet_ms as senets
 
 set_seed(1)
 
+
 def lr_steps_cifar10(global_step, lr_max=None, total_epochs=None, steps_per_epoch=None):
     """Set learning rate."""
     lr_each_step = []
@@ -185,7 +186,6 @@ if __name__ == '__main__':
     device_target = cfg.device_target
 
     context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target)
-    # context.set_context(enable_graph_kernel=True)
     device_num = int(os.getenv('RANK_SIZE', '1'))
 
     if device_target == "Ascend":
@@ -293,5 +293,5 @@ if __name__ == '__main__':
     cbs = [time_cb, ckpoint_cb, loss_cb]
     if device_num > 1 and device_id != 0:
         cbs = [time_cb, loss_cb]
-    model.train(cfg.epoch_size, dataset, callbacks=cbs)
+    model.train(cfg.epoch_size, dataset, callbacks=cbs, dataset_sink_mode=True)
     print("train success")

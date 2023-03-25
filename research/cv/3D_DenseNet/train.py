@@ -33,6 +33,7 @@ from src.eval_call_back import StepLossAccInfo
 
 set_seed(1)
 
+
 @moxing_wrapper()
 def train_net():
     """
@@ -94,7 +95,8 @@ def train_net():
                                  config=ckpt_config)
     callbacks_list = [loss_cb, time_cb, ckpoint_cb, step_loss_acc_info]
     print("============== Starting Training ==============")
-    model.train(config.epoch_size, train_dataset=trainds, callbacks=callbacks_list)
+    model.train(config.epoch_size, train_dataset=trainds, callbacks=callbacks_list,
+                dataset_sink_mode=True)
     print("============== End Training ==============")
 
 if __name__ == '__main__':

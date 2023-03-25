@@ -135,7 +135,8 @@ if __name__ == "__main__":
     print("============== Starting Training ==============")
     time_cb = TimeMonitor(data_size=ds_train.get_dataset_size())
     eval_callback = mcnn_callback(network, ds_val, args.run_offline, args.ckpt_path)
-    model.train(args.epoch_size, ds_train, callbacks=[time_cb, eval_callback, LossMonitor(1)])
+    model.train(args.epoch_size, ds_train, callbacks=[time_cb, eval_callback, LossMonitor(1)],
+                dataset_sink_mode=True)
     if not args.run_offline:
         mox.file.copy_parallel(src_url='/cache/train_output', dst_url=args.ckpt_path)
 

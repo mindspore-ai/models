@@ -144,7 +144,7 @@ def main():
     epoch_size = config.TRAIN.END_EPOCH - config.TRAIN.BEGIN_EPOCH
     print("************ Start training now ************")
     print('start training, epoch size = %d' % epoch_size)
-    model.train(epoch_size, dataset, callbacks=cb)
+    model.train(epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
 
     if config.MODELARTS.IS_MODEL_ARTS:
         mox.file.copy_parallel(src_url=config.MODELARTS.CACHE_OUTPUT, dst_url=args.train_url)

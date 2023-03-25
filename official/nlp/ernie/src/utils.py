@@ -60,9 +60,8 @@ class CrossEntropyCalculation(nn.Cell):
 
 def make_directory(path: str):
     """Make directory."""
-    if path is None or not isinstance(path, str) or path.strip() == "":
-        logger.error("The path(%r) is invalid type.", path)
-        raise TypeError("Input path is invalid type")
+    if not path:
+        path = os.getcwd()
 
     # convert the relative paths
     path = os.path.realpath(path)
@@ -81,6 +80,7 @@ def make_directory(path: str):
             logger.error("No write permission on the directory(%r), error = %r", path, e)
             raise TypeError("No write permission on the directory.")
     return real_path
+
 
 class LossCallBack(Callback):
     """
@@ -110,6 +110,7 @@ class LossCallBack(Callback):
         else:
             print("epoch: {}, step: {}, outputs are {}".format(cb_params.cur_epoch_num, cb_params.cur_step_num,
                                                                str(cb_params.net_outputs)), flush=True)
+
 
 def LoadNewestCkpt(load_finetune_checkpoint_dir, steps_per_epoch, epoch_num, prefix):
     """
@@ -165,6 +166,7 @@ class ErnieLearningRate(LearningRateSchedule):
             lr = decay_lr
         return lr
 
+
 def _get_poly_lr(global_step, lr_init, lr_end, lr_max, warmup_steps, total_steps, poly_power):
     """
     generate learning rate array
@@ -211,6 +213,7 @@ def get_ernie_thor_damping(damping_max=5e-2, damping_min=1e-6, damping_power=1.0
     damping = _get_poly_lr(global_step=0, lr_init=0.0, lr_end=damping_min, lr_max=damping_max, warmup_steps=0,
                            total_steps=damping_total_steps, poly_power=damping_power)
     return Tensor(damping)
+
 
 def get_file_list(input_file):
     """get file list of input folder"""
