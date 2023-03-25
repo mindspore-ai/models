@@ -48,6 +48,7 @@ context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target,
 if config.device_target != 'GPU' or not config.is_distributed:
     context.set_context(device_id=get_device_id())
 
+
 class DistributedHelper(Cell):
     '''DistributedHelper'''
     def __init__(self, backbone, margin_fc):
@@ -179,6 +180,7 @@ def modelarts_pre_process():
 
     config.ckpt_path = os.path.join(config.output_path, str(get_rank_id()), config.ckpt_path)
 
+
 def model_context():
     """set context for facerecognition"""
     if config.is_distributed:
@@ -302,7 +304,8 @@ def run_train():
         callback_list.append(ckpt_cb)
 
     new_epoch_train = config.max_epoch * steps_per_epoch // config.log_interval
-    model.train(new_epoch_train, de_dataset, callbacks=callback_list, sink_size=config.log_interval)
+    model.train(new_epoch_train, de_dataset, callbacks=callback_list, dataset_sink_mode=True,
+                sink_size=config.log_interval)
 
 
 if __name__ == "__main__":

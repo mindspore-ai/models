@@ -119,7 +119,7 @@ def main():
         ckpoint_cb = ModelCheckpoint(prefix="checkpoint_vnet", directory=ckpt_dir, config=config_ck)
         cb.append(ckpoint_cb)
     print("============== Starting Training fold {} ==============".format(str(cfg.fold)))
-    model.train(args.epochs, ds_train, callbacks=cb)
+    model.train(args.epochs, ds_train, callbacks=cb, dataset_sink_mode=True)
 
     # export network
 

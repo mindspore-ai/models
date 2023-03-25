@@ -42,6 +42,7 @@ from src.model_utils.device_adapter import get_device_id, get_device_num
 
 set_seed(1)
 
+
 def lr_steps_imagenet(_cfg, steps_per_epoch):
     """lr step for imagenet"""
     from src.lr_scheduler.warmup_step_lr import warmup_step_lr
@@ -223,8 +224,9 @@ def run_train():
     ckpoint_cb = ModelCheckpoint(prefix="train_tinydarknet_" + config.dataset_name, directory=ckpt_save_dir,
                                  config=config_ck)
     loss_cb = LossMonitor()
-    model.train(config.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb])
+    model.train(config.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb], dataset_sink_mode=True)
     print("train success")
+
 
 def transfer_learning_modelarts_pre_process():
     '''transfer learning modelarts pre process function.'''
@@ -246,6 +248,7 @@ def run_export():
 
     input_arr = Tensor(np.random.uniform(0.0, 1.0, size=[config.batch_size, 3, 224, 224]), ms.float32)
     export(net, input_arr, file_name=config.file_name, file_format=config.file_format)
+
 
 def freeze_model():
     """ freeze model """
@@ -269,4 +272,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    

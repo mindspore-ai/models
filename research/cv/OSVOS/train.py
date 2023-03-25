@@ -45,6 +45,7 @@ parser.add_argument("--parent_ckpt_path", type=str, default=None, help="the pare
 parser.add_argument("--vgg_features_ckpt", type=str, default='./models/vgg16_features.ckpt',
                     help="Path to the vgg pretrain model.")
 
+
 def train_parent(args, cfg):
     """train stage 1, train parent network."""
     data_path = args.data_path
@@ -121,7 +122,7 @@ def train_parent(args, cfg):
 
     print("start train...")
     start = time.time()
-    model.train(epoch_size, dataset_train, callbacks=cb)
+    model.train(epoch_size, dataset_train, callbacks=cb, dataset_sink_mode=True)
     end = time.time()
     print(f"train success, use time {(end-start)/60} minutes")
 
@@ -182,7 +183,7 @@ def train_online(args, cfg):
     net.set_train()
 
     learning_rate = []
-    warm_up = [lr/ math.floor(epoch_size / 5) * (i + 1) for _ in range(batch_num) for i in
+    warm_up = [lr / math.floor(epoch_size / 5) * (i + 1) for _ in range(batch_num) for i in
                range(math.floor(epoch_size / 5))]
     shrink = [lr / (16 * (i + 1)) for _ in range(batch_num)
               for i in range(math.floor(epoch_size * 2 / 5))]
@@ -205,7 +206,7 @@ def train_online(args, cfg):
 
     print("start train...")
     start = time.time()
-    model.train(epoch_size, dataset_train, callbacks=cb)
+    model.train(epoch_size, dataset_train, callbacks=cb, dataset_sink_mode=True)
     end = time.time()
     print(f"train success, use time {(end-start)/60} minutes")
 

@@ -34,10 +34,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 set_seed(1)
 
+
 def modelarts_pre_process():
     '''modelarts pre process function.'''
     config.train_data_dir = config.data_path
     config.ckpt_path = os.path.join(config.output_path, config.ckpt_path)
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_train():
@@ -76,8 +78,6 @@ def run_train():
                               rank_id=rank_id)
     print("ds_train.size: {}".format(ds_train.get_dataset_size()))
 
-    # steps_size = ds_train.get_dataset_size()
-
     model_builder = ModelBuilder(model_config, train_config)
     train_net, eval_net = model_builder.get_train_eval_net()
     auc_metric = AUCMetric()
@@ -106,6 +106,7 @@ def run_train():
         eval_callback = EvalCallBack(model, ds_eval, auc_metric,
                                      eval_file_path=config.eval_file_name)
         callback_list.append(eval_callback)
-    model.train(config.epochs, ds_train, callbacks=callback_list)
+    model.train(config.epochs, ds_train, callbacks=callback_list, dataset_sink_mode=True)
+
 if __name__ == '__main__':
     run_train()

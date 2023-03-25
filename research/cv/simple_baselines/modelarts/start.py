@@ -43,6 +43,7 @@ if config.MODELARTS.IS_MODEL_ARTS:
 
 set_seed(config.GENERAL.TRAIN_SEED)
 
+
 def get_lr(begin_epoch,
            total_epochs,
            steps_per_epoch,
@@ -65,6 +66,7 @@ def get_lr(begin_epoch,
     learning_rate = lr_each_step[current_step:]
     return learning_rate
 
+
 def parse_args():
     parser = argparse.ArgumentParser(description="Simpleposenet training")
     parser.add_argument('--data_url', required=False, default=None, help='Location of data.')
@@ -74,6 +76,7 @@ def parse_args():
     parser.add_argument('--is_model_arts', type=ast.literal_eval, default=True, help='Location of training outputs.')
     args = parser.parse_args()
     return args
+
 
 def main():
     print("loading parse...")
@@ -147,12 +150,13 @@ def main():
     epoch_size = config.TRAIN.END_EPOCH - config.TRAIN.BEGIN_EPOCH
     print("************ Start training now ************")
     print('start training, epoch size = %d' % epoch_size)
-    model.train(epoch_size, dataset, callbacks=cb)
+    model.train(epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
 
     export_AIR(directory)
     shutil.copy('simple_baselines.air', config.MODELARTS.CACHE_OUTPUT)
     if config.MODELARTS.IS_MODEL_ARTS:
         mox.file.copy_parallel(src_url=config.MODELARTS.CACHE_OUTPUT, dst_url=args.train_url)
+
 
 def export_AIR(ckpt_path):
     """start modelarts export"""

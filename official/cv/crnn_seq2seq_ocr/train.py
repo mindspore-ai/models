@@ -41,6 +41,8 @@ from src.model_utils.config import config
 from src.model_utils.device_adapter import get_device_id, get_rank_id, get_device_num
 
 set_seed(1)
+
+
 def modelarts_pre_process():
     '''modelarts pre process function.'''
     def unzip(zip_file, save_dir):
@@ -93,6 +95,7 @@ def modelarts_pre_process():
         print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
 
     config.ckpt_path = os.path.join(config.output_path, str(get_rank_id()), config.ckpt_path)
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train():
@@ -172,7 +175,7 @@ def train():
         callback.append(ckpt_cb)
 
     model = Model(network)
-    model.train(config.num_epochs, dataset, callbacks=callback)
+    model.train(config.num_epochs, dataset, callbacks=callback, dataset_sink_mode=True)
 
     config.logger.info('==========Training Done===============')
 

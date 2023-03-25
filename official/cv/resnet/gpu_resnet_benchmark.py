@@ -29,6 +29,7 @@ from src.model_utils.moxing_adapter import moxing_wrapper
 
 ms.set_seed(1)
 
+
 class MyTimeMonitor(Callback):
     def __init__(self, batch_size, sink_size, dataset_size, mode):
         super(MyTimeMonitor, self).__init__()
@@ -226,9 +227,11 @@ def train():
     # train model
     print("========START RESNET50 GPU BENCHMARK========")
     if mode == ms.GRAPH_MODE:
-        model.train(int(epoch_size * step_size / print_per_steps), dataset, callbacks=cb, sink_size=print_per_steps)
+        model.train(int(epoch_size * step_size / print_per_steps), dataset, callbacks=cb, dataset_sink_mode=True,
+                    sink_size=print_per_steps)
     else:
-        model.train(epoch_size, dataset, callbacks=cb)
+        model.train(epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
+
 
 @moxing_wrapper()
 def eval_():

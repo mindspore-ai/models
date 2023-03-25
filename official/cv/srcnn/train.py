@@ -35,6 +35,7 @@ from src.model_utils.moxing_adapter import sync_data
 
 set_seed(1)
 
+
 def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
     """remove useless parameters according to filter_list"""
     for key in list(origin_dict.keys()):
@@ -43,6 +44,7 @@ def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
                 print("Delete parameter from checkpoint: ", key)
                 del origin_dict[key]
                 break
+
 
 def run_train():
     cfg = config
@@ -107,7 +109,7 @@ def run_train():
         ckpt_cb = ModelCheckpoint(prefix="srcnn", directory=save_ckpt_path, config=config_ck)
         callbacks.append(ckpt_cb)
 
-    model.train(cfg.epoch_size, train_dataset, callbacks=callbacks)
+    model.train(cfg.epoch_size, train_dataset, callbacks=callbacks, dataset_sink_mode=True)
     if cfg.enable_modelarts == "True":
         sync_data(output_path, cfg.train_url)
 

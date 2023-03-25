@@ -91,7 +91,6 @@ if __name__ == '__main__':
             data_url=cfg.data_path,
             data_list=cfg.train_list,
             batch_size=cfg.batch_size,
-            # num_of_workers=8,
             is_distributed=True,
             group_size=get_group_size(),
             rank=get_rank(),
@@ -102,8 +101,7 @@ if __name__ == '__main__':
             mode='Train',
             data_url=cfg.data_path,
             data_list=cfg.train_list,
-            batch_size=cfg.batch_size,
-            # num_of_workers=8
+            batch_size=cfg.batch_size
         )
     # define network
     network = lightCNN_9Layers(cfg.num_classes)
@@ -187,4 +185,4 @@ if __name__ == '__main__':
     callbacks.append(ckpoint_cb)
 
     print("============== Starting Training ==============")
-    model.train(cfg['epochs'], ds_train, callbacks=callbacks)
+    model.train(cfg['epochs'], ds_train, callbacks=callbacks, dataset_sink_mode=True)
