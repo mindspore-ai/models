@@ -20,9 +20,11 @@ Bert finetune and evaluation script.
 import os
 import mindspore.common.dtype as mstype
 from mindspore import context
+from mindspore import Profiler
 from mindspore import log as logger
 from mindspore.nn.wrap.loss_scale import DynamicLossScaleUpdateCell
 from mindspore.nn.optim import AdamWeightDecay, Lamb, Momentum
+from mindspore.train import SummaryCollector
 from mindspore.train.model import Model
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -38,7 +40,8 @@ from src.model_utils.device_adapter import get_device_id
 _cur_dir = os.getcwd()
 
 
-def do_train(dataset=None, network=None, load_checkpoint_path="", save_checkpoint_path="", epoch_num=1):
+def do_train(dataset=None, network=None, load_checkpoint_path="", save_checkpoint_path="", epoch_num=1,
+             summary_collector=None):
     """ do train """
     if load_checkpoint_path == "":
         raise ValueError("Pretrain model missed, finetune task must load pretrain model!")
@@ -82,7 +85,11 @@ def do_train(dataset=None, network=None, load_checkpoint_path="", save_checkpoin
     netwithgrads = BertFinetuneCell(network, optimizer=optimizer, scale_update_cell=update_cell)
     model = Model(netwithgrads)
     callbacks = [TimeMonitor(dataset.get_dataset_size()), LossCallBack(dataset.get_dataset_size()), ckpoint_cb]
-    model.train(epoch_num, dataset, callbacks=callbacks, dataset_sink_mode=True)
+    dataset_sink_mode = True
+    if summary_collector:
+        callbacks.append(summary_collector)
+        dataset_sink_mode = False
+    model.train(epoch_num, dataset, callbacks=callbacks, dataset_sink_mode=dataset_sink_mode)
 
 
 def eval_result_print(assessment_method="accuracy", callback=None):
@@ -174,10 +181,17 @@ def run_classifier():
             bert_net_cfg.compute_type = mstype.float32
     else:
         raise Exception("Target error, GPU or Ascend is supported.")
-
+    if args_opt.do_summary.lower() == "true":
+        summary_dir = "summary_dir" + str(args_opt.device_id)
+        specified = {"collect_metric": True, "histogram_regular": "^layer.*", "collect_graph": True,
+                     "collect_dataset_graph": True}
+        summary_collector = SummaryCollector(summary_dir=summary_dir, collect_specified_data=specified,
+                                             collect_freq=1, keep_default_action=True, collect_tensor_freq=200)
+    else:
+        summary_collector = None
     netwithloss = BertCLS(bert_net_cfg, True, num_labels=args_opt.num_class, dropout_prob=0.1,
                           assessment_method=assessment_method)
-
+    profiler = Profiler(output_path="./profile_data")
     if args_opt.do_train.lower() == "true":
         ds = create_classification_dataset(batch_size=args_opt.train_batch_size,
                                            assessment_method=assessment_method,
@@ -185,8 +199,10 @@ def run_classifier():
                                            schema_file_path=args_opt.schema_file_path,
                                            dataset_format=args_opt.dataset_format,
                                            do_shuffle=(args_opt.train_data_shuffle.lower() == "true"))
-        do_train(ds, netwithloss, load_pretrain_checkpoint_path, save_finetune_checkpoint_path, epoch_num)
-
+        do_train(ds, netwithloss, load_pretrain_checkpoint_path, save_finetune_checkpoint_path,
+                 epoch_num, summary_collector)
+        if args_opt.do_profiler.lower() == "true":
+            profiler.analyse()
         if args_opt.do_eval.lower() == "true":
             if save_finetune_checkpoint_path == "":
                 load_finetune_checkpoint_dir = _cur_dir
