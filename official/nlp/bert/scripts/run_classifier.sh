@@ -18,8 +18,8 @@ echo "==========================================================================
 echo "Please run the script as: "
 echo "bash scripts/run_classifier.sh DEVICE_ID"
 echo "DEVICE_ID is optional, default value is zero"
-echo "for example: bash scripts/run_classifier.sh DEVICE_ID 1"
-echo "assessment_method include: [MCC, Spearman_correlation ,Accuracy]"
+echo "for example: bash scripts/run_classifier.sh 1"
+echo "assessment_method include: [MCC, Spearman_correlation, Accuracy]"
 echo "=============================================================================================================="
 
 if [ -z $1 ]
@@ -39,11 +39,13 @@ python ${PROJECT_DIR}/../run_classifier.py  \
     --config_path="../../task_classifier_config.yaml" \
     --device_target="Ascend" \
     --do_train="true" \
-    --do_eval="false" \
+    --do_eval="true" \
+    --do_summary="true" \
+    --do_profiler='false' \
     --assessment_method="Accuracy" \
     --device_id=$DEVICE_ID \
     --epoch_num=3 \
-    --num_class=2 \
+    --num_class=15 \
     --train_data_shuffle="true" \
     --eval_data_shuffle="false" \
     --train_batch_size=32 \

@@ -16,6 +16,8 @@ description: "run_classifier"
 assessment_method: "Accuracy"
 do_train: "false"
 do_eval: "false"
+do_summary: "false"
+do_profiler: "false"
 device_id: 0
 epoch_num: 3
 num_class: 2
@@ -29,7 +31,7 @@ load_finetune_checkpoint_path: ""
 train_data_file_path: ""
 eval_data_file_path: ""
 schema_file_path: ""
-dataset_format: "mindrecord"
+dataset_format: "tfrecord"
 # export related
 export_batch_size: 1
 export_ckpt_file: ''
