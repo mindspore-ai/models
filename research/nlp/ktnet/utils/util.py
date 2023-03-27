@@ -22,7 +22,7 @@ from mindspore.ops import operations as P
 from mindspore.common import dtype as mstype
 from mindspore.train.callback import Callback
 from mindspore.nn.learning_rate_schedule import LearningRateSchedule
-from mindspore import _checkparam as validator
+from mindspore._checkparam import Validator as validator
 
 
 def make_directory(path: str):

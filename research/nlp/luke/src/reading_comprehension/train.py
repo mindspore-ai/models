@@ -24,7 +24,7 @@ from mindspore.train.model import Model
 from mindspore.train.callback import LossMonitor, CheckpointConfig, ModelCheckpoint, TimeMonitor
 import mindspore.ops as P
 from mindspore import dtype as mstype
-from mindspore import _checkparam as validator
+from mindspore._checkparam import Validator as validator
 
 from src.reading_comprehension.model import LukeForReadingComprehensionWithLoss
 

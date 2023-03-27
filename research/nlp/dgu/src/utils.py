@@ -29,7 +29,7 @@ import mindspore.ops as P
 
 from mindspore import dtype as mstype
 from mindspore import log as logger
-from mindspore import _checkparam as validator
+from mindspore._checkparam import Validator as validator
 from mindspore.common.tensor import Tensor
 from mindspore.nn.learning_rate_schedule import (LearningRateSchedule,
                                                  PolynomialDecayLR, WarmUpLR)

@@ -24,7 +24,8 @@ from mindspore.ops import composite as C
 from mindspore.ops import functional as F
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
-from mindspore import _checkparam as validator
+from mindspore._checkparam import Validator as validator
+from mindspore._checkparam import Rel
 
 _learning_rate_update_func = ['linear', 'cos', 'sin']
 
@@ -97,7 +98,7 @@ def _check_learning_rate_value(learning_rate, end_learning_rate, decay_steps, po
     validator.check_float_legal_value('end_learning_rate', end_learning_rate, prim_name)
     validator.check_float_positive('power', power, prim_name)
     validator.check_float_legal_value('power', power, prim_name)
-    validator.check_integer('decay_steps', decay_steps, 0, validator.GT, prim_name)
+    validator.check_integer('decay_steps', decay_steps, 0, Rel.GT, prim_name)
 
 
 @adam_opt.register("Function", "Tensor", "Tensor", "Tensor", "Tensor", "Number", "Tensor", "Tensor", "Tensor", "Tensor",
@@ -209,7 +210,7 @@ class Adam(Optimizer):
         validator.check_value_type("use_locking", use_locking, [bool], self.cls_name)
         validator.check_value_type("use_nesterov", use_nesterov, [bool], self.cls_name)
         validator.check_value_type("loss_scale", loss_scale, [float], self.cls_name)
-        # validator.check_number_range("loss_scale", loss_scale, 1.0, float("inf"), validator.INC_LEFT, self.cls_name)
+        # validator.check_number_range("loss_scale", loss_scale, 1.0, float("inf"), Rel.INC_LEFT, self.cls_name)
 
         self.beta1 = Tensor(beta1, mstype.float32)
         self.beta2 = Tensor(beta2, mstype.float32)
