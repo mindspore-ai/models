@@ -21,7 +21,7 @@ import numpy as np
 import mindspore.common.dtype as mstype
 from mindspore import context
 from mindspore import nn
-from mindspore import _checkparam as Validator
+from mindspore._checkparam import Validator
 from mindspore._extends import cell_attr_register
 from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter

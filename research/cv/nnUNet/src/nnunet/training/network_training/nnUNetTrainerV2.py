@@ -21,7 +21,7 @@ from typing import Tuple
 import mindspore
 
 from mindspore import FixedLossScaleManager, nn, ops, Tensor
-from mindspore import _checkparam as validator
+from mindspore._checkparam import Validator as validator
 import numpy as np
 from batchgenerators.utilities.file_and_folder_operations import join, maybe_mkdir_p, save_pickle, load_pickle, isfile
 

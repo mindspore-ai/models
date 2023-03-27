@@ -24,7 +24,7 @@ from mindspore.common.parameter import ParameterTuple, Parameter
 from mindspore.nn.cell import Cell
 from mindspore import nn
 from mindspore import log as logger
-from mindspore import _checkparam as validator
+from mindspore._checkparam import Validator as validator
 
 __all__ = ['GRU', 'RNN', 'AUGRU', 'GRUCell', 'RNNCell', 'AUGRUCell']
 

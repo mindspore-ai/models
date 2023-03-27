@@ -17,7 +17,7 @@ import numpy as np
 import mindspore.nn as nn
 from mindspore.ops import operations as P
 from mindspore.common.tensor import Tensor
-from mindspore import _checkparam as validator
+from mindspore._checkparam import Validator as validator
 from mindspore.common import dtype as mstype
 from mindspore.common.parameter import Parameter
 from mindspore.ops import functional as F

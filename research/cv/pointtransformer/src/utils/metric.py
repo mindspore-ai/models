@@ -20,7 +20,7 @@ from mindspore import nn
 import mindspore.common.dtype as mstype
 from mindspore.ops import operations as P
 from mindspore.ops import functional as F
-from mindspore import _checkparam as validator
+from mindspore._checkparam import Validator as validator
 
 
 classes = {'Earphone': [16, 17, 18], 'Motorbike': [30, 31, 32, 33, 34, 35], 'Rocket': [41, 42, 43],

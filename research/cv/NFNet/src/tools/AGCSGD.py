@@ -18,7 +18,7 @@ from mindspore import Parameter
 from mindspore import dtype as mstype
 from mindspore import numpy as mnp
 from mindspore import ops
-from mindspore import _checkparam as Validator
+from mindspore._checkparam import Validator
 from mindspore.common.tensor import Tensor
 from mindspore.nn.optim import Optimizer
 from mindspore.ops import functional as F, composite as C

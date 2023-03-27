@@ -17,7 +17,7 @@ from mindspore.ops import functional as F, composite as C, operations as P
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
 import mindspore.common.dtype as mstype
-from mindspore import _checkparam as Validator
+from mindspore._checkparam import Validator
 from mindspore.nn.optim.optimizer import Optimizer
 
 _momentum_opt = C.MultitypeFuncGraph("momentum_opt")

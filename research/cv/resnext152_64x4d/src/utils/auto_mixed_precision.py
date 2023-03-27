@@ -15,7 +15,7 @@
 """Auto mixed precision."""
 import mindspore.nn as nn
 from mindspore.ops import functional as F
-from mindspore import _checkparam as validator
+from mindspore._checkparam import Validator as validator
 from mindspore.common import dtype as mstype
 
 

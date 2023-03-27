@@ -18,7 +18,7 @@ import mindspore.ops as P
 from mindspore import Tensor
 from mindspore import Parameter
 import mindspore.common.dtype as mstype
-from mindspore import _checkparam as Validator
+from mindspore._checkparam import Validator
 import mindspore.common.initializer as initializer
 
 import src.utils as op
