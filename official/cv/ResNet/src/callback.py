@@ -42,7 +42,7 @@ class LossCallBack(Callback):
     def on_train_step_end(self, run_context):
         cb_params = run_context.original_args()
         loss = cb_params.net_outputs
-        data_sink_mode = cb_params.get('dataset_sink_mode', False)
+        data_sink_mode = cb_params.get('dataset_sink_mode', True)
         if not data_sink_mode:
             if isinstance(loss, (tuple, list)):
                 if isinstance(loss[0], ms.Tensor) and isinstance(loss[0].asnumpy(), np.ndarray):
