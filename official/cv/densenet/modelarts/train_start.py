@@ -125,6 +125,7 @@ def get_lr_scheduler(configs):
         raise NotImplementedError(configs.lr_scheduler)
     return lr_scheduler
 
+
 def _get_last_ckpt(ckpt_dir):
     ckpt_files = [ckpt_file for ckpt_file in os.listdir(ckpt_dir)
                   if ckpt_file.endswith('.ckpt')]
@@ -157,6 +158,7 @@ def _export_air(ckpt_dir):
     file_name = config.file_name + ".air"
     mox.file.copy(file_name, os.path.join(config.output_path, file_name))
     print("Export success.")
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train():
@@ -277,7 +279,7 @@ def train():
                                   prefix='%s' % config.rank)
         callbacks.append(ckpt_cb)
 
-    model.train(config.max_epoch, de_dataset, callbacks=callbacks)
+    model.train(config.max_epoch, de_dataset, callbacks=callbacks, dataset_sink_mode=True)
     print("train success.")
 
     _export_air(config.save_ckpt_path)

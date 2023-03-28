@@ -532,7 +532,7 @@ python export.py
       ckpoint_cb = ModelCheckpoint(prefix=cfg.model, directory=cfg.ckpt_dir, config=config_ck)
       cbs.append(ckpoint_cb)
 
-  model.train(cfg.train_epochs, dataset, callbacks=cbs)
+  model.train(cfg.train_epochs, dataset, callbacks=cbs, dataset_sink_mode=True)
 
 # [随机事件介绍](#contents)
 

@@ -83,11 +83,13 @@ def test_train(configure):
     ckptconfig = CheckpointConfig(save_checkpoint_steps=ds_train.get_dataset_size(),
                                   keep_checkpoint_max=5)
     ckpoint_cb = ModelCheckpoint(prefix='widedeep_train', directory=configure.ckpt_path, config=ckptconfig)
-    model.train(epochs, ds_train, callbacks=[TimeMonitor(ds_train.get_dataset_size()), callback, ckpoint_cb])
+    model.train(epochs, ds_train, callbacks=[TimeMonitor(ds_train.get_dataset_size()), callback, ckpoint_cb],
+                dataset_sink_mode=True)
 
 
 def modelarts_pre_process():
     config.ckpt_path = config.output_path
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_wide_and_deep():

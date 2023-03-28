@@ -39,6 +39,7 @@ set_seed(1)
 def modelarts_pre_process():
     pass
 
+
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def dpn_train():
     # init context
@@ -139,7 +140,7 @@ def dpn_train():
                                          keep_checkpoint_max=config.keep_checkpoint_max)
             ckpoint_cb = ModelCheckpoint(prefix="dpn", directory=config.ckpt_path, config=config_ck)
             cb.append(ckpoint_cb)
-    model.train(config.epoch_size, train_dataset, callbacks=cb)
+    model.train(config.epoch_size, train_dataset, callbacks=cb, dataset_sink_mode=True)
 
 if __name__ == '__main__':
     dpn_train()

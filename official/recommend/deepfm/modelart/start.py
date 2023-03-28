@@ -146,7 +146,7 @@ def train_deepfm():
                                      auc_metric,
                                      eval_file_path=config.eval_file_name)
         callback_list.append(eval_callback)
-    model.train(config.train_epochs, ds_train, callbacks=callback_list)
+    model.train(config.train_epochs, ds_train, callbacks=callback_list, dataset_sink_mode=True)
 
 
 def freeze_model():

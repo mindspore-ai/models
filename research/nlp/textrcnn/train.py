@@ -94,7 +94,7 @@ def run_train():
     config_ck = CheckpointConfig(save_checkpoint_steps=cfg.save_checkpoint_steps,
                                  keep_checkpoint_max=cfg.keep_checkpoint_max)
     ckpoint_cb = ModelCheckpoint(prefix=cfg.cell, directory=cfg.ckpt_folder_path, config=config_ck)
-    model.train(num_epochs, ds_train, callbacks=[ckpoint_cb, loss_cb, time_cb])
+    model.train(num_epochs, ds_train, callbacks=[ckpoint_cb, loss_cb, time_cb], dataset_sink_mode=True)
     print("train success")
 
 

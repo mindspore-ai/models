@@ -55,7 +55,6 @@ parser.add_argument("--data_url", type=str, default="", help="dataset path for o
 parser.add_argument("--train_url", type=str, default="", help="train path for obs")
 parser.add_argument('--data_path', type=str, default='/cache/data', help='Dataset url for local')
 parser.add_argument("--output_path", type=str, default="/cache/train", help="dir of training output for local")
-# parser.add_argument("--checkpoint_path", type=str, default="./checkpoint/", help="setting dir of checkpoint output")
 parser.add_argument('--device_target', type=str, default='Ascend', choices=['Ascend', 'GPU', 'CPU'],
                     help='device where the code will be implemented. (Default: Ascend)')
 parser.add_argument('--num_classes', type=int, default=10, help='number of classes')
@@ -191,7 +190,7 @@ def train_lenet_model():
         model = Model(network, net_loss, net_opt, metrics={"Accuracy": Accuracy()}, amp_level="O2")
 
     print("============== Starting Training ==============")
-    model.train(cfg.epoch_size, ds_train, callbacks=[time_cb, ckpoint_cb, LossMonitor()])
+    model.train(cfg.epoch_size, ds_train, callbacks=[time_cb, ckpoint_cb, LossMonitor()], dataset_sink_mode=True)
 
     print("============== Training finish ==============")
 

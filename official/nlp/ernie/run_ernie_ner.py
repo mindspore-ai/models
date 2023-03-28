@@ -76,15 +76,17 @@ def do_train(task_type, dataset=None, network=None, load_checkpoint_path="", sav
     model = Model(netwithgrads)
     callbacks = [TimeMonitor(dataset.get_dataset_size()), LossCallBack(dataset.get_dataset_size()), ckpoint_cb]
     train_begin = time.time()
-    model.train(epoch_num, dataset, callbacks=callbacks)
+    model.train(epoch_num, dataset, callbacks=callbacks, dataset_sink_mode=True)
     train_end = time.time()
     print("latency: {:.6f} s".format(train_end - train_begin))
+
 
 def eval_result_print(assessment_method="accuracy", callback=None):
     """print eval result"""
     print("Precision {:.6f} ".format(callback.TP / (callback.TP + callback.FP)))
     print("Recall {:.6f} ".format(callback.TP / (callback.TP + callback.FN)))
     print("F1 {:.6f} ".format(2 * callback.TP / (2 * callback.TP + callback.FP + callback.FN)))
+
 
 def do_eval(dataset=None, network=None, num_class=41, assessment_method="accuracy", data_file="",
             load_checkpoint_path="", vocab_file="", label_file="", tag_to_index=None, batch_size=1):
@@ -116,6 +118,7 @@ def do_eval(dataset=None, network=None, num_class=41, assessment_method="accurac
     print("(w/o first and last) elapsed time: {}, per step time : {}".format(
         sum(evaluate_times), sum(evaluate_times)/len(evaluate_times)))
     print("==============================================================")
+
 
 def parse_args():
     """set and check parameters."""
@@ -162,6 +165,7 @@ def parse_args():
     if args_opt.do_eval.lower() == "true" and args_opt.eval_data_file_path == "":
         raise ValueError("'eval_data_file_path' must be set when do evaluation task")
     return args_opt
+
 
 def run_ner():
     """run ner task"""

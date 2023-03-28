@@ -443,7 +443,7 @@ def train_lstm():
     if config.device_target == "CPU":
         model.train(config.num_epochs, ds_train, callbacks=[time_cb, ckpoint_cb, loss_cb], dataset_sink_mode=False)
     else:
-        model.train(config.num_epochs, ds_train, callbacks=[time_cb, ckpoint_cb, loss_cb])
+        model.train(config.num_epochs, ds_train, callbacks=[time_cb, ckpoint_cb, loss_cb], dataset_sink_mode=True)
     print("============== Training Success ==============")
 
 

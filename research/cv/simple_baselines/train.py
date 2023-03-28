@@ -38,6 +38,8 @@ if config.MODELARTS.IS_MODEL_ARTS:
     import moxing as mox
 
 set_seed(config.GENERAL.TRAIN_SEED)
+
+
 def get_lr(begin_epoch,
            total_epochs,
            steps_per_epoch,
@@ -60,6 +62,7 @@ def get_lr(begin_epoch,
     learning_rate = lr_each_step[current_step:]
     return learning_rate
 
+
 def parse_args():
     '''
     args
@@ -74,6 +77,7 @@ def parse_args():
     parser.add_argument('--is_model_arts', type=ast.literal_eval, default=False, help='Location of training outputs.')
     args = parser.parse_args()
     return args
+
 
 def main():
     print("loading parse...")
@@ -133,9 +137,9 @@ def main():
 
         directory = ''
         if config.MODELARTS.IS_MODEL_ARTS:
-            directory = config.MODELARTS.CACHE_OUTPUT + 'device_'+ os.getenv('DEVICE_ID')
+            directory = config.MODELARTS.CACHE_OUTPUT + 'device_' + os.getenv('DEVICE_ID')
         elif config.GENERAL.RUN_DISTRIBUTE:
-            directory = config.TRAIN.CKPT_PATH + 'device_'+ os.getenv('DEVICE_ID')
+            directory = config.TRAIN.CKPT_PATH + 'device_' + os.getenv('DEVICE_ID')
         else:
             directory = config.TRAIN.CKPT_PATH + 'device'
 
@@ -145,7 +149,7 @@ def main():
     epoch_size = config.TRAIN.END_EPOCH - config.TRAIN.BEGIN_EPOCH
     print("************ Start training now ************")
     print('start training, epoch size = %d' % epoch_size)
-    model.train(epoch_size, dataset, callbacks=cb)
+    model.train(epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
 
     if config.MODELARTS.IS_MODEL_ARTS:
         mox.file.copy_parallel(src_url=config.MODELARTS.CACHE_OUTPUT, dst_url=args.train_url)

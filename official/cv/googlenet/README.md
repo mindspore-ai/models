@@ -683,7 +683,7 @@ If you need to use the trained model to perform inference on multiple hardware p
   loss_cb = LossMonitor()
 
   # Start training
-  model.train(cfg.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb])
+  model.train(cfg.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb], dataset_sink_mode=True)
   print("train success")
   ```
 
@@ -717,7 +717,7 @@ If you need to use the trained model to perform inference on multiple hardware p
   loss_cb = LossMonitor()
 
   # Start training
-  model.train(cfg.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb])
+  model.train(cfg.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb], dataset_sink_mode=True)
   print("train success")
   ```
 

@@ -89,6 +89,7 @@ class EvalCallBack(Callback):
             self.epochs_per_eval["acc"].append(acc["Accuracy"])
             print(acc)
 
+
 def frozen_to_air(input_net, input_args):
     """
     Frozen ckpt file to air file.
@@ -165,11 +166,11 @@ if __name__ == "__main__":
     eval_cb = EvalCallBack(model, eval_dataset, epoch_per_eval, "ibn")
     cb = [ckpoint_cb, time_cb, loss_cb, eval_cb]
     if args.device_num == 1:
-        model.train(train_epoch, train_dataset, callbacks=cb)
+        model.train(train_epoch, train_dataset, callbacks=cb, dataset_sink_mode=True)
     elif args.device_num > 1 and get_rank() % 8 == 0:
-        model.train(train_epoch, train_dataset, callbacks=cb)
+        model.train(train_epoch, train_dataset, callbacks=cb, dataset_sink_mode=True)
     else:
-        model.train(train_epoch, train_dataset)
+        model.train(train_epoch, train_dataset, dataset_sink_mode=True)
 
     # find the newest ckpt file
     ckpt_list = glob.glob(CKPT_PATH + prefix + "*.ckpt")

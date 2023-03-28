@@ -56,12 +56,14 @@ parser.add_argument('--filter_weight', type=ast.literal_eval, default=False, hel
 parser.add_argument('--pre_trained_path', type=str, default='', help='pretrained path.')
 args, unknown = parser.parse_known_args()
 
+
 def save_ckpt_to_air(save_ckpt_path, path):
     srcnn = SRCNN()
     # load the parameter into net
     load_checkpoint(path, net=srcnn)
     input_size = np.random.uniform(0.0, 1.0, size=[1, 1, args.image_width, args.image_height]).astype(np.float32)
-    export(srcnn, Tensor(input_size), file_name=save_ckpt_path +'srcnn', file_format="AIR")
+    export(srcnn, Tensor(input_size), file_name=save_ckpt_path + 'srcnn', file_format="AIR")
+
 
 def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
     """remove useless parameters according to filter_list"""
@@ -71,6 +73,7 @@ def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
                 print("Delete parameter from checkpoint: ", key)
                 del origin_dict[key]
                 break
+
 
 def run_train():
     pretrained_ckpt_path = args.pre_trained_path
@@ -136,12 +139,13 @@ def run_train():
         ckpt_cb = ModelCheckpoint(prefix="srcnn", directory=save_ckpt_path, config=config_ck)
         callbacks.append(ckpt_cb)
     print("============== Starting Training ==============")
-    model.train(epoch, train_dataset, callbacks=callbacks)
+    model.train(epoch, train_dataset, callbacks=callbacks, dataset_sink_mode=True)
     print("============== End Training ==============")
     if args.enable_modelarts == "True":
         sync_data(args.output_path, args.train_url)
     path = os.path.join(save_ckpt_path, 'srcnn'+'-'+str(epoch)+'_'+str(step_size)+'.ckpt')
     save_ckpt_to_air(save_ckpt_path, path)
     moxing.file.copy_parallel(save_ckpt_path, args.train_url)
+
 if __name__ == '__main__':
     run_train()

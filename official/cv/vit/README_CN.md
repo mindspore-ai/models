@@ -519,7 +519,7 @@ python export.py --config_path=[CONFIG_PATH]
                           eval_engine=eval_engine,
                           logger=args.logger.info)
   cb = [state_cb, ]
-  model.train(epoch_size, dataset, callbacks=cb, sink_size=step_size)
+  model.train(epoch_size, dataset, callbacks=cb, sink_size=step_size, dataset_sink_mode=True)
   print("train success")
   ```
 

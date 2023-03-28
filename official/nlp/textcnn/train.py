@@ -35,6 +35,7 @@ from src.dataset import MovieReview, SST2, Subjectivity
 
 set_seed(1)
 
+
 def modelarts_pre_process():
     config.checkpoint_path = os.path.join(config.output_path, str(get_rank_id()), config.checkpoint_path)
 
@@ -90,11 +91,12 @@ def train_net():
     loss_cb = LossMonitor()
     eval_callback = EvalCallback(model, eval_dataset, save_path=ckpt_save_dir)
     if config.device_target == "CPU":
-        model.train(config.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb])
+        model.train(config.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb],
+                    dataset_sink_mode=True)
     else:
         epoch_count = config.epoch_size * batch_num // config.sink_size
         model.train(epoch_count, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb, eval_callback],
-                    sink_size=config.sink_size)
+                    dataset_sink_mode=True, sink_size=config.sink_size)
     print("train success")
 
 

@@ -17,7 +17,6 @@
 Ernie finetune and evaluation script.
 '''
 
-import os
 import time
 import argparse
 from src.ernie_for_finetune import ErnieFinetuneCell, ErnieCLS
@@ -36,7 +35,6 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.context import ParallelMode
 from mindspore.communication.management import init
 
-_cur_dir = os.getcwd()
 
 def do_train(task_type, dataset=None, network=None, load_checkpoint_path="", save_checkpoint_path="", epoch_num=1):
     """ do train """
@@ -76,7 +74,8 @@ def do_train(task_type, dataset=None, network=None, load_checkpoint_path="", sav
     netwithgrads = ErnieFinetuneCell(network, optimizer=optimizer, scale_update_cell=update_cell)
     model = Model(netwithgrads)
     callbacks = [TimeMonitor(dataset.get_dataset_size()), LossCallBack(dataset.get_dataset_size()), ckpoint_cb]
-    model.train(epoch_num, dataset, callbacks=callbacks)
+    model.train(epoch_num, dataset, callbacks=callbacks, dataset_sink_mode=True)
+
 
 def do_eval(dataset=None, network=None, number_labels=2,
             load_checkpoint_path="", assessment_method='accuracy'):
@@ -113,6 +112,7 @@ def do_eval(dataset=None, network=None, number_labels=2,
         sum(evaluate_times), sum(evaluate_times)/len(evaluate_times)))
     print("==============================================================")
 
+
 def eval_result_print(assessment_method="accuracy", callback=None):
     """ print eval result """
     if assessment_method == "accuracy":
@@ -124,6 +124,7 @@ def eval_result_print(assessment_method="accuracy", callback=None):
         print("F1 {:.6f} ".format(2 * callback.TP / (2 * callback.TP + callback.FP + callback.FN)))
     else:
         raise ValueError("Assessment method not supported, support: [accuracy, f1, mcc, spearman_correlation]")
+
 
 def parse_args():
     """set and check parameters."""
@@ -169,28 +170,25 @@ def parse_args():
 
     return args_opt
 
+
 def run_classifier():
     """run classifier task"""
     args_opt = parse_args()
-
+    cfg_maps = {
+        'chnsenticorp': {'seq_length': 256, 'learning_rate': 5e-5, 'assessment_method': 'accuracy'},
+        'xnli': {'seq_length': 512, 'learning_rate': 1e-4, 'assessment_method': 'accuracy'},
+        'dbqa': {'seq_length': 512, 'learning_rate': 2e-5, 'assessment_method': 'f1'}
+    }
     epoch_num = args_opt.epoch_num
     load_pretrain_checkpoint_path = args_opt.load_pretrain_checkpoint_path
     save_finetune_checkpoint_path = args_opt.save_finetune_checkpoint_path
     load_finetune_checkpoint_path = args_opt.load_finetune_checkpoint_path
-    if args_opt.task_type == 'chnsenticorp':
-        ernie_net_cfg.seq_length = 256
-        optimizer_cfg.AdamWeightDecay.learning_rate = 5e-5
-        assessment_method = 'accuracy'
-    elif args_opt.task_type == 'xnli':
-        ernie_net_cfg.seq_length = 512
-        optimizer_cfg.AdamWeightDecay.learning_rate = 1e-4
-        assessment_method = 'accuracy'
-    elif args_opt.task_type == 'dbqa':
-        ernie_net_cfg.seq_length = 512
-        optimizer_cfg.AdamWeightDecay.learning_rate = 2e-5
-        assessment_method = 'f1'
-    else:
-        raise ValueError("Unsupported task type.")
+    task_type = args_opt.task_type
+    cfg = cfg_maps.get(task_type)
+    ernie_net_cfg.seq_length = cfg.get('seq_length')
+    optimizer_cfg.AdamWeightDecay.learning_rate = cfg.get('learning_rate')
+    assessment_method = cfg.get('assessment_method')
+
 
     if args_opt.run_distribute == 'true':
         if args_opt.device_target == "Ascend":
@@ -210,49 +208,42 @@ def run_classifier():
         rank = 0
         device_num = 1
 
-    if args_opt.do_train.lower() == "false" and args_opt.do_eval.lower() == "false":
+    if args_opt.do_train == "false" and args_opt.do_eval == "false":
         raise ValueError("At least one of 'do_train' or 'do_eval' must be true")
-    if args_opt.do_train.lower() == "true" and args_opt.train_data_file_path == "":
-        raise ValueError("'train_data_file_path' must be set when do finetune task")
-    if args_opt.do_eval.lower() == "true" and args_opt.eval_data_file_path == "":
-        raise ValueError("'eval_data_file_path' must be set when do evaluation task")
+    if args_opt.do_train == "true" and args_opt.train_data_file_path == "":
+        raise ValueError("train_data_file_path' must be set when do finetune task")
+    if args_opt.do_eval == "true" and args_opt.eval_data_file_path == "":
+        raise ValueError("eval_data_file_path' must be set when do evaluation task")
 
     target = args_opt.device_target
     if target == "Ascend":
         context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=args_opt.device_id)
-    elif target == "GPU":
+    else:
         context.set_context(mode=context.GRAPH_MODE, device_target="GPU")
         if ernie_net_cfg.compute_type != mstype.float32:
             logger.warning('GPU only support fp32 temporarily, run with fp32.')
             ernie_net_cfg.compute_type = mstype.float32
-    else:
-        raise Exception("Target error, GPU or Ascend is supported.")
 
     netwithloss = ErnieCLS(ernie_net_cfg, True, num_labels=args_opt.number_labels, dropout_prob=0.1)
 
-    if args_opt.do_train.lower() == "true":
+    if args_opt.do_train == "true":
         ds = create_finetune_dataset(batch_size=args_opt.train_batch_size,
                                      repeat_count=1,
                                      data_file_path=args_opt.train_data_file_path,
                                      rank_size=args_opt.device_num,
                                      rank_id=rank,
-                                     do_shuffle=(args_opt.train_data_shuffle.lower() == "true"))
-        do_train(args_opt.task_type + '-' + str(rank), ds, netwithloss,
+                                     do_shuffle=(args_opt.train_data_shuffle == "true"))
+        do_train(task_type + '-' + str(rank), ds, netwithloss,
                  load_pretrain_checkpoint_path, save_finetune_checkpoint_path, epoch_num)
 
-        if args_opt.do_eval.lower() == "true":
-            if save_finetune_checkpoint_path == "":
-                load_finetune_checkpoint_dir = _cur_dir
-            else:
-                load_finetune_checkpoint_dir = make_directory(save_finetune_checkpoint_path)
-            load_finetune_checkpoint_path = LoadNewestCkpt(load_finetune_checkpoint_dir,
-                                                           ds.get_dataset_size(), epoch_num, args_opt.task_type)
-
-    if args_opt.do_eval.lower() == "true":
+    if args_opt.do_eval == "true":
+        load_finetune_checkpoint_dir = make_directory(save_finetune_checkpoint_path)
+        load_finetune_checkpoint_path = LoadNewestCkpt(load_finetune_checkpoint_dir,
+                                                       ds.get_dataset_size(), epoch_num, task_type)
         ds = create_finetune_dataset(batch_size=args_opt.eval_batch_size,
                                      repeat_count=1,
                                      data_file_path=args_opt.eval_data_file_path,
-                                     do_shuffle=(args_opt.eval_data_shuffle.lower() == "true"))
+                                     do_shuffle=(args_opt.eval_data_shuffle == "true"))
         do_eval(ds, ErnieCLS, args_opt.number_labels, load_finetune_checkpoint_path, assessment_method)
 
 if __name__ == "__main__":
