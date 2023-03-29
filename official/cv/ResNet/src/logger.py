@@ -29,12 +29,20 @@ class LOGGER(logging.Logger):
     def __init__(self, logger_name, rank=0, param_server=False):
         super(LOGGER, self).__init__(logger_name)
         self.rank = rank
-        if rank % 8 == 0 or param_server:
+        if rank % 8 == 0 or param_server or self.use_server():
             console = logging.StreamHandler(sys.stdout)
             console.setLevel(logging.INFO)
             formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
             console.setFormatter(formatter)
             self.addHandler(console)
+
+    @staticmethod
+    def use_server():
+        worked = os.getenv('MS_WORKER_NUM', None)
+        server = os.getenv('MS_SERVER_NUM', None)
+        if worked is not None and server is not None:
+            return True
+        return False
 
     def setup_logging_file(self, log_dir):
         """Setup logging file."""
