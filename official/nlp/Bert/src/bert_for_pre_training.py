@@ -830,7 +830,7 @@ class BertNetworkMatchBucket(nn.Cell):
         self.network = network
         if not bucket_list or not isinstance(bucket_list, list):
             bucket_list = [seq_length]
-        self.bucket_list = [bucket for bucket in bucket_list if bucket <= seq_length]
+        self.bucket_list = [bucket for bucket in bucket_list if bucket < seq_length]
 
         if network.reducer_flag:
             reuse_attr = 'reuse_communication_node'
