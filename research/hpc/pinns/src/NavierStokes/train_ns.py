@@ -34,6 +34,8 @@ class EvalCallback(Callback):
         self.per_eval_epoch = per_eval_epoch
         self.eval_begin_epoch = eval_begin_epoch
         self.best_result = None
+        self.error1 = 0.3
+        self.error2 = 1.0
 
     def epoch_end(self, run_context):
         """epoch end function."""
@@ -46,8 +48,10 @@ class EvalCallback(Callback):
             error2 = np.abs(lambda2_pred - 0.01) / 0.01 * 100
             print(f'Error of lambda 1 is {error1[0]:.6f}%')
             print(f'Error of lambda 2 is {error2[0]:.6f}%')
-            if self.best_result is None or error1 + error2 < self.best_result:
+            if self.best_result is None or (error1 < self.error1 and error2 < self.error2):
                 self.best_result = error1 + error2
+                self.error1 = error1
+                self.error2 = error2
                 save_checkpoint(self.network, os.path.join(self.ckpt_dir, "best_result.ckpt"))
 
 
