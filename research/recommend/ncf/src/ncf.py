@@ -15,7 +15,6 @@
 """Neural Collaborative Filtering Model"""
 from mindspore import nn, context
 from mindspore import Tensor, Parameter, ParameterTuple
-from mindspore._checkparam import Validator as validator
 from mindspore.nn.layer.activation import get_activation
 import mindspore.common.dtype as mstype
 from mindspore.ops import operations as P
@@ -39,9 +38,9 @@ class DenseLayer(nn.Cell):
                  has_bias=True,
                  activation=None):
         super(DenseLayer, self).__init__()
-        self.in_channels = validator.check_positive_int(in_channels)
-        self.out_channels = validator.check_positive_int(out_channels)
-        self.has_bias = validator.check_bool(has_bias)
+        assert isinstance(in_channels, int) and in_channels > 0, "in_channels should be bigger than 0"
+        assert isinstance(out_channels, int) and out_channels > 0, "out_channels should be bigger than 0"
+        assert isinstance(has_bias, bool), "has_bias should be bool"
 
         if isinstance(weight_init, Tensor):
             if weight_init.ndim != 2 or weight_init.shape()[0] != out_channels or \
@@ -172,8 +171,8 @@ class NCFModel(nn.Cell):
         embedding_user = self.embedding_user(user_input)  # input: (256, 1)  output: (256, 1, 16 + 32)
         embedding_item = self.embedding_item(item_input)  # input: (256, 1)  output: (256, 1, 16 + 32)
 
-        mf_user_latent = self.squeeze(embedding_user)[:, :self.num_factors]  # input: (256, 1, 16 + 32) output: (256, 16)
-        mf_item_latent = self.squeeze(embedding_item)[:, :self.num_factors]  # input: (256, 1, 16 + 32) output: (256, 16)
+        mf_user_latent = self.squeeze(embedding_user)[:, :self.num_factors]
+        mf_item_latent = self.squeeze(embedding_item)[:, :self.num_factors]
 
         # MLP part
         mlp_user_latent = self.squeeze(embedding_user)[:, self.mf_dim:]  # input: (256, 1, 16 + 32) output: (256, 32)

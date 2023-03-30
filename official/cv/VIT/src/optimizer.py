@@ -19,24 +19,19 @@ import numpy as np
 import mindspore as ms
 import mindspore.ops as ops
 from mindspore import jit
-from mindspore._checkparam import Validator as validator
 
 from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
-from mindspore._checkparam import Rel
 from mindspore.nn.optim import Optimizer
 from mindspore.nn.optim.optimizer import opt_init_args_register
 
 
 def _check_param_value(beta1, beta2, eps, prim_name):
     """Check the type of inputs."""
-    validator.check_value_type("beta1", beta1, [float], prim_name)
-    validator.check_value_type("beta2", beta2, [float], prim_name)
-    validator.check_value_type("eps", eps, [float], prim_name)
-    validator.check_float_range(beta1, 0.0, 1.0, Rel.INC_NEITHER, "beta1", prim_name)
-    validator.check_float_range(beta2, 0.0, 1.0, Rel.INC_NEITHER, "beta2", prim_name)
-    validator.check_positive_float(eps, "eps", prim_name)
+    assert isinstance(beta1, float) and 0 <= beta1 <= 0, "beta1 should between 0 and 1"
+    assert isinstance(beta2, float) and 0 <= beta2 <= 0, "beta2 should between 0 and 1"
+    assert isinstance(eps, float) and eps > 0, "eps should be bigger than 0"
 
 
 _grad_scale = ops.MultitypeFuncGraph("grad_scale")
@@ -178,6 +173,7 @@ class AdamW(Optimizer):
             self.broadcast_params(optim_result)
         return optim_result
 
+
 def paramter_group(network, weight_decay, no_weight_decay_filter, gc_flag):
     """paramter_group"""
     filter_len = len(no_weight_decay_filter)
@@ -199,6 +195,7 @@ def paramter_group(network, weight_decay, no_weight_decay_filter, gc_flag):
                         {'order_params': network.trainable_params()}]
 
     return group_params
+
 
 def get_optimizer(optimizer_name, network, lrs, args):
     no_weight_decay_filter = [x for x in args.no_weight_decay_filter.split(",") if len(x) > 0]

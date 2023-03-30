@@ -21,7 +21,6 @@ from typing import Tuple
 import mindspore
 
 from mindspore import FixedLossScaleManager, nn, ops, Tensor
-from mindspore._checkparam import Validator as validator
 import numpy as np
 from batchgenerators.utilities.file_and_folder_operations import join, maybe_mkdir_p, save_pickle, load_pickle, isfile
 
@@ -92,9 +91,10 @@ class WithEvalCell(nn.Cell):
 
     def __init__(self, network, loss_fn, add_cast_fp32=False):
         super(WithEvalCell, self).__init__(auto_prefix=False)
+        assert isinstance(add_cast_fp32, bool), "add_cast_fp32 should be bool"
         self._network = network
         self._loss_fn = loss_fn
-        self.add_cast_fp32 = validator.check_value_type("add_cast_fp32", add_cast_fp32, [bool], self.cls_name)
+        self.add_cast_fp32 = add_cast_fp32
 
     def construct(self, data, y0, y1, y2):
         """construct forward"""

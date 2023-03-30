@@ -18,7 +18,6 @@ import mindspore.ops as P
 from mindspore import Tensor
 from mindspore import Parameter
 import mindspore.common.dtype as mstype
-from mindspore._checkparam import Validator
 import mindspore.common.initializer as initializer
 
 import src.utils as op
@@ -53,9 +52,9 @@ class DenseLayer(nn.Cell):
                  bias_init='zeros',
                  has_bias=True):
         super(DenseLayer, self).__init__()
-        self.in_channels = Validator.check_positive_int(in_channels)
-        self.out_channels = Validator.check_positive_int(out_channels)
-        self.has_bias = Validator.check_bool(has_bias)
+        assert isinstance(in_channels, int) and in_channels > 0, "in_channels should be bigger than 0"
+        assert isinstance(out_channels, int) and out_channels > 0, "out_channels should be bigger than 0"
+        assert isinstance(has_bias, bool), "has_bias should be bool"
         self.reshape = P.Reshape()
         self.shape_op = P.Shape()
 

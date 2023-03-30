@@ -15,13 +15,6 @@
 
 import mindspore.ops as ops
 from mindspore import nn
-from mindspore._checkparam import Validator as validator
-from mindspore.ops.primitive import constexpr
-
-
-@constexpr
-def _check_positive_int(arg_value, arg_name=None, prim_name=None):
-    validator.check_positive_int(arg_value, arg_name=arg_name, prim_name=prim_name)
 
 
 def pixel_shuffle(x, upscale_factor):
@@ -59,7 +52,7 @@ def pixel_shuffle(x, upscale_factor):
         >>> print(output.shape)
         (3, 2, 1, 12, 12)
     """
-    _check_positive_int(upscale_factor, "upscale_factor")
+    assert isinstance(upscale_factor, int) and upscale_factor > 0, "upscale_factor should be bigger than 0"
     idx = x.shape
     length = len(idx)
     if length < 3:

@@ -14,7 +14,6 @@
 # ============================================================================
 """crnn lr scheduler."""
 import math
-from mindspore._checkparam import Validator as validator
 
 def cosine_decay_lr_with_start_step(min_lr, max_lr, total_step, step_per_epoch, decay_epoch, start_step):
     r"""
@@ -62,15 +61,11 @@ def cosine_decay_lr_with_start_step(min_lr, max_lr, total_step, step_per_epoch, 
         >>> print(output)
         [0.1, 0.1, 0.05500000000000001, 0.05500000000000001, 0.01, 0.01]
     """
-    if not isinstance(min_lr, float):
-        raise TypeError("For 'cosine_decay_lr_with_start_step', the argument 'min_lr' must be type of float, "
-                        "but got 'min_lr' type: {}.".format(type(min_lr)))
-    validator.check_non_negative_float(min_lr, "min_lr", None)
-    validator.check_positive_float(max_lr, 'max_lr')
-    validator.check_is_float(max_lr, 'max_lr')
-    validator.check_positive_int(total_step, 'total_step')
-    validator.check_positive_int(step_per_epoch, 'step_per_epoch')
-    validator.check_positive_int(decay_epoch, 'decay_epoch')
+    assert isinstance(min_lr, float) and min_lr >= 0, "min_lr should be equal or bigger than 0"
+    assert isinstance(max_lr, float) and max_lr > 0, "max_lr should be bigger than 0"
+    assert isinstance(total_step, int) and total_step > 0, "total_step should be bigger than 0"
+    assert isinstance(step_per_epoch, int) and step_per_epoch > 0, "step_per_epoch should be bigger than 0"
+    assert isinstance(decay_epoch, int) and decay_epoch > 0, "decay_epoch should be bigger than 0"
     if min_lr >= max_lr:
         raise ValueError("For 'cosine_decay_lr_with_start_step', the 'max_lr' must be greater than the 'min_lr', "
                          "but got 'max_lr' value: {}, 'min_lr' value: {}.".format(max_lr, min_lr))

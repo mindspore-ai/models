@@ -22,7 +22,6 @@ from mindspore.common.tensor import Tensor
 from mindspore.common.parameter import Parameter
 from mindspore.communication.management import get_group_size
 from mindspore.common.seed import _get_graph_seed
-from mindspore._checkparam import Validator
 from mindspore import context
 
 from src.weight_init import normal_weight, zero_weight, one_weight
@@ -111,11 +110,13 @@ class LayerNorm(nn.Cell):
 
 get_square_sum = C.MultitypeFuncGraph("get_square_sum")
 
+
 @get_square_sum.register("Tensor", "Tensor")
 def _get_square_sum(grad, value):
     norm = P.ReduceSum(False)(F.square(grad) / value, ())
     norm = F.expand_dims(F.cast(norm, mstype.float32), 0)
     return norm
+
 
 @get_square_sum.register("Tensor", "Number")
 def _get_square_sum_number(grad, value):
@@ -125,6 +126,7 @@ def _get_square_sum_number(grad, value):
 
 
 apply_global_norm = C.MultitypeFuncGraph("apply_global_norm")
+
 
 @apply_global_norm.register("Tensor", "Tensor", "Tensor")
 def _apply_global_norm(clip_norm, global_norm, grad):
@@ -176,7 +178,6 @@ class ClipByGlobalNorm(nn.Cell):
     def construct(self, grads):
         global_norm_value = self.global_norm(grads)
         cond = P.GreaterEqual()(global_norm_value, self.clip_norm)
-        # P.Print()("do clip ", cond, ", global norm is ", global_norm_value)
         global_norm = F.select(cond, global_norm_value, self.clip_norm)
         grads = self.hyper_map(F.partial(apply_global_norm, self.clip_norm, global_norm), grads)
         return grads, global_norm_value
@@ -189,10 +190,7 @@ class Dropout(nn.Cell):
 
     def __init__(self, keep_prob=0.5, dtype=mstype.float32):
         super(Dropout, self).__init__()
-        if keep_prob <= 0 or keep_prob > 1:
-            raise ValueError("dropout probability should be a number in range (0, 1], but got {}".format(keep_prob))
-        Validator.check_subclass("dtype", dtype, mstype.number_type, self.cls_name)
-        Validator.check_value_type('keep_prob', keep_prob, [float], self.cls_name)
+        assert isinstance(keep_prob, float) and 0 < keep_prob <= 1, "keep_prob should be between 0 and 1"
         self.keep_prob = keep_prob
         seed0, seed1 = _get_graph_seed(0, "dropout")
         self.seed0 = seed0

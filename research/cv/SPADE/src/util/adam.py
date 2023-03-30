@@ -25,8 +25,6 @@ from mindspore.ops import composite as C
 from mindspore.ops import functional as F
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
-from mindspore._checkparam import Validator as validator
-from mindspore._checkparam import Rel
 from mindspore.nn.optim.optimizer import Optimizer
 from mindspore.nn.optim.optimizer import opt_init_args_register
 
@@ -181,12 +179,9 @@ def _run_off_load_opt(opt, beta1_power, beta2_power, beta1, beta2, eps, lr, grad
 
 def _check_param_value(beta1, beta2, eps, prim_name):
     """Check the type of inputs."""
-    validator.check_value_type("beta1", beta1, [float], prim_name)
-    validator.check_value_type("beta2", beta2, [float], prim_name)
-    validator.check_value_type("eps", eps, [float], prim_name)
-    validator.check_float_range(beta1, 0.0, 1.0, Rel.INC_BOTH, "beta1", prim_name)
-    validator.check_float_range(beta2, 0.0, 1.0, Rel.INC_BOTH, "beta2", prim_name)
-    validator.check_positive_float(eps, "eps", prim_name)
+    assert isinstance(beta1, float) and 0 <= beta1 <= 0, "beta1 should between 0 and 1"
+    assert isinstance(beta2, float) and 0 <= beta2 <= 0, "beta2 should between 0 and 1"
+    assert isinstance(eps, float) and eps > 0, "eps should be bigger than 0"
 
 
 class Adam(Optimizer):
@@ -320,9 +315,8 @@ class Adam(Optimizer):
                  use_nesterov=False, weight_decay=0.0, loss_scale=1.0):
         super(Adam, self).__init__(learning_rate, params, weight_decay, loss_scale)
         _check_param_value(beta1, beta2, eps, self.cls_name)
-        validator.check_value_type("use_locking", use_locking, [bool], self.cls_name)
-        validator.check_value_type("use_nesterov", use_nesterov, [bool], self.cls_name)
-
+        assert isinstance(use_locking, bool), "use_locking should be bool"
+        assert isinstance(use_nesterov, bool), "use_nesterov should be bool"
         self.beta1 = Tensor(beta1, mstype.float32)
         self.beta2 = Tensor(beta2, mstype.float32)
         self.beta1_power = Parameter(initializer(1, [1], mstype.float32), name="beta1_power")
@@ -627,9 +621,8 @@ class AdamOffload(Optimizer):
                  use_nesterov=False, weight_decay=0.0, loss_scale=1.0):
         super(AdamOffload, self).__init__(learning_rate, params, weight_decay, loss_scale)
         _check_param_value(beta1, beta2, eps, self.cls_name)
-        validator.check_value_type("use_locking", use_locking, [bool], self.cls_name)
-        validator.check_value_type("use_nesterov", use_nesterov, [bool], self.cls_name)
-
+        assert isinstance(use_locking, bool), "use_locking should be bool"
+        assert isinstance(use_nesterov, bool), "use_nesterov should be bool"
         self.beta1 = Tensor(beta1, mstype.float32)
         self.beta2 = Tensor(beta2, mstype.float32)
         self.beta1_power = Parameter(initializer(1, [1], mstype.float32), name="beta1_power")

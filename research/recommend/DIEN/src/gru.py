@@ -24,7 +24,6 @@ from mindspore.common.parameter import ParameterTuple, Parameter
 from mindspore.nn.cell import Cell
 from mindspore import nn
 from mindspore import log as logger
-from mindspore._checkparam import Validator as validator
 
 __all__ = ['GRU', 'RNN', 'AUGRU', 'GRUCell', 'RNNCell', 'AUGRUCell']
 
@@ -40,7 +39,8 @@ def _init_state(shape, dtype, is_lstm):
 
 @constexpr
 def _check_input_dtype(input_dtype, param_name, allow_dtypes, cls_name):
-    validator.check_type_name(param_name, input_dtype, allow_dtypes, cls_name)
+    assert isinstance(input_dtype, allow_dtypes), \
+        "{} in {} should be {}".format(param_name, cls_name, allow_dtypes)
 
 
 def _rnn_tanh_cell(inputs, hidden, w_ih, w_hh, b_ih, b_hh):
@@ -189,13 +189,13 @@ class _RNNBase(Cell):
     def __init__(self, mode, input_size, hidden_size, num_layers=1, has_bias=True,
                  batch_first=False, dropout=0.0, bidirectional=False):
         super().__init__()
-        validator.check_positive_int(hidden_size, "hidden_size", self.cls_name)
-        validator.check_positive_int(input_size, "input_size", self.cls_name)
-        validator.check_positive_int(num_layers, "num_layers", self.cls_name)
-        validator.check_is_float(dropout, "dropout", self.cls_name)
-        validator.check_value_type("has_bias", has_bias, [bool], self.cls_name)
-        validator.check_value_type("batch_first", batch_first, [bool], self.cls_name)
-        validator.check_value_type("bidirectional", bidirectional, [bool], self.cls_name)
+        assert isinstance(hidden_size, int) and hidden_size > 0, "hidden_size should be bigger than 0"
+        assert isinstance(input_size, int) and input_size > 0, "input_size should be bigger than 0"
+        assert isinstance(num_layers, int) and num_layers > 0, "num_layers should be bigger than 0"
+        assert isinstance(dropout, float), "dropout should be float"
+        assert isinstance(has_bias, bool), "has_bias should be bool"
+        assert isinstance(batch_first, bool), "batch_first should be bool"
+        assert isinstance(bidirectional, bool), "bidirectional should be bool"
         self.mode = mode
 
         if not 0 <= dropout < 1:
@@ -531,9 +531,9 @@ class _RNNCellBase(Cell):
 
     def __init__(self, input_size: int, hidden_size: int, has_bias: bool, num_chunks: int):
         super().__init__()
-        validator.check_value_type("has_bias", has_bias, [bool], self.cls_name)
-        validator.check_positive_int(hidden_size, "hidden_size", self.cls_name)
-        validator.check_positive_int(input_size, "input_size", self.cls_name)
+        assert isinstance(has_bias, bool), "has_bias should be bool"
+        assert isinstance(hidden_size, int) and hidden_size > 0, "hidden_size should be int and bigger than 0"
+        assert isinstance(input_size, int) and input_size > 0, "input_size should be int and bigger than 0"
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.bias = has_bias
@@ -764,13 +764,13 @@ class _RNNBaseAUGRU(Cell):
     def __init__(self, mode, input_size, hidden_size, num_layers=1, has_bias=True,
                  batch_first=False, dropout=0.0, bidirectional=False):
         super().__init__()
-        validator.check_positive_int(hidden_size, "hidden_size", self.cls_name)
-        validator.check_positive_int(input_size, "input_size", self.cls_name)
-        validator.check_positive_int(num_layers, "num_layers", self.cls_name)
-        validator.check_is_float(dropout, "dropout", self.cls_name)
-        validator.check_value_type("has_bias", has_bias, [bool], self.cls_name)
-        validator.check_value_type("batch_first", batch_first, [bool], self.cls_name)
-        validator.check_value_type("bidirectional", bidirectional, [bool], self.cls_name)
+        assert isinstance(hidden_size, int) and hidden_size > 0, "hidden_size should be bigger than 0"
+        assert isinstance(input_size, int) and input_size > 0, "input_size should be bigger than 0"
+        assert isinstance(num_layers, int) and num_layers > 0, "num_layers should be bigger than 0"
+        assert isinstance(dropout, float), "dropout should be float"
+        assert isinstance(has_bias, bool), "has_bias should be float"
+        assert isinstance(batch_first, bool), "batch_first should be float"
+        assert isinstance(bidirectional, bool), "bidirectional should be float"
         self.mode = mode
 
         if not 0 <= dropout < 1:
