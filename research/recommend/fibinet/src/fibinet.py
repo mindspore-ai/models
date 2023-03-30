@@ -171,7 +171,6 @@ class BilinearInteraction(nn.Cell):
     def __init__(self, field_size, emb_dim, bilinear_type="all", seed=1024):
         super(BilinearInteraction, self).__init__()
         self.bilinear_type = bilinear_type
-        seed = seed
         self.split = ops.Split()
         self.comb = list(itertools.combinations(range(field_size), 2))
         self.comb0 = [i[0] for i in self.comb]
@@ -180,10 +179,6 @@ class BilinearInteraction(nn.Cell):
 
         if bilinear_type not in ["all", "each", "interaction"]:
             raise NotImplementedError
-
-        self.selcet_index = [self.bilinear_type == "all",
-                             self.bilinear_type == "each",
-                             self.bilinear_type == "interaction"].index(1)
 
         self.bilinear_all = nn.Dense(len(self.comb0)*emb_dim, len(self.comb0)*emb_dim, has_bias=False)
 
@@ -201,22 +196,20 @@ class BilinearInteraction(nn.Cell):
             raise ValueError("Unexpected inputs dimensions %d, expect to be 3 dimensions" % (len(inputs.shape)))
 
         bilinear_in = ops.Split(1, inputs.shape[1])(inputs)
-
-        type_all = self.bilinear_all(self.flatten(inputs[:, self.comb0, :])).reshape(
-            (inputs.shape[0], len(self.comb0), inputs.shape[2]))
-        type_all = ops.Mul()(type_all, inputs[:, self.comb1, :])
-
-        type_each = []
-        for index in self.comb0:
-            type_each.append(self.bilinear_each[index](bilinear_in[index]))
-        type_each = ops.Mul()(ops.Concat(1)(type_each), inputs[:, self.comb1, :])
-
-        type_interaction = []
-        for index, bilinear in zip(self.comb0, self.bilinear_interaction):
-            type_interaction.append(bilinear(bilinear_in[index]))
-        type_interaction = ops.Mul()(ops.Concat(1)(type_interaction), inputs[:, self.comb1, :])
-
-        interaction = [type_all, type_each, type_interaction][self.selcet_index]
+        if self.bilinear_type == "all":
+            type_all = self.bilinear_all(self.flatten(inputs[:, self.comb0, :])).reshape(
+                (inputs.shape[0], len(self.comb0), inputs.shape[2]))
+            interaction = ops.Mul()(type_all, inputs[:, self.comb1, :])
+        elif self.bilinear_type == "each":
+            type_each = []
+            for index in self.comb0:
+                type_each.append(self.bilinear_each[index](bilinear_in[index]))
+            interaction = ops.Mul()(ops.Concat(1)(type_each), inputs[:, self.comb1, :])
+        else:
+            type_interaction = []
+            for index, bilinear in zip(self.comb0, self.bilinear_interaction):
+                type_interaction.append(bilinear(bilinear_in[index]))
+            interaction = ops.Mul()(ops.Concat(1)(type_interaction), inputs[:, self.comb1, :])
 
         return interaction
 
