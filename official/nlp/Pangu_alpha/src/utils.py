@@ -422,6 +422,15 @@ def add_context_args_mode(opt):
                      choices=['data_parallel', "semi_auto_parallel", "auto_parallel"], help="The parallel context mode")
 
 
+def add_search_mode_args_mode(opt):
+    """Add auto parallel context search mode args params"""
+    opt.add_argument("--search_mode",
+                     type=str,
+                     default="recursive_programming",
+                     choices=["recursive_programming", "sharding_propagation", "dynamic_programming"],
+                     help="The auto parallel context search mode")
+
+
 def add_downstream_params(opt):
     opt.add_argument("--eval_task",
                      help="Enable evaluating the tasks. Currently supports WPLC, C3.",
@@ -570,6 +579,7 @@ def get_args(inference=False):
                         default=6000,
                         help="Set the hccl build time out, only effective on Ascend. Default 6000")
     add_context_args_mode(parser)
+    add_search_mode_args_mode(parser)
     add_training_params(parser)
     add_retrain_params(parser)
     if inference:
