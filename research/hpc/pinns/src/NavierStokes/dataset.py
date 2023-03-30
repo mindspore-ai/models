@@ -108,5 +108,5 @@ def generate_training_set_navier_stokes(batch_size, n_train, path, noise):
     lb = s.lb
     ub = s.ub
     dataset = ds.GeneratorDataset(source=s, column_names=['data', 'label'], shuffle=True,
-                                  num_parallel_workers=2, python_multiprocessing=True)
+                                  num_parallel_workers=1)
     return dataset, lb, ub
