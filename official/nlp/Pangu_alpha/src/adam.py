@@ -22,8 +22,13 @@ from mindspore.ops import functional as F
 from mindspore.common.initializer import initializer
 from mindspore.common.tensor import Tensor
 from mindspore.common.parameter import Parameter, ParameterTuple
-from mindspore._checkparam import Validator as validator
-from mindspore._checkparam import Rel
+try:
+    from mindspore._checkparam import Validator as validator
+    from mindspore._checkparam import Rel
+except ImportError:
+    import mindspore._checkparam as validator
+    import mindspore._checkparam as Rel
+
 from mindspore.nn.optim.optimizer import Optimizer
 
 _adam_opt = C.MultitypeFuncGraph("adam_opt")
