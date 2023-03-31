@@ -147,7 +147,6 @@ int main(int argc, char **argv) {
   }
   auto ascend310 = std::make_shared<mindspore::Ascend310DeviceInfo>();
   ascend310->SetDeviceID(FLAGS_device_id);
-  ascend310->SetPrecisionMode("preferred_fp32");
   Model model;
   if (!LoadModel(FLAGS_mindir_path, FLAGS_device_type, FLAGS_device_id, ascend310, &model)) {
     std::cout << "Failed to load model " << FLAGS_mindir_path << ", device id: " << FLAGS_device_id
@@ -206,13 +205,15 @@ int main(int argc, char **argv) {
     float imgInfo[4];
     imgInfo[0] = shape[0];
     imgInfo[1] = shape[1];
+    size_t heightIndex = 2;
+    size_t widthIndex = 3;
     if (FLAGS_KEEP_RATIO) {
       float resizeScale = widthScale < heightScale ? widthScale : heightScale;
-      imgInfo[2] = resizeScale;
-      imgInfo[3] = resizeScale;
+      imgInfo[heightIndex] = resizeScale;
+      imgInfo[widthIndex] = resizeScale;
     } else {
-      imgInfo[2] = heightScale;
-      imgInfo[3] = widthScale;
+      imgInfo[heightIndex] = heightScale;
+      imgInfo[widthIndex] = widthScale;
     }
 
     MSTensor imgMeta("imgMeta", DataType::kNumberTypeFloat32, {static_cast<int64_t>(4)}, imgInfo, 16);
@@ -231,8 +232,10 @@ int main(int argc, char **argv) {
       std::cout << "Predict " << all_files[i] << " failed." << std::endl;
       return 1;
     }
-    startTimeMs = (1.0 * start.tv_sec * 1000000 + start.tv_usec) / 1000;
-    endTimeMs = (1.0 * end.tv_sec * 1000000 + end.tv_usec) / 1000;
+    size_t uSecScale = 1000000;
+    size_t msScale = 1000;
+    startTimeMs = (1.0 * start.tv_sec * uSecScale + start.tv_usec) / msScale;
+    endTimeMs = (1.0 * end.tv_sec * uSecScale + end.tv_usec) / msScale;
     costTime_map.insert(std::pair<double, double>(startTimeMs, endTimeMs));
     WriteResult(all_files[i], outputs);
   }
