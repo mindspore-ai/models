@@ -29,7 +29,7 @@ loss_scale: 1.0
 label_smooth: 0
 label_smooth_factor: 0
 buffer_size: 10
-image_size: '224,224'
+image_size: [224,224]
 pad_mode: 'same'
 has_bias: False
 batch_norm: True
