@@ -109,11 +109,13 @@ def set_parallel_context(args_opt):
     print("rank_id is {}, device_num is {}".format(rank, device_num))
     context.reset_auto_parallel_context()
     context.set_auto_parallel_context(
-        parallel_mode=args_opt.parallel_mode, gradients_mean=False,
+        parallel_mode=args_opt.parallel_mode, gradients_mean=False, search_mode=args_opt.search_mode,
         full_batch=bool(args_opt.full_batch), strategy_ckpt_load_file=args_opt.strategy_load_ckpt_path,
         enable_parallel_optimizer=bool(args_opt.optimizer_shard), strategy_ckpt_save_file='strategy.ckpt',
         enable_alltoall=bool(args_opt.enable_alltoall))
     set_algo_parameters(elementwise_op_strategy_follow=True)
+    if context.get_auto_parallel_context("parallel_mode") == ParallelMode.AUTO_PARALLEL:
+        set_algo_parameters(elementwise_op_strategy_follow=False, fully_use_devices=False)
     _set_multi_subgraphs()
     return rank, device_num
 
@@ -128,6 +130,18 @@ def set_optimizer(optimizer, opt_offload, group_params, learning_rate, config):
     else:
         optimizer = FP32StateAdamWeightDecay(group_params, learning_rate=learning_rate, eps=1e-8, beta1=0.9, beta2=0.95)
     return optimizer
+
+
+def cal_model_property(args_opt, device_num):
+    # in case when the model parallel is smaller than the device num, the model_parallel_num will be zero.
+    model_parallel_num = min(args_opt.op_level_model_parallel_num, device_num)
+    data_parallel_num = int(device_num / model_parallel_num)
+    batch_size = args_opt.per_batch_size * data_parallel_num
+    if (context.get_auto_parallel_context("parallel_mode") == ParallelMode.DATA_PARALLEL or
+            context.get_auto_parallel_context("parallel_mode") == ParallelMode.AUTO_PARALLEL):
+        batch_size = args_opt.per_batch_size
+    return model_parallel_num, data_parallel_num, batch_size
+
 
 def run_train(args_opt):
     r"""The main training process."""
@@ -159,11 +173,7 @@ def run_train(args_opt):
         download_data(src_data_url=args_opt.data_url, tgt_data_path=cache_url, rank=rank)
         download_data(src_data_url=args_opt.eval_data_url, tgt_data_path=eval_cache_url, rank=rank)
     # Set model property
-    # in case when the model parallel is smaller than the device num, the model_parallel_num will be zero.
-    model_parallel_num = min(args_opt.op_level_model_parallel_num, device_num)
-    data_parallel_num = int(device_num / model_parallel_num)
-    batch_size = args_opt.per_batch_size * data_parallel_num if context.get_auto_parallel_context(
-        "parallel_mode") != ParallelMode.DATA_PARALLEL else args_opt.per_batch_size
+    model_parallel_num, data_parallel_num, batch_size = cal_model_property(args_opt, device_num)
     micro_batch_interleaved = args_opt.micro_batch_interleaved
     recompute_config = TransformerRecomputeConfig(recompute=True,
                                                   recompute_slice_activation=bool(args_opt.recompute_slice_activation))
@@ -406,13 +416,28 @@ def set_pipeline_parallel_context(args_opt):
     print("rank_id is {}, device_num is {}".format(rank_id, device_num))
     context.reset_auto_parallel_context()
     context.set_auto_parallel_context(
-        parallel_mode=args_opt.parallel_mode, gradients_mean=False,
+        parallel_mode=args_opt.parallel_mode, gradients_mean=False, search_mode=args_opt.search_mode,
         full_batch=bool(args_opt.full_batch), loss_repeated_mean=True,
         device_num=device_num, enable_parallel_optimizer=bool(args_opt.optimizer_shard),
         pipeline_stages=args_opt.stage_num, enable_alltoall=bool(args_opt.enable_alltoall))
     set_algo_parameters(elementwise_op_strategy_follow=True)
+    if context.get_auto_parallel_context("parallel_mode") == ParallelMode.AUTO_PARALLEL:
+        set_algo_parameters(elementwise_op_strategy_follow=False, fully_use_devices=False)
     _set_multi_subgraphs()
     return rank_id, device_num
+
+
+def cal_model_property_pipeline(args_opt, device_num):
+    is_auto_parallel = context.get_auto_parallel_context("parallel_mode") == ParallelMode.AUTO_PARALLEL
+    # in order to make sure data_parallel_num is always non-zero, set model_parallel_num to 1
+    model_parallel_num = 1 if is_auto_parallel else args_opt.op_level_model_parallel_num
+    stage_device_num = int(device_num / args_opt.stage_num)
+    data_parallel_num = int(stage_device_num / model_parallel_num)
+    per_batch_size = args_opt.per_batch_size
+    batch_size = per_batch_size * data_parallel_num * args_opt.micro_size
+    if is_auto_parallel:
+        batch_size = per_batch_size * args_opt.micro_size
+    return model_parallel_num, data_parallel_num, batch_size
 
 
 def run_train_pipeline(args_opt):
@@ -432,12 +457,9 @@ def run_train_pipeline(args_opt):
     else:
         download_data(src_data_url=args_opt.data_url, tgt_data_path=cache_url, rank=rank_id)
         download_data(src_data_url=args_opt.eval_data_url, tgt_data_path=eval_cache_url, rank=rank_id)
-    model_parallel_num = args_opt.op_level_model_parallel_num
+    model_parallel_num, data_parallel_num, batch_size = cal_model_property_pipeline(args_opt, device_num)
     stage_device_num = int(device_num / args_opt.stage_num)
-    data_parallel_num = int(stage_device_num / model_parallel_num)
     is_last_stage = (rank_id // stage_device_num) == args_opt.stage_num -1
-    per_batch_size = args_opt.per_batch_size
-    batch_size = per_batch_size * data_parallel_num * args_opt.micro_size
     micro_batch_interleaved = args_opt.micro_batch_interleaved
     recompute_config = TransformerRecomputeConfig(recompute=True,
                                                   recompute_slice_activation=bool(args_opt.recompute_slice_activation))
