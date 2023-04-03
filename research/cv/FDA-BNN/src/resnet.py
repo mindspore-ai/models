@@ -17,7 +17,6 @@ import numpy as np
 import mindspore.nn as nn
 from mindspore.ops import operations as P
 from mindspore.common.tensor import Tensor
-from mindspore._checkparam import Validator as validator
 from mindspore.common import dtype as mstype
 from mindspore.common.parameter import Parameter
 from mindspore.ops import functional as F
@@ -79,7 +78,7 @@ class PReLU(nn.Cell):
     def __init__(self, channel=1, w=0.25):
         """Initialize PReLU."""
         super(PReLU, self).__init__()
-        validator.check_positive_int(channel, 'channel', self.cls_name)
+        assert isinstance(channel, int) and channel > 0, "channel should be bigger than 0"
         if isinstance(w, (float, np.float32)):
             tmp = np.empty((channel,), dtype=np.float32)
             tmp.fill(w)

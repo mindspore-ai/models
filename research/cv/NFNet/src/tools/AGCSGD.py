@@ -18,7 +18,6 @@ from mindspore import Parameter
 from mindspore import dtype as mstype
 from mindspore import numpy as mnp
 from mindspore import ops
-from mindspore._checkparam import Validator
 from mindspore.common.tensor import Tensor
 from mindspore.nn.optim import Optimizer
 from mindspore.ops import functional as F, composite as C
@@ -89,9 +88,7 @@ class SGDAGC(Optimizer):
     def __init__(self, params, learning_rate=1e-3, momentum=0.9, eps=1e-3, clipping=None, weight_decay=2e-5,
                  use_nesterov=True):
         super(SGDAGC, self).__init__(learning_rate=learning_rate, parameters=params, weight_decay=weight_decay)
-
-        Validator.check_bool(use_nesterov)
-
+        assert isinstance(use_nesterov, bool), "use_nesterov should be bool"
         self.use_nesterov = use_nesterov
         self.momentum = Parameter(Tensor(momentum, mstype.float32), name="momentum")
         self.eps = Parameter(Tensor(eps, mstype.float32), name="eps")

@@ -20,7 +20,6 @@ from mindspore import nn
 import mindspore.common.dtype as mstype
 from mindspore.ops import operations as P
 from mindspore.ops import functional as F
-from mindspore._checkparam import Validator as validator
 
 
 classes = {'Earphone': [16, 17, 18], 'Motorbike': [30, 31, 32, 33, 34, 35], 'Rocket': [41, 42, 43],
@@ -36,10 +35,11 @@ for cls in classes:
 class WithEvalCell(nn.Cell):
     def __init__(self, network, add_cast_fp32=False):
         super(WithEvalCell, self).__init__(auto_prefix=False)
+        assert isinstance(add_cast_fp32, bool), "add_cast_fp32 should be float"
         self._network = network
         self._log_softmax = nn.LogSoftmax()
         self.cast = P.Cast()
-        self.add_cast_fp32 = validator.check_value_type("add_cast_fp32", add_cast_fp32, [bool], self.cls_name)
+        self.add_cast_fp32 = add_cast_fp32
 
     def construct(self, data, label1, label2):
         outputs = self._network(data)

@@ -17,7 +17,6 @@ from mindspore import ops
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
 import mindspore.common.dtype as mstype
-from mindspore._checkparam import Validator
 from mindspore.nn.optim.optimizer import Optimizer
 
 _momentum_opt = ops.MultitypeFuncGraph("momentum_opt")
@@ -122,12 +121,10 @@ class Momentum(Optimizer):
     """
     def __init__(self, params, learning_rate, momentum, weight_decay=0.0, loss_scale=1.0, use_nesterov=False):
         super().__init__(learning_rate, params, weight_decay, loss_scale)
-        Validator.check_value_type("momentum", momentum, [float], self.cls_name)
-        if isinstance(momentum, float) and momentum < 0.0:
-            raise ValueError(f'momentum should be at least 0.0, but got momentum {momentum}')
+        assert isinstance(momentum, float) and momentum >= 0, "momentum should be equal or bigger than 0"
+        assert isinstance(use_nesterov, bool), "use_nesterov should be bool"
         self.momentum = Parameter(Tensor(momentum, mstype.float32), name="momentum")
         self.params = self.parameters
-        self.use_nesterov = Validator.check_bool(use_nesterov)
         self.moments = self.params.clone(prefix="moments", init='zeros')
         self.hyper_map = ops.HyperMap()
         # Use FusedWeightScaleApplyMomentum to avoid extra kernel launch.

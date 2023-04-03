@@ -24,8 +24,6 @@ from mindspore.ops import composite as C
 from mindspore.ops import functional as F
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
-from mindspore._checkparam import Validator as validator
-from mindspore._checkparam import Rel
 
 _learning_rate_update_func = ['linear', 'cos', 'sin']
 
@@ -83,22 +81,19 @@ def _update_run_op(beta1, beta2, eps, lr, weight_decay_tensor, param, m, v, grad
 
 def _check_param_value(beta1, beta2, eps, weight_decay, prim_name):
     """Check the type of inputs."""
-    validator.check_value_type("beta1", beta1, [float], prim_name)
-    validator.check_value_type("beta2", beta2, [float], prim_name)
-    validator.check_value_type("eps", eps, [float], prim_name)
-    validator.check_value_type("weight_dacay", weight_decay, [float], prim_name)
-
+    assert isinstance(beta1, float), "beta1 should be float"
+    assert isinstance(beta2, float), "beta2 should be float"
+    assert isinstance(eps, float), "eps should be float"
+    assert isinstance(weight_dacay, float), "weight_dacay should be float"
 
 
 def _check_learning_rate_value(learning_rate, end_learning_rate, decay_steps, power, prim_name):
     """Check the type of inputs."""
-    validator.check_float_positive('learning_rate', learning_rate, prim_name)
-    validator.check_float_legal_value('learning_rate', learning_rate, prim_name)
-    validator.check_float_positive('end_learning_rate', end_learning_rate, prim_name)
-    validator.check_float_legal_value('end_learning_rate', end_learning_rate, prim_name)
-    validator.check_float_positive('power', power, prim_name)
-    validator.check_float_legal_value('power', power, prim_name)
-    validator.check_integer('decay_steps', decay_steps, 0, Rel.GT, prim_name)
+    assert isinstance(learning_rate, float) and learning_rate > 0, "learning_rate should bigger than 0"
+    assert isinstance(end_learning_rate, float) and end_learning_rate > 0, \
+        "learning_rate should bigger than 0"
+    assert isinstance(power, float) and power > 0, "power should bigger than 0"
+    assert isinstance(decay_steps, int) and decay_steps > 0, "decay_steps should be bigger than 0"
 
 
 @adam_opt.register("Function", "Tensor", "Tensor", "Tensor", "Tensor", "Number", "Tensor", "Tensor", "Tensor", "Tensor",
@@ -207,10 +202,9 @@ class Adam(Optimizer):
                  use_nesterov=False, weight_decay=0.0, loss_scale=1.0):
         super(Adam, self).__init__(learning_rate, params, weight_decay, loss_scale)
         _check_param_value(beta1, beta2, eps, weight_decay, self.cls_name)
-        validator.check_value_type("use_locking", use_locking, [bool], self.cls_name)
-        validator.check_value_type("use_nesterov", use_nesterov, [bool], self.cls_name)
-        validator.check_value_type("loss_scale", loss_scale, [float], self.cls_name)
-        # validator.check_number_range("loss_scale", loss_scale, 1.0, float("inf"), Rel.INC_LEFT, self.cls_name)
+        assert isinstance(use_locking, bool), "use_locking should be bool"
+        assert isinstance(use_nesterov, bool), "use_nesterov should be bool"
+        assert isinstance(loss_scale, float), "loss_scale should be float"
 
         self.beta1 = Tensor(beta1, mstype.float32)
         self.beta2 = Tensor(beta2, mstype.float32)

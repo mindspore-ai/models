@@ -29,7 +29,6 @@ import mindspore.ops as P
 
 from mindspore import dtype as mstype
 from mindspore import log as logger
-from mindspore._checkparam import Validator as validator
 from mindspore.common.tensor import Tensor
 from mindspore.nn.learning_rate_schedule import (LearningRateSchedule,
                                                  PolynomialDecayLR, WarmUpLR)
@@ -59,19 +58,19 @@ class CustomWarmUpLR(LearningRateSchedule):
     """
     def __init__(self, learning_rate, warmup_steps, max_train_steps):
         super(CustomWarmUpLR, self).__init__()
-        if not isinstance(learning_rate, float):
-            raise TypeError("learning_rate must be float.")
-        validator.check_non_negative_float(learning_rate, "learning_rate", self.cls_name)
-        validator.check_positive_int(warmup_steps, 'warmup_steps', self.cls_name)
+        assert isinstance(learning_rate, float) and learning_rate >= 0, \
+            "learning_rate should be equal or bigger than 0"
+        assert isinstance(warmup_steps, int) and warmup_steps > 0, "warmup_steps should be bigger than 0"
         self.warmup_steps = warmup_steps
         self.learning_rate = learning_rate
         self.max_train_steps = max_train_steps
         self.cast = P.Cast()
+
     def construct(self, current_step):
         if current_step < self.warmup_steps:
-            warmup_percent = self.cast(current_step, mstype.float32)/ self.warmup_steps
+            warmup_percent = self.cast(current_step, mstype.float32) / self.warmup_steps
         else:
-            warmup_percent = 1 - self.cast(current_step, mstype.float32)/ self.max_train_steps
+            warmup_percent = 1 - self.cast(current_step, mstype.float32) / self.max_train_steps
 
         return self.learning_rate * warmup_percent
 

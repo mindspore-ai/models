@@ -22,7 +22,6 @@ from mindspore.ops import operations as P
 from mindspore.common import dtype as mstype
 from mindspore.train.callback import Callback
 from mindspore.nn.learning_rate_schedule import LearningRateSchedule
-from mindspore._checkparam import Validator as validator
 
 
 def make_directory(path: str):
@@ -117,10 +116,8 @@ class CustomWarmUpLR(LearningRateSchedule):
 
     def __init__(self, learning_rate, warmup_steps, max_train_steps):
         super(CustomWarmUpLR, self).__init__()
-        if not isinstance(learning_rate, float):
-            raise TypeError("learning_rate must be float.")
-        validator.check_non_negative_float(learning_rate, "learning_rate", self.cls_name)
-        validator.check_positive_int(warmup_steps, 'warmup_steps', self.cls_name)
+        assert isinstance(learning_rate, float) and learning_rate >= 0, "learning_rate should be equal or bigger than 0"
+        assert isinstance(warmup_steps, int) and warmup_steps > 0, "warmup_steps should be bigger than 0"
         self.warmup_steps = warmup_steps
         self.learning_rate = learning_rate
         self.max_train_steps = max_train_steps

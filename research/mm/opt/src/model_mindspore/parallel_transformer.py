@@ -21,7 +21,6 @@ import numpy as np
 import mindspore.common.dtype as mstype
 from mindspore import context
 from mindspore import nn
-from mindspore._checkparam import Validator
 from mindspore._extends import cell_attr_register
 from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
@@ -155,12 +154,7 @@ class Dropout(Cell):
 
     def __init__(self, keep_prob=0.5, dtype=mstype.float32):
         super(Dropout, self).__init__()
-        if keep_prob <= 0 or keep_prob > 1:
-            raise ValueError(
-                "dropout probability should be a number in range (0, 1], but got {}".format(
-                    keep_prob))
-        Validator.check_subclass("dtype", dtype, mstype.number_type, self.cls_name)
-        Validator.check_value_type('keep_prob', keep_prob, [float], self.cls_name)
+        assert isinstance(keep_prob, float) and 0 < keep_prob <= 1, "keep_prob should be between 0 and 1"
         self.keep_prob = keep_prob
         self.is_ascend = context.get_context('device_target') in ["Ascend"]
         if self.is_ascend:
@@ -756,18 +750,15 @@ class MultiHeadAttention(Cell):
         query = self.dense1(from_tensor)
         key = self.dense2(to_tensor)
         value = self.dense3(to_tensor)
-        # [bs, num_heads, seq_length, size_per_head]
         query = self.transpose(
             F.reshape(
                 query,
                 (-1, from_tensor_original_shape[1], self.n_head, self.size_per_head)),
             (0, 2, 1, 3))
-        # [bs, num_heads, size_per_head, seq_length]
         key = self.transpose(
             F.reshape(
                 key, (-1, to_tensor_original_shape[1], self.n_head, self.size_per_head)),
             (0, 2, 3, 1))
-        # [bs, num_heads, seq_length, size_per_head]
         value = self.transpose(
             F.reshape(
                 value,

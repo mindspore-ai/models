@@ -26,7 +26,6 @@ from mindspore.ops import composite as C
 from mindspore.common.tensor import Tensor
 from mindspore.common.parameter import Parameter
 from mindspore.ops.primitive import Primitive
-from mindspore._checkparam import Validator
 from mindspore._extends import cell_attr_register
 
 
@@ -813,9 +812,9 @@ class Dense(nn.cell.Cell):
                  has_bias=True,
                  activation=None):
         super(Dense, self).__init__()
-        self.in_channels = Validator.check_positive_int(in_channels)
-        self.out_channels = Validator.check_positive_int(out_channels)
-        self.has_bias = Validator.check_bool(has_bias)
+        assert isinstance(in_channels, int) and in_channels > 0, "in_channels should be bigger than 0"
+        assert isinstance(out_channels, int) and out_channels > 0, "out_channels should be bigger than 0"
+        assert isinstance(has_bias, bool), "has_bias should be bool"
         self.reshape = P.Reshape()
         self.shape_op = P.Shape()
 

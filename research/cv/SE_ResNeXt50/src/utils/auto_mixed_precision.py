@@ -15,7 +15,6 @@
 """Auto mixed precision."""
 import mindspore.nn as nn
 from mindspore.ops import functional as F
-from mindspore._checkparam import Validator as validator
 from mindspore.common import dtype as mstype
 
 
@@ -24,8 +23,9 @@ class OutputTo(nn.Cell):
 
     def __init__(self, op, to_type=mstype.float16):
         super(OutputTo, self).__init__(auto_prefix=False)
+        assert isinstance(to_type, (mstype.float16, mstype.float32)), \
+            "to_type should be mstype.float16 or mstype.float32"
         self._op = op
-        validator.check_type_name('to_type', to_type, [mstype.float16, mstype.float32], None)
         self.to_type = to_type
 
     def construct(self, x):
