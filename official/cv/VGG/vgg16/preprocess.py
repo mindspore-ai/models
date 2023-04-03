@@ -44,7 +44,6 @@ def create_label(result_path, dir_path):
     print("[INFO] Completed! Total {} data.".format(total))
 
 config.per_batch_size = config.batch_size
-config.image_size = list(map(int, config.image_size.split(',')))
 
 
 if __name__ == "__main__":

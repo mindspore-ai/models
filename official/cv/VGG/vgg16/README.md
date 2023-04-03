@@ -423,7 +423,7 @@ loss_scale: 1.0                      # loss scale
 label_smooth: 0                      # label smooth
 label_smooth_factor: 0               # label smooth factor
 buffer_size: 10                      # shuffle buffer size
-image_size: '224,224'                # image size
+image_size: [224,224]                # image size
 pad_mode: 'same'                     # pad mode for conv2d
 padding: 0                           # padding value for conv2d
 has_bias: False                      # whether has bias in conv2d
@@ -451,7 +451,7 @@ loss_scale: 1024                    # loss scale
 label_smooth: 1                     # label smooth
 label_smooth_factor: 0.1            # label smooth factor
 buffer_size: 10                     # shuffle buffer size
-image_size: '224,224'               # image size
+image_size: [224,224]               # image size
 pad_mode: 'pad'                     # pad mode for conv2d
 padding: 1                          # padding value for conv2d
 has_bias: True                      # whether has bias in conv2d
