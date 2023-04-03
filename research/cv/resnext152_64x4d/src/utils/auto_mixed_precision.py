@@ -23,7 +23,7 @@ class OutputTo(nn.Cell):
 
     def __init__(self, op, to_type=mstype.float16):
         super(OutputTo, self).__init__(auto_prefix=False)
-        assert isinstance(to_type, (mstype.float16, mstype.float32)), \
+        assert to_type in [mstype.float16, mstype.float32], \
             "to_type should be (mstype.float16, mstype.float32)"
         self._op = op
         self.to_type = to_type
