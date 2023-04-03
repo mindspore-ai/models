@@ -191,8 +191,8 @@ def _run_off_load_opt(opt, beta1_power, beta2_power, beta1, beta2, eps, lr, grad
 
 def _check_param_value(beta1, beta2, eps, prim_name):
     """Check the type of inputs."""
-    assert isinstance(beta1, float) and 0 <= beta1 <= 0, "beta1 should between 0 and 1"
-    assert isinstance(beta2, float) and 0 <= beta2 <= 0, "beta2 should between 0 and 1"
+    assert isinstance(beta1, float) and 0 <= beta1 <= 1, "beta1 should between 0 and 1"
+    assert isinstance(beta2, float) and 0 <= beta2 <= 1, "beta2 should between 0 and 1"
     assert isinstance(eps, float) and eps > 0, "eps should be bigger than 0"
 
 
