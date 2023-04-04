@@ -15,6 +15,8 @@
 """eval resnet."""
 import os
 import mindspore as ms
+from mindspore import Tensor
+from mindspore.nn.optim import Momentum
 from mindspore.common import set_seed
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 from mindspore.train.model import Model
@@ -43,6 +45,22 @@ elif config.net_name == "resnet101":
 else:
     from src.resnet import se_resnet50 as resnet
     from src.dataset import create_dataset4 as create_dataset
+
+
+def init_group_params(net):
+    decayed_params = []
+    no_decayed_params = []
+    for param in net.trainable_params():
+        if 'beta' not in param.name and 'gamma' not in param.name and 'bias' not in param.name:
+            decayed_params.append(param)
+        else:
+            no_decayed_params.append(param)
+
+    group_params = [{'params': decayed_params, 'weight_decay': config.weight_decay},
+                    {'params': no_decayed_params},
+                    {'order_params': net.trainable_params()}]
+    return group_params
+
 
 @moxing_wrapper()
 def eval_net():
@@ -78,8 +96,14 @@ def eval_net():
     else:
         loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
 
-    # define model
-    model = Model(net, loss_fn=loss, metrics={'top_1_accuracy', 'top_5_accuracy'})
+    #Currently, boost inference only supports scenarios with optimizers
+    #Optimizer waiting for decoupling in boost model
+    group_params = init_group_params(net)
+    opt = Momentum(group_params, Tensor(0.0), config.momentum, loss_scale=config.loss_scale)
+
+    # define model, add boostmode for eval scenarios with train.py
+    model = Model(net, loss_fn=loss, boost_level=config.boost_mode,
+                  optimizer=opt, metrics={'top_1_accuracy', 'top_5_accuracy'})
 
     # eval model
     res = model.eval(dataset)
