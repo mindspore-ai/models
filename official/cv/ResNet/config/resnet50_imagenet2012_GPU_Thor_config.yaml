@@ -56,8 +56,8 @@ boost_mode: "O0"
 conv_init: "HeUniform"
 dense_init: "HeUniform"
 all_reduce_fusion_config:
-    - 80
-    - 160
+    - 75
+    - 155
 train_image_size: 224
 eval_image_size: 224
 
