@@ -49,7 +49,7 @@
 
     - NDK >= 21.3 [NDK](https://developer.android.google.cn/ndk/downloads?hl=zh-cn)
     - CMake >= 3.10.2   [CMake](https://cmake.org/download)
-    - Android SDK >= 26 [SDK](https://developer.microsoft.com/zh-cn/windows/downloads/windows-10-sdk/)
+    - Android SDK >= 26 [SDK](https://developer.android.com/studio?hl=zh-cn#cmdline-tools)
     - JDK >= 1.8 [JDK](http://jdk.java.net)
 
         ![project_structure](images/project_structure.png)
