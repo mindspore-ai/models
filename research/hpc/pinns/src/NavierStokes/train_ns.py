@@ -49,9 +49,10 @@ class EvalCallback(Callback):
             print(f'Error of lambda 1 is {error1[0]:.6f}%')
             print(f'Error of lambda 2 is {error2[0]:.6f}%')
             if self.best_result is None or (error1 < self.error1 and error2 < self.error2):
+                if self.best_result is not None:
+                    self.error1 = error1
+                    self.error2 = error2
                 self.best_result = error1 + error2
-                self.error1 = error1
-                self.error2 = error2
                 save_checkpoint(self.network, os.path.join(self.ckpt_dir, "best_result.ckpt"))
 
 
