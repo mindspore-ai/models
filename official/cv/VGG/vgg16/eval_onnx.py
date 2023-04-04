@@ -63,7 +63,6 @@ def run_eval(checkpoint_path, dataset_name, data_dir, batch_size, image_size, ta
 
 if __name__ == '__main__':
     config = get_config()
-    config.image_size = [int(x) for x in config.image_size.split(',')]
 
     results = run_eval(config.file_name, config.dataset, config.data_dir,
                        config.batch_size, config.image_size, config.device_target)

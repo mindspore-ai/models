@@ -34,7 +34,6 @@ def modelarts_pre_process():
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_export():
-    config.image_size = list(map(int, config.image_size.split(',')))
 
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
     if config.device_target == "Ascend":

@@ -422,7 +422,7 @@ loss_scale: 1.0                   # 损失放大
 label_smooth: 0                   # 标签平滑
 label_smooth_factor: 0            # 标签平滑因子
 buffer_size: 10                   # 混洗缓冲区大小
-image_size: '224,224'             # 图像大小
+image_size: [224,224]             # 图像大小
 pad_mode: 'same'                  # conv2d的填充方式
 padding: 0                        # conv2d的填充值
 has_bias: False                   # conv2d是否有偏差
@@ -450,7 +450,7 @@ loss_scale: 1024                    # 损失放大
 label_smooth: 1                     # 标签平滑
 label_smooth_factor: 0.1            # 标签平滑因子
 buffer_size: 10                     # 混洗缓冲区大小
-image_size: '224,224'               # 图像大小
+image_size: [224,224]              # 图像大小
 pad_mode: 'pad'                     # conv2d的填充方式
 padding: 1                          # conv2d的填充值
 has_bias: True                      # conv2d是否有偏差

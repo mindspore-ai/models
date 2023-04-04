@@ -124,7 +124,6 @@ def _get_last_ckpt(ckpt_dir):
 
 def run_export(ckpt_dir):
     ckpt_file = _get_last_ckpt(ckpt_dir)
-#   config.image_size = list(map(int, config.image_size.split(',')))
 
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
     if config.device_target == "Ascend":
@@ -148,7 +147,6 @@ def run_export(ckpt_dir):
 def run_train():
     '''run train'''
     config.lr_epochs = list(map(int, config.lr_epochs.split(',')))
-    config.image_size = list(map(int, config.image_size.split(',')))
     config.per_batch_size = config.batch_size
 
     _enable_graph_kernel = config.device_target == "GPU"
