@@ -144,7 +144,6 @@ class GlobalNorm(nn.Cell):
 
     def __init__(self, params, config):
         super(GlobalNorm, self).__init__()
-        self.norm = nn.Norm()
         self.hyper_map = C.HyperMap()
         self.is_pipeline = context.get_auto_parallel_context("pipeline_stages") > 1
         self.is_data_parallel = context.get_auto_parallel_context("parallel_mode") == ParallelMode.DATA_PARALLEL
