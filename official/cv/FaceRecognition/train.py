@@ -41,8 +41,11 @@ from model_utils.config import config
 from model_utils.device_adapter import get_device_id, get_device_num, get_rank_id
 
 mindspore.common.seed.set_seed(1)
+
+# Only Ascend910B supports the ascend_config option.
 context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False,
-                    reserve_class_name_in_scope=False, enable_graph_kernel=config.device_target == "GPU")
+                    reserve_class_name_in_scope=False, enable_graph_kernel=config.device_target == "GPU",
+                    ascend_config={"precision_mode": "allow_fp32_to_fp16"})
 
 
 if config.device_target != 'GPU' or not config.is_distributed:
