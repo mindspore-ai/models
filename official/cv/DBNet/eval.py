@@ -18,34 +18,54 @@ import sys
 
 import mindspore as ms
 
-from src.datasets.load import create_dataset
+from src.datasets.load import create_dataset, save_mindrecord
 from src.utils.eval_utils import WithEval
 from src.utils.env import init_env
 from src.modules.model import get_dbnet
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
+from src.utils.logger import get_logger
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+
+def set_default():
+    config.output_dir = os.path.join(config.output_dir, config.net, config.backbone.initializer)
+    config.save_ckpt_dir = os.path.join(config.output_dir, 'ckpt')
+    config.log_dir = os.path.join(config.output_dir, 'log')
 
 
 @moxing_wrapper()
 def evaluate(cfg, path):
     cfg.device_num = 1
+    set_default()
     init_env(cfg)
+    cfg.logger = get_logger(cfg.log_dir, cfg.rank_id)
     cfg.backbone.pretrained = False
-    eval_net = get_dbnet(cfg.net, cfg, isTrain=False)
-    eval_net = WithEval(eval_net, cfg)
+
+    save_mindrecord(config)
     val_dataset, _ = create_dataset(cfg, False)
     val_dataset = val_dataset.create_dict_iterator(output_numpy=True)
-    ms.load_checkpoint(path, eval_net.model)
-    eval_net.model.set_train(False)
-    metrics, fps = eval_net.eval(val_dataset, show_imgs=cfg.eval.show_images)
-    params = sum([param.size for param in eval_net.model.get_parameters()]) / (1024 ** 2)
-    print(f"Param: {params} M")
-    print(f"FPS: {fps}\n"
-          f"Recall: {metrics['recall'].avg}\n"
-          f"Precision: {metrics['precision'].avg}\n"
-          f"Fmeasure: {metrics['fmeasure'].avg}\n")
+    paths = [path]
+    if os.path.isdir(path):
+        paths = []
+        files = os.listdir(path)
+        for file in files:
+            if file.endswith(".ckpt"):
+                paths.append(os.path.join(path, file))
+    for p in paths:
+        eval_net = get_dbnet(cfg.net, cfg, isTrain=False)
+        eval_net = WithEval(eval_net, cfg)
+        eval_net.model.set_train(False)
+        cfg.logger.info(f"infer {p}")
+        ms.load_checkpoint(p, eval_net.model)
+        metrics, fps = eval_net.eval(val_dataset, show_imgs=cfg.eval.show_images)
+        params = sum([param.size for param in eval_net.model.get_parameters()]) / (1024 ** 2)
+        cfg.logger.info(f"Param: {params} M")
+        cfg.logger.info(f"FPS: {fps}\n"
+                        f"Recall: {metrics['recall'].avg}\n"
+                        f"Precision: {metrics['precision'].avg}\n"
+                        f"Fmeasure: {metrics['fmeasure'].avg}\n")
     return metrics
 
 

@@ -1,4 +1,4 @@
-# Copyright 2022 Huawei Technologies Co., Ltd
+# Copyright 2022-2023 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,14 +18,15 @@
 import os
 import math
 import glob
+import multiprocessing
 import cv2
 import numpy as np
 
 from mindspore import dataset as ds
-from mindspore.dataset.vision import RandomColorAdjust, ToTensor, ToPIL
 
 from .pre_process import MakeSegDetectionData, MakeBorderMap
 from .random_thansform import RandomAugment
+from .load_mindrecord import create_dataset_md
 
 
 def get_img(img_path):
@@ -93,7 +94,6 @@ class IC15DataLoader():
     """IC15 DataLoader"""
 
     def __init__(self, config, isTrain=True):
-        self.RGB_MEAN = np.array([122.67891434, 116.66876762, 104.00698793])
         self.config = config
         self.isTrain = isTrain
 
@@ -150,15 +150,6 @@ class IC15DataLoader():
             cv2.imwrite('./images/gt_mask.jpg', gt_mask * 255)
             cv2.imwrite('./images/thresh_map.jpg', thresh_map * 255)
             cv2.imwrite('./images/thresh_mask.jpg', thresh_mask * 255)
-
-        # Random Colorize
-        if self.isTrain and self.config.train.is_transform:
-            colorjitter = RandomColorAdjust(brightness=32.0 / 255, saturation=0.5)
-            img = colorjitter(ToPIL()(img.astype(np.uint8)))
-
-        # Normalize
-        img -= self.RGB_MEAN
-        img = ToTensor()(img)
 
         if self.isTrain:
             return img, gt, gt_mask, thresh_map, thresh_mask
@@ -246,22 +237,13 @@ class TotalTextDataLoader():
             cv2.imwrite('./images/thresh_map.jpg', thresh_map * 255)
             cv2.imwrite('./images/thresh_mask.jpg', thresh_mask * 255)
 
-        # Random Colorize
-        if self.isTrain and self.config['train']['is_transform']:
-            colorjitter = RandomColorAdjust(brightness=32.0 / 255, saturation=0.5)
-            img = colorjitter(ToPIL()(img.astype(np.uint8)))
-
-        # Normalize
-        img -= self.RGB_MEAN
-        img = ToTensor()(img)
-
         if self.isTrain:
             return img, gt, gt_mask, thresh_map, thresh_mask
         return original, img, polys, dontcare
 
 
-def create_dataset(config, is_train):
-    """Create MindSpore Dataset object."""
+def create_dataset_ori(config, is_train):
+    """Create MindSpore Dataset object from origin dataset."""
     ds.config.set_prefetch_size(config.dataset.prefetch_size)
     if config.dataset.type == "IC15":
         data_loader = IC15DataLoader(config, isTrain=is_train)
@@ -269,19 +251,41 @@ def create_dataset(config, is_train):
         data_loader = TotalTextDataLoader(config, isTrain=is_train)
     else:
         raise ValueError(f"Not support dataset.type: {config.dataset.type}.")
-    if not hasattr(config, "device_num"):
-        config.device_num = 1
-    if not hasattr(config, "rank_id"):
-        config.rank_id = 0
+    change_swap_op = ds.vision.HWC2CHW()
+    normalize_op = ds.vision.Normalize(mean=config.dataset.mean, std=config.dataset.std)
+    color_adjust_op = ds.vision.RandomColorAdjust(brightness=32.0 / 255, saturation=0.5)
     if is_train:
         dataset = ds.GeneratorDataset(data_loader,
                                       ['img', 'gts', 'gt_masks', 'thresh_maps', 'thresh_masks'],
                                       num_parallel_workers=config.dataset.num_workers,
                                       num_shards=config.device_num, shard_id=config.rank_id,
                                       shuffle=True, max_rowsize=config.dataset.max_rowsize)
+        dataset = dataset.map(operations=[color_adjust_op, normalize_op, change_swap_op], input_columns=["img"])
+        dataset = dataset.project(['img', 'gts', 'gt_masks', 'thresh_maps', 'thresh_masks'])
     else:
         dataset = ds.GeneratorDataset(data_loader, ['original', 'img', 'polys', 'dontcare'])
+        dataset = dataset.map(operations=[normalize_op, change_swap_op], input_columns=["img"])
+        dataset = dataset.project(['original', 'img', 'polys', 'dontcare'])
     batch_size = config.train.batch_size if is_train else 1
     dataset = dataset.batch(batch_size, drop_remainder=is_train)
     steps_pre_epoch = dataset.get_dataset_size()
     return dataset, steps_pre_epoch
+
+
+def create_dataset(config, is_train):
+    """Create MindSpore Dataset object."""
+    if not hasattr(config, "device_num"):
+        config.device_num = 1
+    if not hasattr(config, "rank_id"):
+        config.rank_id = 0
+    cores = multiprocessing.cpu_count()
+    if cores < 4:
+        raise EnvironmentError("CPU cores are too small")
+    if cores // min(config.device_num, 8) - 2 < config.dataset.num_workers:
+        config.logger.info("The num_parallel_workers {} is set too large, now set it {}".format(
+            config.dataset.num_workers, cores // 8))
+        config.dataset.num_workers = cores // min(config.device_num, 8) - 2
+    config.logger.info(f"dataset num_workers is {config.dataset.num_workers}")
+    if config.load_mindrecord:
+        return create_dataset_md(config, is_train)
+    return create_dataset_ori(config, is_train)

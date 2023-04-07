@@ -27,6 +27,16 @@
         - 标签：244KB
 - 数据格式：图片，标签
 
+在官网下载完成后将数据集组织成如下结构：
+
+```text
+└─ICDAR2015
+    ├─ch4_training_images                                       # 训练集原始图片
+    ├─ch4_training_localization_transcription_gt                # 训练集标签
+    ├─ch4_test_images                                           # 验证集原始图片
+    └─Challenge4_Test_Task1_GT                                  # 验证集标签
+```
+
 ## 环境要求
 
 - 硬件（Ascend/GPU/CPU）
@@ -47,15 +57,18 @@ pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
 | DBNet-R18 | [R18](https://download.mindspore.cn/thirdparty/dbnet/resnet18-5c106cde.ckpt) | [cfg](config/dbnet/config_resnet18_1p.yaml) | ICDAR2015 Train | ICDAR2015 Test | 1 | 1200 | 736 | 78.63 | 84.21 | 81.32 | [download]() | [download]() |
 | DBNet-R50 | [R50](https://download.mindspore.cn/thirdparty/dbnet/resnet50-19c8e357.ckpt) | [cfg](config/dbnet/config_resnet50_1p.yaml) | ICDAR2015 Train | ICDAR2015 Test | 1 | 1200 | 736 | 81.05 | 88.07 | 84.41 | [download]() | [download]() |
+| DBNet-MobileNetv3 | [M3]() | [cfg](config/dbnet/config_mobilenetv3_1p.yaml) | ICDAR2015 Train | ICDAR2015 Test | 1 | 1200 | 736 | 73,.05 | 77.02 | 74.96 | [download]() | [download]() |
 
 ### 性能
 
-| device | Model     | dataset   | Params(M) | PyNative train 1P bs=16 (ms/step) | PyNative train 8P bs=8 (ms/step) | PyNative infer(FPS)| Graph train 1P bs=16 (ms/step) | Graph train 8P bs=8 (ms/step) | Graph infer(FPS) |
+| device | Model     | dataset   | Params(M) | PyNative train 1P bs=16 FPS | PyNative train 8P bs=8 FPS | PyNative infer FPS | Graph train 1P bs=16 FPS | Graph train 8P bs=8 FPS | Graph infer FPS |
 | ------ | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- |
-| Ascend | DBNet-R18 | ICDAR2015 |  11.78 M  |  370     |   530   |    -     |   224    |   195   |   40.62   |
-|  GPU   | DBNet-R18 | ICDAR2015 |  11.78 M  |  710    |   880     |   -    |  560  |   435    |   30.97   |
-| Ascend | DBNet-R50 | ICDAR2015 |  24.28 M  |  524      |   680     |   -     |  273    |   220    |   33.88   |
-|  GPU   | DBNet-R50 | ICDAR2015 |  24.28 M  |  935      |   1054    |  -    |  730  |  547    |   23.95   |
+| Ascend | DBNet-R18 | ICDAR2015 |  11.78 M  |  95  |  381  |    -     |   150    |   610   | 40.62  |
+|  GPU   | DBNet-R18 | ICDAR2015 |  11.78 M  |  18    |   81     |   -    |  23  |    104 |  30.97  |
+| Ascend | DBNet-R50 | ICDAR2015 |  24.28 M  |  59    |   237  |   -     |  100    |   460    |  33.88  |
+|  GPU   | DBNet-R50 | ICDAR2015 |  24.28 M  |  15      |   74    |  -    |  20  |  102 |  23.95  |
+| Ascend | DBNet-M3 | ICDAR2015 |  1.77 M  |   60  |   241  |   -     |  117    |   550    |  39.11 |
+|  GPU   | DBNet-M3 | ICDAR2015 |  1.77 M  |  15      |   75    |  -    |  18.5  |  98 |  30.21 |
 
 本模型受数据处理影响较大，在不同机器上性能数据波动较大，以上数据仅供参考。
 
@@ -69,87 +82,106 @@ GPU v100 PCIE 32G 8卡；系统： Ubuntu 18.04；内存：502 G；x86 72核 CPU
 
 ## 快速入门
 
+### 参数文件说明
+
 ```text
-参数文件说明:
     config/config_base.yaml: 公共参数文件，数据集路径、优化器、训练策略等参数通常在该文件设置
     config/dbnet/*.yaml: backbone训练策略配置文件
     config/dbnet++/*.yaml: 带dcn的backbone训练策略配置文件
+```
 
 注意：dbnet/*.yaml和/dbnet++/*.yaml的参数会覆盖config_base.yaml的参数，用户可根据需求合理配置
 
-单卡resnet18为backbone训练ICDAR2015数据为例
-config/config_base.yaml配置训练、推理数据集路径
+单卡resnet18为backbone训练ICDAR2015数据为例：
+
+1. 在config/config_base.yaml中配置训练、推理数据集路径，这个路径需要是绝对路径。
+
+```text
+load_mindrecord: True    # 是否将数据预处理成mindrecord格式，整个训练会快一点
+mindrecord_path: "/path/dbnet/dataset"    # mindrecord保存的路径，需要是绝对路径，只需生成一次
 train:
-    img_dir: ICDAR2015/ch4_training_images
-    gt_dir: ICDAR2015/ch4_training_localization_transcription_gt
+    img_dir: /data/ICDAR2015/ch4_training_images
+    gt_dir: /data/ICDAR2015/ch4_training_localization_transcription_gt
 eval:
-    img_dir: ICDAR2015/ch4_test_images
-    gt_dir: ICDAR2015/Challenge4_Test_Task1_GT
+    img_dir: /data/ICDAR2015/ch4_test_images
+    gt_dir: /data/ICDAR2015/Challenge4_Test_Task1_GT
+```
 
-config/dbnet/config_resnet18_1p.yaml配置backbone_ckpt预训练路径
+2. 在config/dbnet/config_resnet18_1p.yaml配置backbone_ckpt预训练路径
+
+```text
 backbone:
-    backbone_ckpt: "./pretrained/resnet18-5c106cde.ckpt"
+    backbone_ckpt: "/data/pretrained/resnet18-5c106cde.ckpt"
 ```
 
-单卡训练：
+### 单卡训练：
 
 ```shell
-bash run_standalone_train_ascend.sh [CONFIG_PATH] [DEVICE_ID]
+bash scripts/run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [LOG_NAME](optional)
 
-# Ascend 单卡训练resnet18
-bash run_standalone_train_ascend.sh ../config/dbnet/config_resnet18_1p.yaml 0
+# 单卡训练 resnet18
+bash scripts/run_standalone_train.sh config/dbnet/config_resnet18_1p.yaml 0 db_r18_1p
 
-# Ascend 单卡训练resnet50
-bash run_standalone_train_ascend.sh ../config/dbnet/config_resnet50_1p.yaml 0
+# 单卡训练 resnet50
+bash scripts/run_standalone_train.sh config/dbnet/config_resnet50_1p.yaml 0 db_r50_1p
+
+# 单卡训练 mobilenetv3 large
+bash scripts/run_standalone_train.sh config/dbnet/config_mobilenetv3_1p.yaml 0 db_m3_1p
 ```
 
-多卡训练：
+### 多卡训练：
 
 ```shell
-bash run_distribution_train_ascend.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
+# 1.8之前Ascend上使用for循环启动
+bash scripts/run_distribution_train.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
 
-# Ascend 8卡训练resnet18
-bash run_standalone_train.sh hccl_8p.json 8 ../config/dbnet/config_resnet18_8p.yaml
+# 1.8之后Ascend和GPU一样可以用mpirun启动
+bash scripts/run_distribution_train.sh [DEVICE_NUM] [CONFIG_PATH] [LOG_NAME](optional)
 
-# Ascend 8卡训练resnet50
-bash run_standalone_train.sh hccl_8p.json 8 ../config/dbnet/config_resnet50_8p.yaml
+# 8卡训练 resnet18
+bash scripts/run_distribution_train.sh 8 config/dbnet/config_resnet18_8p.yaml db_r18_8p
+
+# 8卡训练 resnet50
+bash scripts/run_distribution_train.sh 8 config/dbnet/config_resnet50_8p.yaml db_r50_8p
+
+# 8卡训练 mobilenetv3 large
+bash scripts/run_distribution_train.sh 8 config/dbnet/config_mobilenetv3_8p.yaml db_m3_8p
 ```
 
-推理评估：
+### 推理评估：
 
 ```shell
-bash run_eval_ascend.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
+bash scripts/run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID] [LOG_NAME](optional)
 
-# Ascend 推理resnet18
-bash run_eval_ascend.sh ../config/dbnet/config_resnet18_8p.yaml your_ckpt_path 0
+# 推理resnet18
+bash scripts/run_eval.sh config/dbnet/config_resnet18_1p.yaml your_ckpt_path 0 eval_r18
 ```
-
-如需修改device或者其他配置，请对应修改配置文件里的对应项。
 
 ## 训练
 
 ### 单卡训练
 
 ```shell
-bash run_standalone_train_ascend.sh [CONFIG_PATH] [DEVICE_ID]
-# CONFIG_PATH：配置文件路径，默认使用Ascend，如需修改请在config文件里修改 device_target
+bash scripts/run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [LOG_NAME](optional)
+# CONFIG_PATH：配置文件路径
 # DEVICE_ID：执行训练使用的卡号
+# LOG_NAME: 日志和结果保存目录名，默认是 train
 ```
 
-执行上述命令将在后台运行，您可以通过train/log.txt文件查看结果。
+执行上述命令将在后台运行，您可以通过 [LOG_NAME].txt文件查看结果。
 
-训练结束后，您可在outputs对应路径下找到checkpoint文件。
+训练结束后，您可在[LOG_NAME]对应路径下找到checkpoint文件。
 
 ### 分布式训练
 
 ```shell
-bash run_distribution_train.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
-# RANK_TABLE_FILE: 构建分布式环境json文件
+bash scripts/run_distribution_train.sh [DEVICE_NUM] [CONFIG_PATH] [LOG_NAME](optional)
 # DEVICE_NUM：执行训练使用的卡数
-# CONFIG_PATH：配置文件路径，默认使用Ascend，如需修改请在config文件里修改 device_target
+# CONFIG_PATH：配置文件路径
+# LOG_NAME: 日志和结果保存目录名，默认是 distribution_train
 ```
 
-执行上述命令将在后台运行，您可以通过train_parallel0/log.txt文件查看结果。
+执行上述命令将在后台运行，您可以通过[LOG_NAME].txt文件查看结果。
 
 ## 断点训练
 
@@ -170,12 +202,12 @@ bash run_distribution_train.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
 ### 推理评估
 
 ```shell
-bash run_eval_ascend.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
-# CONFIG_PATH：配置文件路径，默认使用Ascend，如需修改请在config文件里修改 device_target
-# DEVICE_ID：执行推理使用的卡号
+bash scripts/run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID] [LOG_NAME](optional)
+# CONFIG_PATH：配置文件路径
+# CKPT_PATH：checkpoint路径
 ```
 
-执行上述python命令将在后台运行，您可以通过eval/log.txt文件查看结果。
+执行上述python命令将在后台运行，您可以通过[LOG_NAME].txt文件查看结果。
 
 ## 离线推理
 
