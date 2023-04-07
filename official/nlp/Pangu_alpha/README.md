@@ -785,6 +785,13 @@ Q: For Ascend devices, when training model on multi-node modes, the programs stu
 
 A: There are mainly two reasons:
 
-- The network is complex, so it should take such long time to compile.
+- The network is complex, so it should take such long time to compile, please be patient and wait. Alternatively, you can reduce the number of layers in the network to the size of two layers, and it is expected that the logs can be printed within a few minutes.
 
 - For some reasons, some devices failed to compile and some devices are waiting for the failed devices. The wait time can be determined by the args `hccl_connect_time`. The value is default set to 6000 seconds. If you want to test whether the network and devices are ok, you can set it to be 1200 seconds and the layers to be 2 to see if you can see the loss.
+
+Q: What should I do if the loss keeps overflowing during model training?
+
+A: Currently, in the network, except for Embedding/Loss/LayerNorm, FP16 calculation is used by default in other parts.
+During the network training process, if you find that the loss suddenly increases, and at the same time, the value of loss scale suddenly drops to 1, please refer to the following method to set the softmax calculation type to FP32.
+
+In the `PanguAlphaConfig` class in the `src/pangu_alpha_config.py` file, modify the initial value of softmax_compute_type to `mstype.float32`.

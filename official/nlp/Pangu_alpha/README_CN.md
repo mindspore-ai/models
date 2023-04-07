@@ -753,6 +753,12 @@ python setup.py install
 
 答：主要有两个原因：
 
-- 网络过于复杂，编译需要的时间长。
+- 网络过于复杂，编译需要的时间长，此时耐心等待。或者将网络的层数缩小到2层的规模，此时预计几分钟内可以打印日志
 
 - 由于某些原因，有些设备无法编译，而有些设备正在等待失败的设备。等待时间可以通过`hccl_connect_time`参数设置，默认为6000秒。如需测试网络和设备是否正常，可以设置为1200秒，层数设置为2，看看是否能得到损失值。
+
+Q：我在模型训练的时候loss持续溢出怎么办?
+
+A：目前网络中除了`Embedding/Loss/LayerNorm`采用`FP32`计算，其余部分默认采用`FP16`计算。如果在网络训练过程中，发现loss突然上升，同时loss scale的值突然下降到1，请参考下面的方式将`softmax`的计算类型设置为`FP32`
+
+在`src/pangu_alpha_config.py`文件中的`PanguAlphaConfig`类中，将`softmax_compute_type`初始值修改为`mstype.float32`
