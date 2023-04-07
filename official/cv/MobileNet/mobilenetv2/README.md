@@ -276,7 +276,8 @@ You can start training using python or shell scripts. The usage of shell scripts
   shell:
       Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]
       # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 /home/DataSet/ImageNet_Original/
-
+      Training on multi cards using hccl: bash run_distributed_train_ascend.sh DATA_PATH RANK_SIZE RANK_TABLE_FILE
+      # example: bash scripts/run_distributed_train_ascend.sh /path/dataset 8 /path/hccl.json
       GPU: bash run_train.sh GPU [CONFIG_PATH] 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH]
       CPU: bash run_train.sh CPU [CONFIG_PATH] [TRAIN_DATASET_PATH]
 

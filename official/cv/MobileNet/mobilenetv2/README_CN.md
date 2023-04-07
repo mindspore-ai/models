@@ -274,10 +274,10 @@ MobileNetV2总体网络架构如下：
   shell:
       Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]
       # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 /home/DataSet/ImageNet_Original/
-
+      提供RankTable方式启动多卡训练： bash run_distributed_train_ascend.sh DATA_PATH RANK_SIZE RANK_TABLE_FILE
+      # example: bash scripts/run_distributed_train_ascend.sh /path/dataset 8 /path/hccl.json
       GPU: bash run_train.sh GPU [CONFIG_PATH] 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH]
       CPU: bash run_train.sh CPU [CONFIG_PATH] [TRAIN_DATASET_PATH]
-
 # 全网微调示例
   python:
       Ascend: python train.py --platform Ascend --config_path [CONFIG_PATH] --dataset_path [TRAIN_DATASET_PATH] --pretrain_ckpt [CKPT_PATH] --freeze_layer none --filter_head True

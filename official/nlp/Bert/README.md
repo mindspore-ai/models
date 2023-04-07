@@ -165,7 +165,7 @@ bash scripts/run_distributed_pretrain_ascend.sh /path/cn-wiki-128 /path/hccl.jso
 
 # run the evaluation for pre-training example
 # Modify the `eval_ckpt` and `eval_data_dir` in pretrain_config.yaml
-python pretrain_eval.py
+bash scripts/run_pretrain_eval_ascend.sh
 
 # run fine-tuning and evaluation example
 - If you are going to run a fine-tuning task, please prepare a checkpoint generated from pre-training.

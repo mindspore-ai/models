@@ -168,6 +168,12 @@ bash scripts/run_standalone_pretrain_ascend.sh 0 1 /path/cn-wiki-128
 
 bash scripts/run_distributed_pretrain_ascend.sh /path/cn-wiki-128 /path/hccl.json
 
+# 单独运行训练评估脚本示例
+
+- GE流程暂不支持边训边推，MLM任务可以单独加载训练ckpt后执行评估脚本
+- 修改对应yaml配置文件中`eval_ckpt` and `eval_data_dir`加载路径
+bash scripts/run_pretrain_eval_ascend.sh
+
 # 运行微调和评估示例
 
 - 如需运行微调任务，请先准备预训练生成的权重文件（ckpt）。
