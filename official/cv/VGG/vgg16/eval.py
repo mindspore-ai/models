@@ -135,7 +135,6 @@ def modelarts_pre_process():
 def run_eval():
     """run eval"""
     config.per_batch_size = config.batch_size
-    config.image_size = list(map(int, config.image_size.split(',')))
     config.rank = get_rank_id()
     config.group_size = get_device_num()
 
