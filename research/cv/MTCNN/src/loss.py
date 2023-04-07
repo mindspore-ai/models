@@ -17,10 +17,11 @@ from mindspore import nn, ops
 import mindspore
 import numpy
 
+
 class ClassLoss(nn.Cell):
     def __init__(self, valid_class_num=2):
         super(ClassLoss, self).__init__()
-        self.one_hot = nn.OneHot(depth=valid_class_num)
+        self.depth = valid_class_num
         self.keep_ratio = 0.7
         self.sort_descending = ops.Sort(descending=True)
         self.reduce_sum = ops.ReduceSum()
@@ -37,7 +38,7 @@ class ClassLoss(nn.Cell):
         num_valid = valid_label.sum()
         valid_class_out = class_out * valid_label.expand_dims(-1)
         keep_num = (num_valid * self.keep_ratio).astype(mindspore.int32)
-        one_hot_label = self.one_hot(gt_label * valid_label)
+        one_hot_label = ops.one_hot(gt_label * valid_label, self.depth, 1.0, 0.0)
         loss = ops.SoftmaxCrossEntropyWithLogits()(valid_class_out, one_hot_label)[0] * \
                valid_label.astype(valid_class_out.dtype)
 
@@ -67,6 +68,7 @@ class BoxLoss(nn.Cell):
         # top k
         return self.reduce_sum(loss) / keep_num
 
+
 class LandmarkLoss(nn.Cell):
     def __init__(self):
         super(LandmarkLoss, self).__init__()
@@ -83,6 +85,7 @@ class LandmarkLoss(nn.Cell):
         loss = loss * valid_label
 
         return self.reduce_sum(loss) / keep_num
+
 
 # Calculate accuracy while training
 def accuracy(pred_label, gt_label):

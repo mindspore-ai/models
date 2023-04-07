@@ -210,9 +210,8 @@ class RelativeBias(nn.Cell):
         self.relative_position_bias_table = Parameter(
             Tensor(np.random.randn((2 * window_size[0] - 1) * (2 * window_size[1] - 1), num_heads),
                    dtype=mstype.float32))  # 2*Wh-1 * 2*Ww-1, nH
-        self.one_hot = nn.OneHot(axis=-1, depth=(2 * window_size[0] - 1) * (2 * window_size[1] - 1),
-                                 dtype=mstype.float32)
-        self.index = Parameter(self.one_hot(self.relative_position_index), requires_grad=False)
+        self.depth = (2 * window_size[0] - 1) * (2 * window_size[1] - 1)
+        self.index = Parameter(ops.one_hot(self.relative_position_index, self.depth, 1.0, 0.0), requires_grad=False)
 
     def construct(self, axis=0):
         out = ops.MatMul()(self.index, self.relative_position_bias_table)
@@ -314,7 +313,6 @@ class SwinTransformerBlock(nn.Cell):
         # cyclic shift
         if self.shift_size > 0:
             shifted_x = self.roll_neg(x)
-            # shifted_x = numpy.roll(x, (-self.shift_size, -self.shift_size), (1, 2))
         else:
             shifted_x = x
 
@@ -333,7 +331,6 @@ class SwinTransformerBlock(nn.Cell):
         # reverse cyclic shift
         if self.shift_size > 0:
             x = self.roll_pos(shifted_x)
-            # x = numpy.roll(shifted_x, (self.shift_size, self.shift_size), (1, 2))  # TODO:Don't stupid
         else:
             x = shifted_x
 

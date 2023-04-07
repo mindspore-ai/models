@@ -14,13 +14,13 @@
 # ============================================================================
 """Face detection loss."""
 import numpy as np
-
-import mindspore.nn as nn
+import mindspore.ops as ops
 from mindspore.ops import operations as P
 from mindspore.ops import functional as F
 from mindspore.nn import Cell
 from mindspore import Tensor
 from mindspore.common import dtype as mstype
+
 
 class MyLoss(Cell):
     """
@@ -72,6 +72,7 @@ class MyLoss(Cell):
 
     def construct(self, base, target):
         raise NotImplementedError
+
 
 class PtLinspace(Cell):
     '''PtLinspace'''
@@ -194,7 +195,6 @@ class YoloLoss(Cell):
         self.ce = P.SoftmaxCrossEntropyWithLogits()
 
         self.pt_linspace = PtLinspace()
-        self.one_hot = nn.OneHot(-1, self.num_classes, 1.0, 0.0)
         self.squeeze_2 = P.Squeeze(2)
 
 
@@ -292,7 +292,7 @@ class YoloLoss(Cell):
         if num_classes > 1:
             shape_t_cls = self.shape(t_cls)
             t_cls = self.reshape(t_cls, (shape_t_cls[0] * shape_t_cls[1] * shape_t_cls[2],))
-            one_hot_label = self.one_hot(self.cast(t_cls, mstype.int32))
+            one_hot_label = ops.one_hot(self.cast(t_cls, mstype.int32), self.num_classes, 1.0, 0.0)
 
             shape_cls_mask = self.shape(cls_mask)
             cls_mask = self.reshape(cls_mask, (1, shape_cls_mask[0] * shape_cls_mask[1] * shape_cls_mask[2]))

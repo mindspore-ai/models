@@ -291,7 +291,7 @@ class YOLOLossCell(nn.Cell):
         # ----dynamic_k---- END-----------------------------------------------------------------------------------------
         cost_t = cost * pos_mask + (1.0 - pos_mask) * 2000.
         min_index, _ = P.ArgMinWithValue(axis=1)(cost_t)
-        ret_posk = P.Transpose()(nn.OneHot(depth=gt_max, axis=-1)(min_index), (0, 2, 1))
+        ret_posk = P.Transpose()(ops.one_hot(min_index, gt_max, 1.0, 0.0), (0, 2, 1))
         pos_mask = pos_mask * ret_posk
         pos_mask = F.stop_gradient(pos_mask)
         # AA problem--------------END ----------------------------------------------------------------------------------

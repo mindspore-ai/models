@@ -19,6 +19,7 @@ import copy
 import numpy as np
 import mindspore.common.dtype as mstype
 import mindspore.nn as nn
+import mindspore.ops as ops
 import mindspore.ops.functional as F
 from mindspore.common.initializer import TruncatedNormal, initializer
 from mindspore.ops import operations as P
@@ -308,7 +309,6 @@ class RelaPosEmbeddingsGenerator(nn.Cell):
         self.relative_positions_matrix = RelaPosMatrixGenerator(length=length,
                                                                 max_relative_position=max_relative_position)
         self.reshape = P.Reshape()
-        self.one_hot = nn.OneHot(depth=self.vocab_size)
         self.shape = P.Shape()
         self.gather = P.Gather()  # index_select
         self.matmul = P.BatchMatMul()
@@ -319,8 +319,8 @@ class RelaPosEmbeddingsGenerator(nn.Cell):
 
         if self.use_one_hot_embeddings:
             flat_relative_positions_matrix = self.reshape(relative_positions_matrix_out, (-1,))
-            one_hot_relative_positions_matrix = self.one_hot(
-                flat_relative_positions_matrix)
+            one_hot_relative_positions_matrix = ops.one_hot(flat_relative_positions_matrix,
+                                                            self.vocab_size, 1.0, 0.0)
             embeddings = self.matmul(one_hot_relative_positions_matrix, self.embeddings_table)
             my_shape = self.shape(relative_positions_matrix_out) + (self.depth,)
             embeddings = self.reshape(embeddings, my_shape)

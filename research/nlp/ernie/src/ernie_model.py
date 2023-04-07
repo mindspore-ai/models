@@ -19,12 +19,14 @@ import copy
 import numpy as np
 import mindspore.common.dtype as mstype
 import mindspore.nn as nn
+import mindspore.ops as ops
 import mindspore.ops.functional as F
 from mindspore.common.initializer import TruncatedNormal, initializer
 from mindspore.ops import operations as P
 from mindspore.ops import composite as C
 from mindspore.common.tensor import Tensor
 from mindspore.common.parameter import Parameter
+
 
 class ErnieConfig:
     """
@@ -301,7 +303,6 @@ class RelaPosEmbeddingsGenerator(nn.Cell):
         self.relative_positions_matrix = RelaPosMatrixGenerator(length=length,
                                                                 max_relative_position=max_relative_position)
         self.reshape = P.Reshape()
-        self.one_hot = nn.OneHot(depth=self.vocab_size)
         self.shape = P.Shape()
         self.gather = P.Gather()  # index_select
         self.matmul = P.BatchMatMul()
@@ -312,8 +313,7 @@ class RelaPosEmbeddingsGenerator(nn.Cell):
 
         if self.use_one_hot_embeddings:
             flat_relative_positions_matrix = self.reshape(relative_positions_matrix_out, (-1,))
-            one_hot_relative_positions_matrix = self.one_hot(
-                flat_relative_positions_matrix)
+            one_hot_relative_positions_matrix = ops.one_hot(flat_relative_positions_matrix, self.vocab_size, 1.0, 0.0)
             embeddings = self.matmul(one_hot_relative_positions_matrix, self.embeddings_table)
             my_shape = self.shape(relative_positions_matrix_out) + (self.depth,)
             embeddings = self.reshape(embeddings, my_shape)
@@ -469,26 +469,20 @@ class ErnieAttention(nn.Cell):
 
         # use_relative_position, supplementary logic
         if self.use_relative_positions:
-            # relations_keys is [F|T, F|T, H]
             relations_keys = self._generate_relative_positions_embeddings()
             relations_keys = self.cast_compute_type(relations_keys)
-            # query_layer_t is [F, B, N, H]
             query_layer_t = self.transpose(query_layer, self.trans_shape_relative)
-            # query_layer_r is [F, B * N, H]
             query_layer_r = self.reshape(query_layer_t,
                                          (self.from_seq_length,
                                           -1,
                                           self.size_per_head))
-            # key_position_scores is [F, B * N, F|T]
             key_position_scores = self.matmul_trans_b(query_layer_r,
                                                       relations_keys)
-            # key_position_scores_r is [F, B, N, F|T]
             key_position_scores_r = self.reshape(key_position_scores,
                                                  (self.from_seq_length,
                                                   -1,
                                                   self.num_attention_heads,
                                                   self.from_seq_length))
-            # key_position_scores_r_t is [B, N, F, F|T]
             key_position_scores_r_t = self.transpose(key_position_scores_r,
                                                      self.trans_shape_position)
             attention_scores = attention_scores + key_position_scores_r_t
@@ -512,27 +506,21 @@ class ErnieAttention(nn.Cell):
 
         # use_relative_position, supplementary logic
         if self.use_relative_positions:
-            # relations_values is [F|T, F|T, H]
             relations_values = self._generate_relative_positions_embeddings()
             relations_values = self.cast_compute_type(relations_values)
-            # attention_probs_t is [F, B, N, T]
             attention_probs_t = self.transpose(attention_probs, self.trans_shape_relative)
-            # attention_probs_r is [F, B * N, T]
             attention_probs_r = self.reshape(
                 attention_probs_t,
                 (self.from_seq_length,
                  -1,
                  self.to_seq_length))
-            # value_position_scores is [F, B * N, H]
             value_position_scores = self.matmul(attention_probs_r,
                                                 relations_values)
-            # value_position_scores_r is [F, B, N, H]
             value_position_scores_r = self.reshape(value_position_scores,
                                                    (self.from_seq_length,
                                                     -1,
                                                     self.num_attention_heads,
                                                     self.size_per_head))
-            # value_position_scores_r_t is [B, N, F, H]
             value_position_scores_r_t = self.transpose(value_position_scores_r,
                                                        self.trans_shape_position)
             context_layer = context_layer + value_position_scores_r_t

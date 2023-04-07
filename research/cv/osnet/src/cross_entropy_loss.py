@@ -60,7 +60,6 @@ class CrossEntropyLoss(nn.Cell):
         """
         log_probs = self.logsoftmax(inputs)
         depth = log_probs.shape[1]
-        onehot = nn.OneHot(depth=depth, axis=-1)
-        targets = onehot(targets)
+        targets = ops.one_hot(targets, depth, 1.0, 0.0)
         targets = (1 - self.eps) * targets + self.eps / self.num_classes
         return (-targets * log_probs).mean(0).sum()
