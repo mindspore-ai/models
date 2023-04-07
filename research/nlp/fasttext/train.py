@@ -40,10 +40,7 @@ def get_ms_timestamp():
     t = time.time()
     return int(round(t * 1000))
 
-if config.data_name == "ag":
-    set_seed(2)
-else:
-    set_seed(1001)
+set_seed(1)
 time_stamp_init = False
 time_stamp_first = 0
 context.set_context(mode=context.GRAPH_MODE, save_graphs=False, device_target=config.device_target)
