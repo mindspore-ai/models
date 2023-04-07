@@ -56,6 +56,9 @@ def set_default():
 def train():
     set_default()
     init_env(config)
+    if config.run_profiler:
+        from mindspore.profiler import Profiler
+        profiler = Profiler(output_path='./profiler_data')
     config.logger = get_logger(config.log_dir, config.rank_id)
     train_dataset, steps_pre_epoch = create_dataset(config, True)
     config.steps_per_epoch = steps_pre_epoch
@@ -118,8 +121,13 @@ def train():
     cb_default.append(DBNetMonitor(config, net, lr.asnumpy(), per_print_times=config.per_print_times))
     model = ms.Model(train_net)
     config.logger.save_args(config)
-    model.train(config.train.total_epochs - config.train.start_epoch_num, train_dataset, callbacks=cb_default,
-                dataset_sink_mode=config.train.dataset_sink_mode)
+    if config.run_profiler:
+        model.train(3, train_dataset, callbacks=cb_default, sink_size=20,
+                    dataset_sink_mode=config.train.dataset_sink_mode)
+        profiler.analyse()
+    else:
+        model.train(config.train.total_epochs - config.train.start_epoch_num, train_dataset, callbacks=cb_default,
+                    dataset_sink_mode=config.train.dataset_sink_mode)
     config.logger.info("Train has completed.")
 
 

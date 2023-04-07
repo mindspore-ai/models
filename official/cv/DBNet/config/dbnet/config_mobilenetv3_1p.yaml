@@ -1,0 +1,10 @@
+net: DBnet
+backbone:
+    initializer: mobilenetv3
+    pretrained: True
+    backbone_ckpt: "./pretrained/mobilenetv3.ckpt" # If on modelarts, set the name of checkpoint saved in data_url
+segdetector:
+    in_channels: [16, 24, 56, 480]  # R18: [64, 128, 256, 512]
+optimizer:
+    lr:
+        base_lr: 0.007
