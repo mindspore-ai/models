@@ -34,7 +34,7 @@ class MultiMarginLoss(nn.Cell):
         self.margin = margin
         self.on_value, self.off_value = Tensor(1.0, mindspore.float32), Tensor(0.0, mindspore.float32)
         self.op_sum = ops.ReduceSum(keep_dims=True)
-        self.onehot = nn.OneHot(depth=class_num, axis=-1)
+        self.depth = class_num
         self.relu = nn.ReLU()
 
     def construct(self, input_: Tensor, target: Tensor) -> Tensor:
@@ -44,7 +44,7 @@ class MultiMarginLoss(nn.Cell):
         :param target: target
         :return: loss
         """
-        target = self.onehot(target)
+        target = ops.one_hot(target, self.depth, 1.0, 0.0)
         loss = self.margin - self.op_sum(input_ * target, 1) + input_ - target
         if self.weight is not None:
             loss = loss * self.op_sum(target * self.weight, 1)

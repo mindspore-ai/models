@@ -15,6 +15,8 @@
 """CrossEntropyLabelSmooth"""
 import mindspore
 import mindspore.nn as nn
+import mindspore.ops as ops
+
 
 class CrossEntropyLabelSmooth(nn.Cell):
     """
@@ -33,7 +35,7 @@ class CrossEntropyLabelSmooth(nn.Cell):
         self.num_classes = num_classes
         self.epsilon = epsilon
         self.zeros = mindspore.ops.Zeros()
-        self.onehot = nn.OneHot(axis=1, depth=num_classes)
+        self.depth = num_classes
         self.unsqueeze = mindspore.ops.ExpandDims()
         self.logsoftmax = nn.LogSoftmax(axis=1)
         self.sum = mindspore.ops.ReduceSum(keep_dims=False)
@@ -45,7 +47,7 @@ class CrossEntropyLabelSmooth(nn.Cell):
         - targets: ground truth labels with shape (num_classes)
         """
         log_probs = self.logsoftmax(inputs)
-        targets = self.onehot(targets)
+        targets = ops.one_hot(targets, self.depth, 1.0, 0.0, axis=1)
         targets = (1 - self.epsilon) * targets + self.epsilon / self.num_classes
 
         loss = (- targets * log_probs).mean(axis=0, keep_dims=False)

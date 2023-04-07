@@ -24,6 +24,7 @@ import mindspore as ms
 import mindspore.nn as nn
 from mindspore import Tensor
 import mindspore.dataset as ds
+import mindspore.ops as ops
 from mindspore.nn import FixedLossScaleUpdateCell
 from mindspore import context, load_checkpoint, load_param_into_net
 from mindspore.train.callback import ModelCheckpoint
@@ -37,6 +38,7 @@ from src.util import AdditiveAngularMargin
 from src.loss_scale import TrainOneStepWithLossScaleCellv2 as TrainOneStepWithLossScaleCell
 from src.model_utils.config import config as hparams
 from src.sampler import DistributedSampler
+
 
 def create_dataset(cfg, data_home, shuffle=False):
     """
@@ -57,6 +59,7 @@ def create_dataset(cfg, data_home, shuffle=False):
     cnt = int(len(dataset_generator) / cfg.group_size)
     return vox2_ds, cnt
 
+
 class CorrectLabelNum(nn.Cell):
     def __init__(self):
         super(CorrectLabelNum, self).__init__()
@@ -68,6 +71,7 @@ class CorrectLabelNum(nn.Cell):
         correct = self.sum((output == target).astype(ms.dtype.float32))
         return correct
 
+
 class BuildTrainNetwork(nn.Cell):
     '''Build train network.'''
     def __init__(self, my_network, classifier, lossfunc, my_criterion, train_batch_size, class_num_):
@@ -78,11 +82,11 @@ class BuildTrainNetwork(nn.Cell):
         self.lossfunc = lossfunc
         # Initialize self.output
         self.output = ms.Parameter(Tensor(np.ones((train_batch_size, class_num_)), ms.float32), requires_grad=False)
-        self.onehot = ms.nn.OneHot(depth=class_num_, axis=-1, dtype=ms.float32)
+        self.depth = class_num_
 
     def construct(self, input_data, label):
         output = self.network(input_data)
-        label_onehot = self.onehot(label)
+        label_onehot = ops.one_hot(label, self.depth, 1.0, 0.0)
         # Get the network output and assign it to self.output
         logits = self.classifier(output)
         output = self.lossfunc(logits, label_onehot)
@@ -90,10 +94,12 @@ class BuildTrainNetwork(nn.Cell):
         loss0 = self.criterion(output, label_onehot)
         return loss0
 
+
 def update_average(loss_, avg_loss, step):
     avg_loss -= avg_loss / step
     avg_loss += loss_ / step
     return avg_loss
+
 
 def train_net(rank, model, epoch_max, data_train, ckpt_cb, steps_per_epoch,
               train_batch_size):
@@ -157,17 +163,20 @@ def train_net(rank, model, epoch_max, data_train, ckpt_cb, steps_per_epoch,
             print('Train Loss:', my_train_loss)
             print('Train Accuracy:', my_train_accuracy, '%')
 
+
 def triangular():
     """
     triangular for cyclic LR. https://arxiv.org/abs/1506.01186
     """
     return 1.0
 
+
 def triangular2(cycle):
     """
     triangular2 for cyclic LR. https://arxiv.org/abs/1506.01186
     """
     return 1.0 / (2.**(cycle - 1))
+
 
 def learning_rate_clr_triangle_function(step_size, max_lr, base_lr, clr_iterations):
     """
@@ -176,6 +185,7 @@ def learning_rate_clr_triangle_function(step_size, max_lr, base_lr, clr_iteratio
     cycle = math.floor(1 + clr_iterations / (2 * step_size))
     x = abs(clr_iterations / step_size - 2 * cycle + 1)
     return base_lr + (max_lr - base_lr) * max(0, (1 - x)) * triangular()
+
 
 def train():
     # init distributed

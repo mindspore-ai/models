@@ -27,8 +27,6 @@ class LabelTransform(nn.Cell):
 
     def __init__(self, num_classes=5):
         super(LabelTransform, self).__init__()
-        self.onehot1 = nn.OneHot(depth=2, axis=-1)
-        self.onehot2 = nn.OneHot(depth=num_classes, axis=-1)
         self.num_classes = num_classes
         self.T = Tensor(1, mindspore.int32)
         self.F = Tensor(0, mindspore.int32)
@@ -36,8 +34,8 @@ class LabelTransform(nn.Cell):
     def construct(self, label):
         """ Construct  label transform """
         label1 = mnp.where(label > 0, self.T, self.F)
-        flair_t2_gt_node = self.onehot1(label1)
-        t1_t1ce_gt_node = self.onehot2(label)
+        flair_t2_gt_node = ops.one_hot(label1, 2, 1.0, 0.0)
+        t1_t1ce_gt_node = ops.one_hot(label, self.num_classes, 1.0, 0.0)
         return flair_t2_gt_node, t1_t1ce_gt_node
 
 
