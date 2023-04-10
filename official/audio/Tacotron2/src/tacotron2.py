@@ -17,7 +17,7 @@ import math
 
 import numpy as np
 import mindspore
-from mindspore import nn
+from mindspore import nn, ops
 from mindspore.ops import operations as P
 from mindspore.ops import composite as C
 from mindspore.ops import functional as F
@@ -1056,8 +1056,7 @@ compute_norm = C.MultitypeFuncGraph("compute_norm")
 
 @compute_norm.register("Tensor")
 def _compute_norm(grad):
-    norm = nn.Norm()
-    norm = norm(F.cast(grad, mindspore.float32))
+    norm = ops.norm(F.cast(grad, mindspore.float32))
     ret = F.expand_dims(F.cast(norm, mindspore.float32), 0)
     return ret
 
@@ -1105,7 +1104,6 @@ class TrainStepWrap(nn.Cell):
         self.get_status = P.NPUGetFloatStatus()
         self.clear_before_grad = P.NPUClearFloatStatus()
         self.is_distributed = False
-        self.norm = nn.Norm(keep_dims=True)
         self.base = Tensor(1, mindspore.float32)
 
         self.all_reduce = P.AllReduce()

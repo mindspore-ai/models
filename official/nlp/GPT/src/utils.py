@@ -56,9 +56,9 @@ class GPTConfig:
         self.use_past = use_past
 
 
-
-
 get_square_sum = C.MultitypeFuncGraph("get_square_sum")
+
+
 @get_square_sum.register("Tensor")
 def _get_square_sum(grad):
     norm = P.ReduceSum(False)(F.square(grad), ())
@@ -67,10 +67,13 @@ def _get_square_sum(grad):
 
 
 apply_global_norm = C.MultitypeFuncGraph("apply_global_norm")
+
+
 @apply_global_norm.register("Tensor", "Tensor", "Tensor")
 def _apply_global_norm(clip_norm, global_norm, grad):
     grad = grad * clip_norm / global_norm
     return grad
+
 
 class GlobalNorm(nn.Cell):
     """
@@ -78,13 +81,13 @@ class GlobalNorm(nn.Cell):
     """
     def __init__(self):
         super(GlobalNorm, self).__init__()
-        self.norm = nn.Norm()
         self.hyper_map = C.HyperMap()
 
     def construct(self, grads):
         square_sum = self.hyper_map(get_square_sum, grads)
         global_norms = F.sqrt(F.addn(square_sum) / F.scalar_to_tensor(len(square_sum), mstype.int32))
         return global_norms
+
 
 class ClipByGlobalNorm(nn.Cell):
     """

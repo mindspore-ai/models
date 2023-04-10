@@ -22,7 +22,6 @@ import argparse
 import numpy as np
 
 import mindspore
-import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore import Tensor
 from mindspore import context
@@ -35,6 +34,7 @@ import onnxruntime as ort
 
 set_seed(1)
 
+
 def fliplr(x):
     """flip horizontally
     """
@@ -42,10 +42,10 @@ def fliplr(x):
         x[i] = np.transpose(np.fliplr(np.transpose(x[i], (0, 2, 1))), (0, 2, 1))
     return x
 
+
 def extract_feature(model, input_name, dataset):
     """feature extract
     """
-    norm = nn.Norm(axis=1, keep_dims=True)
     div = ops.Div()
     squeeze = ops.Squeeze(0)
 
@@ -72,11 +72,12 @@ def extract_feature(model, input_name, dataset):
             outputs = squeeze(Tensor(outputs))
             ff += outputs
 
-        fnorm = norm(ff)
+        fnorm = ops.norm(ff, dim=1, keepdim=True)
         ff = div(ff, fnorm.expand_as(ff))
         features[idx] = ff.asnumpy()
 
     return features, label, camera
+
 
 def calculate_result_rerank(test_feature_, test_label_, test_camera_, query_feature_, query_label_, query_camera_, k1=100, k2=15, lambda_value=0):
     """accuracy calculation
@@ -104,6 +105,7 @@ def calculate_result_rerank(test_feature_, test_label_, test_camera_, query_feat
     str_result = 'Rank@1:%f Rank@5:%f Rank@10:%f mAP:%f\n' % (CMC[0], CMC[4], CMC[9], AP / len(query_label_))
     print(str_result)
 
+
 def evaluate(score, query_label_, query_camera_, test_label_, test_camera_):
     """evaluate
     """
@@ -120,6 +122,7 @@ def evaluate(score, query_label_, query_camera_, test_label_, test_camera_):
     CMC_tmp = compute_mAP(index, good_index, junk_index)
 
     return CMC_tmp
+
 
 def compute_mAP(index, good_index, junk_index):
     """compute mAP
@@ -155,6 +158,7 @@ def compute_mAP(index, good_index, junk_index):
         ap = ap + d_recall * (old_precision + precision) / 2
 
     return ap, cmc
+
 
 def create_session(checkpoint_path, target_device):
     """Create ONNX runtime session"""

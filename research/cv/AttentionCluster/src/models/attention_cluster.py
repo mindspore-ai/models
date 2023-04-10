@@ -15,6 +15,7 @@
 """Attention Cluster structure"""
 import mindspore
 import mindspore.nn as nn
+import mindspore.ops as ops
 import mindspore.common.initializer as initializer
 import numpy as np
 
@@ -43,8 +44,6 @@ class ShiftingAttention(nn.Cell):
         self.b = mindspore.Parameter(mindspore.Tensor(shape=(self.n_att,),
                                                       init=initializer.Normal(0.0, self.glrt), dtype=mindspore.float32))
 
-        self.norm = nn.Norm(axis=-1, keep_dims=True)
-
     def construct(self, x):
         """construct"""
         # x = (N, L, F)
@@ -68,13 +67,14 @@ class ShiftingAttention(nn.Cell):
 
             o = (x * weight).sum(axis=1) * w + b
 
-            norm2 = self.norm(o).expand_as(o)
+            norm2 = ops.norm(o, dim=-1, keepdim=True).expand_as(o)
             o = o / norm2 / self.gnorm
             outs.append(o)
         concat = mindspore.ops.Concat(axis=-1)
         outputs = concat(outs)
         # outputs = (N, F*C)
         return outputs, weights
+
 
 def softmax_m1(x):
     flat_x = x.view(-1, x.shape[-1])

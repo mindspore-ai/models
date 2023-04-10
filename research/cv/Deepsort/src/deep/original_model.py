@@ -16,6 +16,7 @@ import mindspore
 import mindspore.nn as nn
 import mindspore.ops as F
 
+
 class BasicBlock(nn.Cell):
     def __init__(self, c_in, c_out, is_downsample=False):
         super(BasicBlock, self).__init__()
@@ -57,6 +58,7 @@ class BasicBlock(nn.Cell):
         y = self.ReLU(y)
         return y
 
+
 def make_layers(c_in, c_out, repeat_times, is_downsample=False):
     blocks = []
     for i in range(repeat_times):
@@ -95,18 +97,15 @@ class Net(nn.Cell):
         # 256 1 1
         self.reid = reid
         self.ascend = ascend
-        #self.flatten = nn.Flatten()
         self.div = F.Div()
         self.batch_norm = nn.BatchNorm1d(128, momentum=0.9)
         self.classifier = nn.Dense(128, num_classes)
-        self.Norm = nn.Norm(axis=0, keep_dims=True)
 
     def construct(self, x):
         x = self.conv(x)
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
-        #x = self.flatten(x)
         x = x.view((x.shape[0], -1))
         if self.reid:
             x = self.dp(x)
@@ -114,7 +113,7 @@ class Net(nn.Cell):
             if self.ascend:
                 x = self.bn1(x)
             else:
-                f = self.Norm(x)
+                f = F.norm(x, dim=0, keepdim=True)
                 x = self.div(x, f)
             return x
         x = self.dp(x)

@@ -19,6 +19,7 @@ import mindspore
 from mindspore import nn, ops, Tensor, dtype
 from mindspore.ops.primitive import constexpr
 
+
 class Dense16(nn.Cell):
     def __init__(self,
                  in_channels,
@@ -68,8 +69,7 @@ def batched_index_select(values, indices):
 
 def square_distance(src, dst):
     dist = src[:, :, None] - dst[:, None]
-    norm = nn.Norm(-1)
-    return norm(dist)
+    return ops.norm(dist, dim=-1)
 
 
 def farthest_point_sample(xyz, npoint):
@@ -93,7 +93,7 @@ def farthest_point_sample(xyz, npoint):
         npoint = npoint - one
         centroids[:, npoint] = farthest
         centroid = xyz[batch_indices, farthest, :].view(B, 1, 3)
-        dist = nn.Norm(-1)(xyz - centroid)
+        dist = ops.norm(xyz - centroid, dim=-1)
         distance = ops.Minimum()(distance, dist)
         farthest = ops.ArgMaxWithValue(axis=-1)(distance)[0]
     return centroids.astype(mindspore.int32)

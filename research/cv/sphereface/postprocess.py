@@ -15,9 +15,10 @@
 """postprocess for 310 inference"""
 import numpy as np
 import mindspore
-from mindspore import context
+from mindspore import context, ops
 from src.model_utils.device_adapter import get_device_id
 from src.model_utils.config import config
+
 
 def KFold(n=6000, n_folds=10, shuffle=False):
     folds = []
@@ -27,6 +28,7 @@ def KFold(n=6000, n_folds=10, shuffle=False):
         train = list(set(base)-set(ktest))
         folds.append([train, ktest])
     return folds
+
 
 def eval_acc(threshold, diff):
     y_true = []
@@ -40,6 +42,7 @@ def eval_acc(threshold, diff):
     accuracy = 1.0*np.count_nonzero(y_true == y_predict)/len(y_true)
     return accuracy
 
+
 def find_best_threshold(thresholds, predicts):
     best_threshold = best_acc = 0
     for threshold in thresholds:
@@ -49,10 +52,10 @@ def find_best_threshold(thresholds, predicts):
             best_threshold = threshold
     return best_threshold
 
+
 class get_predict():
     def __init__(self):
         super(get_predict, self).__init__()
-        normnet = mindspore.nn.Norm(axis=1)
         self.res_src = config.eval_data_dir
         self.predict = []
         for i in range(6000):
@@ -67,14 +70,15 @@ class get_predict():
             output1 = mindspore.Tensor(output1)
             output2 = mindspore.Tensor(output2)
             cosdistance = mindspore.Tensor(cosdistance)
-            norm1 = normnet(output1)
-            norm2 = normnet(output2)
+            norm1 = ops.norm(output1, dim=1)
+            norm2 = ops.norm(output2, dim=1)
             cosdistance = cosdistance / (norm1 * norm2 + 1e-5)
             cosdistance = float(cosdistance.asnumpy())
             self.predict.append('{}\t{}\t{}\t{}\n'.format(res1name, res2name, cosdistance, trueflag))
 
     def getresult(self):
         return self.predict
+
 
 def test():
     config.image_size = list(map(int, config.image_size.split(',')))

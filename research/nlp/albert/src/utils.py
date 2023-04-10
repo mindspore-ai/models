@@ -34,6 +34,8 @@ from mindspore.nn.learning_rate_schedule import LearningRateSchedule, Polynomial
 
 
 get_square_sum = C.MultitypeFuncGraph("get_square_sum")
+
+
 @get_square_sum.register("Tensor")
 def _get_square_sum(grad):
     norm = P.ReduceSum(False)(F.square(grad), ())
@@ -42,6 +44,7 @@ def _get_square_sum(grad):
 
 
 apply_global_norm = C.MultitypeFuncGraph("apply_global_norm")
+
 @apply_global_norm.register("Tensor", "Tensor", "Tensor")
 def _apply_global_norm(clip_norm, global_norm, grad):
     grad = grad * clip_norm / global_norm
@@ -54,7 +57,6 @@ class GlobalNorm(nn.Cell):
     """
     def __init__(self):
         super(GlobalNorm, self).__init__()
-        self.norm = nn.Norm()
         self.hyper_map = C.HyperMap()
 
     def construct(self, grads):
@@ -134,6 +136,7 @@ def make_directory(path: str):
             raise TypeError("No write permission on the directory.")
     return real_path
 
+
 class LossCallBack(Callback):
     """
     Monitor the loss in training.
@@ -146,6 +149,7 @@ class LossCallBack(Callback):
     def __init__(self, dataset_size=-1):
         super(LossCallBack, self).__init__()
         self._dataset_size = dataset_size
+
     def step_end(self, run_context):
         """
         Print loss after each step
@@ -161,6 +165,7 @@ class LossCallBack(Callback):
         else:
             print("epoch: {}, step: {}, outputs are {}".format(cb_params.cur_epoch_num, cb_params.cur_step_num,
                                                                str(cb_params.net_outputs)))
+
 
 def LoadNewestCkpt(load_finetune_checkpoint_dir, steps_per_epoch, epoch_num, prefix):
     """

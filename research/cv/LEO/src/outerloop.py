@@ -54,7 +54,6 @@ class OuterLoop(nn.Cell):
 
         self.reduce_mean = ops.ReduceMean()
         self.matmul = ops.MatMul(transpose_b=True)
-        self.norm1 = nn.Norm(axis=1, keep_dims=True)
         self.eye = ops.Eye()
         self.get_shape = ops.Shape()
         self.zeros = ops.Zeros()
@@ -155,7 +154,7 @@ class OuterLoop(nn.Cell):
     def orthogonality(self, weight):
         w2 = self.matmul(weight, weight)
 
-        wn = self.norm1(weight) + 1e-20
+        wn = ops.norm(weight, dim=1, keepdim=True) + 1e-20
         correlation_matrix = w2 / self.matmul(wn, wn)
 
         I = self.eye(self.get_shape(correlation_matrix)[0], self.get_shape(correlation_matrix)[0], mindspore.float32)

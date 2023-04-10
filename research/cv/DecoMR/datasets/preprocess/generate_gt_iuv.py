@@ -16,13 +16,14 @@
 import os
 from os.path import join, exists
 import mindspore
-from mindspore import ops, Tensor, nn
+from mindspore import ops, Tensor
 from utils.renderer import render_IUV
 from utils import config as cfg
 import numpy as np
 import cv2
 from tqdm import tqdm
 from models.smpl import SMPL
+
 
 def cal_cam(origin_2d, target_2d):
     tmp_o = origin_2d - ops.ReduceMean(keep_dims=True)(origin_2d, 0)
@@ -31,12 +32,13 @@ def cal_cam(origin_2d, target_2d):
     trans = ops.ReduceMean(keep_dims=True)(target_2d, 0) / scale - ops.ReduceMean(keep_dims=True)(origin_2d, 0)
 
     err = (origin_2d + trans) * scale - target_2d
-    err = ops.ReduceMean(keep_dims=False)(nn.Norm(axis=1)(err))
+    err = ops.ReduceMean(keep_dims=False)(ops.norm(err, dim=1))
     cam = ops.Zeros()(3, mindspore.float32)
 
     cam[0] = scale
     cam[1:] = trans.T
     return cam, err
+
 
 def process_image(img, joint, pose, beta, smpl, renderer, uv_type):
     to_lsp = list(range(14))
@@ -76,6 +78,7 @@ def process_image(img, joint, pose, beta, smpl, renderer, uv_type):
     iuv_im_out = np.concatenate((mask_im_int, uv_im_int), axis=-1)
     return iuv_im_out
 
+
 def cal_projection_err(joint, pose, beta, smpl):
     to_lsp = list(range(14))
 
@@ -94,6 +97,7 @@ def cal_projection_err(joint, pose, beta, smpl):
     _, err = cal_cam(origin_2d, target_2d)
     normalized_err = err / (size + 1e-8)
     return normalized_err.item()
+
 
 def process_dataset(dataset, is_train, uv_type, smpl, renderer):
     dataset_file = cfg.DATASET_FILES[is_train][dataset]
@@ -162,6 +166,7 @@ def process_dataset(dataset, is_train, uv_type, smpl, renderer):
     np.savez(dataset_file, **save_data)
 
     return 0
+
 
 # The joint of SURREAL is different from other dataset,so the generation of
 # IUV image is also a little different from other datasets.

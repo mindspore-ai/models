@@ -28,9 +28,7 @@ from mindspore.parallel._auto_parallel_context import auto_parallel_context
 from mindspore.communication.management import get_rank, get_group_size, create_group
 from mindspore.train.callback import Callback
 from mindspore.train.summary import SummaryRecord
-
 import moxing as mox
-
 
 
 class GPTConfig:
@@ -115,7 +113,6 @@ class GlobalNorm(nn.Cell):
 
     def __init__(self, params, config):
         super(GlobalNorm, self).__init__()
-        self.norm = nn.Norm()
         self.hyper_map = C.HyperMap()
         self.allreduce_filter = tuple(
             "projection.bias" not in x.name and
@@ -157,7 +154,6 @@ class GlobalNormOptShard(nn.Cell):
 
     def __init__(self, params, config):
         super(GlobalNormOptShard, self).__init__()
-        self.norm = nn.Norm()
         self.hyper_map = C.HyperMap()
         device_nums = get_group_size()
         per_stage_device_num = device_nums // config.stage_num
@@ -360,8 +356,6 @@ class LossSummaryCallback(Callback):
         process = Process(target=mox.file.copy_parallel, args=(
             self._summary_dir, self.bucket), name="file_sync")
         process.start()
-        # mox.file.copy_parallel(self._summary_dir, self.bucket)
-
 
 
 class StrategyCkptCallback(Callback):
