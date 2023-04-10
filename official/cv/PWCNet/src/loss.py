@@ -13,6 +13,7 @@
 # limitations under the License.
 # ============================================================================
 import mindspore.nn as nn
+import mindspore.ops as ops
 from mindspore.nn.loss.loss import LossBase
 from mindspore.ops import operations as P
 
@@ -23,9 +24,11 @@ def _downsample2d_as(inputs, target_as):
     resize = h2 // h1
     return nn.AvgPool2d(1, stride=(resize, resize))(inputs) * (1.0 / resize)
 
+
 def _elementwise_epe(input_flow, target_flow):
     residual = target_flow - input_flow
-    return nn.Norm(axis=1, keep_dims=True)(residual)
+    return ops.norm(residual, dim=1, keepdim=True)
+
 
 class MultiScaleEPE_PWC(LossBase):
     '''define loss function'''
@@ -33,7 +36,6 @@ class MultiScaleEPE_PWC(LossBase):
         super(MultiScaleEPE_PWC, self).__init__()
         self.shape = P.Shape()
         self._weights = [0.32, 0.08, 0.02, 0.01, 0.005]
-
 
     def construct(self, outputs, target, training=True):
         N, _, _, _ = self.shape(target)

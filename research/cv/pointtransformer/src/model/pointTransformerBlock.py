@@ -19,7 +19,7 @@ import mindspore.ops as ops
 from src.model.point_helper import batched_index_select, Dense16
 from src.utils.common import exists
 
-# classes
+
 class PointTransformerLayer(nn.Cell):
     def __init__(self,
                  in_planes,
@@ -38,7 +38,6 @@ class PointTransformerLayer(nn.Cell):
 
         self.func_split = ops.Split(-1, 3)
         self.func_sort = ops.Sort(axis=-1)
-        self.func_norm = nn.Norm(axis=-1)
         self.func_softmax = ops.Softmax(axis=-2)
         self.func_sum = ops.ReduceSum()
         self.pos_embed = nn.SequentialCell([Dense16(3, 3 * share_planes, weight_init='he_uniform'),
@@ -61,7 +60,7 @@ class PointTransformerLayer(nn.Cell):
         rel_pos = pos[:, :, None, :] - pos[:, None, :, :]
 
         if exists(num_neighbors) and num_neighbors < n:
-            rel_dist = self.func_norm(rel_pos)
+            rel_dist = ops.norm(rel_pos, dim=-1)
             indices = self.func_sort(rel_dist)[1][:, :, :num_neighbors]
             k = batched_index_select(k, indices)
             v = batched_index_select(v, indices)
@@ -85,6 +84,7 @@ class PointTransformerLayer(nn.Cell):
         # aggregate
         agg = self.func_sum(attn * v, 2) #sim -> [B, N, C]
         return agg
+
 
 class PointTransformerBlock(nn.Cell):
     expansion = 1

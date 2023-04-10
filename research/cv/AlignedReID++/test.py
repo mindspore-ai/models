@@ -27,7 +27,6 @@ from mindspore import context
 from mindspore import Tensor
 from mindspore import ops
 from mindspore.train.serialization import load_param_into_net
-import mindspore.nn as nn
 
 from src.utils import Logger
 from src.eval_metrics import evaluate
@@ -62,6 +61,7 @@ set_seed(1)
 
 context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False)
 context.set_context(device_id=args.device_id)
+
 
 def test(model, queryload, galleryload):
     """test part 1"""
@@ -111,20 +111,20 @@ def test(model, queryload, galleryload):
     print("Extracted features for gallery set, obtained {}-by-{} matrix".format(gf.shape[0], gf.shape[1]))
     test_part2(qf, gf, lqf, lgf, q_pids, g_pids, q_camids, g_camids)
 
+
 def test_part2(qf, gf, lqf, lgf, q_pids, g_pids, q_camids, g_camids):
     """test part 2"""
     ranks = [1, 5, 10, 20]
     # feature normlization
-    m_norm = nn.Norm(axis=-1, keep_dims=True)
     broadcast_toq = ops.BroadcastTo(qf.shape)
     broadcast_tog = ops.BroadcastTo(gf.shape)
 
-    m_qf = m_norm(qf)
+    m_qf = ops.norm(qf, dim=-1, keepdim=True)
     m_qf = broadcast_toq(m_qf)
-    qf = 1.*qf /(m_qf + 1e-12)
-    m_gf = m_norm(gf)
+    qf = 1. * qf / (m_qf + 1e-12)
+    m_gf = ops.norm(gf, dim=-1, keepdim=True)
     m_gf = broadcast_tog(m_gf)
-    gf = 1.*gf /(m_gf + 1e-12)
+    gf = 1. * gf / (m_gf + 1e-12)
 
     m, n = qf.shape[0], gf.shape[0]
     op_pow = ops.Pow()

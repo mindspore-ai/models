@@ -15,16 +15,13 @@
 
 
 import os
-
 import sys
-
 import numpy as np
-
 import mindspore as ms
 import mindspore.ops.functional as mF
 from mindspore.ops import constexpr
 from mindspore.ops import Print
-from mindspore import ops, nn
+import mindspore.ops as ops
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(BASE_DIR)
@@ -270,8 +267,6 @@ def get_box3d_corners_helper(centers, headings, sizes) -> ms.Tensor:
     return corners_3d
 
 
-
-
 @constexpr()
 def gen_np_arange():
     return ms.Tensor(
@@ -315,8 +310,6 @@ def get_box3d_corners(center, heading_residuals, size_residuals):
          3])  # [32, 12, 8, 8, 3]
 
 
-
-
 def huber_loss(error, delta) -> ms.Tensor:
 
     abs_error = mF.absolute(error)
@@ -336,8 +329,6 @@ class FrustumPointNetLoss(ms.nn.Cell):
         self.return_all = return_all
         self.sparse_softmax_cross_entropy_with_logits_op = ops.SparseSoftmaxCrossEntropyWithLogits(
         )
-        self.norm_op = nn.Norm(1)
-        self.norm_op_11 = nn.Norm(-1)
         self.min_op = ops.Minimum()
         self.nllloss_op = ops.NLLLoss(reduction="mean")
         self.log_softmax = ops.LogSoftmax(1)
@@ -398,7 +389,7 @@ class FrustumPointNetLoss(ms.nn.Cell):
 
         center_dist = ms.numpy.norm(center - center_label, axis=-1)  # (32,)
         center_loss = huber_loss(center_dist, delta=2.0)
-        stage1_center_dist = self.norm_op(center - stage1_center)  # (32,)
+        stage1_center_dist = ops.norm(center - stage1_center, dim=1)  # (32,)
         stage1_center_loss = huber_loss(stage1_center_dist, delta=1.0)
 
         heading_class_label = heading_class_label.astype(ms.int32)
@@ -437,9 +428,9 @@ class FrustumPointNetLoss(ms.nn.Cell):
         mean_size_label = mF.reduce_sum(scls_onehot_repeat *
                                         mean_size_arr_expand.astype(ms.float32), 1)  # 32,3
         size_residuals_label_normalized = size_residuals_label / mean_size_label
-        size_normalized_dist = self.norm_op(
+        size_normalized_dist = ops.norm(
             size_residuals_label_normalized.astype(ms.float32) -
-            predicted_size_residuals_normalized_dist.astype(ms.float32))  # 32
+            predicted_size_residuals_normalized_dist.astype(ms.float32), dim=1)  # 32
         size_residuals_normalized_loss = huber_loss(
             size_normalized_dist,
             delta=1.0)

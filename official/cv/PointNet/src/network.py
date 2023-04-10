@@ -19,6 +19,7 @@ from mindspore import Tensor
 import mindspore.nn as nn
 import mindspore.ops as ops
 
+
 class STN3d(nn.Cell):
     """STN3d"""
     def __init__(self):
@@ -39,6 +40,7 @@ class STN3d(nn.Cell):
         self.bn5 = nn.BatchNorm1d(256)
         self.argmaxwithvalue = ops.ArgMaxWithValue(axis=2, keep_dims=True)
         self.s1 = Tensor([1, 0, 0, 0, 1, 0, 0, 0, 1], mindspore.float32)
+
     def construct(self, x):
         """construct"""
         batchsize = x.shape[0]
@@ -167,6 +169,7 @@ class PointNetfeat(nn.Cell):
 
         return self.cat((x, pointfeats)), transf, trans_feat
 
+
 class PointNetCls(nn.Cell):
     """PointNetCls"""
     def __init__(self, k=2, feature_transform=False):
@@ -189,6 +192,7 @@ class PointNetCls(nn.Cell):
         x = self.relu(self.bn2(self.dropout(self.fc2(x))))
         x = self.fc3(x)
         return self.logsoftmax(x), transf, trans_feat
+
 
 class PointNetDenseCls(nn.Cell):
     """PointNetDenseCls"""
@@ -227,17 +231,15 @@ class PointNetDenseCls(nn.Cell):
         return x
 
 
-
 def feature_transform_regularizer(_trans):
     """feature_transform_regularizer"""
     d = _trans.shape[1]
 
     eye = ops.Eye()
     I = eye(d, d, mindspore.float32)[None, :, :]
-    norm = nn.Norm(axis=(1, 2))
     transpose = ops.Transpose()
     reduce = ops.ReduceMean()
-    loss = reduce(norm(np.matmul(_trans.asnumpy(), transpose(_trans, (0, 2, 1).asnumpy()) - I)))
+    loss = reduce(ops.norm(np.matmul(_trans.asnumpy(), transpose(_trans, (0, 2, 1).asnumpy()) - I)), dim=(1, 2))
     return loss
 
 if __name__ == '__main__':

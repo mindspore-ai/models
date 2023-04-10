@@ -141,7 +141,6 @@ class GlobalNorm(nn.Cell):
 
     def __init__(self, params):
         super(GlobalNorm, self).__init__()
-        self.norm = nn.Norm()
         self.hyper_map = C.HyperMap()
 
         self.allreduce_filter = tuple(

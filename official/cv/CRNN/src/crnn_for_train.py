@@ -22,7 +22,7 @@ from mindspore.ops import functional as F
 from mindspore.ops import operations as P
 from mindspore.nn.cell import Cell
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
-import mindspore.nn as nn
+import mindspore.ops as ops
 from mindspore.common.tensor import Tensor
 
 compute_norm = C.MultitypeFuncGraph("compute_norm")
@@ -30,8 +30,7 @@ compute_norm = C.MultitypeFuncGraph("compute_norm")
 
 @compute_norm.register("Tensor")
 def _compute_norm(grad):
-    norm = nn.Norm()
-    norm = norm(F.cast(grad, mstype.float32))
+    norm = ops.norm(F.cast(grad, mstype.float32))
     ret = F.expand_dims(F.cast(norm, mstype.float32), 0)
     return ret
 
@@ -82,7 +81,6 @@ class TrainOneStepCellWithGradClip(Cell):
         self.hyper_map = C.HyperMap()
         self.greater = P.Greater()
         self.select = P.Select()
-        self.norm = nn.Norm(keep_dims=True)
         self.dtype = P.DType()
         self.cast = P.Cast()
         self.concat = P.Concat(axis=0)
@@ -100,7 +98,7 @@ class TrainOneStepCellWithGradClip(Cell):
         grads = self.grad(self.network, weights)(data, label, sens)
         norm = self.hyper_map(F.partial(compute_norm), grads)
         norm = self.concat(norm)
-        norm = self.norm(norm)
+        norm = ops.norm(norm, keepdim=True)
         cond = self.greater(norm, self.cast(self.ten, self.dtype(norm)))
         clip_val = self.select(cond, norm, self.cast(self.ten, self.dtype(norm)))
         grads = self.hyper_map(F.partial(grad_div, clip_val), grads)

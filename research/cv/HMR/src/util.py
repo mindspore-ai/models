@@ -16,8 +16,6 @@
 """
 Add notes.
 """
-
-
 import math
 import h5py
 import numpy as np
@@ -46,9 +44,7 @@ def load_mean_theta():
 
 
 def batch_rodrigues(theta):
-
-    net = nn.Norm(axis=1)
-    l1norm = net(theta + 1e-8)
+    l1norm = ops.norm(theta + 1e-8, dim=1)
     expand_dims = ops.ExpandDims()
     angle = expand_dims(l1norm, -1)
     div = ops.Div()
@@ -65,10 +61,8 @@ def batch_rodrigues(theta):
 
 
 def quat2mat(quat):
-
     norm_quat = quat
-    net = nn.Norm(axis=1, keep_dims=True)
-    norm_quat = norm_quat / net(norm_quat)
+    norm_quat = norm_quat / ops.norm(norm_quat, dim=1, keepdim=True)
     w, x, y, z = norm_quat[:, 0], norm_quat[:, 1], norm_quat[:,
                                                              2], norm_quat[:,
                                                                            3]
