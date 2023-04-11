@@ -17,7 +17,7 @@ import numpy as np
 
 import mindspore.common.dtype as mstype
 import mindspore.ops.operations as P
-from mindspore import nn
+from mindspore import nn, ops
 from mindspore.common.tensor import Tensor
 from mindspore.common.parameter import Parameter
 from mindspore.common.initializer import Uniform
@@ -77,7 +77,6 @@ class BahdanauAttention(nn.Cell):
         self.expand = P.ExpandDims()
         self.tile = P.Tile()
 
-        self.norm = nn.Norm(axis=-1)
         self.mul = P.Mul()
         self.matmul = P.MatMul()
         self.batchMatmul = P.BatchMatMul()
@@ -176,7 +175,7 @@ class BahdanauAttention(nn.Cell):
         if self.normalize:
             # (batch_size, t_q_length, t_k_length, n)
             sum_qk_add = sum_qk_add + self.normalize_bias
-            linear_att_norm = self.linear_att / self.norm(self.linear_att)
+            linear_att_norm = self.linear_att / ops.norm(self.linear_att, dim=-1)
             linear_att_norm = self.cast(linear_att_norm, mstype.float32)
             linear_att_norm = self.mul(linear_att_norm, self.normalize_scalar)
         else:

@@ -18,10 +18,10 @@ import mindspore.nn as nn
 from mindspore.nn import rearrange_inputs
 import numpy as np
 
+
 class FlowNetEPE(nn.Metric):
     def __init__(self):
         super(FlowNetEPE, self).__init__()
-        self.norm_op = nn.Norm(axis=1)
         self.mean = ops.ReduceMean()
 
     def clear(self):
@@ -34,7 +34,7 @@ class FlowNetEPE(nn.Metric):
             raise ValueError('The MAE needs 2 inputs (y_pred, y), but got {}'.format(len(inputs)))
         y_pred = self._convert_data(inputs[0])
         y = self._convert_data(inputs[1])
-        abs_error_sum = self.mean(self.norm_op(ms.Tensor(y) - ms.Tensor(y_pred)))
+        abs_error_sum = self.mean(ops.norm(ms.Tensor(y) - ms.Tensor(y_pred), dim=1))
         self._abs_error_sum.append(abs_error_sum.asnumpy().sum())
         self._samples_num += y.shape[0]
 

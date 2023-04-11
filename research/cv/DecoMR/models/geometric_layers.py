@@ -13,8 +13,8 @@
 # limitations under the License.
 # ============================================================================
 
-import mindspore.nn as nn
 from mindspore import ops
+
 
 def rodrigues(theta):
     """Convert axis-angle representation to rotation matrix.
@@ -23,8 +23,7 @@ def rodrigues(theta):
     Returns:
         Rotation matrix corresponding to the quaternion -- size = [B, 3, 3]
     """
-    net = nn.Norm(axis=1)
-    l1norm = net(theta + 1e-8)
+    l1norm = ops.norm(theta + 1e-8, dim=1)
     angle = ops.ExpandDims()(l1norm, -1)
     normalized = ops.Div()(theta, angle)
     angle = angle*0.5
@@ -32,6 +31,7 @@ def rodrigues(theta):
     v_sin = ops.Sin()(angle)
     quat = ops.Concat(axis=1)((v_cos, v_sin*normalized))
     return quat2mat(quat)
+
 
 def quat2mat(quat):
     """Convert quaternion coefficients to rotation matrix.
@@ -41,7 +41,7 @@ def quat2mat(quat):
         Rotation matrix corresponding to the quaternion -- size = [B, 3, 3]
     """
     norm_quat = quat
-    y = nn.Norm(axis=1, keep_dims=True)(norm_quat)
+    y = ops.norm(norm_quat, dim=1, keepdim=True)
     x = norm_quat
 
     norm_quat = x / y
@@ -57,6 +57,7 @@ def quat2mat(quat):
                                 2*wz + 2*xy, w2 - x2 + y2 - z2, 2*yz - 2*wx,
                                 2*xz - 2*wy, 2*wx + 2*yz, w2 - x2 - y2 + z2]).view(B, 3, 3)
     return rotMat
+
 
 def orthographic_projection(X, camera):
     """Perform orthographic projection of 3D points X using the camera parameters

@@ -90,8 +90,6 @@ class CalcLossG(nn.LossBase):
         self.div = ops.Div()
         self.cos = ops.Cos()
         self.sin = ops.Sin()
-        self.net_1 = nn.Norm(axis=1)
-        self.net_2 = nn.Norm(axis=1, keep_dims=True)
         self.sub = ops.Sub()
         self.zeros = ops.Zeros()
         self.reshape = ops.Reshape()
@@ -189,7 +187,7 @@ class CalcLossG(nn.LossBase):
     def quat2mat(self, quat):
 
         norm_quat = quat
-        norm_quat = norm_quat / self.net_2(norm_quat)
+        norm_quat = norm_quat / self.net_2(norm_quat, dim=1, keepdim=True)
         w, x, y, z = norm_quat[:, 0], norm_quat[:,
                                                 1], norm_quat[:,
                                                               2], norm_quat[:,
@@ -212,7 +210,7 @@ class CalcLossG(nn.LossBase):
 
     def batch_rodrigues(self, theta):
 
-        l1norm = self.net_1(theta + 1e-8)
+        l1norm = ops.norm(theta + 1e-8, dim=1)
         angle = self.expand_dims(l1norm, -1)
         Normalizationd = self.div(theta, angle)
         angle = angle * 0.5

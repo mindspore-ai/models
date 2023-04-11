@@ -26,7 +26,6 @@ class FilipTemplateEncoder(nn.Cell):
     def __init__(self, text_encoder):
         super(FilipTemplateEncoder, self).__init__()
         self.text_encoder = text_encoder
-        self.text_norm = nn.Norm(axis=-1, keep_dims=True)
         self.concat = ops.Concat()
         self.expand_dims = ops.ExpandDims()
 
@@ -38,7 +37,8 @@ class FilipTemplateEncoder(nn.Cell):
         for i in range(100):
             text_tokens_part = text_tokens[batch_num * i: batch_num * (i + 1), :]
             text_tokens_features_part = self.text_encoder(text_tokens_part)
-            text_tokens_features_part = text_tokens_features_part / self.text_norm(text_tokens_features_part)
+            text_tokens_features_part = text_tokens_features_part / ops.norm(text_tokens_features_part,
+                                                                             dim=-1, keepdim=True)
             text_pad_mask = text_tokens_part > 0
             text_pad_mask = self.expand_dims(text_pad_mask, -1)
             text_tokens_features_part = text_tokens_features_part * text_pad_mask
@@ -53,7 +53,6 @@ class ClipTemplateEncoder(nn.Cell):
     def __init__(self, text_encoder):
         super(ClipTemplateEncoder, self).__init__()
         self.text_encoder = text_encoder
-        self.text_norm = nn.Norm(axis=-1, keep_dims=True)
         self.concat = ops.Concat()
         self.expand_dims = ops.ExpandDims()
 
@@ -65,13 +64,14 @@ class ClipTemplateEncoder(nn.Cell):
         for i in range(100):
             text_tokens_part = text_tokens[batch_num * i: batch_num * (i + 1), :]
             text_tokens_features_part = self.text_encoder(text_tokens_part)
-            text_tokens_features_part = text_tokens_features_part / self.text_norm(text_tokens_features_part)
+            text_tokens_features_part = text_tokens_features_part / ops.norm(text_tokens_features_part,
+                                                                             dim=-1, keepdim=True)
             res.append(text_tokens_features_part)
         text_features = self.concat(res)
         if n_templates > 1:
             text_features = text_features.reshape(n_class, n_templates, -1)
             text_features = text_features.mean(1)
-            text_features = text_features / self.text_norm(text_features)
+            text_features = text_features / ops.norm(text_features, dim=-1, keepdim=True)
         return text_features, n_templates
 
 
@@ -97,8 +97,6 @@ class FilipEval(nn.Cell):
         self.text_encoder = text_encoder
         self.text_features = text_features
         self.n_template = n_template
-        self.image_norm = nn.Norm(axis=-1, keep_dims=True)
-        self.text_norm = nn.Norm(axis=-1, keep_dims=True)
         self.equal = ops.Equal()
         self.cast = ops.Cast()
         self.sim_func = LateSimilarity()
@@ -118,7 +116,7 @@ class FilipEval(nn.Cell):
         image_features = self.image_encoder(images)
         total = image_features.shape[0]
         image_features = image_features[:, 1:, :]
-        image_features = image_features / self.image_norm(image_features)
+        image_features = image_features / ops.norm(image_features, dim=-1, keepdim=True)
         if self.n_template > 1:
             all_sim = []
             for i in range(self.text_features.shape[1]):
@@ -141,7 +139,6 @@ class ClipEval(nn.Cell):
         super(ClipEval, self).__init__()
         self.image_encoder = image_encoder
         self.text_encoder = text_encoder
-        self.image_norm = nn.Norm(axis=-1, keep_dims=True)
         self.text_features = text_features
         self.n_template = n_template
         self.softmax = ops.Softmax()
@@ -155,7 +152,7 @@ class ClipEval(nn.Cell):
     def construct(self, images, targets):
         image_features = self.image_encoder(images)
         total = image_features.shape[0]
-        image_features = image_features / self.image_norm(image_features)
+        image_features = image_features / ops.norm(image_features, dim=-1, keepdim=True)
         image_features = self.cast(image_features, mstype.float16)
 
         similarity = self.softmax(self.matmul(image_features, self.text_features))

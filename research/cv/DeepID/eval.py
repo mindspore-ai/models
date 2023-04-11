@@ -15,16 +15,15 @@
 """Evaluation for DeepID"""
 import time
 import argparse
-
 import mindspore
 from mindspore import context, load_checkpoint
 from mindspore.train.serialization import load_param_into_net
 import mindspore.ops as P
-
 from src.utils import get_network
 from src.dataset import dataloader
-
 import numpy as np
+
+
 def KFold(n=3120, n_folds=10, shuffle=False):
     folds = []
     base = list(range(n))
@@ -33,6 +32,7 @@ def KFold(n=3120, n_folds=10, shuffle=False):
         train = list(set(base)-set(ktest))
         folds.append([train, ktest])
     return folds
+
 
 def eval_acc(threshold, diff):
     """acc the eval"""
@@ -47,6 +47,7 @@ def eval_acc(threshold, diff):
     accuracy = 1.0*np.count_nonzero(y_true == y_predict)/len(y_true)
     return accuracy
 
+
 def find_best_threshold(thresholds, predicts):
     best_threshold = best_acc = 0
     for threshold in thresholds:
@@ -56,6 +57,7 @@ def find_best_threshold(thresholds, predicts):
             best_threshold = threshold
     return best_threshold
 
+
 def test():
     """test in test dataset"""
     test_dataset, test_dataset_length = dataloader(args_opt.data_url, epoch=1, batch_size=1,
@@ -63,7 +65,6 @@ def test():
     predict = []
     test_dataset_iter = test_dataset.create_dict_iterator()
     print('Valid dataset length:', test_dataset_length)
-    normnet = mindspore.nn.Norm(axis=1)
     deepid = get_network(args_opt, args_opt.num_class, True)
     param_network = load_checkpoint(args_opt.ckpt_url)
     load_param_into_net(deepid, param_network)
@@ -77,8 +78,8 @@ def test():
         output1 = deepid(img1_test)
         output2 = deepid(img2_test)
         cosdistance = mindspore.ops.tensor_dot(output1, output2, (1, 1))
-        norm1 = normnet(output1)
-        norm2 = normnet(output2)
+        norm1 = P.norm(output1, dim=1)
+        norm2 = P.norm(output2, dim=1)
         cosdistance = cosdistance / (norm1 * norm2 + 1e-5)
         cosdistance = float(cosdistance.asnumpy())
         predict.append('{}\t{}\t{}\t{}\n'.format(img1, img2, cosdistance, int(label.asnumpy())))
@@ -94,6 +95,7 @@ def test():
         accuracy.append(eval_acc(best_thresh, predicts[ktest]))
         thd.append(best_thresh)
     print('ACC={:.4f} std={:.4f} thd={:.4f}'.format(np.mean(accuracy), np.std(accuracy), np.mean(thd)))
+
 
 def valid():
     """test in valid dataset"""
@@ -120,8 +122,8 @@ def valid():
         print('Test time per step: {:.2f} ms'.format((time.time() - step_begin_time) * 1000))
     print('Valid dataset accuracy: {:.2f}%'.format(100 * correct_num.asnumpy() / valid_dataset_length))
 
-parser = argparse.ArgumentParser(description='DeepID_test')
 
+parser = argparse.ArgumentParser(description='DeepID_test')
 parser.add_argument('--data_url', type=str, default='data/', help='Dataset path')
 parser.add_argument('--batch_size', type=int, default=1024, help='Batch Size')
 parser.add_argument('--ckpt_url', type=str, default='', help='checkpoint path')

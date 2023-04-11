@@ -16,6 +16,7 @@
 
 import mindspore
 import mindspore.nn as nn
+import mindspore.ops as ops
 from mindspore import Parameter, Tensor
 from mindspore.ops import Gather, ExpandDims, Split, Abs, CumSum, Sin, Select, Cast, Print
 import numpy as np
@@ -60,7 +61,6 @@ class HAKE_GRAPH(nn.Cell):
         self.cumsum = CumSum()
         self.sin = Sin()
         self.select = Select()
-        self.norm = nn.Norm(axis=2)
         self.cast = Cast()
 
         self.print = Print()
@@ -78,7 +78,7 @@ class HAKE_GRAPH(nn.Cell):
 
         r_score = mod_head * (mod_relation + bias_relation_new) - mod_tail * (1 - bias_relation_new)
         phase_score = self.abs(self.sin(phase_score / 2)).sum(axis=2) * self.phase_weight
-        r_score = self.norm(r_score) * self.modulus_weight
+        r_score = ops.norm(r_score, dim=2) * self.modulus_weight
 
         return self.cast(self.gamma - (phase_score + r_score), mindspore.float32)
 

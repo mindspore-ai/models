@@ -88,8 +88,6 @@ class LossForMultiLabel(LossBase):
         base2 = base[1]
         x1 = self.bceloss(base1, target1)
         x2 = self.bceloss(base2, target2)
-        # x1 = self.bceloss(base1, target1.astype(mindspore.float16))
-        # x2 = self.bceloss(base2, target2.astype(mindspore.float16))
         return self.get_loss(x1) + self.get_loss(x2)
 
 
@@ -170,8 +168,7 @@ compute_norm = C.MultitypeFuncGraph("compute_norm")
 
 @compute_norm.register("Tensor")
 def _compute_norm(grad):
-    norm = nn.Norm()
-    norm = norm(F.cast(grad, mindspore.float32))
+    norm = P.norm(F.cast(grad, mindspore.float32))
     ret = F.expand_dims(F.cast(norm, mindspore.float32), 0)
     return ret
 
@@ -217,7 +214,6 @@ class TrainStepWrap(nn.Cell):
         self.get_status = P.NPUGetFloatStatus()
         self.clear_before_grad = P.NPUClearFloatStatus()
         self.is_distributed = False
-        self.norm = nn.Norm(keep_dims=True)
         self.base = Tensor(1, mindspore.float32)
 
         self.all_reduce = P.AllReduce()
