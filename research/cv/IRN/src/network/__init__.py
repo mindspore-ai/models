@@ -17,11 +17,9 @@
 import mindspore as ms
 import mindspore.nn as nn
 from mindspore.ops import functional as F
-from mindspore.ops import composite as C
 from mindspore.ops import operations as ops
-from mindspore import dtype as mstype
 import src.network.Invnet as Invnet
-from .net_with_loss import IRN_loss
+
 
 def create_model(opt):
     """
@@ -55,7 +53,6 @@ class TrainOneStepCell_IRN(nn.TrainOneStepCell):
         self.image_visuals = {}
 
         self.stack = ms.ops.Stack()
-        self.norm = nn.Norm()
         self.mul = ms.ops.Mul()
 
     def test(self, ref_L, real_H):
@@ -74,7 +71,7 @@ class TrainOneStepCell_IRN(nn.TrainOneStepCell):
         total_norm = 0.0
         norm_type = 2.0
         for grad in grads:
-            param_norm = self.norm(grad)
+            param_norm = ops.norm(grad)
             total_norm += param_norm**norm_type
         total_norm = total_norm ** (1. / norm_type)
         clip_coef = max_norm / (total_norm + 1e-6)

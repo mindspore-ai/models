@@ -16,11 +16,11 @@
 
 import mindspore.nn as nn
 from mindspore.common.initializer import HeNormal, Normal, Constant
-
 import mindspore.ops as ops
 
 from src.model_utils.config import config
 from src.resnet import resnet50
+
 
 class PCB(nn.Cell):
     """PCB Model"""
@@ -37,7 +37,6 @@ pad_mode="valid", weight_init=HeNormal(mode="fan_out"))
         self.feat_bn2d = nn.BatchNorm2d(num_features=256)
         self.relu = ops.ReLU()
         self.expandDims = ops.ExpandDims()
-        self.norm = nn.Norm(axis=1)
         self.split = ops.Split(2, 6)
         # define 6 classifiers
         self.instance0 = nn.Dense(256, self.num_classes, weight_init=Normal(sigma=0.001), bias_init=Constant(0))
@@ -59,11 +58,11 @@ pad_mode="valid", weight_init=HeNormal(mode="fan_out"))
         x = self.base.layer3(x)
         x = self.base.layer4(x)
         x = self.avgpool(x)
-        g_feature = x / (self.expandDims(self.norm(x), 1)).expand_as(x)
+        g_feature = x / (self.expandDims(ops.norm(x, dim=1), 1)).expand_as(x)
         if self.training:
             x = self.dropout(x)
         x = self.local_conv(x)
-        h_feature = x / (self.expandDims(self.norm(x), 1)).expand_as(x)
+        h_feature = x / (self.expandDims(ops.norm(x, dim=1), 1)).expand_as(x)
         x = self.feat_bn2d(x)
         x = self.relu(x)
         x = self.split(x)
@@ -102,8 +101,11 @@ class NetWithLossCell(nn.Cell):
         loss = (loss0 + loss1 + loss2 + loss3 + loss4 + loss5)
         return loss
 
+
 #for 310 infer
 use_G_feature = config.use_G_feature
+
+
 class PCB_infer(nn.Cell):
     """PCB for inference with classifiers removed"""
     def __init__(self):
@@ -117,7 +119,6 @@ pad_mode="valid", weight_init=HeNormal(mode="fan_out"))
         self.feat_bn2d = nn.BatchNorm2d(num_features=256)
         self.relu = ops.ReLU()
         self.expandDims = ops.ExpandDims()
-        self.norm = nn.Norm(axis=1)
 
     def construct(self, x):
         """Forward propagation"""
@@ -131,9 +132,9 @@ pad_mode="valid", weight_init=HeNormal(mode="fan_out"))
         x = self.base.layer3(x)
         x = self.base.layer4(x)
         x = self.avgpool(x)
-        g_feature = x / (self.expandDims(self.norm(x), 1)).expand_as(x)
+        g_feature = x / (self.expandDims(ops.norm(x, dim=1), 1)).expand_as(x)
         x = self.local_conv(x)
-        h_feature = x / (self.expandDims(self.norm(x), 1)).expand_as(x)
+        h_feature = x / (self.expandDims(ops.norm(x, dim=1), 1)).expand_as(x)
         if use_G_feature:
             return g_feature
         return h_feature

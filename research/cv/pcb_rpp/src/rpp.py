@@ -39,7 +39,6 @@ class RPP(nn.Cell):
 
         self.dropout = nn.Dropout(p=0.5)
 
-        # self.avg_pool3d = ops.AvgPool3D(kernel_size=(8,1,1),strides=(8,1,1),pad_mode="valid")
         self.avg_pool_2 = ops.AvgPool(kernel_size=(8, 1), strides=(8, 1), pad_mode="valid")
         self.local_mask = nn.Conv2d(256, 6, kernel_size=1, pad_mode="valid", has_bias=True,
                                     weight_init=HeNormal(mode="fan_out"), bias_init=Constant(0))
@@ -51,9 +50,7 @@ class RPP(nn.Cell):
         self.relu = ops.ReLU()
         self.expand_dims = ops.ExpandDims()
         self.trans = ops.Transpose()
-        self.norm = nn.Norm(axis=1)
 
-        # self.squeeze = ops.Squeeze(1)
         self.avgpool2d = ops.AvgPool(kernel_size=(24, 8))
         self.softmax = ops.Softmax(axis=1)
         self.split_1 = ops.Split(1, 6)
@@ -109,13 +106,13 @@ class RPP(nn.Cell):
         x = self.concat((f0, f1, f2, f3, f4, f5))
 
         feat = self.concat((f0, f1, f2, f3, f4, f5))
-        g_feature = feat / (self.expand_dims(self.norm(feat), 1)).expand_as(feat)
+        g_feature = feat / (self.expand_dims(ops.norm(feat, dim=1), 1)).expand_as(feat)
 
         if self.training:
             x = self.dropout(x)
         x = self.local_conv(x)
 
-        h_feature = x / (self.expand_dims(self.norm(x), 1)).expand_as(x)
+        h_feature = x / (self.expand_dims(ops.norm(x, dim=1), 1)).expand_as(x)
         x = self.feat_bn2d(x)
 
         x = self.relu(x)
@@ -151,7 +148,6 @@ class RPPInfer(nn.Cell):
         resnet = resnet50(1000)
         self.base = resnet
 
-        # self.avg_pool3d = ops.AvgPool3D(kernel_size=(8,1,1),strides=(8,1,1),pad_mode="valid")
         self.avg_pool_2 = ops.AvgPool(kernel_size=(8, 1), strides=(8, 1), pad_mode="valid")
         self.local_mask = nn.Conv2d(256, 6, kernel_size=1, pad_mode="valid", has_bias=True,
                                     weight_init=HeNormal(mode="fan_out"), bias_init=Constant(0))
@@ -163,7 +159,6 @@ class RPPInfer(nn.Cell):
         self.relu = ops.ReLU()
         self.expand_dims = ops.ExpandDims()
         self.trans = ops.Transpose()
-        self.norm = nn.Norm(axis=1)
 
         self.avgpool2d = ops.AvgPool(kernel_size=(24, 8))
         self.softmax = ops.Softmax(axis=1)
@@ -210,11 +205,11 @@ class RPPInfer(nn.Cell):
         x = self.concat((f0, f1, f2, f3, f4, f5))
 
         feat = self.concat((f0, f1, f2, f3, f4, f5))
-        g_feature = feat / (self.expand_dims(self.norm(feat), 1)).expand_as(feat)
+        g_feature = feat / (self.expand_dims(ops.norm(feat, dim=1), 1)).expand_as(feat)
 
         x = self.local_conv(x)
 
-        h_feature = x / (self.expand_dims(self.norm(x), 1)).expand_as(x)
+        h_feature = x / (self.expand_dims(ops.norm(x, dim=1), 1)).expand_as(x)
 
         if use_g_feature:
             return g_feature

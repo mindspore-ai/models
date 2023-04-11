@@ -22,7 +22,7 @@ import mindspore as ms
 from mindspore.ops import operations as P
 from mindspore.ops import composite as C
 from mindspore.ops import functional as F
-from mindspore import nn, Tensor, Parameter, context
+from mindspore import nn, ops, Tensor, Parameter, context
 from mindspore.context import ParallelMode
 from mindspore.communication.management import get_group_size
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
@@ -153,7 +153,6 @@ def eval_model(hparams, global_step, model, x, y, c, g, input_lengths, eval_dir)
     else:
         initial_value = 0.0
 
-    # (C,)
     if is_mulaw_quantize(hparams.input_type):
         initial_input = to_categorical(
             initial_value, num_classes=hparams.quantize_channels).astype(np.float32)
@@ -315,8 +314,7 @@ compute_norm = C.MultitypeFuncGraph("compute_norm")
 
 @compute_norm.register("Tensor")
 def _compute_norm(grad):
-    norm = nn.Norm()
-    norm = norm(F.cast(grad, ms.float32))
+    norm = ops.norm(F.cast(grad, ms.float32))
     ret = F.expand_dims(F.cast(norm, ms.float32), 0)
     return ret
 
@@ -373,7 +371,6 @@ class WaveNetTrainOneStepWithLossScaleCell(nn.Cell):
         self.get_status = P.NPUGetFloatStatus()
         self.clear_before_grad = P.NPUClearFloatStatus()
         self.is_distributed = False
-        self.norm = nn.Norm(keep_dims=True)
         self.base = Tensor(1, ms.float32)
 
         self.all_reduce = P.AllReduce()

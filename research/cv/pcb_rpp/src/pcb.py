@@ -44,7 +44,6 @@ class PCB(nn.Cell):
         self.feat_bn2d = nn.BatchNorm2d(num_features=256)
         self.relu = ops.ReLU()
         self.expand_dims = ops.ExpandDims()
-        self.norm = nn.Norm(axis=1)
         self.split = ops.Split(2, 6)
 
         # define 6 classifiers
@@ -67,11 +66,11 @@ class PCB(nn.Cell):
         x = self.base.layer3(x)
         x = self.base.layer4(x)
         x = self.avgpool(x)
-        g_feature = x / (self.expand_dims(self.norm(x), 1)).expand_as(x)
+        g_feature = x / (self.expand_dims(ops.norm(x, dim=1), 1)).expand_as(x)
         if self.training:
             x = self.dropout(x)
         x = self.local_conv(x)
-        h_feature = x / (self.expand_dims(self.norm(x), 1)).expand_as(x)
+        h_feature = x / (self.expand_dims(ops.norm(x, dim=1), 1)).expand_as(x)
         x = self.feat_bn2d(x)
 
         x = self.relu(x)
@@ -132,7 +131,6 @@ class PCBInfer(nn.Cell):
         self.feat_bn2d = nn.BatchNorm2d(num_features=256)
         self.relu = ops.ReLU()
         self.expand_dims = ops.ExpandDims()
-        self.norm = nn.Norm(axis=1)
 
     def construct(self, x):
         """ Forward """
@@ -146,9 +144,9 @@ class PCBInfer(nn.Cell):
         x = self.base.layer3(x)
         x = self.base.layer4(x)
         x = self.avgpool(x)
-        g_feature = x / (self.expand_dims(self.norm(x), 1)).expand_as(x)
+        g_feature = x / (self.expand_dims(ops.norm(x, dim=1), 1)).expand_as(x)
         x = self.local_conv(x)
-        h_feature = x / (self.expand_dims(self.norm(x), 1)).expand_as(x)
+        h_feature = x / (self.expand_dims(ops.norm(x, dim=1), 1)).expand_as(x)
         if use_g_feature:
             return g_feature
         return h_feature

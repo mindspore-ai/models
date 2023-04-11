@@ -16,11 +16,11 @@
 
 import mindspore.nn as nn
 from mindspore.common.initializer import HeNormal, Normal, Constant
-
 import mindspore.ops as ops
 
 from src.model_utils.config import config
 from src.resnet import resnet50
+
 
 class RPP(nn.Cell):
     """PCB+RPP"""
@@ -39,7 +39,6 @@ pad_mode="valid", weight_init=HeNormal(mode="fan_out"))
         self.feat_bn2d = nn.BatchNorm2d(num_features=256)
         self.relu = ops.ReLU()
         self.expandDims = ops.ExpandDims()
-        self.norm = nn.Norm(axis=1)
         self.squeeze = ops.Squeeze(1)
         self.avgpool2d = ops.AvgPool(kernel_size=(24, 8))
         self.softmax = ops.Softmax(axis=1)
@@ -91,11 +90,11 @@ pad_mode="valid", weight_init=HeNormal(mode="fan_out"))
         f5 = self.avgpool2d(f5)
         x = self.concat((f0, f1, f2, f3, f4, f5))
         feat = self.concat((f0, f1, f2, f3, f4, f5))
-        g_feature = feat / (self.expandDims(self.norm(feat), 1)).expand_as(feat)
+        g_feature = feat / (self.expandDims(ops.norm(feat, dim=1), 1)).expand_as(feat)
         if self.training:
             x = self.dropout(x)
         x = self.local_conv(x)
-        h_feature = x / (self.expandDims(self.norm(x), 1)).expand_as(x)
+        h_feature = x / (self.expandDims(ops.norm(x, dim=1), 1)).expand_as(x)
         x = self.feat_bn2d(x)
         x = self.relu(x)
         x = self.split_2(x)
@@ -113,8 +112,11 @@ pad_mode="valid", weight_init=HeNormal(mode="fan_out"))
         c5 = self.instance5(x5)
         return (c0, c1, c2, c3, c4, c5), g_feature, h_feature
 
+
 #for infer 310
 use_G_feature = config.use_G_feature
+
+
 class RPP_infer(nn.Cell):
     """PCB+RPP for inference"""
     def __init__(self):
@@ -130,7 +132,6 @@ pad_mode="valid", weight_init=HeNormal(mode="fan_out"))
         self.feat_bn2d = nn.BatchNorm2d(num_features=256)
         self.relu = ops.ReLU()
         self.expandDims = ops.ExpandDims()
-        self.norm = nn.Norm(axis=1)
         self.squeeze = ops.Squeeze(1)
         self.avgpool2d = ops.AvgPool(kernel_size=(24, 8))
         self.softmax = ops.Softmax(axis=1)
@@ -172,9 +173,9 @@ pad_mode="valid", weight_init=HeNormal(mode="fan_out"))
         f5 = self.avgpool2d(f5)
         x = self.concat((f0, f1, f2, f3, f4, f5))
         feat = self.concat((f0, f1, f2, f3, f4, f5))
-        g_feature = feat / (self.expandDims(self.norm(feat), 1)).expand_as(feat)
+        g_feature = feat / (self.expandDims(ops.norm(feat, dim=1), 1)).expand_as(feat)
         x = self.local_conv(x)
-        h_feature = x / (self.expandDims(self.norm(x), 1)).expand_as(x)
+        h_feature = x / (self.expandDims(ops.norm(x, dim=1), 1)).expand_as(x)
         if use_G_feature:
             return g_feature
         return h_feature

@@ -58,11 +58,11 @@ class Conv2dNormalized(nn.Cell):
 
         if self.training:
             v = ops.matmul(weight_mat.T, u)
-            v_norm = nn.Norm()(v)
+            v_norm = ops.norm(v)
             v = v / v_norm
 
             u = ops.matmul(weight_mat, v)
-            u_norm = nn.Norm()(u)
+            u_norm = ops.norm(u)
             u = u / u_norm
 
             u = ops.depend(u, ops.assign(self.weight_u, u))

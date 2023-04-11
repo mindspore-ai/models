@@ -12,7 +12,6 @@ from mindspore import context
 from mindspore import Tensor
 from mindspore import ops
 from mindspore.train.serialization import load_param_into_net
-import mindspore.nn as nn
 import moxing as mox
 
 from src.utils import Logger
@@ -104,14 +103,13 @@ def test(model, queryloader, galleryloader, ranks):
 
     qf, q_pids, q_camids, lqf, gf, g_pids, g_camids, lgf = cal(model, queryloader, galleryloader)
     # feature normlization
-    m_norm = nn.Norm(axis=-1, keep_dims=True)
     broadcast_toq = ops.BroadcastTo(qf.shape)
     broadcast_tog = ops.BroadcastTo(gf.shape)
 
-    m_qf = m_norm(qf)
+    m_qf = ops.norm(qf, dim=-1, keepdim=True)
     m_qf = broadcast_toq(m_qf)
     qf = 1. * qf / (m_qf + 1e-12)
-    m_gf = m_norm(gf)
+    m_gf = ops.norm(gf, dim=-1, keepdim=True)
     m_gf = broadcast_tog(m_gf)
     gf = 1. * gf / (m_gf + 1e-12)
 

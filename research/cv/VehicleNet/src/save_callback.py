@@ -17,13 +17,13 @@ import time
 import numpy as np
 
 import mindspore
-import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore import Tensor
 from mindspore import save_checkpoint
 from mindspore.train.callback import Callback
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.re_ranking import re_ranking
+
 
 def fliplr(x):
     """flip horizontally
@@ -32,10 +32,10 @@ def fliplr(x):
         x[i] = np.transpose(np.fliplr(np.transpose(x[i], (0, 2, 1))), (0, 2, 1))
     return x
 
+
 def extract_feature(model, dataset):
     """feature extract
     """
-    norm = nn.Norm(axis=1, keep_dims=True)
     div = ops.Div()
 
     image_size = dataset.get_dataset_size()
@@ -59,11 +59,12 @@ def extract_feature(model, dataset):
             outputs = model(img)
             ff += outputs
 
-        fnorm = norm(ff)
+        fnorm = ops.norm(ff, dim=1, keepdim=True)
         ff = div(ff, fnorm.expand_as(ff))
         features[idx] = ff.asnumpy()
 
     return features, label, camera
+
 
 def calculate_result_rerank(test_feature, test_label, test_camera, query_feature, query_label, query_camera, k1=100, k2=15, lambda_value=0):
     """accuracy calculation
@@ -109,6 +110,7 @@ def evaluate(score, query_label, query_camera, test_label, test_camera):
 
     return CMC_tmp
 
+
 def compute_mAP(index, good_index, junk_index):
     """compute mAP
     """
@@ -144,6 +146,7 @@ def compute_mAP(index, good_index, junk_index):
 
     return ap, cmc
 
+
 def get_base_param(load_ckpt_path):
     par_dict = load_checkpoint(load_ckpt_path)
     new_params_dict = {}
@@ -151,6 +154,7 @@ def get_base_param(load_ckpt_path):
         if 'classifier' not in name:
             new_params_dict[name] = par_dict[name]
     return new_params_dict
+
 
 class SaveCallback(Callback):
     """SaveCallback"""

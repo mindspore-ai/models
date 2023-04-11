@@ -20,6 +20,7 @@ from PIL import Image
 import mindspore
 from mindspore import context
 import mindspore.nn as nn
+import mindspore.ops as ops
 from mindspore import Tensor
 from mindspore.communication.management import init, get_group_size
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -31,6 +32,7 @@ from src.model_utils.device_adapter import get_rank_id, get_device_id
 from src.model_utils.matlab_cp2tform import get_similarity_transform_for_cv2
 import cv2
 
+
 def KFold(n=6000, n_folds=10, shuffle=False):
     folds = []
     base = list(range(n))
@@ -39,6 +41,7 @@ def KFold(n=6000, n_folds=10, shuffle=False):
         train = list(set(base)-set(ktest))
         folds.append([train, ktest])
     return folds
+
 
 def alignment(src_img, src_pts):
     ref_pts = [[30.2946, 51.6963], [65.5318, 51.5014],
@@ -52,6 +55,7 @@ def alignment(src_img, src_pts):
     face_img = cv2.warpAffine(src_img, tfm, crop_size)
     return face_img
 
+
 def eval_acc(threshold, diff):
     y_true = []
     y_predict = []
@@ -64,6 +68,7 @@ def eval_acc(threshold, diff):
     accuracy = 1.0*np.count_nonzero(y_true == y_predict)/len(y_true)
     return accuracy
 
+
 def find_best_threshold(thresholds, predicts):
     best_threshold = best_acc = 0
     for threshold in thresholds:
@@ -72,6 +77,7 @@ def find_best_threshold(thresholds, predicts):
             best_acc = accuracy
             best_threshold = threshold
     return best_threshold
+
 
 class ParameterReduce(nn.Cell):
     """
@@ -87,6 +93,7 @@ class ParameterReduce(nn.Cell):
         out = x * one
         ret = self.reduce(out)
         return ret
+
 
 class getImg():
     def __init__(self, datatxt_src, pairtxt_src, datasrc, net):
@@ -110,7 +117,6 @@ class getImg():
             name1list = []
             name2list = []
             reshape = mindspore.ops.Reshape()
-            normnet = mindspore.nn.Norm(axis=1)
             for j in range(self.batchsize):
                 p = pairs_lines[i * self.batchsize + j].replace('\n', '').split('\t')
                 if len(p) == 3:
@@ -148,14 +154,15 @@ class getImg():
                 output1 = reshape(output1, (1, -1))
                 output2 = reshape(output2, (1, -1))
                 cosdistance = mindspore.ops.tensor_dot(output1, output2, (1, 1))
-                norm1 = normnet(output1)
-                norm2 = normnet(output2)
+                norm1 = ops.norm(output1, dim=1)
+                norm2 = ops.norm(output2, dim=1)
                 cosdistance = cosdistance / (norm1 * norm2 + 1e-5)
                 cosdistance = float(cosdistance.asnumpy())
                 self.predict.append('{}\t{}\t{}\t{}\n'.format(name1list[k], name2list[k], cosdistance, samelist[k]))
 
     def getresult(self):
         return self.predict
+
 
 def test():
     config.image_size = list(map(int, config.image_size.split(',')))
@@ -208,7 +215,7 @@ def test():
         if config.enable_modelarts:
             images_dir = '/cache/dataset/device' + os.getenv("DEVICE_ID")
             os.system('cd %s ; tar -xvf lfw.tar' % (images_dir))
-            datasrc = images_dir +'/'
+            datasrc = images_dir + '/'
             pairtxt_src = datasrc + 'pairs.txt'
             datatxt_src = datasrc + 'lfw_landmark.txt'
         ImgOut = getImg(datatxt_src, pairtxt_src, datasrc, network)

@@ -17,6 +17,7 @@ import mindspore.ops.operations as P
 from mindspore import dtype as mstype
 from mindspore import nn, Tensor, ops
 
+
 class GradientWithInput(nn.Cell):
     """Get Discriminator Gradient with Input"""
 
@@ -48,6 +49,7 @@ class WGANGPGradientPenalty(nn.Cell):
         self.uniformreal = ops.UniformReal()
         self.shape = (1, 1, 1, 1)
         self.sens = sens
+
     def construct(self, x_real, x_fake):
         """get gradient penalty"""
         alpha = self.uniformreal(self.shape)
@@ -57,7 +59,7 @@ class WGANGPGradientPenalty(nn.Cell):
         sens = P.Fill()(loss.dtype, loss.shape, self.sens)
         gradient = self.gradient_op(self.GradientWithInput)(x_hat, sens)
         gradient = gradient / self.sens
-        gradient_penalty = ops.ReduceMean()((nn.Norm(1)(gradient) - 1) ** 2)
+        gradient_penalty = ops.ReduceMean()((ops.norm(gradient, dim=1) - 1) ** 2)
 
         return gradient_penalty
 

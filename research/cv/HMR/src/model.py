@@ -114,8 +114,6 @@ class SMPL(nn.Cell):
         self.div = ops.Div()
         self.cos = ops.Cos()
         self.sin = ops.Sin()
-        self.net_1 = nn.Norm(axis=1)
-        self.net_2 = nn.Norm(axis=1, keep_dims=True)
         self.sub = ops.Sub()
         self.zeros = ops.Zeros()
         self.batch_size = config.batch_size + config.batch_3d_size
@@ -147,7 +145,6 @@ class SMPL(nn.Cell):
                                              self.type)))
             return self.op_2((self.R_homo, t_homo))
 
-        #
         A0 = make_A(root_rotation, Js[:, 0])
 
         results = [A0]
@@ -178,7 +175,7 @@ class SMPL(nn.Cell):
             Rotation matrix corresponding to the quaternion -- size = [B, 3, 3]
         """
         norm_quat = quat
-        norm_quat = norm_quat / self.net_2(norm_quat)
+        norm_quat = norm_quat / self.net_2(norm_quat, dim=1, keepdim=True)
         w, x, y, z = norm_quat[:, 0], norm_quat[:,
                                                 1], norm_quat[:,
                                                               2], norm_quat[:,
@@ -200,7 +197,7 @@ class SMPL(nn.Cell):
 
     def batch_rodrigues(self, theta):
 
-        l1norm = self.net_1(theta + 1e-8)
+        l1norm = self.net_1(theta + 1e-8, dim=1)
         angle = self.expand_dims(l1norm, -1)
         normalized = self.div(theta, angle)
         angle = angle * 0.5
@@ -715,10 +712,8 @@ class Discriminator(nn.Cell):
         print('finished create the discriminator modules...')
 
     def quat2mat(self, quat):
-
         norm_quat = quat
-        net = nn.Norm(axis=1, keep_dims=True)
-        norm_quat = norm_quat / net(norm_quat)
+        norm_quat = norm_quat / ops.norm(norm_quat, dim=1, keepdim=True)
         w, x, y, z = norm_quat[:, 0], norm_quat[:,
                                                 1], norm_quat[:,
                                                               2], norm_quat[:,
@@ -741,8 +736,7 @@ class Discriminator(nn.Cell):
         return rotMat
 
     def batch_rodrigues(self, theta):
-        net = nn.Norm(axis=1)
-        l1norm = net(theta + 1e-8)
+        l1norm = ops.norm(theta + 1e-8, dim=1)
         expand_dims = ops.ExpandDims()
         angle = expand_dims(l1norm, -1)
         div = ops.Div()
