@@ -15,6 +15,7 @@
 """YOLACT++ clean up and full release."""
 import mindspore
 import mindspore.nn as nn
+from mindspore import Tensor
 from mindspore import ops as P
 from src.yolact.utils.ms_box_utils import jaccard
 from src.config import yolact_plus_resnet50_config as cfg
@@ -46,7 +47,6 @@ class Detectx(nn.Cell):
         self.cast = P.Cast()
         self.mul = P.Mul()
         self.sort = P.TopK(sorted=True)
-        self.range = nn.Range(80)
         self.expanddims = P.ExpandDims()
         shape = (80, 200)
         self.broadcast_to = P.BroadcastTo(shape)
@@ -160,11 +160,9 @@ class Detectx(nn.Cell):
 
 
         # Assign each kept detection to its corresponding class
-        # classes = nn.Range(num_classes, device=boxes.device)[:, None].expand_as(keep)
-        # classes = nn.Range(num_classes)[:, None].expand_as(keep)
 
-
-        classes = self.broadcast_to(self.expanddims(self.range(), 1))
+        value = P.range(Tensor(0, mindspore.int32), Tensor(80, mindspore.int32), Tensor(1, mindspore.int32))
+        classes = self.broadcast_to(self.expanddims(value, 1))
 
         classes = classes[keep]
         boxes = boxes[keep]

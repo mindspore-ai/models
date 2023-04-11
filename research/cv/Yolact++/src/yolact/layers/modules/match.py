@@ -16,6 +16,7 @@
 import mindspore.ops as P
 import mindspore.nn as nn
 import mindspore
+from mindspore import Tensor
 from src.config import yolact_plus_resnet50_config as cfg
 
 class match(nn.Cell):
@@ -44,8 +45,6 @@ class match(nn.Cell):
 
         self.broadcast_to2 = P.BroadcastTo(shape2)
         self.update = self.expand_dims(mindspore.Tensor(2, mindspore.float16), 0)
-        self.range_op_1 = mindspore.nn.Range(0, 128, 1)
-        self.range_op_2 = mindspore.nn.Range(0, 57744, 1)
 
         self.transpose = P.Transpose()
         self.prem = (1, 0)
@@ -174,8 +173,10 @@ class match(nn.Cell):
         best_truth_overlap = self.cast(best_truth_overlap, mindspore.float16)
         best_truth_idx = self.expand_dims(best_truth_idx, 0)
 
-        x_idx = P.Tile()(P.ExpandDims()(self.range_op_1(), 1), (1, 57744))
-        z_idx = P.Tile()(self.range_op_2(), (128, 1))
+        value1 = P.range(Tensor(0, mindspore.int32), Tensor(128, mindspore.int32), Tensor(1, mindspore.int32))
+        value2 = P.range(Tensor(0, mindspore.int32), Tensor(57744, mindspore.int32), Tensor(1, mindspore.int32))
+        x_idx = P.Tile()(P.ExpandDims()(value1, 1), (1, 57744))
+        z_idx = P.Tile()(value2, (128, 1))
         minus_one = P.OnesLike()(overlaps) * -1
 
         for _ in range(overlaps.shape[0]):

@@ -135,13 +135,15 @@ class PositionalEncodingVector(nn.Cell):
         self.concat = P.Concat(axis=1)
         self.mod = P.Mod()
         self.pad = P.Pad(((0, 0), (0, self.channels % 2)))
+        self.start = Tensor(0, mstype.int32)
+        self.step = Tensor(1, mstype.int32)
 
     def construct(self, x):
         """Generate position code"""
-        position = nn.Range(self.length)()
+        position = P.range(self.start, Tensor(self.length, mstype.int32), self.step)
         log_timescale_increment = (P.log(self.max_timescale / self.min_timescale) / (self.num_timescales - 1))
-        inv_timescales = self.min_timescale * self.exp(
-            nn.Range(self.num_timescales.data)() * -log_timescale_increment)
+        value = P.range(self.start, Tensor(self.num_timescales.data, mstype.int32), self.step)
+        inv_timescales = self.min_timescale * self.exp(value * -log_timescale_increment)
         scaled_time = self.expand_dims(position, 1) * self.expand_dims(inv_timescales, 0)
         signal = self.concat([self.sin(scaled_time), self.cos(scaled_time)])
         signal = self.pad(signal)

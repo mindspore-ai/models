@@ -81,7 +81,7 @@ def _get_feature_by_index(x, p_h, p_w):
     x = x.reshape(-1, c)
 
     # (n)
-    idx_0_n = nn.Range(0, n, 1)()
+    idx_0_n = ops.range(ms.Tensor(0, mstype.int32), ms.Tensor(n, mstype.int32), ms.Tensor(1, mstype.int32))
     # (n, h, w, k*k) + (n, h, w, k*k) + (n, 1, 1, 1) -> (n, h, w, k*k)
     index = p_w + p_h * w_in + idx_0_n.reshape(n, 1, 1, 1) * w_in * h_in
 

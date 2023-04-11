@@ -16,6 +16,7 @@
 import mindspore
 import mindspore.nn as nn
 import mindspore.ops as P
+from mindspore import Tensor
 
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, dilation=1, isReLU=True):
@@ -68,9 +69,9 @@ class FeatureExtractor(nn.Cell):
 # Warping layer ---------------------------------
 def get_grid(x):
     batch_size, height, width, _ = P.Shape()(x)
-    tmp1 = nn.Range(batch_size)()
-    tmp2 = nn.Range(height)()
-    tmp3 = nn.Range(width)()
+    tmp1 = P.range(Tensor(0, mindspore.int32), Tensor(batch_size, mindspore.int32), Tensor(1, mindspore.int32))
+    tmp2 = P.range(Tensor(0, mindspore.int32), Tensor(height, mindspore.int32), Tensor(1, mindspore.int32))
+    tmp3 = P.range(Tensor(0, mindspore.int32), Tensor(width, mindspore.int32), Tensor(1, mindspore.int32))
     inputs = (tmp1, tmp2, tmp3)
     Bg, Yg, Xg = P.Meshgrid(indexing='ij')(inputs)
     return Bg, Yg, Xg
