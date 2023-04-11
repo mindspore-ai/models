@@ -13,10 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
-if [ $# != 3 ]
+if [ $# != 2 ]
 then
-    echo "Usage: bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]"
+    echo "Usage: bash run_standalone_train.sh [CONFIG_PATH] [CUDA_VISIBLE_DEVICES]"
 exit 1
 fi
 
@@ -29,19 +28,19 @@ get_real_path(){
 }
 
 CONFIG_PATH=$(get_real_path $1)
-CKPT_PATH=$(get_real_path $2)
+export CUDA_VISIBLE_DEVICES=$2
 
-if [ -d "eval" ];
+if [ -d "train" ];
 then
-    rm -rf ./eval
+    rm -rf ./train
 fi
 
-mkdir ./eval
-cp ../*.py ./eval
-cp -r ../src ./eval
-cp -r ../config ./eval
-cd ./eval || exit
+mkdir ./train
+cp ../*.py ./train
+cp -r ../src ./train
+cp -r ../config ./train
+cd ./train || exit
 env > env.log
 
-echo "start inferring for device $DEVICE_ID"
-python eval.py --config_path=$CONFIG_PATH --ckpt_path=$CKPT_PATH --device_id=$3 > log.txt 2>&1 &
+echo "start training for device $CUDA_VISIBLE_DEVICES"
+python train.py --config_path=$CONFIG_PATH --device_target='GPU' >log.txt 2>&1 &

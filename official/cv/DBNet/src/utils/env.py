@@ -56,7 +56,7 @@ def init_env(cfg):
             ms.set_auto_parallel_context(all_reduce_fusion_config=cfg.all_reduce_fusion_config)
         cpu_affinity(cfg.rank_id, cfg.device_num)
     else:
-        if hasattr(cfg, "device_id") and isinstance(cfg.device_id, int):
+        if hasattr(cfg, "device_id") and isinstance(cfg.device_id, int) and cfg.device_target == 'Ascend':
             ms.set_context(device_id=cfg.device_id)
         cfg.device_num = 1
         cfg.rank_id = 0
