@@ -92,13 +92,13 @@ backbone:
 Run standalone:
 
 ```shell
-bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [PLATFORM]
+bash run_standalone_train_ascend.sh [CONFIG_PATH] [DEVICE_ID]
 
 # Ascend standalone train resnet18
-bash run_standalone_train.sh ../config/dbnet/config_resnet18_1p.yaml 0 Ascend
+bash run_standalone_train_ascend.sh ../config/dbnet/config_resnet18_1p.yaml 0
 
 # Ascend standalone train resnet50
-bash run_standalone_train.sh ../config/dbnet/config_resnet50_1p.yaml 0 Ascend
+bash run_standalone_train_ascend.sh ../config/dbnet/config_resnet50_1p.yaml 0
 ```
 
 Run distribution:
@@ -116,10 +116,10 @@ bash run_standalone_train.sh hccl_8p.json 8 ../config/dbnet/config_resnet50_8p.y
 Evaluation:
 
 ```shell
-bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
+bash run_eval_ascend.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
 
 # Ascend eval resnet18
-bash run_eval.sh ../config/dbnet/config_resnet18_8p.yaml your_ckpt_path 0
+bash run_eval_ascend.sh ../config/dbnet/config_resnet18_8p.yaml your_ckpt_path 0
 ```
 
 If you need to modify the device or other configurations, please modify the corresponding items in the configuration file.
@@ -129,10 +129,9 @@ If you need to modify the device or other configurations, please modify the corr
 ### Run standalone train
 
 ```shell
-bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [PLATFORM]
+bash run_standalone_train_ascend.sh [CONFIG_PATH] [DEVICE_ID]
 # CONFIG_PATH：The configuration file path is Ascend by default. If you need to modify it, please modify the device_target
 # DEVICE_ID：Card number used for training
-# PLATFORM: Ascend/GPU/CPU
 ```
 
 Executing the above command will run in the background. You can view the results through the train/log.txt file
@@ -169,7 +168,7 @@ If you want to use the resume training function, you only need to resume in the 
 ### evaluation
 
 ```shell
-bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
+bash run_eval_ascend.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
 # CONFIG_PATH: The configuration file path, device target default is Ascend. If you need to modify it, please modify the device in the config file.
 # DEVICE_ID: Device id used for training
 ```

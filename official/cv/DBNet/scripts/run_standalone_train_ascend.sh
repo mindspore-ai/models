@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 3 ]
+if [ $# != 2 ]
 then
-    echo "Usage: bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [PLATFORM]"
+    echo "Usage: bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID]"
 exit 1
 fi
 
@@ -43,4 +43,4 @@ cd ./train || exit
 env > env.log
 
 echo "start training for device $DEVICE_ID"
-python train.py --config_path=$CONFIG_PATH --device_id=$2 --device_target=$3 >log.txt 2>&1 &
+python train.py --config_path=$CONFIG_PATH --device_id=$2 --device_target='Ascend' >log.txt 2>&1 &
