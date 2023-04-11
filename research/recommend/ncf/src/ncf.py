@@ -41,6 +41,9 @@ class DenseLayer(nn.Cell):
         assert isinstance(in_channels, int) and in_channels > 0, "in_channels should be bigger than 0"
         assert isinstance(out_channels, int) and out_channels > 0, "out_channels should be bigger than 0"
         assert isinstance(has_bias, bool), "has_bias should be bool"
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.has_bias = has_bias
 
         if isinstance(weight_init, Tensor):
             if weight_init.ndim != 2 or weight_init.shape()[0] != out_channels or \
