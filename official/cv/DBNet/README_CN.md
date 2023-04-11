@@ -94,13 +94,13 @@ backbone:
 单卡训练：
 
 ```shell
-bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [PLATFORM]
+bash run_standalone_train_ascend.sh [CONFIG_PATH] [DEVICE_ID]
 
 # Ascend 单卡训练resnet18
-bash run_standalone_train.sh ../config/dbnet/config_resnet18_1p.yaml 0 Ascend
+bash run_standalone_train_ascend.sh ../config/dbnet/config_resnet18_1p.yaml 0
 
 # Ascend 单卡训练resnet50
-bash run_standalone_train.sh ../config/dbnet/config_resnet50_1p.yaml 0 Ascend
+bash run_standalone_train_ascend.sh ../config/dbnet/config_resnet50_1p.yaml 0
 ```
 
 多卡训练：
@@ -118,10 +118,10 @@ bash run_standalone_train.sh hccl_8p.json 8 ../config/dbnet/config_resnet50_8p.y
 推理评估：
 
 ```shell
-bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
+bash run_eval_ascend.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
 
 # Ascend 推理resnet18
-bash run_eval.sh ../config/dbnet/config_resnet18_8p.yaml your_ckpt_path 0
+bash run_eval_ascend.sh ../config/dbnet/config_resnet18_8p.yaml your_ckpt_path 0
 ```
 
 如需修改device或者其他配置，请对应修改配置文件里的对应项。
@@ -131,10 +131,9 @@ bash run_eval.sh ../config/dbnet/config_resnet18_8p.yaml your_ckpt_path 0
 ### 单卡训练
 
 ```shell
-bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [PLATFORM]
+bash run_standalone_train_ascend.sh [CONFIG_PATH] [DEVICE_ID]
 # CONFIG_PATH：配置文件路径，默认使用Ascend，如需修改请在config文件里修改 device_target
 # DEVICE_ID：执行训练使用的卡号
-# PLATFORM: Ascend/GPU/CPU
 ```
 
 执行上述命令将在后台运行，您可以通过train/log.txt文件查看结果。
@@ -171,7 +170,7 @@ bash run_distribution_train.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
 ### 推理评估
 
 ```shell
-bash run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
+bash run_eval_ascend.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
 # CONFIG_PATH：配置文件路径，默认使用Ascend，如需修改请在config文件里修改 device_target
 # DEVICE_ID：执行推理使用的卡号
 ```
