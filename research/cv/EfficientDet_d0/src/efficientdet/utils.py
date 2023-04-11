@@ -20,7 +20,8 @@ import mindspore.common.dtype as mstype
 from mindspore import Tensor
 from mindspore import ops as op
 
-class box_encoder(nn.Cell):
+
+class BoxEncoder(nn.Cell):
     """ encode box to xywh """
     def __init__(self):
         super().__init__()
@@ -59,12 +60,14 @@ class Anchors(nn.Cell):
         self.meshgrid = op.Meshgrid(indexing="xy")
         self.scalar_cast = op.ScalarCast()
         self.tile = op.Tile()
-        self.box_enchor = box_encoder()
+        self.box_enchor = BoxEncoder()
         self.reshape = op.Reshape()
 
         self._range = []
         for i in range(5):
-            self._range.append(nn.Range(self.strides[i] / 2, 512, self.strides[i]))
+            self._range.append(op.range(Tensor(self.strides[i] / 2, mstype.int32),
+                                        Tensor(512, mstype.int32),
+                                        Tensor(self.strides[i], mstype.int32)))
 
 
     def construct(self, image):

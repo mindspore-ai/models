@@ -19,6 +19,7 @@ Deformable Convolution operator V2
 import mindspore.nn as nn
 import mindspore.ops as ops
 import mindspore.common.dtype as mstype
+from mindspore import Tensor
 
 class ClipByValue(nn.Cell):
     """
@@ -52,7 +53,6 @@ class GetOffsetPosition(nn.Cell):
     """
     def __init__(self, begin, stride):
         super(GetOffsetPosition, self).__init__()
-        self.begin = begin
         self.stride = stride
         self.meshgrid = ops.Meshgrid()
         self.shape = ops.Shape()
@@ -61,7 +61,11 @@ class GetOffsetPosition(nn.Cell):
         self.cat_a1 = ops.Concat(axis=1)
         self.tile = ops.Tile()
         self.dtype = ops.DType()
-        self.range = nn.Range(-self.begin, self.begin + 1)
+        self.start = Tensor(-begin, mstype.int32)
+        self.end = Tensor(begin + 1, mstype.int32)
+        self.delta = Tensor(1, mstype.int32)
+        self.begin = Tensor(begin, mstype.int32)
+        self.stride = Tensor(stride, mstype.int32)
         self.cast = ops.Cast()
 
     def construct(self, offset):
@@ -69,15 +73,15 @@ class GetOffsetPosition(nn.Cell):
         offset_shape = self.shape(offset) # b * 2N * h * w
         n, h, w = offset_shape[1] // 2, offset_shape[2], offset_shape[3]
         # get p_n
-        range_pn = self.range()
+        range_pn = ops.range(self.start, self.end, self.delta)
         p_n_x, p_n_y = self.meshgrid((range_pn, range_pn))
         # (2N, 1)
         p_n = self.cat_a0((self.reshape(p_n_x, (n, 1)), self.reshape(p_n_y, (n, 1))))
         p_n = self.reshape(p_n, (1, 2 * n, 1, 1))
 
         # get p_0
-        range_h = nn.Range(self.begin, h*self.stride + 1, self.stride)()
-        range_w = nn.Range(self.begin, w*self.stride + 1, self.stride)()
+        range_h = ops.range(self.begin, h * self.stride + 1, self.stride)
+        range_w = ops.range(self.begin, w * self.stride + 1, self.stride)
         p_0_x, p_0_y = self.meshgrid((range_h, range_w))
         p_0_x = self.reshape(p_0_x, (1, 1, h, w))
         p_0_x = self.tile(p_0_x, (1, n, 1, 1))
@@ -112,6 +116,8 @@ class GetSurroundFeature(nn.Cell):
         self.perm_list = (0, 2, 3, 1)
         self.order_list = (0, 3, 1, 2)
         self.expand_dims = ops.ExpandDims()
+        self.start = Tensor(0, mstype.int32)
+        self.delta = Tensor(1, mstype.int32)
 
     def construct(self, x, q_h, q_w):
         """gather feature by specified index"""
@@ -125,7 +131,7 @@ class GetSurroundFeature(nn.Cell):
         # (b * hwN)
         q = q_h * w_p + q_w
         q = self.reshape(q, (-1, 1))
-        ind_b = nn.Range(0, b, 1)()
+        ind_b = ops.range(self.start, Tensor(b, mstype.int32), self.delta)
         ind_b = self.reshape(ind_b, (-1, 1))
         ind_b = self.tile(ind_b, (1, hwn))
         ind_b = self.reshape(ind_b, (-1, 1))

@@ -18,7 +18,9 @@ import numpy as np
 import mindspore.nn as nn
 import mindspore.common.dtype as mstype
 from mindspore.ops import operations as P
+from mindspore.ops import function as F
 from mindspore.common.tensor import Tensor
+
 
 class BboxAssignSampleForRcnn(nn.Cell):
     """
@@ -107,10 +109,10 @@ class BboxAssignSampleForRcnn(nn.Cell):
         self.concat_last_axis = P.Concat(axis=-1)
         self.round = P.Round()
         self.image_h_w = Tensor([cfg.img_height, cfg.img_width, cfg.img_height, cfg.img_width], dtype=mstype.float16)
-        self.range = nn.Range(start=0, limit=cfg.num_expected_pos_stage2)
         self.crop_and_resize = P.CropAndResize(method="bilinear_v2")
         self.mask_shape = (cfg.mask_shape[0], cfg.mask_shape[1])
         self.squeeze_mask_last = P.Squeeze(axis=-1)
+
     def construct(self, gt_bboxes_i, gt_labels_i, valid_mask, bboxes, gt_valids, gt_masks_i):
         """assign forward for the second stage"""
         gt_bboxes_i = self.select(self.cast(self.tile(self.reshape(self.cast(gt_valids, mstype.int32), \
@@ -198,7 +200,9 @@ class BboxAssignSampleForRcnn(nn.Cell):
         boxes = self.concat_last_axis((y1, x1, y2, x2))
         # normalized box coordinate
         boxes = boxes / self.image_h_w
-        box_ids = self.range()
+        box_ids = F.range(Tensor(0, mstype.int32),
+                          Tensor(cfg.num_expected_pos_stage2, mstype.int32),
+                          Tensor(1, mstype.int32))
         pos_masks_fb = self.expand_dims(pos_masks_fb, -1)
         boxes = self.cast(boxes, mstype.float32)
         pos_masks_fb = self.crop_and_resize(pos_masks_fb, boxes, box_ids, self.mask_shape)

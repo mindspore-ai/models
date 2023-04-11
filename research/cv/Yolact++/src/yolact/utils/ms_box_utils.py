@@ -16,6 +16,7 @@
 import mindspore
 import mindspore.ops as P
 import mindspore.nn as nn
+from mindspore import Tensor
 
 
 def point_form(boxes):
@@ -223,24 +224,15 @@ def match(pos_thresh, neg_thresh, truths, priors, labels, loc_t, conf_t, idx_t, 
         # In effect, this will loop through overlaps.size(0) in a "smart" order,
         # always choosing the highest overlap first.
         best_prior_idx, best_prior_overlap = P.ArgMaxWithValue(1)(overlaps)
-        # best_prior_overlap, best_prior_idx = max(overlaps, 1)
-        # j = best_prior_overlap.max(0)[1]
-
         cast = P.Cast()
-        # best_prior_overlap = cast(best_prior_overlap, mindspore.float32)
-
         idx_j, _ = P.ArgMaxWithValue(0)(best_prior_overlap)
         # Find i, the highest overlap anchor with this gt
 
-        # j = cast(j, mindspore.int32)
         i = best_prior_idx[idx_j]
 
-        # i = cast(i, mindspore.int32)
-        # idx_j = cast(idx_j, mindspore.int32)
         # Set all other overlaps with i to be -1 so that no other gt uses it
         overlaps[:, i] = mindspore.ops.ScalarCast()(-1, mindspore.float32)
         # Set all other overlaps with j to be -1 so that this loop never uses j again
-        # overlaps[j, :] = -1
         overlaps[idx_j, :] = mindspore.ops.ScalarCast()(-1, mindspore.float32)
 
         best_truth_overlap[i] = mindspore.ops.ScalarCast()(2, mindspore.float32)
@@ -549,11 +541,14 @@ def crop(masks, boxes, padding: int = 1):
     y1, y2 = sanitize_coordinates(boxes[:, 1:2:1], boxes[:, 3:4:1], h, padding, cast=False)
 
     cast = P.Cast()
-    crop_range = nn.Range(w)
     broadcast_to = P.BroadcastTo((h, w, n))
-    row = broadcast_to((crop_range().view(1, -1, 1)))
+    row = broadcast_to((P.range(Tensor(0, mindspore.int32),
+                                Tensor(w, mindspore.int32),
+                                Tensor(1, mindspore.int32)).view(1, -1, 1)))
     rows = cast(row, x1.dtype)
-    col = broadcast_to((crop_range().view(-1, 1, 1)))
+    col = broadcast_to((P.range(Tensor(0, mindspore.int32),
+                                Tensor(w, mindspore.int32),
+                                Tensor(1, mindspore.int32)).view(-1, 1, 1)))
     cols = cast(col, x2.dtype)
 
 
@@ -581,9 +576,10 @@ def index2d(src, idx):
 
     Both src and idx should have the same size.
     """
-    temp_range = nn.Range(idx.shape[0])
     broadcast_to = P.BroadcastTo(idx.shape)
-    offs = broadcast_to(temp_range()[:, None])
+    offs = broadcast_to(P.range(Tensor(0, mindspore.int32),
+                                Tensor(idx.shape[0], mindspore.int32),
+                                Tensor(1, mindspore.int32))[:, None])
     idx = idx + (offs()) * idx.shape[1]
 
     return src.view(-1)[idx.view(-1)].view(idx.shpe)

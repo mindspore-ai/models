@@ -18,8 +18,10 @@ from mindspore import Tensor
 from mindspore import dtype as mstype
 import mindspore
 from mindspore.ops import operations as P
+from mindspore.ops import function as F
 
 from src.DualGCNNet import DualSeg_res101
+
 
 def masked_fill(x, mask, value):
     mul = mindspore.ops.Mul()
@@ -83,6 +85,8 @@ class OhemCrossEntropy2dTensor(nn.Cell):
         self.cast = P.Cast()
         self.min = mindspore.ops.Minimum()
         self.max = mindspore.ops.Maximum()
+        self.start = Tensor(0, mstype.int32)
+        self.delta = Tensor(1, mstype.int32)
 
     def construct(self, pred, target):
         """construct"""
@@ -100,7 +104,7 @@ class OhemCrossEntropy2dTensor(nn.Cell):
             pass
         elif num_valid > 0:
             prob = masked_fill(prob, ~valid_mask, 1)
-            ran = nn.Range(start=0, limit=len(target), delta=1)
+            ran = F.range(self.start, Tensor(len(target), mstype.int32), self.delta)
             t = ran().astype("int64")
             mask_prob = prob[target.astype("int64"), t]
             threshold = self.thresh

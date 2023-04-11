@@ -277,9 +277,13 @@ class ModelWithLossCellDis(nn.Cell):
         # avoid using dynamic shapes
         self.zero = Tensor(0, mstype.int32)
         self.limit_low_dim = Tensor(args.low_dim, mstype.int32)
-        self.base = nn.Range(start=0, limit=args.batch_size * args.unlabel_label * args.device_num)()
-        self.base_xu = nn.Range(start=0,
-                                limit=(args.batch_size + args.batch_size * args.unlabel_label) * args.device_num)()
+        self.base = ops.range(Tensor(0, mstype.int32),
+                              Tensor(args.batch_size * args.unlabel_label * args.device_num, mstype.int32),
+                              Tensor(1, mstype.int32))
+        self.base_xu = ops.range(Tensor(0, mstype.int32),
+                                 Tensor((args.batch_size + args.batch_size * args.unlabel_label) * args.device_num,
+                                        mstype.int32),
+                                 Tensor(1, mstype.int32))
 
     def generate_row_index(self, batch_size, dim):
         row_index = ops.Range()(self.zero, dim, self.delta)

@@ -21,7 +21,8 @@ import mindspore.common.dtype as mstype
 from mindspore import numpy as np
 import mindspore.ops as op
 from mindspore import Tensor
-from src.efficientdet.utils import box_encoder
+from src.efficientdet.utils import BoxEncoder
+
 
 class Maximum(nn.Cell):
     """ maximum op """
@@ -42,6 +43,7 @@ class Maximum(nn.Cell):
 
         return self.max(a, b)
 
+
 class Minimum(nn.Cell):
     """ minimum op"""
     def __init__(self):
@@ -58,6 +60,7 @@ class Minimum(nn.Cell):
         b = self.expand_dims(self.squeeze(b), 0)
         b = self.tile_op(b, (49104, 1))
         return self.min(a, b)
+
 
 class IOU(nn.Cell):
     """ iou """
@@ -92,6 +95,7 @@ class IOU(nn.Cell):
 
         return IoU
 
+
 class FocalLoss(nn.Cell):
     """ focal loss for efficientdet"""
 
@@ -109,7 +113,7 @@ class FocalLoss(nn.Cell):
         self.max_value1 = Tensor(1.0 - 1e-4, mindspore.float32)
         self.tile = P.Tile()
         self.expand_dims = op.ExpandDims()
-        self.box_encoder = box_encoder()
+        self.box_encoder = BoxEncoder()
         self.reduce_sum = P.ReduceSum(keep_dims=True)
         self.argmaxwithvalue = op.ArgMaxWithValue(axis=2, keep_dims=True)
         self.iou = IOU()
@@ -138,7 +142,6 @@ class FocalLoss(nn.Cell):
     def construct(self, regressions, classifications, anchor, annotations):
         """ loss calc """
 
-        # print('----------------------Focal cls loss-----------------------')
         alpha = 0.25
         gamma = 2.0
         batch_size = classifications.shape[0]
