@@ -84,7 +84,7 @@ def _check_param_value(beta1, beta2, eps, weight_decay, prim_name):
     assert isinstance(beta1, float), "beta1 should be float"
     assert isinstance(beta2, float), "beta2 should be float"
     assert isinstance(eps, float), "eps should be float"
-    assert isinstance(weight_dacay, float), "weight_dacay should be float"
+    assert isinstance(weight_decay, float), "weight_decay should be float"
 
 
 def _check_learning_rate_value(learning_rate, end_learning_rate, decay_steps, power, prim_name):
@@ -222,7 +222,6 @@ class Adam(Optimizer):
         self.sqrt = P.Sqrt()
         self.one = Tensor(np.array([1.0]).astype(np.float32))
         self.realdiv = P.RealDiv()
-
 
     def construct(self, gradients):
         """Adam optimizer."""
