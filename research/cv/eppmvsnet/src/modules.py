@@ -24,6 +24,7 @@ from mindspore import Tensor
 from mindspore.ops import constexpr
 from mindspore.ops import operations as P
 from mindspore.ops import composite as C
+from mindspore.ops import function as F
 
 
 @constexpr
@@ -395,7 +396,7 @@ def soft_argmin(volume, dim, keepdim=False, window=None):
     softmax = nn.Softmax(1)
     prob_vol = softmax(volume)
     length = volume.shape[dim]
-    index = nn.Range(0, length)()
+    index = F.range(Tensor(0, mstype.int32), Tensor(length, mstype.int32), Tensor(1, mstype.int32))
     index_shape = []
     for i in range(len(volume.shape)):
         if i == dim:

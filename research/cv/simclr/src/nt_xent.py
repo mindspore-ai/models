@@ -57,7 +57,6 @@ class NT_Xent_Loss(nn.Cell):
         self.criterion = CrossEntropyLoss(reduction="mean")
         self.norm = P.L2Normalize(axis=1)
         self.one_hot = P.OneHot()
-        self.range = nn.Range(0, self.batch_size)
         self.one = Tensor(1.0, mstype.float32)
         self.zero = Tensor(0.0, mstype.float32)
         self.transpose = P.Transpose()
@@ -75,7 +74,7 @@ class NT_Xent_Loss(nn.Cell):
         hidden2 = self.norm(z_j)
         hidden1_large = hidden1
         hidden2_large = hidden2
-        ones_mask = self.range()
+        ones_mask = P.range(self.zero, Tensor(self.batch_size, mstype.int32), self.one)
         zeros_mask = self.zeros((self.batch_size, self.batch_size), mstype.float32)
         masks = self.one_hot(ones_mask, self.batch_size, self.one, self.zero)
         labels = self.cat1((masks, zeros_mask))

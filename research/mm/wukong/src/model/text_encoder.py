@@ -17,6 +17,7 @@ import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore import dtype as mstype
 from mindspore.ops import operations as P
+from mindspore.ops import function as F
 from mindspore import Parameter, Tensor
 from mindspore.common.initializer import TruncatedNormal, initializer
 
@@ -160,7 +161,7 @@ class BERT_Wukong(nn.Cell):
         x = x.transpose(1, 0, 2)
         x = self.ln_final(x)
         if not self.return_full_embed:
-            x = x[nn.Range(x.shape[0])(),
+            x = x[F.range(Tensor(0, mstype.int32), Tensor(x.shape[0], mstype.int32), Tensor(1, mstype.int32)),
                   self.cast(self.cast(text != 0, mstype.float32).sum(axis=-1), mstype.int32) - 1]
         x = ops.matmul(x, self.text_projection)
         return x
