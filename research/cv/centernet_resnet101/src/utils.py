@@ -70,6 +70,8 @@ class GatherFeature(nn.Cell):
         self.concat = ops.Concat(axis=1)
         self.reshape = ops.Reshape()
         self.enable_cpu_gather = enable_cpu_gather
+        self.start = Tensor(0, mstype.int32)
+        self.step = Tensor(1, mstype.int32)
         if self.enable_cpu_gather:
             self.gather_nd = ops.GatherD()
             self.expand_dims = ops.ExpandDims()
@@ -88,7 +90,7 @@ class GatherFeature(nn.Cell):
             # (b, N)->(b*N, 1)
             b, N = self.shape(ind)
             ind = self.reshape(ind, (-1, 1))
-            ind_b = nn.Range(0, b, 1)()
+            ind_b = ops.range(self.start, Tensor(b, mstype.int32), self.step)
             ind_b = self.reshape(ind_b, (-1, 1))
             ind_b = self.tile(ind_b, (1, N))
             ind_b = self.reshape(ind_b, (-1, 1))
@@ -195,7 +197,7 @@ class FocalLoss(nn.Cell):
         return loss
 
 
-class RegLoss(nn.Cell): #reg_l1_loss
+class RegLoss(nn.Cell):
     """
     Warpper for regression loss.
 
@@ -350,7 +352,6 @@ class CenterNetMultiEpochsDecayLR(LearningRateSchedule):
             lr = (self.one - is_warmup) * decay_lr + is_warmup * warmup_lr
         else:
             lr = decay_lr
-        # print('CenterNetMultiEpochsDecayLR:',lr.dtype)
         return lr
 
 

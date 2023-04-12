@@ -16,8 +16,10 @@
 Functional Cells to be used.
 """
 
+import mindspore as ms
 import mindspore.nn as nn
 import mindspore.ops as ops
+from mindspore import Tensor
 
 
 class GatherFeature(nn.Cell):
@@ -37,13 +39,15 @@ class GatherFeature(nn.Cell):
         self.concat = ops.Concat(axis=1)
         self.reshape = ops.Reshape()
         self.gather_nd = ops.GatherNd()
+        self.start = Tensor(0, ms.int32)
+        self.delta = Tensor(1, ms.int32)
 
     def construct(self, feat, ind):
         """gather by specified index"""
         # (b, N)->(b*N, 1)
         b, N = self.shape(ind)
         ind = self.reshape(ind, (-1, 1))
-        ind_b = nn.Range(0, b, 1)()
+        ind_b = ops.range(self.start, Tensor(b, ms.int32), self.delta)
         ind_b = self.reshape(ind_b, (-1, 1))
         ind_b = self.tile(ind_b, (1, N))
         ind_b = self.reshape(ind_b, (-1, 1))
