@@ -34,7 +34,7 @@ MindSpore models仓中提供了不同任务领域，经典的SOTA模型实现和
 | 推荐 | 推荐系统 | [naml](https://gitee.com/mindspore/models/tree/master/research/recommend/naml) |✅| ✅ |   |
 | 推荐 | 推荐系统 | [ncf](https://gitee.com/mindspore/models/tree/master/research/recommend/ncf) |✅| ✅ |   |
 | 推荐 | 推荐系统 | [tbnet](https://gitee.com/mindspore/models/tree/master/official/recommend/Tbnet) |✅| ✅ |   |
-| 图像 | 图像分类 | [alexnet](https://gitee.com/mindspore/models/tree/master/official/cv/Alexnet) |✅| ✅ |   |
+| 图像 | 图像分类 | [alexnet](https://gitee.com/mindspore/models/tree/master/research/cv/Alexnet) |✅| ✅ |   |
 | 图像 | 图像去噪 | [brdnet](https://gitee.com/mindspore/models/tree/master/research/cv/brdnet) |✅|   |   |
 | 图像 | 目标检测 | [centerface](https://gitee.com/mindspore/models/tree/master/research/cv/centerface) |✅| ✅ | ✅ |
 | 图像 | 图像分类 | [cnn_direction_model](https://gitee.com/mindspore/models/tree/master/research/cv/cnn_direction_model) |✅| ✅ |   |
