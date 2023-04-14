@@ -39,11 +39,9 @@ def _update_run_kernel(opt, clip_value, beta1, beta2, eps, lr, weight_decay,
     success = True
     if optim_filter:
         if decay_flags:
-            next_param = opt(param, m, v, lr, beta1, beta2, eps, weight_decay,
-                             P.Cast()(gradient, mstype.float16), clip_value)
+            next_param = opt(param, m, v, lr, beta1, beta2, eps, weight_decay, gradient, clip_value)
         else:
-            next_param = opt(param, m, v, lr, beta1, beta2, eps, 0.0,
-                             P.Cast()(gradient, mstype.float16), clip_value)
+            next_param = opt(param, m, v, lr, beta1, beta2, eps, 0.0, gradient, clip_value)
         return F.depend(success, next_param)
     return success
 
