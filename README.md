@@ -34,7 +34,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Recommendation | Recommender System | [naml](https://gitee.com/mindspore/models/tree/master/research/recommend/naml) |✅| ✅ |   |
 | Recommendation | Recommender System | [ncf](https://gitee.com/mindspore/models/tree/master/research/recommend/ncf) |✅| ✅ |   |
 | Recommendation | Recommender System | [tbnet](https://gitee.com/mindspore/models/tree/master/official/recommend/Tbnet) |✅| ✅ |   |
-| Image | Image Classification | [alexnet](https://gitee.com/mindspore/models/tree/master/official/cv/Alexnet) |✅| ✅ |   |
+| Image | Image Classification | [alexnet](https://gitee.com/mindspore/models/tree/master/research/cv/Alexnet) |✅| ✅ |   |
 | Image | Image Denoise | [brdnet](https://gitee.com/mindspore/models/tree/master/research/cv/brdnet) |✅|   |   |
 | Image | Object Detection | [centerface](https://gitee.com/mindspore/models/tree/master/research/cv/centerface) |✅| ✅ | ✅ |
 | Image | Image Classification | [cnn_direction_model](https://gitee.com/mindspore/models/tree/master/research/cv/cnn_direction_model) |✅| ✅ |   |
