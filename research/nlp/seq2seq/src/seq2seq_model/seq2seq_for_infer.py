@@ -21,19 +21,13 @@ import mindspore.nn as nn
 import mindspore.common.dtype as mstype
 from mindspore.common.tensor import Tensor
 from mindspore.ops import operations as P
-from mindspore import context, Parameter
+from mindspore import Parameter
 from mindspore.train.model import Model
 
 from src.dataset import load_dataset
 from .seq2seq import Seq2seqModel
 from ..utils import zero_weight
 from ..utils.load_weights import load_infer_weights
-
-context.set_context(
-    mode=context.GRAPH_MODE,
-    save_graphs=False,
-    device_target="Ascend",
-    reserve_class_name_in_scope=False)
 
 
 class Seq2seqInferCell(nn.Cell):
