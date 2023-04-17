@@ -132,6 +132,7 @@ class LabelSmoothedCrossEntropyCriterion(nn.Cell):
         """
         prediction_scores = self.reshape(prediction_scores, (-1, self.vocab_size))
         label_ids = self.reshape(label_ids, (-1, 1))
+        label_ids = F.select(label_ids < self.vocab_size, label_ids, Tensor(0, mstype.int32))
         label_weights = self.reshape(label_weights, (-1,))
         tmp_gather_indices = self.concat((self.index_ids, label_ids))
         nll_loss = self.neg(self.gather_nd(prediction_scores, tmp_gather_indices))
