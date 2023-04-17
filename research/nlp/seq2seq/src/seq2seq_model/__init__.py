@@ -19,6 +19,7 @@ from .seq2seq_for_train import Seq2seqTraining, LabelSmoothedCrossEntropyCriteri
     Seq2seqNetworkWithLoss, Seq2seqTrainOneStepWithLossScaleCell
 from .bleu_calculate import bleu_calculate
 from .seq2seq_for_infer_onnx import infer_onnx
+from .seq2seq_for_infer import infer
 
 __all__ = [
     "Seq2seqTraining",
@@ -28,5 +29,6 @@ __all__ = [
     "Seq2seqModel",
     "Seq2seqConfig",
     "bleu_calculate",
-    "infer_onnx"
+    "infer_onnx",
+    "infer"
 ]
