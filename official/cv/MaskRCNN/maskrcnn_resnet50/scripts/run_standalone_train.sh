@@ -48,6 +48,7 @@ if [ $# == 3 ];
 then
     DEVICE_ID=$3
 fi
+export DEVICE_ID=$DEVICE_ID
 
 if [ -d "train" ];
 then
