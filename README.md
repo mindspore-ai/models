@@ -44,6 +44,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Image | Image Classification | [cspdarknet53](https://gitee.com/mindspore/models/tree/master/research/cv/cspdarknet53) |✅|   |   |
 | Image | Object Detection | [ctpn](https://gitee.com/mindspore/models/tree/master/official/cv/CTPN) |✅| ✅ |   |
 | Image | Object Detection | [darknet53](https://gitee.com/mindspore/models/tree/master/research/cv/darknet53) | | ✅ |   |
+| Image | Text Detection | [dbnet](https://gitee.com/mindspore/models/tree/master/official/cv/DBNet) |✅| ✅ | ✅ |
 | Image | Semantic Segmentation | [deeplabv3](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) |✅| ✅ | ✅ |
 | Image | Text Detection | [deeptext](https://gitee.com/mindspore/models/tree/master/official/cv/DeepText) |✅| ✅ |   |
 | Image | Image Classification | [densenet100](https://gitee.com/mindspore/models/tree/master/research/cv/densenet) |✅| ✅ |   |

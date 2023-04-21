@@ -38,6 +38,7 @@ def init_env(cfg):
 
     cfg.device_target = ms.get_context("device_target")
     if cfg.device_target == "CPU":
+        print("run on CPU !!!")
         cfg.device_id = 0
         cfg.device_num = 1
         cfg.rank_id = 0

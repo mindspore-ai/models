@@ -17,7 +17,6 @@
 """ResNet & ResNet-DCNv2"""
 
 import math
-import mindspore as ms
 from mindspore import ops, nn
 from mindspore.common.initializer import Normal, HeNormal
 
@@ -30,8 +29,7 @@ def conv3x3(inplanes, outplanes, stride=1):
 
 
 class ModulatedDeformConv2d(nn.Conv2d):
-    """
-    A ModulatedDeformable Conv Encapsulation that acts as normal Conv
+    """A ModulatedDeformable Conv Encapsulation that acts as normal Conv
     layers.
     Args:
         in_channels (int): Same as nn.Conv2d. The channel number of the input tensor of the Conv2d layer.
@@ -40,7 +38,8 @@ class ModulatedDeformConv2d(nn.Conv2d):
         stride (int): Same as nn.Conv2d, while tuple is not supported. Default: 1.
         padding (int): Same as nn.Conv2d, while tuple is not supported.
         has_bias (bool: Same as nn.Conv2d. False.
-        """
+
+    """
     def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=1, has_bias=False):
         super(ModulatedDeformConv2d, self).__init__(in_channels,
                                                     out_channels,
@@ -204,65 +203,3 @@ class ResNet(nn.Cell):
         x4 = self.layer3(x3)
         x5 = self.layer4(x4)
         return x2, x3, x4, x5
-
-
-def resnet18(pretrained=True, backbone_ckpt=None, **kwargs):
-    model = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
-
-    if pretrained:
-        ms_dict = ms.load_checkpoint(backbone_ckpt)
-        param_not_load, _ = ms.load_param_into_net(model, ms_dict)
-        print(param_not_load)
-
-    return model
-
-
-def deformable_resnet18(pretrained=True, backbone_ckpt=None, **kwargs):
-    model = ResNet(BasicBlock, [2, 2, 2, 2], dcn=True, **kwargs)
-
-    if pretrained:
-        ms_dict = ms.load_checkpoint(backbone_ckpt)
-        param_not_load, _ = ms.load_param_into_net(model, ms_dict)
-        print(param_not_load)
-
-    return model
-
-
-def resnet50(pretrained=True, backbone_ckpt=None, **kwargs):
-    """Constructs a ResNet-50 model.
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
-
-    if pretrained:
-        ms_dict = ms.load_checkpoint(backbone_ckpt)
-        param_not_load, _ = ms.load_param_into_net(model, ms_dict)
-        print(param_not_load)
-
-    return model
-
-
-def deformable_resnet50(pretrained=True, backbone_ckpt=None, **kwargs):
-    """Constructs a ResNet-50 model.
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    model = ResNet(Bottleneck, [3, 4, 6, 3], dcn=True, **kwargs)
-
-    if pretrained:
-        ms_dict = ms.load_checkpoint(backbone_ckpt)
-        param_not_load, _ = ms.load_param_into_net(model, ms_dict)
-        print(param_not_load)
-
-    return model
-
-
-def get_backbone(initializer):
-    backbone_dict = {
-        "resnet18": resnet18,
-        "deformable_resnet18": deformable_resnet18,
-        "resnet50": resnet50,
-        "deformable_resnet50": deformable_resnet50,
-    }
-    return backbone_dict[initializer]

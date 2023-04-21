@@ -6,11 +6,14 @@ per_print_times: 10
 run_eval: True
 eval_start_epoch: 100
 eval_interval: 20
-device_target: "Ascend"
+device_target: "None"
 context_mode: "graph"
+run_profiler: False
 mix_precision: True       # Please set it to False on GPU/CPU
 ckpt_path: ""
-output_dir: "../outputs"
+output_dir: "./outputs"
+load_mindrecord: True
+mindrecord_path: "./dataset"
 # Url for modelarts
 enable_modelarts: False
 data_url: ""
@@ -50,6 +53,8 @@ dataset:
     max_rowsize: 64
     short_side: 736
     random_angle: [-10, 10]
+    mean: [122.67891434, 116.66876762, 104.00698793]
+    std: [255., 255., 255.]
     random_crop:
         max_tries: 100
         min_crop_side_ratio: 0.1

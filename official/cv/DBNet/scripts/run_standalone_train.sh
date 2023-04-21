@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 2 ]
+if [ $# != 2 ] && [ $# != 3 ]
 then
-    echo "Usage: bash run_standalone_train.sh [CONFIG_PATH] [CUDA_VISIBLE_DEVICES]"
+    echo "Usage: bash scripts/run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [LOG_NAME](optional)"
 exit 1
 fi
 
@@ -28,19 +28,17 @@ get_real_path(){
 }
 
 CONFIG_PATH=$(get_real_path $1)
-export CUDA_VISIBLE_DEVICES=$2
 
-if [ -d "train" ];
+LOG_NAME="train"
+if [ $# == 3 ]
 then
-    rm -rf ./train
+    LOG_NAME=$3
 fi
 
-mkdir ./train
-cp ../*.py ./train
-cp -r ../src ./train
-cp -r ../config ./train
-cd ./train || exit
-env > env.log
+BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
 
-echo "start training for device $CUDA_VISIBLE_DEVICES"
-python train.py --config_path=$CONFIG_PATH --device_target='GPU' >log.txt 2>&1 &
+echo "start training for device $DEVICE_ID"
+python $BASE_PATH/../train.py --config_path=$CONFIG_PATH --device_id=$2 \
+    --output_dir=$LOG_NAME > $LOG_NAME.txt 2>&1 &
+echo "training"
+echo "log at ${LOG_NAME}.txt, you can use [tail -f ${LOG_NAME}.txt] to get log."

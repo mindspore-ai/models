@@ -62,6 +62,7 @@ class DBNetMonitor(Callback):
         self.lr = lr
         self.loss_avg = AverageMeter()
         self.rank_id = config.rank_id
+        self.device_num = config.device_num
         self.run_eval = config.run_eval
         self.eval_interval = config.eval_interval
         self.save_ckpt_dir = config.save_ckpt_dir
@@ -75,15 +76,19 @@ class DBNetMonitor(Callback):
         self.train_net = train_net
         self.epoch_start_time = time.time()
         self.step_start_time = time.time()
+        self.train_start = time.time()
         self.cur_steps = cur_steps
+        self.all_fps = []
 
     def load_parameter(self):
         param_dict = dict()
         for name, param in self.train_net.parameters_and_names():
-            if name.startswith('backbone') or name.startswith('segdetector'):
-                new_name = '.'.join(name.split('.')[1:])
-                param_dict[new_name] = param
-        ms.load_param_into_net(self.eval_net.model, param_dict)
+            param_dict[name] = param
+        for name, param in self.eval_net.model.parameters_and_names():
+            if name in param_dict:
+                param.set_data(param_dict[name])
+            else:
+                print(f"parameter {name} not in train_net")
 
     def handle_loss(self, net_outputs):
         """Handle loss"""
@@ -95,6 +100,10 @@ class DBNetMonitor(Callback):
         elif isinstance(net_outputs, ms.Tensor) and isinstance(net_outputs.asnumpy(), np.ndarray):
             loss = float(np.mean(net_outputs.asumpy()))
         return loss
+
+    def on_train_begin(self, run_context):
+        self.config.logger.info('train start')
+        self.train_start = time.time()
 
     def on_train_epoch_begin(self, run_context):
         """
@@ -129,7 +138,7 @@ class DBNetMonitor(Callback):
 
             if cur_step_in_epoch % self._per_print_times == 0:
                 per_step_time = (time.time() - self.step_start_time) * 1000 / self._per_print_times
-                fps = self.batch_size * 1000 / per_step_time
+                fps = self.batch_size * 1000 * self.device_num / per_step_time
                 loss_log = "epoch: [%s/%s] step: [%s/%s], loss: %.6f, lr: %.6f, per step time: %.3f ms, " \
                            "fps: %.2f img/s" % (
                                cur_epoch, self.config.train.total_epochs, cur_step_in_epoch, cb_params.batch_num,
@@ -150,7 +159,8 @@ class DBNetMonitor(Callback):
         cur_epoch = cb_params.cur_epoch_num
         epoch_time = (time.time() - self.epoch_start_time)
         per_step_time = epoch_time * 1000 / cb_params.batch_num
-        fps = 1000 * self.batch_size / per_step_time
+        fps = 1000 * self.batch_size * self.device_num / per_step_time
+        self.all_fps.append(fps)
         loss_log = "epoch: [%s/%s], loss: %.6f, epoch time: %.3f s, per step time: %.3f ms, fps: %.2f img/s" % (
             cur_epoch, self.config.train.total_epochs, loss[0].asnumpy(), epoch_time, per_step_time, fps)
         self.config.logger.info(loss_log)
@@ -171,5 +181,11 @@ class DBNetMonitor(Callback):
                 self.max_f = cur_f
 
     def on_train_end(self, run_context):
-        if self.rank_id == 0:
+        cb_params = run_context.original_args()
+        if self.rank_id == 0 and self.run_eval:
             self.config.logger.info('best fmeasure is: %s' % self.max_f)
+        self.config.logger.info(f'end train, avg fps (except first epoch) is {np.mean(np.array(self.all_fps[1:]))}')
+        samples = self.batch_size * self.device_num * cb_params.batch_num
+        all_cost = time.time() - self.train_start
+        self.config.logger.info(f'training total cost {all_cost} s, samples {samples}, '
+                                f'avg fps is {all_cost / samples} FPS')
