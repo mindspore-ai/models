@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]
+if [ $# != 2 ] && [ $# != 3 ]
 then 
-    echo "Usage: bash run_standalone_train.sh [PRETRAINED_PATH] [DATA_PATH]"
+    echo "Usage: bash run_standalone_train.sh [PRETRAINED_PATH] [DATA_PATH] [DEVICE_ID](optional)"
 exit 1
 fi
 
@@ -40,9 +40,14 @@ fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=0
 export RANK_ID=0
 export RANK_SIZE=1
+
+DEVICE_ID=0
+if [ $# == 3 ];
+then
+    DEVICE_ID=$3
+fi
 
 if [ -d "train" ];
 then
