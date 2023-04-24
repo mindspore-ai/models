@@ -209,9 +209,9 @@ python create_lm_data.py --input_file /{path}/ptb.test.txt --output_file /{path}
 
 ### Children's Book Test任务
 
-#### CBT-CN / CBT-NE 数据集
+#### Look into Person: Joint Body Parsing &amp;amp; Pose Estimation Network and A New Benchmark-CN / CBT-NE 数据集
 
-- [CBT数据集下载](http://www.thespermwhale.com/jaseweston/babi/CBTest.tgz)  使用在`/data`目录下使用`cbtest_CN_valid_2000ex.txt、cbtest_NE_valid_2000ex.txt`作为该任务的评估集，清洗该数据集，示例代码如下：
+- [CBT数据集下载](https://huggingface.co/datasets/cbt)  使用在`/data`目录下使用`cbtest_CN_valid_2000ex.txt、cbtest_NE_valid_2000ex.txt`作为该任务的评估集，清洗该数据集，示例代码如下：
 
 ```bash
 python task_dataset_preprocess.py --task "CBT" --input_file /{path}/cbtest_CN_valid_2000ex.txt --dataset "cbt" --output_file /{path}/cbt_cn_valid.txt

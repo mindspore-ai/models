@@ -19,7 +19,7 @@
 
 # Resnet_ipl描述
 
-Resnet_ipl是一系列基于resnet扩展的网络模型，用于图像分类。有关该模型的描述，可查阅(http://rwightman.github.io/pytorch-image-models/models/)。
+Resnet_ipl是一系列基于resnet扩展的网络模型，用于图像分类。有关该模型的描述，可查阅(https://github.com/huggingface/pytorch-image-models)。
 本仓库中是基于torch提供的模型文件，使用MindConverter工具转化出Mindspore来ckpt文件，进行全量推理以验证模型文件精度。
 
 # 模型架构

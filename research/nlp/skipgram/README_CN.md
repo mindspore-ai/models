@@ -52,7 +52,7 @@ Skip-gram模型主要由两个嵌入层组成，两个嵌入层的输出再根�
 
 - 使用的数据集：[text8](https://deepai.org/dataset/text8)
     - 注1：由于原论文使用的语料库没有开源，这里我们使用了NLP中常用的中等大小的开源语料库text8。
-    - 注2：text8实际上enwik8数据集经过处理后得到的数据集，关于enwik8数据集和处理脚本的更多信息详见[About the Test Data](http://mattmahoney.net/dc/textdata)
+    - 注2：text8实际上enwik8数据集经过处理后得到的数据集，关于enwik8数据集和处理脚本的更多信息详见[About the Test Data](https://deepai.org/dataset/text8)
 
 - 数据格式：文本文件
     - 注：数据需要通过preprocess.py进行预处理。
