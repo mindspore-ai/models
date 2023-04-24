@@ -14,9 +14,15 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]; then
-  echo "Usage: sh run_standalone_train.sh [TRAIN_DATA_DIR] [DEVICE_TARGET]"
+if [ $# -lt 2 ] || [ $# -gt 3 ]; then
+  echo "Usage: bash run_standalone_train.sh [TRAIN_DATA_DIR] [DEVICE_TARGET] [DEVICE_ID](optional)"
   exit 1
+fi
+
+if [ $3 ];then
+  device_id=$3
+else
+  device_id=0
 fi
 
 get_real_path() {
@@ -38,7 +44,7 @@ fi
 run_ascend() {
   ulimit -u unlimited
   export DEVICE_NUM=1
-  export DEVICE_ID=0
+  export DEVICE_ID=$device_id
   export RANK_ID=0
   export RANK_SIZE=1
 
@@ -49,6 +55,7 @@ run_ascend() {
 }
 
 run_gpu_cpu() {
+  export CUDA_VISIBLE_DEVICES=$device_id
   env >env.log
   python train.py --train_data_dir=$1 --device_target=$2  > log.txt 2>&1 &
   cd ..
