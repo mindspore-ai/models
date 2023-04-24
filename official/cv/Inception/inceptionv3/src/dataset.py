@@ -44,23 +44,22 @@ def create_dataset_imagenet(dataset_path, do_train, cfg, repeat_num=1):
     # define map operations
     if do_train:
         trans = [
-            C.c_transforms.RandomCropDecodeResize(299, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
-            C.c_transforms.RandomHorizontalFlip(prob=0.5),
-            C.c_transforms.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4)
+            C.RandomCropDecodeResize(299, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
+            C.RandomHorizontalFlip(prob=0.5),
+            C.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4)
         ]
     else:
         trans = [
-            C.c_transforms.Decode(),
-            C.c_transforms.Resize(299),
-            C.c_transforms.CenterCrop(299)
+            C.Decode(),
+            C.Resize(299),
+            C.CenterCrop(299)
         ]
     trans += [
-        C.c_transforms.Rescale(1.0 / 255.0, 0.0),
-        # Computed from random subset of ImageNet training images
-        C.c_transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        C.c_transforms.HWC2CHW()
+        C.Rescale(1.0 / 255.0, 0.0),
+        C.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        C.HWC2CHW()
     ]
-    type_cast_op = C2.c_transforms.TypeCast(mstype.int32)
+    type_cast_op = C2.TypeCast(mstype.int32)
     data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=cfg.work_nums)
     data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=cfg.work_nums)
     # apply batch operations
