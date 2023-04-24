@@ -739,10 +739,10 @@ bash scripts/run_classifier.sh
 
 以上命令后台运行，您可以在classfier_log.txt中查看训练日志。
 
-如您选择准确性作为评估方法，可得到如下结果：
+如您选择准确性作为评估方法，可得到如下结果(accuracy: 0.55~0.56)：
 
 ```text
-acc_num XXX, total_num XXX, accuracy 0.588986
+acc_num XXX, total_num XXX, accuracy 0.555500
 ```
 
 #### CPU处理器上运行后评估tnews数据集
@@ -759,7 +759,7 @@ acc_num XXX, total_num XXX, accuracy 0.588986
 python run_classifier.py --config_path=../../task_classifier_cpu_config.yaml --device_target CPU --do_train=true --do_eval=true --num_class=15 --train_data_file_path="" --eval_data_file_path="" --load_pretrain_checkpoint_path=""
 ```
 
-如您选择准确性作为评估方法，可得到如下结果：
+如您选择准确性作为评估方法，可得到如下结果(accuracy: 0.55~0.56)：
 
 ```text
 acc_num XXX, total_num XXX, accuracy 0.554200

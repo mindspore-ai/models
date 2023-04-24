@@ -759,10 +759,10 @@ bash scripts/run_classifier.sh
 
 The command above will run in the background, you can view training logs in classfier_log.txt.
 
-If you choose accuracy as assessment method, the result will be as follows:
+If you choose accuracy as assessment method, the result will be as follows(accuracy: 0.55~0.56):
 
 ```text
-acc_num XXX, total_num XXX, accuracy 0.588986
+acc_num XXX, total_num XXX, accuracy 0.555500
 ```
 
 #### evaluation on tnews dataset when running on CPU
@@ -781,7 +781,7 @@ python run_classifier.py --config_path=../../task_classifier_cpu_config.yaml --d
 
 The command above will run in the background, you can view training logs in classfier_log.txt.
 
-If you choose accuracy as assessment method, the result will be as follows:
+If you choose accuracy as assessment method, the result will be as follows(accuracy: 0.55~0.56)：:
 
 ```text
 acc_num XXX, total_num XXX, accuracy 0.554200
