@@ -55,7 +55,7 @@ HRNet是一个全能型的计算机视觉骨干网络，可用于图像分类、
 
 Cityscapes数据集包含5000幅高质量像素级别精细注释的街城市道场景图像。图像按2975/500/1525的分割方式分为三组，分别用于训练、验证和测试。数据集中共包含30类实体，其中19类用于验证。
 
-2. 数据集 [LIP](https://lip.sysuhcp.com/overview.php)
+2. 数据集 [LIP]于论文[Look into Person: Joint Body Parsing &amp;amp; Pose Estimation Network and A New Benchmark](https://arxiv.org/pdf/1804.01984.pdf)中提供。
 
 Look into person (LIP)数据集用于训练模型进行人类身体部位分割。该数据集包含50000张图像，带有详细的像素注释，其中包含19个语义人体部位标签和16个关键点的二维人体姿势。
 
