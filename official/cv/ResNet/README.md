@@ -670,31 +670,31 @@ Evaluation result will be stored in the example path, whose folder name is "eval
 - Evaluating ResNet18 with CIFAR-10 dataset
 
 ```bash
-result: {'acc': 0.9363061543521088} ckpt=~/resnet50_cifar10/train_parallel0/resnet-90_195.ckpt
+result: {'top_5_accuracy': 0.9988420294494239, 'top_1_accuracy': 0.9369917221518} ckpt=~/resnet50_cifar10/train_parallel0/resnet-90_195.ckpt
 ```
 
 - Evaluating ResNet18 with ImageNet2012 dataset
 
 ```bash
-result: {'acc': 0.7053685897435897} ckpt=train_parallel0/resnet-90_5004.ckpt
+result: {'top_5_accuracy': 0.89609375, 'top_1_accuracy': 0.7056089743589744} ckpt=train_parallel0/resnet-90_625.ckpt
 ```
 
 - Evaluating ResNet50 with CIFAR-10 dataset
 
 ```bash
-result: {'acc': 0.91446314102564111} ckpt=~/resnet50_cifar10/train_parallel0/resnet-90_195.ckpt
+result: {'top_5_accuracy': 0.99879807699230679, 'top_1_accuracy': 0.9372996794891795} ckpt=~/resnet50_cifar10/train_parallel0/resnet-90_195.ckpt
 ```
 
 - Evaluating ResNet50 with ImageNet2012 dataset
 
 ```bash
-result: {'acc': 0.7671054737516005} ckpt=train_parallel0/resnet-90_5004.ckpt
+result: {'top_5_accuracy': 0.930090206185567, 'top_1_accuracy': 0.764074581185567} ckpt=train_parallel0/resnet-90_625.ckpt
 ```
 
 - Evaluating ResNet34 with ImageNet2012 dataset
 
 ```bash
-result: {'top_1_accuracy': 0.736758814102564} ckpt=train_parallel0/resnet-90_625.ckpt
+result: {'top_5_accuracy': 0.9166866987179487, 'top_1_accuracy': 0.7379497051282051} ckpt=train_parallel0/resnet-90_625.ckpt
 ```
 
 - Evaluating ResNet101 with ImageNet2012 dataset
