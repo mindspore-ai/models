@@ -27,6 +27,16 @@ Datasets used: [ICDAR2015](<https://rrc.cvc.uab.es/?ch=4&com=downloads>)
         - label: 244KB
 - Data format: image, label
 
+After downloading on the official website, organize the dataset into the following structure:
+
+```text
+└─ICDAR2015
+    ├─ch4_training_images                                       # train images
+    ├─ch4_training_localization_transcription_gt                # train gts
+    ├─ch4_test_images                                           # val images
+    └─Challenge4_Test_Task1_GT                                  # val gts
+```
+
 ## Environmental requirements
 
 - Device（Ascend/GPU/CPU）
@@ -47,79 +57,102 @@ pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
 | DBNet-R18 | [R18](https://download.mindspore.cn/thirdparty/dbnet/resnet18-5c106cde.ckpt) | [cfg](config/dbnet/config_resnet18_1p.yaml) | ICDAR2015 Train | ICDAR2015 Test | 1 | 1200 | 736 | 78.63 | 84.21 | 81.32 | [download]() | [download]() |
 | DBNet-R50 | [R50](https://download.mindspore.cn/thirdparty/dbnet/resnet50-19c8e357.ckpt) | [cfg](config/dbnet/config_resnet50_1p.yaml) | ICDAR2015 Train | ICDAR2015 Test | 1 | 1200 | 736 | 81.05 | 88.07 | 84.41 | [download]() | [download]() |
+| DBNet-MobileNetv3 | [M3]() | [cfg](config/dbnet/config_mobilenetv3_1p.yaml) | ICDAR2015 Train | ICDAR2015 Test | 1 | 1200 | 736 | 73,.05 | 77.02 | 74.96 | [download]() | [download]() |
 
 ### Performance
 
-| device | Model     | dataset   | Params(M) | PyNative train 1P bs=16 (ms/step) | PyNative train 8P bs=8 (ms/step) | PyNative infer(FPS)| Graph train 1P bs=16 (ms/step) | Graph train 8P bs=8 (ms/step) | Graph infer(FPS) |
+| device | Model     | dataset   | Params(M) | PyNative train 1P bs=16 FPS | PyNative train 8P bs=8 FPS | PyNative infer FPS | Graph train 1P bs=16 FPS | Graph train 8P bs=8 FPS | Graph infer FPS |
 | ------ | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- | --------- |
-| Ascend | DBNet-R18 | ICDAR2015 |  11.78 M  |  370     |   530   |    -     |   224    |   195   |   40.62   |
-|  GPU   | DBNet-R18 | ICDAR2015 |  11.78 M  |  710    |   880     |   -    |  560  |   435    |   30.97   |
-| Ascend | DBNet-R50 | ICDAR2015 |  24.28 M  |  524      |   680     |   -     |  273    |   220    |   33.88   |
-|  GPU   | DBNet-R50 | ICDAR2015 |  24.28 M  |  935      |   1054    |  -    |  730  |  547    |   23.95   |
+| Ascend | DBNet-R18 | ICDAR2015 |  11.78 M  |  95  |  381  |    -     |   150    |   610   | 40.62  |
+|  GPU   | DBNet-R18 | ICDAR2015 |  11.78 M  |  18    |   81     |   -    |  23  |    104 |  30.97  |
+| Ascend | DBNet-R50 | ICDAR2015 |  24.28 M  |  59    |   237  |   -     |  100    |   460    |  33.88  |
+|  GPU   | DBNet-R50 | ICDAR2015 |  24.28 M  |  15      |   74    |  -    |  20  |  102 |  23.95  |
+| Ascend | DBNet-M3 | ICDAR2015 |  1.77 M  |   60  |   241  |   -     |  117    |   550    |  39.11 |
+|  GPU   | DBNet-M3 | ICDAR2015 |  1.77 M  |  15      |   75    |  -    |  18.5  |  98 |  30.21 |
 
 This model is greatly affected by data processing, and the performance data on different machines fluctuate greatly. The above data are for reference.
 
 The above data are tested at:
 
-Ascend 910 32G 8 devices; Operating system: Euler2.8; Memory: 756 G; ARM 96 cores CPU;
+Ascend 910A 32G 8 devices; Operating system: Euler2.8; Memory: 756 G; ARM 96 cores CPU;
 
 GPU v100 PCIE 32G 8 devices; Operating system: Ubuntu 18.04; Memory: 502 G; x86 72 cores CPU.
 
 ## Quickly Start
 
+### Parameter file description
+
 ```text
-Parameter file description:
     config/config_base.yaml: Common parameter file, data set path, optimizer, training strategy and other parameters are usually set in this file
-    config/dbnet/*.yaml: backbone training policy profile
-    config/dbnet++/*.yaml: backbone training policy profile with dcn
+    config/dbnet/*.yaml: backbone training policy profile with dbnet
+    config/dbnet++/*.yaml: backbone training policy profile with dbnet++
+```
 
 notice：dbnet/*.yaml and /dbnet++/*.yaml parameters will cover config_base.yaml，Users can reasonably configure according to their needs
 
-Single train backbone resnet18 with ICDAR2015 as an example
-config/config_base.yaml configure training and reasoning data set path
+Single train backbone resnet18 with ICDAR2015 as an example:
+
+1. Configure training and reasoning data set path in `config/config_base.yaml`, the path need to be an absolute path.
+
+```text
+load_mindrecord: True    # Whether to preprocess the data into Mindrecord format, the entire training will be faster
+mindrecord_path: "/path/dbnet/dataset"    # The path saved by Mindrecord needs to be an absolute path and only needs to be generated once
 train:
-    img_dir: ICDAR2015/ch4_training_images
-    gt_dir: ICDAR2015/ch4_training_localization_transcription_gt
+    img_dir: /data/ICDAR2015/ch4_training_images
+    gt_dir: /data/ICDAR2015/ch4_training_localization_transcription_gt
 eval:
-    img_dir: ICDAR2015/ch4_test_images
-    gt_dir: ICDAR2015/Challenge4_Test_Task1_GT
+    img_dir: /data/ICDAR2015/ch4_test_images
+    gt_dir: /data/ICDAR2015/Challenge4_Test_Task1_GT
+```
 
-config/dbnet/config_resnet18_1p.yaml configure backone_ckpt pre-training path
+2. Configure backone_ckpt pre-training path in `config/dbnet/config_resnet18_1p.yaml`
+
+```text
 backbone:
-    backbone_ckpt: "./pretrained/resnet18-5c106cde.ckpt"
+    backbone_ckpt: "/data/pretrained/resnet18-5c106cde.ckpt"
 ```
 
-Run standalone:
+### Run standalone
 
 ```shell
-bash run_standalone_train_ascend.sh [CONFIG_PATH] [DEVICE_ID]
+bash scripts/run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [LOG_NAME](optional)
 
-# Ascend standalone train resnet18
-bash run_standalone_train_ascend.sh ../config/dbnet/config_resnet18_1p.yaml 0
+# standalone train resnet18
+bash scripts/run_standalone_train.sh config/dbnet/config_resnet18_1p.yaml 0 db_r18_1p
 
-# Ascend standalone train resnet50
-bash run_standalone_train_ascend.sh ../config/dbnet/config_resnet50_1p.yaml 0
+# standalone train resnet50
+bash scripts/run_standalone_train.sh config/dbnet/config_resnet50_1p.yaml 0 db_r50_1p
+
+# standalone train mobilenetv3 large
+bash scripts/run_standalone_train.sh config/dbnet/config_mobilenetv3_1p.yaml 0 db_m3_1p
 ```
 
-Run distribution:
+### Run distribution
 
 ```shell
-bash run_distribution_train_ascend.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
+# Starting with the for loop on Ascend before MindSpore1.8
+bash scripts/run_distribution_train.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
 
-# Ascend distribute train resnet18
-bash run_standalone_train.sh hccl_8p.json 8 ../config/dbnet/config_resnet18_8p.yaml
+# After 1.8, on Ascend, like on GPU, can be started using mpirun
+bash scripts/run_distribution_train.sh [DEVICE_NUM] [CONFIG_PATH] [LOG_NAME](optional)
 
-# Ascend distribute train resnet50
-bash run_standalone_train.sh hccl_8p.json 8 ../config/dbnet/config_resnet50_8p.yaml
+# Ascend distribute train 8p resnet18
+bash scripts/run_distribution_train.sh 8 config/dbnet/config_resnet18_8p.yaml db_r18_8p
+
+# Ascend distribute train 8p resnet50
+bash scripts/run_distribution_train.sh 8 config/dbnet/config_resnet50_8p.yaml db_r50_8p
+
+# Ascend distribute train mobilenetv3 8p large
+bash scripts/run_distribution_train.sh 8 config/dbnet/config_mobilenetv3_8p.yaml db_m3_8p
 ```
 
-Evaluation:
+### Evaluation
 
 ```shell
-bash run_eval_ascend.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
+bash scripts/run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID] [LOG_NAME](optional)
 
-# Ascend eval resnet18
-bash run_eval_ascend.sh ../config/dbnet/config_resnet18_8p.yaml your_ckpt_path 0
+# eval resnet18
+bash scripts/run_eval.sh config/dbnet/config_resnet18_1p.yaml your_ckpt_path 0 eval_r18
 ```
 
 If you need to modify the device or other configurations, please modify the corresponding items in the configuration file.
@@ -129,22 +162,23 @@ If you need to modify the device or other configurations, please modify the corr
 ### Run standalone train
 
 ```shell
-bash run_standalone_train_ascend.sh [CONFIG_PATH] [DEVICE_ID]
-# CONFIG_PATH：The configuration file path is Ascend by default. If you need to modify it, please modify the device_target
+bash scripts/run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID] [LOG_NAME](optional)
+# CONFIG_PATH：The configuration file path
 # DEVICE_ID：Card number used for training
+# LOG_NAME: Directory and logs name for saving results, default is train
 ```
 
-Executing the above command will run in the background. You can view the results through the train/log.txt file
+Executing the above command will run in the background. You can view the results through the [LOG_NAME].txt file
 
-After the training, you can find the checkpoint file in outputs.
+After the training, you can find the checkpoint file in [LOG_NAME].
 
 ### Run distribution train
 
 ```shell
-bash run_distribution_train.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
-# RANK_TABLE_FILE: Build a distributed environment json file
+bash scripts/run_distribution_train.sh [DEVICE_NUM] [CONFIG_PATH] [LOG_NAME](optional)
 # DEVICE_NUM：Number of cards used for training
-# CONFIG_PATH：The configuration file path is Ascend by default. If you need to modify it, please modify the device_target
+# CONFIG_PATH：The configuration file path
+# LOG_NAME: Directory and logs name for saving results, default is distribution_train
 ```
 
 Executing the above command will run in the background. You can view the results through the [LOG_NAME].txt file.
@@ -168,9 +202,11 @@ If you want to use the resume training function, you only need to resume in the 
 ### evaluation
 
 ```shell
-bash run_eval_ascend.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID]
-# CONFIG_PATH: The configuration file path, device target default is Ascend. If you need to modify it, please modify the device in the config file.
+bash scripts/run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID] [LOG_NAME](optional)
+# CONFIG_PATH: The configuration file path
+# CKPT_PATH: The checkpoint path
 # DEVICE_ID: Device id used for training
+# LOG_NAME: Directory and logs name for saving results, default is eval
 ```
 
 Executing the above command will run in the background. You can view the results through the [LOG_NAME].txt file.

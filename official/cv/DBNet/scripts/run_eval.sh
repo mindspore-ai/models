@@ -13,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 2 ]
+
+if [ $# != 3 ] && [ $# != 4 ]
 then
-    echo "Usage: bash run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID]"
+    echo "Usage: bash scripts/run_eval.sh [CONFIG_PATH] [CKPT_PATH] [DEVICE_ID] [LOG_NAME](optional)"
 exit 1
 fi
 
@@ -28,19 +29,20 @@ get_real_path(){
 }
 
 CONFIG_PATH=$(get_real_path $1)
-export DEVICE_ID=$2
+CKPT_PATH=$(get_real_path $2)
 
-if [ -d "train" ];
+LOG_NAME="eval"
+if [ $# == 4 ]
 then
-    rm -rf ./train
+    LOG_NAME=$4
 fi
 
-mkdir ./train
-cp ../*.py ./train
-cp -r ../src ./train
-cp -r ../config ./train
-cd ./train || exit
-env > env.log
+BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
+export RANK_SIZE=$1
 
-echo "start training for device $DEVICE_ID"
-python train.py --config_path=$CONFIG_PATH --device_id=$2 --device_target='Ascend' >log.txt 2>&1 &
+echo "start inferring for device $DEVICE_ID"
+python $BASE_PATH/../eval.py --config_path=$CONFIG_PATH --ckpt_path=$CKPT_PATH --device_id=$3 \
+    --output_dir=$LOG_NAME > $LOG_NAME.txt 2>&1 &
+
+echo "evaluation"
+echo "log at $LOG_NAME.txt, you can use [tail -f $LOG_NAME.txt] to get log."

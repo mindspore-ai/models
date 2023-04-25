@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 3 ]
 then
-    echo "Usage: bash run_distribution_train.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]"
+    echo "Usage: bash scripts/run_distribution_train.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]"
 exit 1
 fi
 
@@ -38,6 +38,8 @@ fi
 export RANK_SIZE=$2
 export DEVICE_NUM=$2
 export RANK_TABLE_FILE=$1
+BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
+cd $BASE_PATH || exit
 
 for((i=0; i<${DEVICE_NUM}; i++))
 do

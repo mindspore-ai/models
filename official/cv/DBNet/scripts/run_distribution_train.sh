@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 2 ] && [ $# != 3 ]
 then
-    echo "Usage: bash run_distribution_train.sh [DEVICE_NUM] [CONFIG_PATH] [LOG_NAME](optional)"
+    echo "Usage: bash scripts/run_distribution_train.sh [DEVICE_NUM] [CONFIG_PATH] [LOG_NAME](optional)"
 exit 1
 fi
 

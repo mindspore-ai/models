@@ -44,6 +44,7 @@ MindSpore models仓中提供了不同任务领域，经典的SOTA模型实现和
 | 图像 | 图像分类 | [cspdarknet53](https://gitee.com/mindspore/models/tree/master/research/cv/cspdarknet53) |✅|   |   |
 | 图像 | 目标检测 | [ctpn](https://gitee.com/mindspore/models/tree/master/official/cv/CTPN) |✅| ✅ |   |
 | 图像 | 目标检测 | [darknet53](https://gitee.com/mindspore/models/tree/master/research/cv/darknet53) | | ✅ |   |
+| 图像 | 文本检测 | [dbnet](https://gitee.com/mindspore/models/tree/master/official/cv/DBNet) |✅| ✅ | ✅ |
 | 图像 | 语义分割 | [deeplabv3](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) |✅| ✅ | ✅ |
 | 图像 | 文本检测 | [deeptext](https://gitee.com/mindspore/models/tree/master/official/cv/DeepText) |✅| ✅ |   |
 | 图像 | 图像分类 | [densenet100](https://gitee.com/mindspore/models/tree/master/research/cv/densenet) |✅| ✅ |   |
