@@ -22,7 +22,7 @@ echo "==========================================================================
 set -e
 if [ $# -lt 1 ]
 then
-    echo "Usage: sh run_distribute_train_GPU.sh [DEVICE_NUM] [CUDA_VISIBLE_DEVICES(0,1,2,3,4,5,6,7)]"
+    echo "Usage: bash run_distribute_train_GPU.sh [DEVICE_NUM] [CUDA_VISIBLE_DEVICES(0,1,2,3,4,5,6,7)]"
     exit 1
 fi
 export DEVICE_NUM=$1

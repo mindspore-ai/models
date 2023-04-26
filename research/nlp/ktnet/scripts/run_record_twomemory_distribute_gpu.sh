@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 2 ]; then
-  echo "Usage: sh run_record_twomemory_distribute_gpu.sh [DATA_PATH] [DEVICE_NUM]"
+  echo "Usage: bash run_record_twomemory_distribute_gpu.sh [DATA_PATH] [DEVICE_NUM]"
   exit 1
 fi
 

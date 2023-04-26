@@ -19,7 +19,7 @@ echo 'current_exec_path: '${current_exec_path}
 
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_distribute_train.sh [RANK_FILE] [PRETRAINED_PATH] [TRAIN_ROOT_DIR]"
+    echo "Usage: bash run_distribute_train.sh [RANK_FILE] [PRETRAINED_PATH] [TRAIN_ROOT_DIR]"
 exit 1
 fi
 

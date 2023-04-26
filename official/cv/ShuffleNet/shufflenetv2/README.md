@@ -99,9 +99,9 @@ Dataset for transfermation:[flower_photos](https://storage.googleapis.com/downlo
 
 You can start training using python or shell scripts. The usage of shell scripts as follows:
 
-- Distributed training on Ascend: sh run_distribute_train_for_ascend.sh [RANK_TABLE_FILE] [DATASET_PATH]
-- Distributed training on GPU: sh run_standalone_train_for_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]
-- Standalone training on GPU: sh run_standalone_train_for_gpu.sh [DATASET_PATH]
+- Distributed training on Ascend: bash run_distribute_train_for_ascend.sh [RANK_TABLE_FILE] [DATASET_PATH]
+- Distributed training on GPU: bash run_standalone_train_for_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]
+- Standalone training on GPU: bash run_standalone_train_for_gpu.sh [DATASET_PATH]
 
 ### Launch
 
@@ -124,8 +124,8 @@ Training result will be stored in the example path. Checkpoints will be stored a
 
 You can start evaluation using python or shell scripts. The usage of shell scripts as follows:
 
-- Ascend: sh run_eval_for_ascend.sh [DATASET_PATH] [CHECKPOINT]
-- GPU: sh run_eval_for_gpu.sh [DATASET_PATH] [CHECKPOINT]
+- Ascend: bash run_eval_for_ascend.sh [DATASET_PATH] [CHECKPOINT]
+- GPU: bash run_eval_for_gpu.sh [DATASET_PATH] [CHECKPOINT]
 
 ### Launch
 

@@ -15,8 +15,8 @@
 # ============================================================================
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh create_dataset.sh SOURCE_DATASET_PATH DATASET_NAME"
-echo "for example: sh create_dataset.sh /home/workspace/ag_news_csv ag"
+echo "bash create_dataset.sh SOURCE_DATASET_PATH DATASET_NAME"
+echo "for example: bash create_dataset.sh /home/workspace/ag_news_csv ag"
 echo "DATASET_NAME including ag, dbpedia, and yelp_p"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="

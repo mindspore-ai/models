@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh run_eval.sh [OUT_DIR] [RESUME_PATH]"
+    echo "Usage: bash run_eval.sh [OUT_DIR] [RESUME_PATH]"
     exit 1
 fi
 

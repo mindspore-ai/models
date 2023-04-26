@@ -16,7 +16,7 @@
 
 if [ $# != 4 ]
 then
-    echo "Usage: sh eval_gpu.sh [DEVICE_ID] [CHECKPOINTPATH] [DATA_DIR] [MODE]"
+    echo "Usage: bash eval_gpu.sh [DEVICE_ID] [CHECKPOINTPATH] [DATA_DIR] [MODE]"
     exit 1
 fi
 

@@ -16,9 +16,9 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_standalone_train_ascend.sh PRE_TRAIN_DATASET"
+echo "bash run_standalone_train_ascend.sh PRE_TRAIN_DATASET"
 echo "for example:"
-echo "sh run_standalone_train_ascend.sh \
+echo "bash run_standalone_train_ascend.sh \
   /home/workspace/dataset_menu/train.tok.clean.bpe.32000.en.mindrecord"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="

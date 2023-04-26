@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 1 ]; then
-  echo "Usage: sh run_record_twomemory_gpu.sh [DATA_PATH]"
+  echo "Usage: bash run_record_twomemory_gpu.sh [DATA_PATH]"
   exit 1
 fi
 

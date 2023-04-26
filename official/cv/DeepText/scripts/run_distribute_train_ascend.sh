@@ -16,7 +16,7 @@
 
 if [ $# -ne 5 ]
 then 
-    echo "Usage: sh run_distribute_train_ascend.sh [IMGS_PATH] [ANNOS_PATH] [RANK_TABLE_FILE] [PRETRAINED_PATH] [COCO_TEXT_PARSER_PATH]"
+    echo "Usage: bash run_distribute_train_ascend.sh [IMGS_PATH] [ANNOS_PATH] [RANK_TABLE_FILE] [PRETRAINED_PATH] [COCO_TEXT_PARSER_PATH]"
 exit 1
 fi
 

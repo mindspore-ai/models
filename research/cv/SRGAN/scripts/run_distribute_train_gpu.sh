@@ -15,7 +15,7 @@
 
 if [ $# != 6 ]
 then
-    echo "Usage: sh run_distribute_train_gpu.sh [DEVICE_NUM] [LRPATH] [GTPATH] [VGGCKPT] [VLRPATH] [VGTPATH] "
+    echo "Usage: bash run_distribute_train_gpu.sh [DEVICE_NUM] [LRPATH] [GTPATH] [VGGCKPT] [VLRPATH] [VGTPATH] "
     exit 1
 fi
 

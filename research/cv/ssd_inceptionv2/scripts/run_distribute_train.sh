@@ -16,15 +16,15 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [DATASET_PATH] [MINDRECORD_PATH] [TRAIN_OUTPUT_PATH] [PRE_TRAINED_PATH](optional)"
+echo "bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [DATASET_PATH] [MINDRECORD_PATH] [TRAIN_OUTPUT_PATH] [PRE_TRAINED_PATH](optional)"
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 
 if [ $# != 5 ] && [ $# != 6 ]
 then
-    echo "Using: sh scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [DATASET_PATH] [MINDRECORD_PATH] [TRAIN_OUTPUT_PATH]"
+    echo "Using: bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [DATASET_PATH] [MINDRECORD_PATH] [TRAIN_OUTPUT_PATH]"
     echo "or"
-    echo "Using: sh scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [DATASET_PATH] [MINDRECORD_PATH] [TRAIN_OUTPUT_PATH] [PRE_TRAINED_PATH]"
+    echo "Using: bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [DATASET_PATH] [MINDRECORD_PATH] [TRAIN_OUTPUT_PATH] [PRE_TRAINED_PATH]"
     exit 1
 fi
 

@@ -16,14 +16,14 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_distribute_train_gpu.sh DEVICE_NUM EPOCH_SIZE LR DATASET RANK_TABLE_FILE PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
-echo "for example: sh run_distribute_train_gpu.sh 8 500 0.1 coco /data/hccl.json /opt/retinanet-500_458.ckpt(optional) 200(optional)"
+echo "bash run_distribute_train_gpu.sh DEVICE_NUM EPOCH_SIZE LR DATASET RANK_TABLE_FILE PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
+echo "for example: bash run_distribute_train_gpu.sh 8 500 0.1 coco /data/hccl.json /opt/retinanet-500_458.ckpt(optional) 200(optional)"
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 
 if [ $# != 4 ] && [ $# != 6 ]
 then
-    echo "Usage: sh run_distribute_train_gpu.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] \
+    echo "Usage: bash run_distribute_train_gpu.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] \
 [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)"
     exit 1
 fi

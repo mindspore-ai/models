@@ -15,7 +15,7 @@
 # ===========================================================================
 
 echo "Please run the script as: "
-echo "sh scripts/run_distribute_train.sh DEVICE_NUM DATASET_PATH RANK_TABLE_FILE"
+echo "bash scripts/run_distribute_train.sh DEVICE_NUM DATASET_PATH RANK_TABLE_FILE"
 echo "for example: bash scripts/run_alone_train.sh 0 data/mindrecord/ Ascend False"
 echo "After running the script, the network runs in the background, The log will be generated in logx/output.log"
 

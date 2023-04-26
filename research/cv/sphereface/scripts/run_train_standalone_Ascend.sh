@@ -20,7 +20,7 @@ echo "==========================================================================
 
 if [ $# -lt 1 ]
 then
-    echo "Usage: sh run_train_cpu.sh [DEVICE_ID] [PRE_TRAINED](optional)"
+    echo "Usage: bash run_train_cpu.sh [DEVICE_ID] [PRE_TRAINED](optional)"
     exit 1
 fi
 export DEVICE_ID=$1

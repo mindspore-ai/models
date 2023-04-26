@@ -16,7 +16,7 @@
 
 if [ $# -le 2 ]
 then 
-    echo "Usage: sh run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [COCO_ROOT] [MINDRECORD_DIR](option)"
+    echo "Usage: bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [COCO_ROOT] [MINDRECORD_DIR](option)"
 exit 1
 fi
 

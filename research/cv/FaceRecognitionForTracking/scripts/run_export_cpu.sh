@@ -16,7 +16,7 @@
 
 if [ $# -lt 2 ]
 then
-  echo "Usage: sh run_export_cpu.sh [PRE_TRAINED] [BATCH_SIZE] [FILE_NAME](optional)"
+  echo "Usage: bash run_export_cpu.sh [PRE_TRAINED] [BATCH_SIZE] [FILE_NAME](optional)"
   exit 1
 fi
 

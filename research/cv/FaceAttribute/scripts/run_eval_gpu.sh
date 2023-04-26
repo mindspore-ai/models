@@ -16,7 +16,7 @@
 
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_eval.sh [MINDRECORD_FILE] [CUDA_VISIBLE_DEVICES] [CKPT_DIR]"
+    echo "Usage: bash run_eval.sh [MINDRECORD_FILE] [CUDA_VISIBLE_DEVICES] [CKPT_DIR]"
 exit 1
 fi
 

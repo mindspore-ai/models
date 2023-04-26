@@ -16,9 +16,9 @@
 if [ $# != 3 ] ; then
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_distribute_train_ascend_single_machine.sh DATASET_PATH CKPT_PATH RANK_TABLE_PATH"
+echo "bash run_distribute_train_ascend_single_machine.sh DATASET_PATH CKPT_PATH RANK_TABLE_PATH"
 echo "for example:"
-echo "sh run_distribute_train_ascend_single_machine.sh /disk0/dataset/finetune_dataset/train.mindrecord /disk0/cpm_ckpt_ms/cpm_mindspore_1p_fp32.ckpt /disk0/rank_table_8p.json"
+echo "bash run_distribute_train_ascend_single_machine.sh /disk0/dataset/finetune_dataset/train.mindrecord /disk0/cpm_ckpt_ms/cpm_mindspore_1p_fp32.ckpt /disk0/rank_table_8p.json"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 exit 1;

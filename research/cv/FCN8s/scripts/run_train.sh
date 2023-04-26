@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh scripts/run_train.sh [device_num][RANK_TABLE_FILE]"
+    echo "Usage: bash scripts/run_train.sh [device_num][RANK_TABLE_FILE]"
 exit 1
 fi
 

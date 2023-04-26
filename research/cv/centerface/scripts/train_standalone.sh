@@ -16,12 +16,12 @@
 
 if [ $# != 0 ] && [ $# != 1 ] && [ $# != 2 ] && [ $# != 3 ] && [ $# != 4 ] && [ $# != 5 ]
 then
-    echo "Usage: sh train_standalone.sh [USE_DEVICE_ID] [PRETRAINED_BACKBONE] [DATASET] [ANNOTATIONS] [IMAGES]"
-    echo "   or: sh train_standalone.sh [USE_DEVICE_ID] [PRETRAINED_BACKBONE] [DATASET] [ANNOTATIONS]"
-    echo "   or: sh train_standalone.sh [USE_DEVICE_ID] [PRETRAINED_BACKBONE] [DATASET]"
-    echo "   or: sh train_standalone.sh [USE_DEVICE_ID] [PRETRAINED_BACKBONE]"
-    echo "   or: sh train_standalone.sh [USE_DEVICE_ID]"
-    echo "   or: sh train_standalone.sh "
+    echo "Usage: bash train_standalone.sh [USE_DEVICE_ID] [PRETRAINED_BACKBONE] [DATASET] [ANNOTATIONS] [IMAGES]"
+    echo "   or: bash train_standalone.sh [USE_DEVICE_ID] [PRETRAINED_BACKBONE] [DATASET] [ANNOTATIONS]"
+    echo "   or: bash train_standalone.sh [USE_DEVICE_ID] [PRETRAINED_BACKBONE] [DATASET]"
+    echo "   or: bash train_standalone.sh [USE_DEVICE_ID] [PRETRAINED_BACKBONE]"
+    echo "   or: bash train_standalone.sh [USE_DEVICE_ID]"
+    echo "   or: bash train_standalone.sh "
 exit 1
 fi
 

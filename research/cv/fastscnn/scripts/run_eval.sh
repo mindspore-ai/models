@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 5 ]; then
-  echo "Usage: sh run_eval.sh [train_code_path] [dataset] [resume_path]" \
+  echo "Usage: bash run_eval.sh [train_code_path] [dataset] [resume_path]" \
        "[resume_name] [output_path]"
   exit 1
 fi

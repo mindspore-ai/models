@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 3 ]; then
-  echo "Usage: sh run_eval_ascend.sh [DEVICE_ID] [DATASET_PATH] [PRETAINED_CHECKPOINT_PATH]"
+  echo "Usage: bash run_eval_ascend.sh [DEVICE_ID] [DATASET_PATH] [PRETAINED_CHECKPOINT_PATH]"
   exit 1
 fi
 

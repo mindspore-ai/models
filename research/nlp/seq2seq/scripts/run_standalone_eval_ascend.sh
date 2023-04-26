@@ -16,10 +16,10 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_standalone_eval_ascend.sh TEST_DATASET EXISTED_CKPT_PATH \
+echo "bash run_standalone_eval_ascend.sh TEST_DATASET EXISTED_CKPT_PATH \
   VOCAB_ADDR BPE_CODE_ADDR TEST_TARGET"
 echo "for example:"
-echo "sh run_standalone_eval_ascend.sh \
+echo "bash run_standalone_eval_ascend.sh \
   /home/workspace/dataset_menu/newstest2014.en.mindrecord \
   /home/workspace/seq2seq/seq2seq-8_3452.ckpt \
   /home/workspace/wmt14_fr_en/vocab.bpe.32000 \

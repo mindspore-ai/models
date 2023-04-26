@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-echo "run as sh run_train_gpu.sh [CUDA_VISIBLE_DEVICES] [DATA_PATH] [CKPT_PATH]"
-echo "for example sh run_train_gpu.sh 0 /home/dataset/Music-Tagging /home/fcn-4/"
+echo "run as bash run_train_gpu.sh [CUDA_VISIBLE_DEVICES] [DATA_PATH] [CKPT_PATH]"
+echo "for example bash run_train_gpu.sh 0 /home/dataset/Music-Tagging /home/fcn-4/"
 
 export CUDA_VISIBLE_DEVICES=$1
 DATA_PATH=$2

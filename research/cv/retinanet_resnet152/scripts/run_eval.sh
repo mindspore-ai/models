@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh run_eval.sh [DATASET] [DEVICE_ID]"
+    echo "Usage: bash run_eval.sh [DATASET] [DEVICE_ID]"
 exit 1
 fi
 

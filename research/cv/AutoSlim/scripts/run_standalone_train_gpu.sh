@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 if [ $# != 2 ]; then
-  echo "Usage: sh run_standalone_train_gpu.sh [DEVICE_ID] [DATASET_PATH]"
+  echo "Usage: bash run_standalone_train_gpu.sh [DEVICE_ID] [DATASET_PATH]"
   exit 1
 fi
 

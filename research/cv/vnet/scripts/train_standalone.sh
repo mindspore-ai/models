@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 if [ $# != 3 ]; then
-  echo "Usage: sh train_standalone.sh [DEVICE_ID] [DATA_PATH] [TRAIN_SPLIT_FILE_PATH]"
+  echo "Usage: bash train_standalone.sh [DEVICE_ID] [DATA_PATH] [TRAIN_SPLIT_FILE_PATH]"
   exit 1
 fi
 

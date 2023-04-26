@@ -17,7 +17,7 @@
 
 if [ $# -lt 1 ]
 then
-    echo "Usage: sh run_distributed_train_gpu.sh [DEVICE_NUM]"
+    echo "Usage: bash run_distributed_train_gpu.sh [DEVICE_NUM]"
 exit 1
 fi
 

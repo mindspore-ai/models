@@ -16,8 +16,8 @@
 if [ $# != 5 ] ; then
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh scripts/run_standalone_train.sh DEVICE_TARGET DEVICE_ID EPOCH_SIZE GRADIENT_ACCUMULATE_STEP DATA_PATH"
-echo "for example: sh run_standalone_train.sh Ascend 0 52 8 /path/ende-l128-mindrecord00"
+echo "bash scripts/run_standalone_train.sh DEVICE_TARGET DEVICE_ID EPOCH_SIZE GRADIENT_ACCUMULATE_STEP DATA_PATH"
+echo "for example: bash run_standalone_train.sh Ascend 0 52 8 /path/ende-l128-mindrecord00"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 exit 1;

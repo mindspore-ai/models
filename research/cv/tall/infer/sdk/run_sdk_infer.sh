@@ -23,7 +23,7 @@ fi
 if [ ! -d $1 ]
 then
     echo "error: EVAL_DATA_DIR=$1 is not a directory"
-    echo "Usage: sh run_sdk_infer.sh [EVAL_DATA_DIR]"
+    echo "Usage: bash run_sdk_infer.sh [EVAL_DATA_DIR]"
 exit 1
 fi
 

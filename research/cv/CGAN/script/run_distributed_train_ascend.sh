@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_distributed_train_ascend.sh [DATA_PATH] [OUTPUT_PATH] [RANK_TABLE] [DEVICE_NUM]"
+    echo "Usage: bash run_distributed_train_ascend.sh [DATA_PATH] [OUTPUT_PATH] [RANK_TABLE] [DEVICE_NUM]"
 exit 1
 fi
 

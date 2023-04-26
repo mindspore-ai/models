@@ -14,7 +14,7 @@
 # limitations under the License.
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_eval_gpu.sh [CKPT] [EVALLRPATH] [EVALGTPATH] [DEVICE_ID]"
+    echo "Usage: bash run_eval_gpu.sh [CKPT] [EVALLRPATH] [EVALGTPATH] [DEVICE_ID]"
     exit 1
 fi
 

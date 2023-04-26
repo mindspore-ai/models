@@ -16,7 +16,7 @@
 
 if [ $# != 2 ] && [ $# != 3 ]
 then 
-    echo "Usage: sh run_standalone_train_gpu.sh [DATA_PATH] [DEVICE_ID] [PRETRAINED_PATH](optional)"
+    echo "Usage: bash run_standalone_train_gpu.sh [DATA_PATH] [DEVICE_ID] [PRETRAINED_PATH](optional)"
     exit 1
 fi
 

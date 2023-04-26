@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_standalone_eval_gpu.sh [CUB|AWA] [att|word] [DATA_PATH] [SAVE_CKPT]"
+    echo "Usage: bash run_standalone_eval_gpu.sh [CUB|AWA] [att|word] [DATA_PATH] [SAVE_CKPT]"
 exit 1
 fi
 

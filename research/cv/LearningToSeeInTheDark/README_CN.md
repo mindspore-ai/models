@@ -176,7 +176,7 @@ epoch: 5 step: 4, loss is 0.19579497
 
 ```Shell
 # 评估
-Usage: sh run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
+Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 ```Shell

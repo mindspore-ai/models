@@ -15,14 +15,14 @@
 # ============================================================================
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_standalone_train.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]"
-echo "for example: sh run_standalone_train.sh Pretraining /path/vgg16_backbone.ckpt 0"
+echo "bash run_standalone_train.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]"
+echo "for example: bash run_standalone_train.sh Pretraining /path/vgg16_backbone.ckpt 0"
 echo "when device id is occupied, choose for another one"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 if [ $# -ne 3 ]
 then 
-    echo "Usage: sh scripts/run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]"
+    echo "Usage: bash scripts/run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]"
 exit 1
 fi
 

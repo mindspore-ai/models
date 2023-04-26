@@ -16,7 +16,7 @@
 
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_eval_gpu.sh [EXPERIMENT_NAME] [CUSTOM_DATA_PATH] [CUSTOM_ATTR_PATH] [GEN_CKPT_NAME]"
+    echo "Usage: bash run_eval_gpu.sh [EXPERIMENT_NAME] [CUSTOM_DATA_PATH] [CUSTOM_ATTR_PATH] [GEN_CKPT_NAME]"
     exit 1
 fi
 

@@ -16,8 +16,8 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_eval.sh DEVICE_ID CKPT_PATH MINDRECORD_DIR IMAGE_DIR ANNO_PATH"
-echo "for example: sh run_eval.sh 0 yolo.ckpt ./Mindrecord_eval ./dataset ./dataset/eval.txt"
+echo "bash run_eval.sh DEVICE_ID CKPT_PATH MINDRECORD_DIR IMAGE_DIR ANNO_PATH"
+echo "for example: bash run_eval.sh 0 yolo.ckpt ./Mindrecord_eval ./dataset ./dataset/eval.txt"
 echo "=============================================================================================================="
 
 BASE_PATH=$(cd "`dirname $0`" || exit; pwd)

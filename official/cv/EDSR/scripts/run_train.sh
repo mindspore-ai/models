@@ -16,7 +16,7 @@
 
 if [ $# -lt 1 ]
 then
-    echo "Usage: sh scripts/run_train.sh [RANK_TABLE_FILE] --opt1 opt1_value --opt2 opt2_value ..."
+    echo "Usage: bash scripts/run_train.sh [RANK_TABLE_FILE] --opt1 opt1_value --opt2 opt2_value ..."
 exit 1
 fi
 

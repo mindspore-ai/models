@@ -22,7 +22,7 @@ then
     echo "=============================================================================================================="
     echo "Please run the script as: "
     echo "bash convert_dataset.sh [TASK_NAME]"
-    echo "for example: sh scripts/convert_dataset.sh match_kn_gene"
+    echo "for example: bash scripts/convert_dataset.sh match_kn_gene"
     echo "TASK_TYPE including [match, match_kn, match_kn_gene]"
     echo "=============================================================================================================="
 exit 1

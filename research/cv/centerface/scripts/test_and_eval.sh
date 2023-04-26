@@ -16,14 +16,14 @@
 
 if [ $# -gt 6 ]
 then
-    echo "Usage: sh test_and_eval.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_ID] [CKPT] [GROUND_TRUTH_PATH]"
-    echo "   or: sh test_and_eval.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_ID] [CKPT]"
-    echo "   or: sh test_and_eval.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_ID]"
-    echo "   or: sh test_and_eval.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH]"
-    echo "   or: sh test_and_eval.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT]"
-    echo "   or: sh test_and_eval.sh [MODEL_PATH] [DATASET]"
-    echo "   or: sh test_and_eval.sh [MODEL_PATH]"
-    echo "   or: sh test_and_eval.sh "
+    echo "Usage: bash test_and_eval.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_ID] [CKPT] [GROUND_TRUTH_PATH]"
+    echo "   or: bash test_and_eval.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_ID] [CKPT]"
+    echo "   or: bash test_and_eval.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_ID]"
+    echo "   or: bash test_and_eval.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH]"
+    echo "   or: bash test_and_eval.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT]"
+    echo "   or: bash test_and_eval.sh [MODEL_PATH] [DATASET]"
+    echo "   or: bash test_and_eval.sh [MODEL_PATH]"
+    echo "   or: bash test_and_eval.sh "
 exit 1
 fi
 

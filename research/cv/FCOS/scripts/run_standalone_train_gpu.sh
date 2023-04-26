@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 6 ]
 then
-    echo "Usage: sh run_standalone_train_gpu.sh [TRAIN_DATA_PATH] [ANNO_DATA_PATH] [PRETRAIN_PATH] [CKPT_SAVE_PATH] [DEVICE_ID] [DEVICE_NUM]"
+    echo "Usage: bash run_standalone_train_gpu.sh [TRAIN_DATA_PATH] [ANNO_DATA_PATH] [PRETRAIN_PATH] [CKPT_SAVE_PATH] [DEVICE_ID] [DEVICE_NUM]"
 exit 1
 fi
 

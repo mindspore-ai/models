@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 2 ]; then
-  echo "Usage: sh run_squad_eval_gpu.sh [DATA_PATH] [LOAD_CHECKPOINT_PATH]"
+  echo "Usage: bash run_squad_eval_gpu.sh [DATA_PATH] [LOAD_CHECKPOINT_PATH]"
   exit 1
 fi
 

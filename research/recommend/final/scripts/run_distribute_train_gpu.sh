@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 echo "Please run the script as: "
-echo "sh scripts/run_distribute_train.sh DEVICE_NUM DATASET_PATH"
-echo "for example: sh scripts/run_distribute_train.sh 8 /dataset_path"
+echo "bash scripts/run_distribute_train.sh DEVICE_NUM DATASET_PATH"
+echo "for example: bash scripts/run_distribute_train.sh 8 /dataset_path"
 echo "After running the script, the network runs in the background, The log will be generated in log/output.log"
 
 

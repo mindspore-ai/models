@@ -15,14 +15,14 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_single_eval.sh DEVICE_ID CONFIG_PATH"
-echo "for example: sh run_single_eval.sh 0 home/hed/config/default_config_910.yaml"
+echo "bash run_single_eval.sh DEVICE_ID CONFIG_PATH"
+echo "for example: bash run_single_eval.sh 0 home/hed/config/default_config_910.yaml"
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh run_single_eval.sh [DEVICE_ID] [CONFIG_PATH]"
+    echo "Usage: bash run_single_eval.sh [DEVICE_ID] [CONFIG_PATH]"
     exit 1
 fi
 

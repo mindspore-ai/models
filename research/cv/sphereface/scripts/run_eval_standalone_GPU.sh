@@ -20,7 +20,7 @@ echo "==========================================================================
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh run_eval_standalone_GPU.sh [DEVICE_ID] [CKPT_FILES]"
+    echo "Usage: bash run_eval_standalone_GPU.sh [DEVICE_ID] [CKPT_FILES]"
     exit 1
 fi
 

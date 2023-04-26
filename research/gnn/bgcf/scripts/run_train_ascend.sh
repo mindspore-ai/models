@@ -16,7 +16,7 @@
 
 if [ $# != 1 ]
 then
-    echo "Usage: sh run_train_ascend.sh [DATASET_PATH]"
+    echo "Usage: bash run_train_ascend.sh [DATASET_PATH]"
     exit 1
 fi
 DATASET_PATH=$1

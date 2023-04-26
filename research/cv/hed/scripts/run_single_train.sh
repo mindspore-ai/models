@@ -16,7 +16,7 @@
 echo "=============================================================================================================="
 echo "Please run the script as: "
 echo "bash run_single_train.sh DEVICE_ID CONFIG_PATH"
-echo "for example: sh run_single_train.sh 0 home/hed/config/default_config_910.yaml"
+echo "for example: bash run_single_train.sh 0 home/hed/config/default_config_910.yaml"
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 

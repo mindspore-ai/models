@@ -16,7 +16,7 @@
 
 if [ $# != 4 ] && [ $# != 5 ]
 then 
-    echo "Usage: sh scripts/run_standalone_train.sh [squeezenet|squeezenet_residual] [cifar10|imagenet] [DEVICE_ID] [DATA_PATH] [PRETRAINED_CKPT_PATH](optional)"
+    echo "Usage: bash scripts/run_standalone_train.sh [squeezenet|squeezenet_residual] [cifar10|imagenet] [DEVICE_ID] [DATA_PATH] [PRETRAINED_CKPT_PATH](optional)"
 exit 1
 fi
 

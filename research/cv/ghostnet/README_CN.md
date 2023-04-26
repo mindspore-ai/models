@@ -216,7 +216,7 @@ epoch time: 280178.602 ms, per step time: 223.964 ms
 
 ```Shell
 # 评估
-Usage: sh run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
+Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 ```Shell

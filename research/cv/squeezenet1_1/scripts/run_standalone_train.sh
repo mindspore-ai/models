@@ -16,7 +16,7 @@
 
 if [ $# != 2 ] && [ $# != 3 ]
 then 
-    echo "Usage: sh scripts/run_standalone_train.sh [DEVICE_ID] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)"
+    echo "Usage: bash scripts/run_standalone_train.sh [DEVICE_ID] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)"
 exit 1
 fi
 

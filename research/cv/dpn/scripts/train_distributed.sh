@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-#Usage: sh train_distributed.sh  [MINDSPORE_HCCL_CONFIG_PATH] [DATASET_PATH] [SAVE_CKPT_PATH] [RANK_SIZE] [EVAL_EACH_EPOCH] [PRETRAINED_CKPT_PATH](optional)
+#Usage: bash train_distributed.sh  [MINDSPORE_HCCL_CONFIG_PATH] [DATASET_PATH] [SAVE_CKPT_PATH] [RANK_SIZE] [EVAL_EACH_EPOCH] [PRETRAINED_CKPT_PATH](optional)
 
 export HCCL_CONNECT_TIMEOUT=1800
 DATA_DIR=$2

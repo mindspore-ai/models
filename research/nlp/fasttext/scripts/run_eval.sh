@@ -15,8 +15,8 @@
 # ============================================================================
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_eval.sh DATASET_PATH DATASET_NAME MODEL_CKPT"
-echo "for example: sh run_eval.sh /home/workspace/ag/test*.mindrecord ag device0/ckpt0/fasttext-5-118.ckpt"
+echo "bash run_eval.sh DATASET_PATH DATASET_NAME MODEL_CKPT"
+echo "for example: bash run_eval.sh /home/workspace/ag/test*.mindrecord ag device0/ckpt0/fasttext-5-118.ckpt"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 

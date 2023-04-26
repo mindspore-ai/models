@@ -16,7 +16,7 @@
 
 if [ $# -le 2 ]
 then 
-    echo "Usage: sh run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_PATH] [COCO_ROOT] [MINDRECORD_DIR](option)"
+    echo "Usage: bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_PATH] [COCO_ROOT] [MINDRECORD_DIR](option)"
 exit 1
 fi
 

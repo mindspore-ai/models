@@ -16,7 +16,7 @@
 # an simple tutorial as follows, more parameters can be setting
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_distribution_ascend.sh [RANK_TABLE_FILE] [DATA_PATH] [TRAIN_CLASS] [EPOCHS]"
+    echo "Usage: bash run_distribution_ascend.sh [RANK_TABLE_FILE] [DATA_PATH] [TRAIN_CLASS] [EPOCHS]"
 exit 1
 fi
 

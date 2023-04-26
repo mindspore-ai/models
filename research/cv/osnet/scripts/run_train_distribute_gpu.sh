@@ -16,7 +16,7 @@
 
 if [ $# != 2 ] && [ $# != 3 ]
 then
-    echo "Usage: sh run_train_distribute_ascend.sh [DEVICE_NUM] [market1501|dukemtmcreid|cuhk03|msmt17] [PRETRAINED_CKPT_PATH](optional)"
+    echo "Usage: bash run_train_distribute_ascend.sh [DEVICE_NUM] [market1501|dukemtmcreid|cuhk03|msmt17] [PRETRAINED_CKPT_PATH](optional)"
 exit 1
 fi
 

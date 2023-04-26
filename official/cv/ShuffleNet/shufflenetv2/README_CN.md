@@ -115,8 +115,8 @@ ShuffleNetV2的整体网络架构如下：
 
 您可以使用python命令或运行shell脚本进行评估。shell脚本的用法如下：
 
-- Ascend: sh run_eval_for_ascend.sh [DATASET_PATH] [CHECKPOINT]
-- GPU: sh run_eval_for_gpu.sh [DATASET_PATH] [CHECKPOINT]
+- Ascend: bash run_eval_for_ascend.sh [DATASET_PATH] [CHECKPOINT]
+- GPU: bash run_eval_for_gpu.sh [DATASET_PATH] [CHECKPOINT]
 
 ### 启动
 

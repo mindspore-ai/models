@@ -16,14 +16,14 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_standalone_train.sh DEVICE_ID EPOCH_SIZE LR DATASET CONFIG_PATH PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
-echo "for example: sh run_standalone_train.sh 0 500 0.2 coco /config_path /opt/ssd-300.ckpt(optional) 200(optional)"
+echo "bash run_standalone_train.sh DEVICE_ID EPOCH_SIZE LR DATASET CONFIG_PATH PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
+echo "for example: bash run_standalone_train.sh 0 500 0.2 coco /config_path /opt/ssd-300.ckpt(optional) 200(optional)"
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 
 if [ $# != 5 ] && [ $# != 7 ]
 then
-    echo "Usage: sh run_standalone_train.sh [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] [CONFIG_PATH] \
+    echo "Usage: bash run_standalone_train.sh [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] [CONFIG_PATH] \
     [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)"
     exit 1
 fi

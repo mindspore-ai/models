@@ -17,8 +17,8 @@ if [ $# -ne 2 ]
 then
     echo "=============================================================================================================="
     echo "Please run the script as: "
-    echo "sh convert_pretrain_dataset.sh [DATASET_PATH] [OUTPUT_PATH]"
-    echo "for example: sh scripts/convert_pretrain_dataset.sh /path/zh_wiki/ /path/zh_wiki/mindrecord/"
+    echo "bash convert_pretrain_dataset.sh [DATASET_PATH] [OUTPUT_PATH]"
+    echo "for example: bash scripts/convert_pretrain_dataset.sh /path/zh_wiki/ /path/zh_wiki/mindrecord/"
     echo "It is better to use absolute path."
     echo "=============================================================================================================="
 exit 1

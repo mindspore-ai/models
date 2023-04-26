@@ -16,7 +16,7 @@
 # an simple tutorial as follows, more parameters can be setting
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_standalone_eval_cpu.sh [cifar10] [SIMCLR_MODEL_PATH] [TRAIN_DATASET_PATH] [EVAL_DATASET_PATH]"
+    echo "Usage: bash run_standalone_eval_cpu.sh [cifar10] [SIMCLR_MODEL_PATH] [TRAIN_DATASET_PATH] [EVAL_DATASET_PATH]"
 exit 1
 else
 

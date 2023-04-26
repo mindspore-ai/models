@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 2 ]; then
-  echo "Usage: sh run_distribute_train.sh [RANK_SIZE] [TRAIN_DATA_DIR]"
+  echo "Usage: bash run_distribute_train.sh [RANK_SIZE] [TRAIN_DATA_DIR]"
   exit 1
 fi
 

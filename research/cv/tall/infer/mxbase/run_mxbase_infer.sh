@@ -23,14 +23,14 @@ fi
 if [ ! -d $1 ]
 then
     echo "error: EVAL_DATA_DIR=$1 is not a directory"
-    echo "Usage: sh run_mxbase_infer.sh [EVAL_DATA_DIR] [OM_PATH]"
+    echo "Usage: bash run_mxbase_infer.sh [EVAL_DATA_DIR] [OM_PATH]"
 exit 1
 fi
 
 if [ ! -f $2 ]
 then
     echo "error: OM_PATH=$2 is not a file"
-    echo "Usage: sh run_mxbase_infer.sh [EVAL_DATA_DIR] [OM_PATH]"
+    echo "Usage: bash run_mxbase_infer.sh [EVAL_DATA_DIR] [OM_PATH]"
 exit 1
 fi
 

@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# -ne 2 ]
 then 
-    echo "Usage: sh run_distribute_train_for_ascend.sh [RANK_TABLE_FILE] [DATASET_PATH]"
+    echo "Usage: bash run_distribute_train_for_ascend.sh [RANK_TABLE_FILE] [DATASET_PATH]"
 exit 1
 fi
 

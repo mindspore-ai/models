@@ -20,21 +20,21 @@ export RANK_ID=0
 
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_eval.sh [CHECKPOINT_PATH] [EVAL_DATA_DIR] [DEVICE_ID]."
+    echo "Usage: bash run_eval.sh [CHECKPOINT_PATH] [EVAL_DATA_DIR] [DEVICE_ID]."
     exit 1
 fi
 
 if [ ! -f $1 ]
 then
     echo "error: CHECKPOINT_PATH=$1 is not a file"
-    echo "Usage: sh run_eval.sh [CHECKPOINT_PATH] [EVAL_DATA_DIR] [DEVICE_ID]."
+    echo "Usage: bash run_eval.sh [CHECKPOINT_PATH] [EVAL_DATA_DIR] [DEVICE_ID]."
 exit 1
 fi
 
 if [ ! -d $2 ]
 then
     echo "error: EVAL_DATA_DIR=$2 is not a directory"
-    echo "Usage: sh run_eval.sh [CHECKPOINT_PATH] [EVAL_DATA_DIR] [DEVICE_ID]."
+    echo "Usage: bash run_eval.sh [CHECKPOINT_PATH] [EVAL_DATA_DIR] [DEVICE_ID]."
 exit 1
 fi
 

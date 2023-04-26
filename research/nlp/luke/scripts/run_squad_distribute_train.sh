@@ -16,9 +16,9 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_distributed_train_ascend.sh RANK_TABLE_ADDR PRE_TRAIN_DATASET"
+echo "bash run_distributed_train_ascend.sh RANK_TABLE_ADDR PRE_TRAIN_DATASET"
 echo "for example:"
-echo "sh run_distributed_train_ascend.sh \
+echo "bash run_distributed_train_ascend.sh \
   /home/workspace/rank_table_8p.json \
   /home/workspace/squad_data \
   /home/workspace/pre_luke/luke_large "

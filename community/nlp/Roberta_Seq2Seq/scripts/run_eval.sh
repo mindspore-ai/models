@@ -16,8 +16,8 @@
 if [ $# != 6 ] ; then
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh scripts/run_eval.sh  DEVICE_ID DATA_PATH CKPT_PATH CONFIG_PATH VOCAB_FILE_PATH OUTPUT_FILE"
-echo "for example: sh run_eval.sh 0 /your/path/data_path /your/path/checkpoint_file ./default_config.yaml ./vocab.json ./output_file"
+echo "bash scripts/run_eval.sh  DEVICE_ID DATA_PATH CKPT_PATH CONFIG_PATH VOCAB_FILE_PATH OUTPUT_FILE"
+echo "for example: bash run_eval.sh 0 /your/path/data_path /your/path/checkpoint_file ./default_config.yaml ./vocab.json ./output_file"
 echo "Note: set the checkpoint and dataset path in default_config.yaml"
 echo "=============================================================================================================="
 exit 1;

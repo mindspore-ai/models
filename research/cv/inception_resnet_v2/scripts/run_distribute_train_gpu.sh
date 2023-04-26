@@ -16,7 +16,7 @@
 
 if [ $# -lt 3 ]
 then
-    echo "Usage: sh run_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATA_DIR]"
+    echo "Usage: bash run_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATA_DIR]"
 exit 1
 fi
 

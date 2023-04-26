@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then 
-    echo "Usage: sh run_train_ascend.sh [SRC_PATH] [DATASET_NAME]"
+    echo "Usage: bash run_train_ascend.sh [SRC_PATH] [DATASET_NAME]"
 exit 1
 fi
 

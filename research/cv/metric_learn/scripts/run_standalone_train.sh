@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 4 ]; then
-  echo "Usage: sh run_standalone_train.sh [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID] [LOSS_NAME]"
+  echo "Usage: bash run_standalone_train.sh [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID] [LOSS_NAME]"
   exit 1
 fi
 

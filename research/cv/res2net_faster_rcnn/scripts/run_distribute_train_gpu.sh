@@ -16,14 +16,14 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_distribute_train_gpu.sh DEVICE_NUM PRETRAINED_PATH BACKBONE COCO_ROOT MINDRECORD_DIR(option)"
-echo "for example: sh run_distribute_train_gpu.sh 8 /path/pretrain.ckpt res2net_v1_50 cocodataset mindrecord_dir(option)"
+echo "bash run_distribute_train_gpu.sh DEVICE_NUM PRETRAINED_PATH BACKBONE COCO_ROOT MINDRECORD_DIR(option)"
+echo "for example: bash run_distribute_train_gpu.sh 8 /path/pretrain.ckpt res2net_v1_50 cocodataset mindrecord_dir(option)"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 
 if [ $# -le 3 ]
 then
-    echo "Usage: sh run_distribute_train_gpu.sh [DEVICE_NUM] [PRETRAINED_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)"
+    echo "Usage: bash run_distribute_train_gpu.sh [DEVICE_NUM] [PRETRAINED_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)"
 exit 1
 fi
 

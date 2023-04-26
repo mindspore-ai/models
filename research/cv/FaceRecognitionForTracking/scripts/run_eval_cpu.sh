@@ -16,7 +16,7 @@
 
 if [ $# -lt 2 ]
 then
-  echo "Usage: sh run_eval_cpu.sh [EVALDATA_PATH] [PRE_TRAINED]"
+  echo "Usage: bash run_eval_cpu.sh [EVALDATA_PATH] [PRE_TRAINED]"
   exit 1
 fi
 

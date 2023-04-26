@@ -17,7 +17,7 @@
 echo "=============================================================================================================="
 echo "Please run the script as: "
 echo "bash run_single_train.sh DEVICE_ID DATA_PATH PRETRAINED_PATH"
-echo "For example: sh run_single_train.sh 0 /path/dataset /path/pretrain_path"
+echo "For example: bash run_single_train.sh 0 /path/dataset /path/pretrain_path"
 echo "It is better to use the absolute path."
 echo "=============================================================================================================="
 set -e

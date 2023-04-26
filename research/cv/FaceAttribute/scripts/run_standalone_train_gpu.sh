@@ -16,8 +16,8 @@
 
 if [ $# != 2 ] && [ $# != 3 ]
 then
-    echo "Usage: sh run_standalone_train_gpu.sh [MINDRECORD_FILE] [CUDA_VISIBLE_DEVICES] [PRETRAINED_BACKBONE]"
-    echo "   or: sh run_standalone_train_gpu.sh [MINDRECORD_FILE] [CUDA_VISIBLE_DEVICES]"
+    echo "Usage: bash run_standalone_train_gpu.sh [MINDRECORD_FILE] [CUDA_VISIBLE_DEVICES] [PRETRAINED_BACKBONE]"
+    echo "   or: bash run_standalone_train_gpu.sh [MINDRECORD_FILE] [CUDA_VISIBLE_DEVICES]"
 exit 1
 fi
 

@@ -16,7 +16,7 @@
 
 if [ $# -ne 2 ]
 then
-    echo "Usage: sh scripts/run_eval_ascend.sh [DEVICE_ID] [TRAINED_CKPT]"
+    echo "Usage: bash scripts/run_eval_ascend.sh [DEVICE_ID] [TRAINED_CKPT]"
 exit 1
 fi
 

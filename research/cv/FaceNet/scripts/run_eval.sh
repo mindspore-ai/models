@@ -16,7 +16,7 @@
 
 if [ $# != 1 ]
 then
-    echo "Usage: sh run_eval.sh [CKPT_DIR]"
+    echo "Usage: bash run_eval.sh [CKPT_DIR]"
     exit 1
 fi
 

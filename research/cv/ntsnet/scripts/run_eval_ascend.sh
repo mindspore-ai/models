@@ -16,7 +16,7 @@
 
 if [ $# != 3 ]
 then 
-    echo "Usage: sh run_eval_ascend.sh [DATA_URL] [TRAIN_URL] [CKPT_FILENAME]"
+    echo "Usage: bash run_eval_ascend.sh [DATA_URL] [TRAIN_URL] [CKPT_FILENAME]"
 exit 1
 fi
 

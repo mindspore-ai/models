@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then 
-    echo "Usage: sh run_train_gpu.sh [DATASET_NAME] [DATA_DIR]"
+    echo "Usage: bash run_train_gpu.sh [DATASET_NAME] [DATA_DIR]"
 exit 1
 fi
 

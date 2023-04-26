@@ -16,7 +16,7 @@
 
 if [ $# != 1 ]
 then
-    echo "Usage: sh scripts/run_distribute.sh [RANK_TABLE_FILE]"
+    echo "Usage: bash scripts/run_distribute.sh [RANK_TABLE_FILE]"
     exit 1
 fi
 

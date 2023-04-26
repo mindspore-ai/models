@@ -16,7 +16,7 @@
 
 if [ $# != 3 ] && [ $# != 4 ]
 then
-    echo "Usage: sh scripts/run_standalone_train.sh [SCALE] [DATA_PATH] [OUTPUT_PATH] [PRETRAIN_PATH](optional)"
+    echo "Usage: bash scripts/run_standalone_train.sh [SCALE] [DATA_PATH] [OUTPUT_PATH] [PRETRAIN_PATH](optional)"
 exit 1
 fi
 

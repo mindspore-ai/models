@@ -16,7 +16,7 @@
 
 if [ $# != 1 ]
 then 
-    echo "Usage: sh run_standalone_train_base.sh [USE_DEVICE_ID]"
+    echo "Usage: bash run_standalone_train_base.sh [USE_DEVICE_ID]"
 exit 1
 fi
 

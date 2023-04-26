@@ -16,7 +16,7 @@
 
 if [ $# -ne 1 ]
 then
-    echo "Usage: sh run_distribute_train_gpu.sh [DATASET_PATH]"
+    echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH]"
 exit 1
 fi
 

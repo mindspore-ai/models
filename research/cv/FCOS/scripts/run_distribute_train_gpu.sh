@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_distribute_train_gpu.sh [TRAIN_DATA_PATH] [ANNO_DATA_PATH] [PRETRAIN_PATH] [CKPT_SAVE_PATH]"
+    echo "Usage: bash run_distribute_train_gpu.sh [TRAIN_DATA_PATH] [ANNO_DATA_PATH] [PRETRAIN_PATH] [CKPT_SAVE_PATH]"
 exit 1
 fi
 

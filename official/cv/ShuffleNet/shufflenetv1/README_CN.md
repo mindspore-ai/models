@@ -157,8 +157,8 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
                           --device_target=GPU > log.txt 2>&1 &
 
   shell:
-      GPU单卡训练示例: sh scripts/run_standalone_train_gpu.sh [DEVICE_ID] [DATA_DIR]
-      GPU八卡并行训练: sh scripts/run_distribute_train_gpu.sh [RANK_SIZE] [TRAIN_DATA_DIR]
+      GPU单卡训练示例: bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [DATA_DIR]
+      GPU八卡并行训练: bash scripts/run_distribute_train_gpu.sh [RANK_SIZE] [TRAIN_DATA_DIR]
 
 - running transfer learning on CPU with default parameters
 

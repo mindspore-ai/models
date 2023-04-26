@@ -17,8 +17,8 @@ if [ $# -ne 1 ]
 then
     echo "=============================================================================================================="
     echo "Please run the script as: "
-    echo "sh run_standalone_finetune.sh [TASK_TYPE]"
-    echo "for example: sh scripts/run_standalone_finetune.sh msra_ner"
+    echo "bash run_standalone_finetune.sh [TASK_TYPE]"
+    echo "for example: bash scripts/run_standalone_finetune.sh msra_ner"
     echo "TASK_TYPE including [msra_ner, chnsenticorp]"
     echo "=============================================================================================================="
 exit 1

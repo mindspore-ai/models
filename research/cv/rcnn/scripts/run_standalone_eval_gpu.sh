@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 1 ]
 then
-    echo "Usage: sh run_standalone_eval_gpu.sh [DEVICE_ID]"
+    echo "Usage: bash run_standalone_eval_gpu.sh [DEVICE_ID]"
 exit 1
 fi
 

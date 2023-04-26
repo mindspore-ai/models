@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh eval_ascend.sh [DEVICE_ID] [CHECKPOINTPATH]"
+    echo "Usage: bash eval_ascend.sh [DEVICE_ID] [CHECKPOINTPATH]"
     exit 1
 fi
 

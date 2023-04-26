@@ -18,7 +18,7 @@ run_ascend()
     if [ $# -gt 6 ] || [ $# -lt 5 ]
     then
         echo "Usage:
-              Ascend: sh run_train.sh Ascend [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH]\n "
+              Ascend: bash run_train.sh Ascend [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH]\n "
         exit 1
     fi;
 

@@ -17,7 +17,7 @@ if [ $# != 6 ] ; then
 echo "=============================================================================================================="
 echo "Please run the script as: "
 echo "bash scripts/run_distribute_train_ascend_multi_machines.sh DEVICE_NUM SERVER_ID EPOCH_SIZE DATA_PATH RANK_TABLE_FILE CONFIG_PATH"
-echo "for example: sh run_distribute_train_ascend_multi_machines.sh 32 0 52 /path/ende-l128-mindrecord00 /path/hccl.json ./default_config_large.yaml"
+echo "for example: bash run_distribute_train_ascend_multi_machines.sh 32 0 52 /path/ende-l128-mindrecord00 /path/hccl.json ./default_config_large.yaml"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 exit 1;

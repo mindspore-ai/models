@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# -ne 2 ]
 then 
-    echo "Usage: sh run_standalone_train_for_ascend.sh [DEVICE_ID] [DATASET_PATH]"
+    echo "Usage: bash run_standalone_train_for_ascend.sh [DEVICE_ID] [DATASET_PATH]"
 exit 1
 fi
 

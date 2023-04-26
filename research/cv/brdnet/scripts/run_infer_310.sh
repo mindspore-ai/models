@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 6 ]; then
-    echo "Usage: sh run_infer_310.sh [model_path] [data_path]" \
+    echo "Usage: bash run_infer_310.sh [model_path] [data_path]" \
        "[noise_image_path] [sigma] [channel] [device_id]"
 exit 1
 fi

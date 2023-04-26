@@ -15,7 +15,7 @@
 # limitations under the License.
 if [ $# != 2 ]
 then
-    echo "Usage: sh air2om.sh [INPUT_MODEL_FILE] [OUTPUT_MODEL_NAME]"
+    echo "Usage: bash air2om.sh [INPUT_MODEL_FILE] [OUTPUT_MODEL_NAME]"
 exit 1
 fi
 

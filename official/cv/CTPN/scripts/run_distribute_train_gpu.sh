@@ -16,7 +16,7 @@
 
 if [ $# -ne 2 ]
 then 
-    echo "Usage: sh scripts/run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH]"
+    echo "Usage: bash scripts/run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH]"
 exit 1
 fi
 

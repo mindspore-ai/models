@@ -16,8 +16,8 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh process_output.sh REF_DATA EVAL_OUTPUT VOCAB_FILE"
-echo "for example: sh parse_output.sh target.txt output.txt vocab.en"
+echo "bash process_output.sh REF_DATA EVAL_OUTPUT VOCAB_FILE"
+echo "for example: bash parse_output.sh target.txt output.txt vocab.en"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 ref_data=$1

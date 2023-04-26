@@ -16,7 +16,7 @@
 
 if [ $# -le 2 ]
 then 
-    echo "Usage: sh run_standalone_train_gpu.sh [DEVICE_ID] [PRETRAINED_PATH] [COCO_ROOT] [MINDRECORD_DIR](option)"
+    echo "Usage: bash run_standalone_train_gpu.sh [DEVICE_ID] [PRETRAINED_PATH] [COCO_ROOT] [MINDRECORD_DIR](option)"
 exit 1
 fi
 

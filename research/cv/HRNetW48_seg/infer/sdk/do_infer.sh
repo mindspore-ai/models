@@ -16,7 +16,7 @@
 
 if [[ $# != 2 ]]; then
     echo "Usage:"
-    echo "sh do_infer.sh [DATA_PATH] [DATA_LST]"
+    echo "bash do_infer.sh [DATA_PATH] [DATA_LST]"
     exit 1
 fi
 

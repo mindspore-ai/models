@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 4 ]; then
-  echo "Usage: sh run_distribute_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATA_DIR] [TRAIN_URL]"
+  echo "Usage: bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATA_DIR] [TRAIN_URL]"
   exit 1
 fi
 

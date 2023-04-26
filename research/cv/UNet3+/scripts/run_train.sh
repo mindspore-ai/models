@@ -16,7 +16,7 @@
 
 # help message
 if [ $# != 1 ]; then
-  echo "Usage: sh run_train.sh [root path of code]"
+  echo "Usage: bash run_train.sh [root path of code]"
   exit 1
 fi
 

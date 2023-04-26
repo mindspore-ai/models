@@ -16,7 +16,7 @@
 echo "=============================================================================================================="
 echo "Please run the script as: "
 echo "bash convert_dataset.sh"
-echo "For example: sh convert_dataset.sh DATA_PATH TRAIN_PATH MINDRECORD_PATH SAMPLE_NUM"
+echo "For example: bash convert_dataset.sh DATA_PATH TRAIN_PATH MINDRECORD_PATH SAMPLE_NUM"
 echo "=============================================================================================================="
 set -e
 if [ $# != 4 ]

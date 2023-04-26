@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 8 ]; then
-  echo "Usage: sh run_distribute_train_gpu.sh [DATASET_PATH] [DATASET] [TRAIN_LIST_PATH] [TRAIN_LIST] [MODALITY] [PRETRAINED_PATH] [PRETRAINED_PATH_NAME] [DEVICE_ID]"
+  echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [DATASET] [TRAIN_LIST_PATH] [TRAIN_LIST] [MODALITY] [PRETRAINED_PATH] [PRETRAINED_PATH_NAME] [DEVICE_ID]"
   exit 1
 fi
 

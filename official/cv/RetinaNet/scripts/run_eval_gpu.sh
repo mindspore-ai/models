@@ -16,7 +16,7 @@
 
 if [ $# != 6 ]
 then
-    echo "Usage: sh scripts/run_eval_GPU.sh [DEVICE_ID] [DATASET] [MINDRECORD_DIR] [checkpoint_path] [instances_set] [CONFIG_PATH]"
+    echo "Usage: bash scripts/run_eval_GPU.sh [DEVICE_ID] [DATASET] [MINDRECORD_DIR] [checkpoint_path] [instances_set] [CONFIG_PATH]"
 exit 1
 fi
 

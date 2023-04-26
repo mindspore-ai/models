@@ -16,7 +16,7 @@
 
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_single_train_gpu.sh [EXPERIMENT_NAME] [DATA_PATH] [ATTR_PATH]"
+    echo "Usage: bash run_single_train_gpu.sh [EXPERIMENT_NAME] [DATA_PATH] [ATTR_PATH]"
     exit 1
 fi
 

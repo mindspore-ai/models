@@ -15,7 +15,7 @@
 # limitations under the License.
 if [ $# != 1 ]
 then
-    echo "Usage: sh run.sh [DATASET_VAL_PATH]"
+    echo "Usage: bash run.sh [DATASET_VAL_PATH]"
 exit 1
 fi
 

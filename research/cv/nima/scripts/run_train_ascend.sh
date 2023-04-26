@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [[ $# -lt 1 || $# -gt 2 ]]; then
-    echo "Usage: sh run_train_ascend.sh [RANK_TABLE_FILE] [CONFIG_PATH]
+    echo "Usage: bash run_train_ascend.sh [RANK_TABLE_FILE] [CONFIG_PATH]
     Single-card training is used by default."
 exit 1
 fi

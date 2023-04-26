@@ -16,12 +16,12 @@
 
 if [ $# != 0 ] && [ $# != 1 ] && [ $# != 2 ] && [ $# != 3 ] && [ $# != 4 ] && [ $# != 5 ]
 then
-    echo "Usage: sh train_distribute.sh [RANK_TABLE] [PRETRAINED_BACKBONE] [DATASET] [ANNOTATIONS] [IMAGES]"
-    echo "   or: sh train_distribute.sh [RANK_TABLE] [PRETRAINED_BACKBONE] [DATASET] [ANNOTATIONS]"
-    echo "   or: sh train_distribute.sh [RANK_TABLE] [PRETRAINED_BACKBONE] [DATASET]"
-    echo "   or: sh train_distribute.sh [RANK_TABLE] [PRETRAINED_BACKBONE]"
-    echo "   or: sh train_distribute.sh [RANK_TABLE]"
-    echo "   or: sh train_distribute.sh "
+    echo "Usage: bash train_distribute.sh [RANK_TABLE] [PRETRAINED_BACKBONE] [DATASET] [ANNOTATIONS] [IMAGES]"
+    echo "   or: bash train_distribute.sh [RANK_TABLE] [PRETRAINED_BACKBONE] [DATASET] [ANNOTATIONS]"
+    echo "   or: bash train_distribute.sh [RANK_TABLE] [PRETRAINED_BACKBONE] [DATASET]"
+    echo "   or: bash train_distribute.sh [RANK_TABLE] [PRETRAINED_BACKBONE]"
+    echo "   or: bash train_distribute.sh [RANK_TABLE]"
+    echo "   or: bash train_distribute.sh "
 exit 1
 fi
 

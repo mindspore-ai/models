@@ -15,7 +15,7 @@
 # ============================================================================
 echo "Please run the script as: "
 echo "bash scripts/run_distribute_train_gpu.sh DEVICE_NUM DATASET_PATH"
-echo "for example: sh scripts/run_distribute_train_gpu.sh 8 /dataset_path"
+echo "for example: bash scripts/run_distribute_train_gpu.sh 8 /dataset_path"
 echo "After running the script, the network runs in the background, The log will be generated in log/output.log"
 
 if [ $# != 2 ]; then

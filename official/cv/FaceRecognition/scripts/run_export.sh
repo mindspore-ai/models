@@ -16,7 +16,7 @@
 
 if [ $# != 3 ]  && [ $# != 2 ]
 then
-    echo "Usage: sh run_export.sh [PRETRAINED_BACKBONE] [DEVICE_TARGET] [USE_DEVICE_ID](optional)"
+    echo "Usage: bash run_export.sh [PRETRAINED_BACKBONE] [DEVICE_TARGET] [USE_DEVICE_ID](optional)"
 exit 1
 fi
 

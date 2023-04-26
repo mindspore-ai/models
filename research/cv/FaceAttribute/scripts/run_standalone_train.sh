@@ -16,8 +16,8 @@
 
 if [ $# != 2 ] && [ $# != 3 ]
 then
-    echo "Usage: sh run_standalone_train.sh [MINDRECORD_FILE] [USE_DEVICE_ID] [PRETRAINED_BACKBONE]"
-    echo "   or: sh run_standalone_train.sh [MINDRECORD_FILE] [USE_DEVICE_ID]"
+    echo "Usage: bash run_standalone_train.sh [MINDRECORD_FILE] [USE_DEVICE_ID] [PRETRAINED_BACKBONE]"
+    echo "   or: bash run_standalone_train.sh [MINDRECORD_FILE] [USE_DEVICE_ID]"
 exit 1
 fi
 

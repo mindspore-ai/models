@@ -15,8 +15,8 @@
 # ============================================================================
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_standalone_train.sh MINDRECORD_PATH"
-echo "for example: sh run_standalone_train.sh /data/mindrecord_path device_id"
+echo "bash run_standalone_train.sh MINDRECORD_PATH"
+echo "for example: bash run_standalone_train.sh /data/mindrecord_path device_id"
 echo "It is better to use absolute path."
 echo "Please pay attention that the dataset should corresponds to dataset_name"
 echo "=============================================================================================================="
