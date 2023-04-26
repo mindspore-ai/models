@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 
-#"sh run_distribute_train.sh darknet53 imagenet2012 [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)"
+#"bash run_distribute_train.sh darknet53 imagenet2012 [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)"
 
 export DEVICE_NUM=8
 export RANK_SIZE=8

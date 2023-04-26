@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 7 ]; then
-  echo "Usage: sh run_distribute_train.sh [train_code_path] [dataset]" \
+  echo "Usage: bash run_distribute_train.sh [train_code_path] [dataset]" \
        "[epochs] [batch_size] [lr] [output_path] [rank_table_file_path]"
   exit 1
 fi

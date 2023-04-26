@@ -16,7 +16,7 @@
 
 if [ $# != 3 ]
 then 
-    echo "Usage: sh scripts/run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]"
+    echo "Usage: bash scripts/run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]"
 exit 1
 fi
 

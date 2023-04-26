@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 2 ]; then
-  echo "Usage: sh run_gpu_distribute_train.sh  [TRAIN_DATA_DIR] [DEVICE_NUM]"
+  echo "Usage: bash run_gpu_distribute_train.sh  [TRAIN_DATA_DIR] [DEVICE_NUM]"
   exit 1
 fi
 

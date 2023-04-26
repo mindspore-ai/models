@@ -16,7 +16,7 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_distribute_train_gpu.sh DEVICE_NUM PRETRAINED_PATH COCO_ROOT MINDRECORD_DIR(option)"
+echo "bash run_distribute_train_gpu.sh DEVICE_NUM PRETRAINED_PATH COCO_ROOT MINDRECORD_DIR(option)"
 echo "for example: bash run_distribute_train_gpu.sh 8 /path/pretrain.ckpt cocodataset mindrecord_dir(option)"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="

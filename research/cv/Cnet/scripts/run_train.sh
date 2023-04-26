@@ -16,7 +16,7 @@
 
 if [ $# != 2 ] && [ $# != 3 ]
 then
-    echo "Usage: sh run_train.sh [RANK_TABLE_FILE] [DATA_PATH] [liberty|notredame|yosemite]"
+    echo "Usage: bash run_train.sh [RANK_TABLE_FILE] [DATA_PATH] [liberty|notredame|yosemite]"
 exit 1
 fi
 

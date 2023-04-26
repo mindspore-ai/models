@@ -16,7 +16,7 @@
 
 if [ $# -lt 6 ]
 then
-    echo "Usage: sh run_distribute_eval_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [NET_NAME] [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH]"
+    echo "Usage: bash run_distribute_eval_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [NET_NAME] [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH]"
     exit 1
 fi
 

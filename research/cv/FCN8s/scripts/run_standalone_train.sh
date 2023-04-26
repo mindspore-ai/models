@@ -16,7 +16,7 @@
 
 if [ $# != 1 ]
 then
-    echo "Usage: sh scripts/run_standalone_train.sh DEVICE_ID"
+    echo "Usage: bash scripts/run_standalone_train.sh DEVICE_ID"
 exit 1
 fi
 

@@ -15,7 +15,7 @@
 # ============================================================================
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_eval.sh MINDRECORD_PATH CKPT_PATH DEVICE_ID"
+echo "bash run_eval.sh MINDRECORD_PATH CKPT_PATH DEVICE_ID"
 echo "for example: bash run_eval.sh /data/path checkpoint/path device_id"
 echo "It is better to use absolute path."
 echo "Please pay attention that the dataset should corresponds to dataset_name"

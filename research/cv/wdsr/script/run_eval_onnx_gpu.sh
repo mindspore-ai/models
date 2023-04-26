@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 3 ]; then
-  echo "Usage: sh run_eval_onnx_gpu.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]"
+  echo "Usage: bash run_eval_onnx_gpu.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]"
   exit 1
 fi
 

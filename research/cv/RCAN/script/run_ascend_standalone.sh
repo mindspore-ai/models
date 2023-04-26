@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 1 ]; then
-  echo "Usage: sh run_standalone_train.sh [TRAIN_DATA_DIR]"
+  echo "Usage: bash run_standalone_train.sh [TRAIN_DATA_DIR]"
   exit 1
 fi
 

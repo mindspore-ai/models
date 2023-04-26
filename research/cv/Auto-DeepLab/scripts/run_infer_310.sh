@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 3 ]; then
-    echo "Usage: sh run_infer_310.sh [MODEL_PATH] [DATA_PATH] [DEVICE_ID]
+    echo "Usage: bash run_infer_310.sh [MODEL_PATH] [DATA_PATH] [DEVICE_ID]
     DEVICE_ID is optional, it can be set by environment variable DEVICE_ID, otherwise the value is zero"
 exit 1
 fi

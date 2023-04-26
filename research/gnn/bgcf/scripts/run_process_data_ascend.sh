@@ -16,7 +16,7 @@
 
 if [ $# != 1 ]
 then
-    echo "Usage: sh run_process_data_ascend.sh [SRC_PATH] "
+    echo "Usage: bash run_process_data_ascend.sh [SRC_PATH] "
 exit 1
 fi
 

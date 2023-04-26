@@ -16,16 +16,16 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh scripts/run_standalone_train.sh  [DEVICE_ID] [DATASET] [DATASET_PATH] [MINDRECORD_PATH] [TRAIN_OUTPUT_PATH] [PRE_TRAINED_PATH]"
-echo "for example: sh scripts/run_standalone_train.sh 0 coco /home/neu/ssd-coco /home/neu/coco-mindrecord ./train_out /home/neu/ssdresnet34lj/resnet34.ckpt(optional)"
+echo "bash scripts/run_standalone_train.sh  [DEVICE_ID] [DATASET] [DATASET_PATH] [MINDRECORD_PATH] [TRAIN_OUTPUT_PATH] [PRE_TRAINED_PATH]"
+echo "for example: bash scripts/run_standalone_train.sh 0 coco /home/neu/ssd-coco /home/neu/coco-mindrecord ./train_out /home/neu/ssdresnet34lj/resnet34.ckpt(optional)"
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 
 if [ $# != 5 ] && [ $# != 6 ]
 then
-    echo "Using: sh scripts/run_standalone_train.sh [DEVICE_ID] [DATASET] [DATASET_PATH] [MINDRECORD_PATH] [TRAIN_OUTPUT_PATH]"
+    echo "Using: bash scripts/run_standalone_train.sh [DEVICE_ID] [DATASET] [DATASET_PATH] [MINDRECORD_PATH] [TRAIN_OUTPUT_PATH]"
     echo "or"
-    echo "Using: sh scripts/run_standalone_train.sh  [DEVICE_ID] [DATASET] [DATASET_PATH] [MINDRECORD_PATH] [TRAIN_OUTPUT_PATH] [PRE_TRAINED_PATH]"
+    echo "Using: bash scripts/run_standalone_train.sh  [DEVICE_ID] [DATASET] [DATASET_PATH] [MINDRECORD_PATH] [TRAIN_OUTPUT_PATH] [PRE_TRAINED_PATH]"
     exit 1
 fi
 

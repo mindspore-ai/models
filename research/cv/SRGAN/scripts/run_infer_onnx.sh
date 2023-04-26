@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_eval_onnx.sh [TEST_LR_PATH] [TEST_GT_PATH] [ONNX_PATH] [DEVICE_TARGET]"
+    echo "Usage: bash run_eval_onnx.sh [TEST_LR_PATH] [TEST_GT_PATH] [ONNX_PATH] [DEVICE_TARGET]"
     exit 1
 fi
 

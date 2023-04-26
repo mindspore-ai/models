@@ -15,7 +15,7 @@
 
 if [ $# != 6 ]
 then
-    echo "Usage: sh run_standalone_train.sh  [DEVICE_ID] [LRPATH] [GTPATH] [VGGCKPT] [VLRPATH] [VGTPATH]"
+    echo "Usage: bash run_standalone_train.sh  [DEVICE_ID] [LRPATH] [GTPATH] [VGGCKPT] [VLRPATH] [VGTPATH]"
     exit 1
 fi
 

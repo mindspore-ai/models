@@ -16,7 +16,7 @@
 
 if [ $# -lt 1 ]
 then
-  echo "Usage: sh run_standalone_train_gpu.sh [DATASET_PATH] [PRE_TRAINED] (optional)"
+  echo "Usage: bash run_standalone_train_gpu.sh [DATASET_PATH] [PRE_TRAINED] (optional)"
   exit 1
 fi
 

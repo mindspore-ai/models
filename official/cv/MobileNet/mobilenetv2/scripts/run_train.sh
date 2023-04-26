@@ -30,8 +30,8 @@ run_ascend_or_gpu()
         FILTER_HEAD=$8
     else
         echo "Usage:
-              Ascend: sh run_train.sh $1 [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH](optional) [FREEZE_LAYER](optional) [FILTER_HEAD](optional)
-              Ascend: sh run_train.sh $1 [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]"
+              Ascend: bash run_train.sh $1 [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH](optional) [FREEZE_LAYER](optional) [FILTER_HEAD](optional)
+              Ascend: bash run_train.sh $1 [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]"
         exit 1
     fi;
 
@@ -127,8 +127,8 @@ run_cpu()
         FILTER_HEAD=$6
     else
         echo "Usage:
-              CPU: sh run_train.sh CPU [CONFIG_PATH] [DATASET_PATH]
-              CPU: sh run_train.sh CPU [CONFIG_PATH] [DATASET_PATH] [CKPT_PATH](optional) [FREEZE_LAYER](optional) [FILTER_HEAD](optional)"
+              CPU: bash run_train.sh CPU [CONFIG_PATH] [DATASET_PATH]
+              CPU: bash run_train.sh CPU [CONFIG_PATH] [DATASET_PATH] [CKPT_PATH](optional) [FREEZE_LAYER](optional) [FILTER_HEAD](optional)"
         exit 1
     fi;
     if [ ! -d $3 ]

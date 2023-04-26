@@ -16,7 +16,7 @@
 # an simple tutorial as follows, more parameters can be setting
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_distribution_gpu.sh [cifar10|imagenet] [DATA_PATH] [CKPT_PATH]"
+    echo "Usage: bash run_distribution_gpu.sh [cifar10|imagenet] [DATA_PATH] [CKPT_PATH]"
 exit 1
 fi
 

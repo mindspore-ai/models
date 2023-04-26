@@ -16,7 +16,7 @@
 
 if [ $# -ne 3 ]
 then
-    echo "Usage: sh run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TRAIN_DIR] [VAL_DIR]"
+    echo "Usage: bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TRAIN_DIR] [VAL_DIR]"
 exit 1
 fi
 

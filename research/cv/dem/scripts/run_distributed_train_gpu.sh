@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 5 ]
 then
-    echo "Usage: sh run_distributed_train_gpu.sh [CUB|AWA] [att|word] [DATA_PATH] [SAVE_CKPT] [DEVICE_NUM]"
+    echo "Usage: bash run_distributed_train_gpu.sh [CUB|AWA] [att|word] [DATA_PATH] [SAVE_CKPT] [DEVICE_NUM]"
 exit 1
 fi
 

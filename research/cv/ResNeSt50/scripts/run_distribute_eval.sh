@@ -16,7 +16,7 @@
 
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_distribute_eval.sh [RANK_TABLE_FILE] [OUT_DIR] [RESUME_PATH]"
+    echo "Usage: bash run_distribute_eval.sh [RANK_TABLE_FILE] [OUT_DIR] [RESUME_PATH]"
     exit 1
 fi
 

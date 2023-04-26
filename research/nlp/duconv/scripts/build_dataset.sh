@@ -22,8 +22,8 @@ if [ $# -ne 1 ]
 then
     echo "=============================================================================================================="
     echo "Please run the script as: "
-    echo "sh build_dataset.sh [TASK_NAME]"
-    echo "for example: sh scripts/build_dataset.sh match_kn_gene"
+    echo "bash build_dataset.sh [TASK_NAME]"
+    echo "for example: bash scripts/build_dataset.sh match_kn_gene"
     echo "TASK_TYPE including [match, match_kn, match_kn_gene]"
     echo "=============================================================================================================="
 exit 1

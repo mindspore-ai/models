@@ -20,7 +20,7 @@ export RANK_SIZE=1
 
 if [ $# != 0 ]
 then
-    echo "Usage: sh run_standalone.sh"
+    echo "Usage: bash run_standalone.sh"
 exit 1
 fi
 

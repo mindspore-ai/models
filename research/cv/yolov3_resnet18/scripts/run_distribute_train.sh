@@ -16,15 +16,15 @@
 
 echo "======================================================================================================================================================="
 echo "Please run the script as: "
-echo "sh run_distribute_train.sh DEVICE_NUM EPOCH_SIZE MINDRECORD_DIR IMAGE_DIR ANNO_PATH RANK_TABLE_FILE PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
-echo "For example: sh run_distribute_train.sh 8 160 /data/Mindrecord_train /data /data/train.txt /data/hccl.json /opt/yolov3-150.ckpt(optional) 100(optional)"
+echo "bash run_distribute_train.sh DEVICE_NUM EPOCH_SIZE MINDRECORD_DIR IMAGE_DIR ANNO_PATH RANK_TABLE_FILE PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
+echo "For example: bash run_distribute_train.sh 8 160 /data/Mindrecord_train /data /data/train.txt /data/hccl.json /opt/yolov3-150.ckpt(optional) 100(optional)"
 echo "It is better to use absolute path."
 echo "The learning rate is 0.005 as default, if you want other lr, please change the value in this script."
 echo "======================================================================================================================================================="
 
 if [ $# != 6 ] && [ $# != 8 ]
 then
-    echo "Usage: sh run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [MINDRECORD_DIR] [IMAGE_DIR] [ANNO_PATH] [RANK_TABLE_FILE] \
+    echo "Usage: bash run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [MINDRECORD_DIR] [IMAGE_DIR] [ANNO_PATH] [RANK_TABLE_FILE] \
 [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)"
     exit 1
 fi

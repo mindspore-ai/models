@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 8 ]; then
-  echo "Usage: sh run_distribute_train.sh  [RANK_TABLE_FILE] [DATASET_PATH] [DATASET] [TRAIN_LIST_PATH] [TRAIN_LIST] [MODALITY] [PRETRAINED_PATH] [PRETRAINED_PATH_NAME]"
+  echo "Usage: bash run_distribute_train.sh  [RANK_TABLE_FILE] [DATASET_PATH] [DATASET] [TRAIN_LIST_PATH] [TRAIN_LIST] [MODALITY] [PRETRAINED_PATH] [PRETRAINED_PATH_NAME]"
   exit 1
 fi
 

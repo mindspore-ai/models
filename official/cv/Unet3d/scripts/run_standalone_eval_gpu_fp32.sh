@@ -25,7 +25,7 @@ fi
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh run_standalone_eval_gpu.sh [DATA_PATH] [CHECKPOINT_PATH]"
+    echo "Usage: bash run_standalone_eval_gpu.sh [DATA_PATH] [CHECKPOINT_PATH]"
 exit 1
 fi
 

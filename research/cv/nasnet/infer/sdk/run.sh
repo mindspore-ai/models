@@ -15,7 +15,7 @@
 # limitations under the License.
 if [ $# != 2 ]
 then
-    echo "Usage: sh run.sh [IMAGE_PATH] [RESULT_DIR]"
+    echo "Usage: bash run.sh [IMAGE_PATH] [RESULT_DIR]"
 exit 1
 fi
 

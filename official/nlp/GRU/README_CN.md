@@ -375,7 +375,7 @@ bash create_dataset.sh [DATASET_PATH] [OUTPUT_PATH]
     bash parse_output.sh target.txt output.txt /path/vocab.en
     ```
 
-    我们建议在本地执行此操作，但你也可以通过运行带有此命令"os.system("sh parse_output.sh target.txt output.txt /path/vocab.en")"的python脚本在ModelArts上执行此操作。
+    我们建议在本地执行此操作，但你也可以通过运行带有此命令"os.system("bash parse_output.sh target.txt output.txt /path/vocab.en")"的python脚本在ModelArts上执行此操作。
 
 - 解析输出后，将获得target.txt.forbleu和output.txt.forbleu。要计算BLEU分数，可以使用[perl脚本](https://github.com/moses-smt/mosesdecoder/blob/master/scripts/generic/multi-bleu.perl)并执行以下命令，获取BLEU分数。
 

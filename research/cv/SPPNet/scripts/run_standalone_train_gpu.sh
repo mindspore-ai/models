@@ -16,7 +16,7 @@
 # an simple tutorial as follows, more parameters can be setting
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_standalone_train_gpu.sh [TRAIN_DATA_PATH] [EVAL_DATA_PATH] [DEVICE_ID] [TRAIN_MODEL]"
+    echo "Usage: bash run_standalone_train_gpu.sh [TRAIN_DATA_PATH] [EVAL_DATA_PATH] [DEVICE_ID] [TRAIN_MODEL]"
 exit 1
 fi
 

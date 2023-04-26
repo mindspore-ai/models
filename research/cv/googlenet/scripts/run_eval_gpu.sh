@@ -18,7 +18,7 @@ ulimit -u unlimited
 
 if [ $# != 1 ] && [ $# != 2 ]
 then
-    echo "GPU: sh run_eval_gpu.sh [CHECKPOINT_PATH] [cifar10|imagenet]"
+    echo "GPU: bash run_eval_gpu.sh [CHECKPOINT_PATH] [cifar10|imagenet]"
 exit 1
 fi
 

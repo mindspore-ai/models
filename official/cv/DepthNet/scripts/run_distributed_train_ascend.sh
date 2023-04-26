@@ -15,8 +15,8 @@
 # ============================================================================
 
 echo "Please run the script as: "
-echo "sh run_standalone_train_ascend.sh [DATASET_PATH] [RANK_TABLE_FILE]"
-echo "for example: sh run_standalone_train_ascend.sh ~/NYU ~/rank_table_8pcs.json"
+echo "bash run_standalone_train_ascend.sh [DATASET_PATH] [RANK_TABLE_FILE]"
+echo "for example: bash run_standalone_train_ascend.sh ~/NYU ~/rank_table_8pcs.json"
 echo "After running the script, the network runs in the background, The log will be generated in train_8p.log"
 
 export DATASET_PATH=$1

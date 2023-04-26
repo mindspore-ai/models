@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then 
-    echo "Usage: sh run_train.sh [DATASET_NAME] [DEVICE_ID]"
+    echo "Usage: bash run_train.sh [DATASET_NAME] [DEVICE_ID]"
 exit 1
 fi
 

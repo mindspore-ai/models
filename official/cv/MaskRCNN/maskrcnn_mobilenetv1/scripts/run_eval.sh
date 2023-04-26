@@ -16,7 +16,7 @@
 
 if [ $# != 5 ]
 then 
-    echo "Usage: sh run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET] [DEVICE_ID]"
+    echo "Usage: bash run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET] [DEVICE_ID]"
 exit 1
 fi
 

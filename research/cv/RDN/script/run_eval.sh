@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 4 ]; then
-  echo "Usage: sh run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE] [DEVICE_TARGET]"
+  echo "Usage: bash run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE] [DEVICE_TARGET]"
   exit 1
 fi
 

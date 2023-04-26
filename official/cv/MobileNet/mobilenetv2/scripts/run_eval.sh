@@ -118,9 +118,9 @@ run_cpu()
 if [ $# -ne 4 ]
 then
     echo "Usage:
-          Ascend: sh run_eval.sh [PLATFORM] [CONFIG_PATH] [DATASET_PATH] [PRETRAIN_CKPT]
-          GPU: sh run_eval.sh [PLATFORM] [CONFIG_PATH] [DATASET_PATH] [PRETRAIN_CKPT]
-          CPU: sh run_eval.sh [PLATFORM] [CONFIG_PATH] [DATASET_PATH] [PRETRAIN_CKPT]"
+          Ascend: bash run_eval.sh [PLATFORM] [CONFIG_PATH] [DATASET_PATH] [PRETRAIN_CKPT]
+          GPU: bash run_eval.sh [PLATFORM] [CONFIG_PATH] [DATASET_PATH] [PRETRAIN_CKPT]
+          CPU: bash run_eval.sh [PLATFORM] [CONFIG_PATH] [DATASET_PATH] [PRETRAIN_CKPT]"
 exit 1
 fi
 

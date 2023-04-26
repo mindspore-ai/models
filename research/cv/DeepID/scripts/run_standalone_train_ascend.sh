@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh eval_ascend.sh [DEVICE_NUM] [DEVICE_ID]"
+    echo "Usage: bash eval_ascend.sh [DEVICE_NUM] [DEVICE_ID]"
     exit 1
 fi
 export DEVICE_NUM=$1

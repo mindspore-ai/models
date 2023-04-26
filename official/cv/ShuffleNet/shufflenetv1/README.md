@@ -153,8 +153,8 @@ You can use Python or shell scripts for training.
                           --device_target=GPU > log.txt 2>&1 &
 
   shell:
-      GPU-based single-device training: sh scripts/run_standalone_train_gpu.sh [DEVICE_ID] [DATA_DIR]
-      GPU-based 8-device training: sh scripts/run_distribute_train_gpu.sh [RANK_SIZE] [TRAIN_DATA_DIR]
+      GPU-based single-device training: bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [DATA_DIR]
+      GPU-based 8-device training: bash scripts/run_distribute_train_gpu.sh [RANK_SIZE] [TRAIN_DATA_DIR]
 
 - running transfer learning on CPU with default parameters
 

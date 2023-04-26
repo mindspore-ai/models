@@ -286,7 +286,7 @@ bash scripts/migrate_pretrained_models.sh
 
 ```bash
 bash scripts/run_standalone_finetune.sh [TASK_TYPE]
-# for example: sh run_standalone_finetune.sh msra_ner
+# for example: bash run_standalone_finetune.sh msra_ner
 # TASK_TYPE including [msra_ner, chnsenticorp]
 ```
 
@@ -296,7 +296,7 @@ bash scripts/run_standalone_finetune.sh [TASK_TYPE]
 
 ```bash
 bash scripts/run_distribute_finetune.sh [RANK_TABLE_FILE] [TASK_TYPE]
-# for example: sh run_distribute_finetune.sh rank_table.json xnli
+# for example: bash run_distribute_finetune.sh rank_table.json xnli
 # TASK_TYPE including [xnli, dbqa, drcd]
 ```
 
@@ -320,7 +320,7 @@ python
 
 ```bash
 bash scripts/run_finetune_eval.sh [TASK_TYPE]
-# for example: sh run_finetune_eval.sh msra_ner
+# for example: bash run_finetune_eval.sh msra_ner
 # TASK_TYPE including [msra_ner, chnsenticorp, xnli, dbqa, drcd]
 ```
 
@@ -435,7 +435,7 @@ F1 0.848703
 
 ```bash
 bash export.sh [CKPT_FILE] [EXPORT_PATH] [TASK_TYPE]
-# for example: sh sh export.sh /path/ckpt.ckpt /path/ msra_ner
+# for example: bash export.sh /path/ckpt.ckpt /path/ msra_ner
 # TASK_TYPE including [msra_ner, chnsenticorp]
 ```
 

@@ -16,7 +16,7 @@
 
 if [ $# -ne 2 ]
 then
-    echo "Usage: sh run_distribute_train_ascend.sh [DATA_PATH] [DEVICE_ID]"
+    echo "Usage: bash run_distribute_train_ascend.sh [DATA_PATH] [DEVICE_ID]"
 exit 1
 fi
 

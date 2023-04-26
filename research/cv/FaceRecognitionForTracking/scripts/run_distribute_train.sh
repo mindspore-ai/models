@@ -16,8 +16,8 @@
 
 if [ $# != 2 ] && [ $# != 3 ]
 then
-    echo "Usage: sh run_distribute_train.sh [DATA_DIR] [RANK_TABLE] [PRETRAINED_BACKBONE]"
-    echo "   or: sh run_distribute_train.sh [DATA_DIR] [RANK_TABLE]"
+    echo "Usage: bash run_distribute_train.sh [DATA_DIR] [RANK_TABLE] [PRETRAINED_BACKBONE]"
+    echo "   or: bash run_distribute_train.sh [DATA_DIR] [RANK_TABLE]"
 exit 1
 fi
 

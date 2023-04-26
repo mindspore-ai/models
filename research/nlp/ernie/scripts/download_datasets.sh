@@ -17,8 +17,8 @@ if [ $# -ne 1 ]
 then
     echo "=============================================================================================================="
     echo "Please run the script as: "
-    echo "sh download_dataset.sh [DATA_TYPE]"
-    echo "for example: sh scripts/download_dataset.sh.sh pretrain"
+    echo "bash download_dataset.sh [DATA_TYPE]"
+    echo "for example: bash scripts/download_dataset.sh.sh pretrain"
     echo "TASK_TYPE including [pretrain, finetune]"
     echo "=============================================================================================================="
 exit 1

@@ -16,7 +16,7 @@
 
 # help message
 if [ $# != 4 ]; then
-  echo "Usage: sh run_train.sh [root path of code] [rank size]" \
+  echo "Usage: bash run_train.sh [root path of code] [rank size]" \
        "[rank start id] [rank table file]"
   exit 1
 fi

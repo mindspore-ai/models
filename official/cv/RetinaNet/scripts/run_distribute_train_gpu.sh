@@ -16,14 +16,14 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh scripts/run_distribute_train_GPU.sh DEVICE_NUM MINDRECORD_DIR CONFIG_PATH VISIABLE_DEVICES PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
-echo "for example: sh scripts/run_distribute_train_GPU.sh 8 /cache/mindrecord_dir/ /config/default_config_GPU.yaml 0,1,2,3,4,5,6,7 /opt/retinanet-500_458.ckpt(optional) 200(optional)"
+echo "bash scripts/run_distribute_train_GPU.sh DEVICE_NUM MINDRECORD_DIR CONFIG_PATH VISIABLE_DEVICES PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
+echo "for example: bash scripts/run_distribute_train_GPU.sh 8 /cache/mindrecord_dir/ /config/default_config_GPU.yaml 0,1,2,3,4,5,6,7 /opt/retinanet-500_458.ckpt(optional) 200(optional)"
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 
 if [ $# != 4 ] && [ $# != 6 ]
 then
-    echo "Usage: sh scripts/run_distribute_train_GPU.sh [DEVICE_NUM] [MINDRECORD_DIR] \ 
+    echo "Usage: bash scripts/run_distribute_train_GPU.sh [DEVICE_NUM] [MINDRECORD_DIR] \
     [CONFIG_PATH] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)"
     exit 1
 fi

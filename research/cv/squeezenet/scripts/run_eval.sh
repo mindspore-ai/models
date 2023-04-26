@@ -16,7 +16,7 @@
 
 if [ $# != 5 ]
 then 
-    echo "Usage: sh scripts/run_eval.sh [squeezenet|squeezenet_residual] [cifar10|imagenet] [DEVICE_ID] [DATA_PATH] [CHECKPOINT_PATH]"
+    echo "Usage: bash scripts/run_eval.sh [squeezenet|squeezenet_residual] [cifar10|imagenet] [DEVICE_ID] [DATA_PATH] [CHECKPOINT_PATH]"
 exit 1
 fi
 

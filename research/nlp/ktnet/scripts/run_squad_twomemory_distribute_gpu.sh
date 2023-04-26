@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 2 ]; then
-  echo "Usage: sh run_squad_twomemory_distribute_gpu.sh [DATA_PATH] [DEVICE_NUM]"
+  echo "Usage: bash run_squad_twomemory_distribute_gpu.sh [DATA_PATH] [DEVICE_NUM]"
   exit 1
 fi
 

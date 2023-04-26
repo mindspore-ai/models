@@ -16,7 +16,7 @@
 # an simple tutorial as follows, more parameters can be setting
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_standalone_train_gpu.sh [cifar10] [TRAIN_DATASET_PATH] [DEVICE_ID]"
+    echo "Usage: bash run_standalone_train_gpu.sh [cifar10] [TRAIN_DATASET_PATH] [DEVICE_ID]"
 else
 
 self_path=$(cd "$(dirname "$0")" || exit; pwd)

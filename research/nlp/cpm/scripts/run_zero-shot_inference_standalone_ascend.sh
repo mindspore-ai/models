@@ -16,9 +16,9 @@
 if [ $# != 4 ] ; then
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_zero-shot_inference_standalone_ascend.sh DATASET_PATH LABEL_PATH MODEL_CKPT DEVICE_ID"
+echo "bash run_zero-shot_inference_standalone_ascend.sh DATASET_PATH LABEL_PATH MODEL_CKPT DEVICE_ID"
 echo "for example: "
-echo "sh run_zero-shot_inference_standalone_ascend.sh /disk0/dataset/zero_shot_dataset_infer/test.mindrecord /disk0/dataset/zero_shot_dataset_infer/true_labels.txt /disk0/cpm_ckpt_ms/cpm_mindspore_1p_fp32.ckpt 5"
+echo "bash run_zero-shot_inference_standalone_ascend.sh /disk0/dataset/zero_shot_dataset_infer/test.mindrecord /disk0/dataset/zero_shot_dataset_infer/true_labels.txt /disk0/cpm_ckpt_ms/cpm_mindspore_1p_fp32.ckpt 5"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 exit 1;

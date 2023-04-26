@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [[ $# -lt 4 || $# -gt 6 ]]; then
-    echo "Usage: sh run_infer_310.sh [MINDIR_PATH] [ucf101|hmdb51] [VIDEO_PATH] [ANNOTATION_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [ucf101|hmdb51] [VIDEO_PATH] [ANNOTATION_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero.NEED_PREPROCESS is also 
 optional, if you have done PREPROCESS, it is UNNECESSARY."
 exit 1

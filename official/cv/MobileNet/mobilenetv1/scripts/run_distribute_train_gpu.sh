@@ -16,7 +16,7 @@
 
 if [ $# != 3 ] && [ $# != 4 ]
 then 
-    echo "Usage: sh run_distribute_train_gpu.sh [cifar10|imagenet2012] [CONFIG_PATH] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)"
+    echo "Usage: bash run_distribute_train_gpu.sh [cifar10|imagenet2012] [CONFIG_PATH] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)"
     exit 1
 fi
 

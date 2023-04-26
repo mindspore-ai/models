@@ -17,7 +17,7 @@
 echo "=============================================================================================================="
 echo "Please run the script as: "
 echo "bash run_distribute_train.sh DEVICE_NUM DEVICE_ID(0,1,2,3,4,5,6,7) DATA_PATH PRETRAINED_PATH"
-echo "For example: sh run_distribute_train.sh 8 0,1,2,3,4,5,6,7 /path/dataset /path/pretrain_path"
+echo "For example: bash run_distribute_train.sh 8 0,1,2,3,4,5,6,7 /path/dataset /path/pretrain_path"
 echo "It is better to use the absolute path."
 echo "=============================================================================================================="
 set -e

@@ -15,7 +15,7 @@
 # ============================================================================
 echo "Please run the script as: "
 echo "bash scripts/run_standalone_train.sh DEVICE_ID/CUDA_VISIBLE_DEVICES DEVICE_TARGET DATASET_PATH"
-echo "for example: sh scripts/run_standalone_train.sh 0 GPU /dataset_path"
+echo "for example: bash scripts/run_standalone_train.sh 0 GPU /dataset_path"
 echo "After running the script, the network runs in the background, The log will be generated in ms_log/output.log"
 
 DEVICE_TARGET=$2

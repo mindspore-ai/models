@@ -20,7 +20,7 @@ export RANK_SIZE=8
 
 if [ $# != 1 ]
 then
-    echo "Usage: sh run_distribution.sh [RANK_TABLE_FILE]"
+    echo "Usage: bash run_distribution.sh [RANK_TABLE_FILE]"
 exit 1
 fi
 

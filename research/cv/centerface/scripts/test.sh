@@ -16,13 +16,13 @@
 
 if [ $# -gt 6 ]
 then
-    echo "Usage: sh test.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_ID] [CKPT]"
-    echo "   or: sh test.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_ID]"
-    echo "   or: sh test.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH]"
-    echo "   or: sh test.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT]"
-    echo "   or: sh test.sh [MODEL_PATH] [DATASET]"
-    echo "   or: sh test.sh [MODEL_PATH]"
-    echo "   or: sh test.sh "
+    echo "Usage: bash test.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_ID] [CKPT]"
+    echo "   or: bash test.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_ID]"
+    echo "   or: bash test.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH]"
+    echo "   or: bash test.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT]"
+    echo "   or: bash test.sh [MODEL_PATH] [DATASET]"
+    echo "   or: bash test.sh [MODEL_PATH]"
+    echo "   or: bash test.sh "
 exit 1
 fi
 

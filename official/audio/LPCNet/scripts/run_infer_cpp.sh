@@ -16,7 +16,7 @@
 
 
 if [[ $# -lt 4 || $# -gt 5 ]]; then
-    echo "Usage: sh run_infer_cpp.sh [ENCODER_PATH] [DECODER_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
+    echo "Usage: bash run_infer_cpp.sh [ENCODER_PATH] [DECODER_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
     DEVICE_TYPE can choose from [Ascend, GPU, CPU]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1

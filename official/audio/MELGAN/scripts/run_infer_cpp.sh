@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [[ $# -lt 3 || $# -gt 4 ]]; then
-    echo "Usage: sh run_infer_cpp.sh [MODEL_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
+    echo "Usage: bash run_infer_cpp.sh [MODEL_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
     DEVICE_TYPE can choose from [Ascend, GPU, CPU]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1

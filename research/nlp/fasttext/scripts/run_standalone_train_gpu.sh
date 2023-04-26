@@ -15,8 +15,8 @@
 # ============================================================================
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_standalone_train_gpu.sh DATASET_PATH DATASET_NAME"
-echo "for example: sh run_standalone_train_gpu.sh /home/workspace/ag ag"
+echo "bash run_standalone_train_gpu.sh DATASET_PATH DATASET_NAME"
+echo "for example: bash run_standalone_train_gpu.sh /home/workspace/ag ag"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 get_real_path(){

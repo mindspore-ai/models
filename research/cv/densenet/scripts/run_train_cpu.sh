@@ -16,7 +16,7 @@
 
 if [ $# -lt 3 ]
 then
-    echo "Usage: sh run_train_cpu.sh [NET_NAME] [DATASET_NAME] [DATASET_PATH] [PRE_TRAINED](optional)"
+    echo "Usage: bash run_train_cpu.sh [NET_NAME] [DATASET_NAME] [DATASET_PATH] [PRE_TRAINED](optional)"
     exit 1
 fi
 

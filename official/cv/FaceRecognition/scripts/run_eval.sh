@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 1 ]
 then
-    echo "Usage: sh run_eval.sh [USE_DEVICE_ID]"
+    echo "Usage: bash run_eval.sh [USE_DEVICE_ID]"
 exit 1
 fi
 

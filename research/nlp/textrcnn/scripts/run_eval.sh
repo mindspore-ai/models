@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 if [ $# != 2 ] && [ $# != 1 ]; then
-  echo "Usage: sh run_eval.sh [CKPT_PATH] [DEVICE_ID]"
+  echo "Usage: bash run_eval.sh [CKPT_PATH] [DEVICE_ID]"
   exit 1
 fi
 

@@ -16,7 +16,7 @@
 
 if [ $# != 5 ]
 then
-    echo "Usage: sh run_standalone_train_gpu.sh [im] [jm] [kb] [step] [DATASET_PATH]"
+    echo "Usage: bash run_standalone_train_gpu.sh [im] [jm] [kb] [step] [DATASET_PATH]"
 exit 1
 fi
 

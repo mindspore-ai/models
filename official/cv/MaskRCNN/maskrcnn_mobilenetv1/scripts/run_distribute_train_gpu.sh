@@ -16,7 +16,7 @@
 
 if [ $# != 1 ] && [ $# != 2 ]
 then 
-    echo "Usage: sh run_distribute_train.sh [DATA_PATH] [PRETRAINED_PATH](optional)"
+    echo "Usage: bash run_distribute_train.sh [DATA_PATH] [PRETRAINED_PATH](optional)"
     exit 1
 fi
 

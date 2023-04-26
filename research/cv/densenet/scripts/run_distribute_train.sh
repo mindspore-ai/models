@@ -16,8 +16,8 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh scripts/run_distribute_train.sh DEVICE_NUM RANK_TABLE_FILE NET_NAME DATASET_NAME DATASET CKPT_FILE"
-echo "for example: sh scripts/run_distribute_train.sh 8 /data/hccl.json densenet121 imagenet /path/to/dataset ckpt_file"
+echo "bash scripts/run_distribute_train.sh DEVICE_NUM RANK_TABLE_FILE NET_NAME DATASET_NAME DATASET CKPT_FILE"
+echo "for example: bash scripts/run_distribute_train.sh 8 /data/hccl.json densenet121 imagenet /path/to/dataset ckpt_file"
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 

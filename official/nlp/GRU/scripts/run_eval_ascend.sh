@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# -ne 2 ]
 then
-    echo "Usage: sh run_eval_ascend.sh [CKPT_FILE] [DATASET_PATH]"
+    echo "Usage: bash run_eval_ascend.sh [CKPT_FILE] [DATASET_PATH]"
 exit 1
 fi
 ulimit -u unlimited

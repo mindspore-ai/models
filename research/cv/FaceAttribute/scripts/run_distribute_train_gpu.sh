@@ -16,8 +16,8 @@
 
 if [ $# != 3 ] && [ $# != 4 ]
 then
-    echo "Usage: sh run_distribute_train_gpu [DEVICE_NUM] [CUDA_VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [MINDRECORD_FILE] [PRETRAINED_BACKBONE]"
-    echo "   or: sh run_distrubute_train_gpu.sh [DEVICE_NUM] [CUDA_VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [MINDRECORD_FILE]"
+    echo "Usage: bash run_distribute_train_gpu [DEVICE_NUM] [CUDA_VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [MINDRECORD_FILE] [PRETRAINED_BACKBONE]"
+    echo "   or: bash run_distrubute_train_gpu.sh [DEVICE_NUM] [CUDA_VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [MINDRECORD_FILE]"
 exit 1
 fi
 

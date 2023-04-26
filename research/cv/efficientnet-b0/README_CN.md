@@ -126,7 +126,7 @@ EfficientNet总体网络架构如下：
       Ascend单卡训练示例：python train.py --device_id [DEVICE_ID] --dataset_path [DATA_DIR]
 
   shell:
-      Ascend单卡训练示例: sh ./scripts/run_standalone_train.sh [DEVICE_ID] [DATA_DIR]
+      Ascend单卡训练示例: bash ./scripts/run_standalone_train.sh [DEVICE_ID] [DATA_DIR]
       Ascend八卡并行训练:
           cd ./scripts/
           sh ./run_distribute_train.sh [RANK_TABLE_FILE] [DATA_DIR]

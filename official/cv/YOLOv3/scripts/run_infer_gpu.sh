@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh run_eval_gpu.sh [DATASET_PATH] [ONNX_PATH]"
+    echo "Usage: bash run_eval_gpu.sh [DATASET_PATH] [ONNX_PATH]"
 exit 1
 fi
 

@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_standalone_eval_gpu.sh [EVAL_DATA_PATH] [ANNO_DATA_PATH] [CKPT_PATH] [DEVICE_ID]"
+    echo "Usage: bash run_standalone_eval_gpu.sh [EVAL_DATA_PATH] [ANNO_DATA_PATH] [CKPT_PATH] [DEVICE_ID]"
 exit 1
 fi
 

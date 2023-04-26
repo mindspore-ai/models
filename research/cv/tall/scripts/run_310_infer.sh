@@ -23,14 +23,14 @@ fi
 if [ ! -f $1 ]
 then
     echo "error: MINDIR_PATH=$1 is not a file"
-    echo "Usage: sh run_eval.sh [MINDIR_PATH] [EVAL_DATA_DIR] [DEVICE_ID]."
+    echo "Usage: bash run_eval.sh [MINDIR_PATH] [EVAL_DATA_DIR] [DEVICE_ID]."
 exit 1
 fi
 
 if [ ! -d $2 ]
 then
     echo "error: EVAL_DATA_DIR=$2 is not a directory"
-    echo "Usage: sh run_eval.sh [MINDIR_PATH] [EVAL_DATA_DIR] [DEVICE_ID]."
+    echo "Usage: bash run_eval.sh [MINDIR_PATH] [EVAL_DATA_DIR] [DEVICE_ID]."
 exit 1
 fi
 

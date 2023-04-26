@@ -16,7 +16,7 @@
 # an simple tutorial as follows, more parameters can be setting
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_standalone_eval_gpu.sh [cifar10|imagenet] [DATA_PATH] [CKPT_PATH] [DEVICE_ID]"
+    echo "Usage: bash run_standalone_eval_gpu.sh [cifar10|imagenet] [DATA_PATH] [CKPT_PATH] [DEVICE_ID]"
 exit 1
 fi
 

@@ -20,7 +20,7 @@ VIEW_NUM=$[${SRC_NUM}+1]
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh eval.sh [DATA_PATH] [GPU_ID]"
+    echo "Usage: bash eval.sh [DATA_PATH] [GPU_ID]"
 exit 1
 fi
 

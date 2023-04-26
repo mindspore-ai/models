@@ -17,8 +17,8 @@ if [ $# -ne 2 ]
 then
     echo "=============================================================================================================="
     echo "Please run the script as: "
-    echo "sh run_distribute_finetune.sh [RANK_TABLE_FILE] [TASK_TYPE]"
-    echo "for example: sh scripts/run_distribute_finetune.sh rank_table.json xnli"
+    echo "bash run_distribute_finetune.sh [RANK_TABLE_FILE] [TASK_TYPE]"
+    echo "for example: bash scripts/run_distribute_finetune.sh rank_table.json xnli"
     echo "TASK_TYPE including [xnli, dbqa, drcd, cmrc]"
     echo "=============================================================================================================="
 exit 1

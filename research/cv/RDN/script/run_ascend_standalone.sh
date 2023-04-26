@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 2 ]; then
-  echo "Usage: sh run_ascend_standalone.sh [TRAIN_DATA_DIR] [DEVICE_ID]"
+  echo "Usage: bash run_ascend_standalone.sh [TRAIN_DATA_DIR] [DEVICE_ID]"
   exit 1
 fi
 

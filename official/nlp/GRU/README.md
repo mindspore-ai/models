@@ -374,7 +374,7 @@ Parameters for both training and evaluation can be set in config.py. All the dat
     bash parse_output.sh target.txt output.txt /path/vocab.en
     ```
 
-    Extra: We recommend doing this locally, but you can also do it on modelarts by running a python script with the following command "os.system("sh parse_output.sh target.txt output.txt /path/vocab.en")".
+    Extra: We recommend doing this locally, but you can also do it on modelarts by running a python script with the following command "os.system("bash parse_output.sh target.txt output.txt /path/vocab.en")".
 
 - After parse output, we will get target.txt.forbleu and output.txt.forbleu.To calculate BLEU score, you may use this [perl script](https://github.com/moses-smt/mosesdecoder/blob/master/scripts/generic/multi-bleu.perl) and run following command to get the BLEU score.
 

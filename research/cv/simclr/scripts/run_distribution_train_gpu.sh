@@ -16,7 +16,7 @@
 # an simple tutorial as follows, more parameters can be setting
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_distribution_train_gpu.sh [cifar10] [DEVICE_NUM] [TRAIN_DATASET_PATH]"
+    echo "Usage: bash run_distribution_train_gpu.sh [cifar10] [DEVICE_NUM] [TRAIN_DATASET_PATH]"
 else
 
 #

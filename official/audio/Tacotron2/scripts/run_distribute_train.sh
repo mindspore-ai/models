@@ -20,8 +20,8 @@ then
 fi
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_distributed_train.sh [DATASET_PATH] [RANK_TABLE_PATH] [DATANAME] [RANK_SIZE] [DEVICE_BEGIN]"
-echo "for example: sh run_distributed_train.sh /path/ljspeech.hdf5 /home/workspace/rank_table_file.json 8 0"
+echo "bash run_distributed_train.sh [DATASET_PATH] [RANK_TABLE_PATH] [DATANAME] [RANK_SIZE] [DEVICE_BEGIN]"
+echo "for example: bash run_distributed_train.sh /path/ljspeech.hdf5 /home/workspace/rank_table_file.json 8 0"
 echo "It is better to use absolute path."
 echo "Please pay attention that the dataset should corresponds to dataset_name"
 echo "=============================================================================================================="

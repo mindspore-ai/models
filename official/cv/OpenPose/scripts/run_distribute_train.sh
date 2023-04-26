@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 5 ]
 then
-    echo "Usage: sh scripts/run_distribute_train.sh [RANK_TABLE_FILE] [IAMGEPATH_TRAIN] [JSONPATH_TRAIN] [MASKPATH_TRAIN] [VGG_PATH]"
+    echo "Usage: bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [IAMGEPATH_TRAIN] [JSONPATH_TRAIN] [MASKPATH_TRAIN] [VGG_PATH]"
 exit 1
 fi
 

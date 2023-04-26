@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 3 ]; then
-  echo "Usage: sh run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID]"
+  echo "Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID]"
   exit 1
 fi
 

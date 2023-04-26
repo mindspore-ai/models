@@ -25,6 +25,6 @@ elif [ $# == 3 ];
 then
     python eval.py --checkpoint_path=$1 --dictionary=$2 --eval_data_dir=$3 &> eval.log &
 else
-    echo "Usage1: sh run_eval.sh [EVAL_DATA_DIR]"
-    echo "Usage2: sh run_eval.sh [CHECKPOINT_PATH] [ID2WORD_DICTIONARY] [EVAL_DATA_DIR]"
+    echo "Usage1: bash run_eval.sh [EVAL_DATA_DIR]"
+    echo "Usage2: bash run_eval.sh [CHECKPOINT_PATH] [ID2WORD_DICTIONARY] [EVAL_DATA_DIR]"
 fi 

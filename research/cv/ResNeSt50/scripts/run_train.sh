@@ -16,7 +16,7 @@
 
 if [ $# != 1 ]
 then
-    echo "Usage: sh run_single_train.sh [OUTPUT]"
+    echo "Usage: bash run_single_train.sh [OUTPUT]"
     exit 1
 fi
 

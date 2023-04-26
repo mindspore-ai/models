@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 6 ]; then
-  echo "Usage: sh run_train.sh [train_code_path] [dataset]" \
+  echo "Usage: bash run_train.sh [train_code_path] [dataset]" \
        "[epochs] [batch_size] [lr] [output_path]"
   exit 1
 fi

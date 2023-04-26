@@ -19,8 +19,8 @@ run_gpu()
     if [ $# -gt 5 ] || [ $# -lt 4 ]
     then
         echo "Usage:\n \
-              GPU: sh run_train.sh GPU [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]\n \
-              CPU: sh run_train.sh CPU [DATASET_PATH]\n \
+              GPU: bash run_train.sh GPU [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]\n \
+              CPU: bash run_train.sh CPU [DATASET_PATH]\n \
              "
     exit 1
     fi
@@ -67,8 +67,8 @@ run_cpu()
     if [ $# -gt 3 ] || [ $# -lt 2 ]
     then
         echo "Usage:\n \
-              GPU: sh run_train.sh GPU [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]\n \
-              CPU: sh run_train.sh CPU [DATASET_PATH]\n \
+              GPU: bash run_train.sh GPU [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]\n \
+              CPU: bash run_train.sh CPU [DATASET_PATH]\n \
              "
     exit 1
     fi

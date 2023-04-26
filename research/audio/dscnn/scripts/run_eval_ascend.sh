@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh scripts/run_train_ascend.sh [EVAL_FEAT_DIR] [MODEL_DIR]"
+    echo "Usage: bash scripts/run_train_ascend.sh [EVAL_FEAT_DIR] [MODEL_DIR]"
     exit 1
 fi
 

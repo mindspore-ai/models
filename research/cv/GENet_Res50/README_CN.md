@@ -180,7 +180,7 @@ epoch: 5 step: 5000, loss is 3.1978393
 ```shell
 # 推理示例
   shell:
-      Ascend: sh run_eval.sh Ascend ~/imagenet/val/ ~/train/GENet-150_625.ckpt True True 0
+      Ascend: bash run_eval.sh Ascend ~/imagenet/val/ ~/train/GENet-150_625.ckpt True True 0
 ```
 
 > 训练过程中可以生成检查点。

@@ -20,7 +20,7 @@ echo "==========================================================================
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh run_train_cpu.sh [DEVICE_ID] [CKPT_FILES]"
+    echo "Usage: bash run_train_cpu.sh [DEVICE_ID] [CKPT_FILES]"
     exit 1
 fi
 

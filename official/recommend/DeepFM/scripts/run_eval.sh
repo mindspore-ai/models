@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 echo "Please run the script as: "
-echo "sh scripts/run_eval.sh DEVICE_ID DEVICE_TARGET DATASET_PATH CHECKPOINT_PATH"
-echo "for example: sh scripts/run_eval.sh 0 GPU /dataset_path /checkpoint_path"
+echo "bash scripts/run_eval.sh DEVICE_ID DEVICE_TARGET DATASET_PATH CHECKPOINT_PATH"
+echo "for example: bash scripts/run_eval.sh 0 GPU /dataset_path /checkpoint_path"
 echo "After running the script, the network runs in the background, The log will be generated in ms_log/eval_output.log"
 
 export DEVICE_ID=$1

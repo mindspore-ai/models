@@ -15,7 +15,7 @@
 # ============================================================================
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_standalone_train.sh DATASET_PATH DEVICE_ID"
+echo "bash run_standalone_train.sh DATASET_PATH DEVICE_ID"
 echo "example: bash run_standalone_train.sh ./data/ljspeech.hdf5 0"
 echo "It is better to use absolute path."
 echo "Please pay attention that the dataset should corresponds to dataset_name"

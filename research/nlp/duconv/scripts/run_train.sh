@@ -21,8 +21,8 @@ if [ $# -ne 3 ]
 then
     echo "=============================================================================================================="
     echo "Please run the script as: "
-    echo "sh run_train.sh [TASK_NAME] [DATA_PATH]"
-    echo "for example: sh scripts/run_train.sh match_kn_gene"
+    echo "bash run_train.sh [TASK_NAME] [DATA_PATH]"
+    echo "for example: bash scripts/run_train.sh match_kn_gene"
     echo "TASK_TYPE including [match, match_kn, match_kn_gene]"
     echo "=============================================================================================================="
 exit 1

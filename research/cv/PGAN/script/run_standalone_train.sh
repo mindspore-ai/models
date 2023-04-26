@@ -15,8 +15,8 @@
 # ============================================================================
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_standalone_train.sh DATASET_PATH DEVICE_ID CONFIG_PATH"
-echo "for example: sh run_standalone_train.sh /path/data/image 1 /home/PGAN/910_config.yaml"
+echo "bash run_standalone_train.sh DATASET_PATH DEVICE_ID CONFIG_PATH"
+echo "for example: bash run_standalone_train.sh /path/data/image 1 /home/PGAN/910_config.yaml"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 

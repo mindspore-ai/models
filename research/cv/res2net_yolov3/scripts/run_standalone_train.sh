@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh run_standalone_train.sh [DATASET_PATH] [PRETRAINED_BACKBONE]"
+    echo "Usage: bash run_standalone_train.sh [DATASET_PATH] [PRETRAINED_BACKBONE]"
 exit 1
 fi
 

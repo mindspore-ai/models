@@ -16,7 +16,7 @@
 
 if [ $# -ne 2 ]
 then
-    echo "Usage: sh run_stand_alone_train_ascend.sh [TRAIN_DIR] [VAL_DIR]"
+    echo "Usage: bash run_stand_alone_train_ascend.sh [TRAIN_DIR] [VAL_DIR]"
 exit 1
 fi
 

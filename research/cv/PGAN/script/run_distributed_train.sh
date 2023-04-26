@@ -16,7 +16,7 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_distributed_train.sh DATASET_PATH RANK_TABLE_PATH CONFIG_PATH"
+echo "bash run_distributed_train.sh DATASET_PATH RANK_TABLE_PATH CONFIG_PATH"
 echo "for example:   bash run_distribute_train.sh /path/data/image  /path/hccl_config_file ./910_config.yaml"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="

@@ -16,7 +16,7 @@
 
 if [ $# -lt 3 ] ||  [ $# -gt 4 ]
 then 
-    echo "Usage: sh run_eval_gpu.sh [DATA_URL] [TRAIN_URL] [CKPT_FILENAME] [DEVICE_ID(optional)]"
+    echo "Usage: bash run_eval_gpu.sh [DATA_URL] [TRAIN_URL] [CKPT_FILENAME] [DEVICE_ID(optional)]"
 exit 1
 fi
 

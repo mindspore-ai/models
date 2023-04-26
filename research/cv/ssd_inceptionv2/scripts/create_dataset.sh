@@ -16,12 +16,12 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh scripts/create_dataset.sh [DATASET_COCO2017] [DATASET_TARGET] [NUMBER_VAL_PATH]"
+echo "bash scripts/create_dataset.sh [DATASET_COCO2017] [DATASET_TARGET] [NUMBER_VAL_PATH]"
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 if [ $# != 3 ]
 then
-    echo "Using: sh scripts/create_dataset.sh [DATASET_COCO2017] [DATASET_TARGET] [NUMBER_VAL_PATH]"
+    echo "Using: bash scripts/create_dataset.sh [DATASET_COCO2017] [DATASET_TARGET] [NUMBER_VAL_PATH]"
     exit 1
 fi
 get_real_path(){

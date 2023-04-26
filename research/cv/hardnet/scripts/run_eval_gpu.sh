@@ -17,7 +17,7 @@
 echo "=============================================================================================================="
 echo "Please run the script as: "
 echo "bash run_eval.sh DATA_PATH DEVICE_ID CKPT_PATH"
-echo "For example: sh run_eval.sh /path/dataset 0 /path/ckpt"
+echo "For example: bash run_eval.sh /path/dataset 0 /path/ckpt"
 echo "It is better to use the absolute path."
 echo "=============================================================================================================="
 set -e

@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_distribution_gpu.sh [DATA_PATH] [TRAIN_CLASS] [EPOCHS] [DEVICE_NUM]"
+    echo "Usage: bash run_distribution_gpu.sh [DATA_PATH] [TRAIN_CLASS] [EPOCHS] [DEVICE_NUM]"
 exit 1
 fi
 

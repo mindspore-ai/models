@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 2 ]
 then
-    echo "Usage: sh run_eval_for_ascend.sh [DATASET_PATH] [CHECKPOINT]"
+    echo "Usage: bash run_eval_for_ascend.sh [DATASET_PATH] [CHECKPOINT]"
 exit 1
 fi
 

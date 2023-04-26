@@ -16,13 +16,13 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh scripts/run_eval.sh [DEVICE_ID] [DATASET] [DATASET_PATH] [CHECKPOINT_PATH] [MINDRECORD_PATH]"
+echo "bash scripts/run_eval.sh [DEVICE_ID] [DATASET] [DATASET_PATH] [CHECKPOINT_PATH] [MINDRECORD_PATH]"
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 
 if [ $# != 5 ]
 then
-    echo "Using: sh scripts/run_eval.sh [DEVICE_ID] [DATASET] [DATASET_PATH] [CHECKPOINT_PATH] [MINDRECORD_PATH]"
+    echo "Using: bash scripts/run_eval.sh [DEVICE_ID] [DATASET] [DATASET_PATH] [CHECKPOINT_PATH] [MINDRECORD_PATH]"
     exit 1
 fi
 

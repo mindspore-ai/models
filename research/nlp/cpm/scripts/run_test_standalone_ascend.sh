@@ -16,9 +16,9 @@
 if [ $# != 7 ] ; then
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_test_standalone_ascend.sh DEV_DATASET_PATH DEV_JSON_PATH TEST_DATASET_PATH TEST_JSON_PATH MODEL_CKPT CKPT_NUMBER DEVICEID"
+echo "bash run_test_standalone_ascend.sh DEV_DATASET_PATH DEV_JSON_PATH TEST_DATASET_PATH TEST_JSON_PATH MODEL_CKPT CKPT_NUMBER DEVICEID"
 echo "for example:"
-echo "sh run_test_standalone_ascend.sh /disk0/dataset/finetune_dataset/finetune_dev.mindrecord /disk0/dataset/finetune_dataset/dev.json /disk0/dataset/finetune_dataset/finetune_test.mindrecord /disk0/dataset/finetune_dataset/test.json /disk2/ckpt_8p 8 4"
+echo "bash run_test_standalone_ascend.sh /disk0/dataset/finetune_dataset/finetune_dev.mindrecord /disk0/dataset/finetune_dataset/dev.json /disk0/dataset/finetune_dataset/finetune_test.mindrecord /disk0/dataset/finetune_dataset/test.json /disk2/ckpt_8p 8 4"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 exit 1;

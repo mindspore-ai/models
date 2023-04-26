@@ -16,17 +16,17 @@
 
 if [ $# -gt 8 ]
 then
-    echo "Usage: sh test_distribute.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_NUM] [STEPS_PER_EPOCH] [START] [END]"
-    echo "   or: sh test_distribute.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_NUM] [STEPS_PER_EPOCH] [START]"
-    echo "   or: sh test_distribute.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_NUM] [STEPS_PER_EPOCH]"
-    echo "   or: sh test_distribute.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_NUM]"
-    echo "   or: sh test_distribute.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_NUM]"
-    echo "   or: sh test_distribute.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH]"
-    echo "   or: sh test_distribute.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT]"
-    echo "   or: sh test_distribute.sh [MODEL_PATH] [DATASET]"
-    echo "   or: sh test_distribute.sh [MODEL_PATH] [DATASET]"
-    echo "   or: sh test_distribute.sh [MODEL_PATH]"
-    echo "   or: sh test_distribute.sh "
+    echo "Usage: bash test_distribute.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_NUM] [STEPS_PER_EPOCH] [START] [END]"
+    echo "   or: bash test_distribute.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_NUM] [STEPS_PER_EPOCH] [START]"
+    echo "   or: bash test_distribute.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_NUM] [STEPS_PER_EPOCH]"
+    echo "   or: bash test_distribute.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_NUM]"
+    echo "   or: bash test_distribute.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH] [DEVICE_NUM]"
+    echo "   or: bash test_distribute.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT] [SAVE_PATH]"
+    echo "   or: bash test_distribute.sh [MODEL_PATH] [DATASET] [GROUND_TRUTH_MAT]"
+    echo "   or: bash test_distribute.sh [MODEL_PATH] [DATASET]"
+    echo "   or: bash test_distribute.sh [MODEL_PATH] [DATASET]"
+    echo "   or: bash test_distribute.sh [MODEL_PATH]"
+    echo "   or: bash test_distribute.sh "
 exit 1
 fi
 

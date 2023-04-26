@@ -18,7 +18,7 @@ ulimit -u unlimited
 
 if [ $# != 2 ] && [ $# != 3 ]
 then
-    echo "Usage: sh run_eval.sh [DATA_PATH] [PATH_CHECKPOINT] [liberty|notredame|yosemite]"
+    echo "Usage: bash run_eval.sh [DATA_PATH] [PATH_CHECKPOINT] [liberty|notredame|yosemite]"
 exit 1
 fi
 

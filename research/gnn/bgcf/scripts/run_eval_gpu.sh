@@ -18,7 +18,7 @@ ulimit -u unlimited
 
 if [ $# -lt 2 ]
 then
-    echo "Usage: sh run_eval_gpu.sh [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]"
+    echo "Usage: bash run_eval_gpu.sh [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]"
 exit 1
 fi
 

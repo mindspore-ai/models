@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 3 ]; then
-  echo "Usage: sh run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR] [DEVICE_NUM]"
+  echo "Usage: bash run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR] [DEVICE_NUM]"
   exit 1
 fi
 

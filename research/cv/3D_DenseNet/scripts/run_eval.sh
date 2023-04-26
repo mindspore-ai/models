@@ -16,7 +16,7 @@
 
 if [ $# -ne 2 ]
 then
-    echo "Usage: sh run_eval.sh [CHECKPOINT_FILE_PATH] [EVAL_DIR]"
+    echo "Usage: bash run_eval.sh [CHECKPOINT_FILE_PATH] [EVAL_DIR]"
 exit 1
 fi
 

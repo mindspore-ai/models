@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 
-#"Usage: sh run_standalone_train.sh darknet53 imagenet2012 [DATASET_PATH]"
+#"Usage: bash run_standalone_train.sh darknet53 imagenet2012 [DATASET_PATH]"
 
 #ulimit -u unlimited
 export DEVICE_NUM=1

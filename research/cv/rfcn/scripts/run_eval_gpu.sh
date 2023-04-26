@@ -16,7 +16,7 @@
 
 if [ $# -le 3 ]
 then 
-    echo "Usage: sh run_eval_gpu.sh [DEVICE_ID] [ANNO_PATH] [CHECKPOINT_PATH] [COCO_ROOT] [MINDRECORD_DIR](option)"
+    echo "Usage: bash run_eval_gpu.sh [DEVICE_ID] [ANNO_PATH] [CHECKPOINT_PATH] [COCO_ROOT] [MINDRECORD_DIR](option)"
 exit 1
 fi
 

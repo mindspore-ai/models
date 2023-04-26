@@ -16,7 +16,7 @@
 
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_eval.sh [EVAL_DIR] [USE_DEVICE_ID] [PRETRAINED_BACKBONE]"
+    echo "Usage: bash run_eval.sh [EVAL_DIR] [USE_DEVICE_ID] [PRETRAINED_BACKBONE]"
     exit 1
 fi
 

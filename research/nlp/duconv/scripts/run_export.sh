@@ -19,7 +19,7 @@ export model
 
 """
 if [ $# != 3 ]; then
-  echo "Usage: sh run_distribute_train.sh [TASK] [CHECK_POINT_PATH] [FILE_FORMAT]"
+  echo "Usage: bash run_distribute_train.sh [TASK] [CHECK_POINT_PATH] [FILE_FORMAT]"
   exit 1
 fi
 TASK_NAME=$1

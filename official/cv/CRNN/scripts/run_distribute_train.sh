@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [[ $# -lt 3 || $# -gt 5 ]]; then
-  echo "Usage: sh run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM] [RANK_TABLE_FILE](if Ascend) [RESUME_CKPT](optional for resume)"
+  echo "Usage: bash run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM] [RANK_TABLE_FILE](if Ascend) [RESUME_CKPT](optional for resume)"
   exit 1
 fi
 

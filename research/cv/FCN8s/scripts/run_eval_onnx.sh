@@ -17,8 +17,8 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_distribute_eval.sh ONNX_PATH RANK_TABLE_FILE DATASET CONFIG_PATH "
-echo "for example: sh scripts/run_eval.sh path/to/onnx_path /path/to/dataroot /path/to/dataset"
+echo "bash run_distribute_eval.sh ONNX_PATH RANK_TABLE_FILE DATASET CONFIG_PATH "
+echo "for example: bash scripts/run_eval.sh path/to/onnx_path /path/to/dataroot /path/to/dataset"
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 if [ $# -lt 3 ]; then

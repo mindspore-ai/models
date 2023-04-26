@@ -16,7 +16,7 @@
 # an simple tutorial as follows, more parameters can be setting
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_standalone_eval_ascend.sh [TEST_DATA_PATH] [CKPT_PATH] [DEVICE_ID] [TEST_MODEL]"
+    echo "Usage: bash run_standalone_eval_ascend.sh [TEST_DATA_PATH] [CKPT_PATH] [DEVICE_ID] [TEST_MODEL]"
 exit 1
 fi
 

@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [[ $# -lt 1 || $# -gt 1 ]]; then 
-    echo "Usage: sh eval.sh [CONFIG_PATH]
+    echo "Usage: bash eval.sh [CONFIG_PATH]
     CONFIG_PATH Must Be Provided!"
 exit 1
 fi

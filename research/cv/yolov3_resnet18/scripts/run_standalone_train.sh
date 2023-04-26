@@ -16,13 +16,13 @@
 
 echo "========================================================================================================================================="
 echo "Please run the script as: "
-echo "sh run_standalone_train.sh DEVICE_ID EPOCH_SIZE MINDRECORD_DIR IMAGE_DIR ANNO_PATH PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
-echo "for example: sh run_standalone_train.sh 0 60 ./Mindrecord_train ./dataset ./dataset/train.txt /opt/yolov3-50.ckpt(optional) 30(optional)"
+echo "bash run_standalone_train.sh DEVICE_ID EPOCH_SIZE MINDRECORD_DIR IMAGE_DIR ANNO_PATH PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
+echo "for example: bash run_standalone_train.sh 0 60 ./Mindrecord_train ./dataset ./dataset/train.txt /opt/yolov3-50.ckpt(optional) 30(optional)"
 echo "========================================================================================================================================="
 
 if [ $# != 5 ] && [ $# != 7 ]
 then
-    echo "Usage: sh run_standalone_train.sh [DEVICE_ID] [EPOCH_SIZE] [MINDRECORD_DIR] [IMAGE_DIR] [ANNO_PATH] \
+    echo "Usage: bash run_standalone_train.sh [DEVICE_ID] [EPOCH_SIZE] [MINDRECORD_DIR] [IMAGE_DIR] [ANNO_PATH] \
 [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)"
     exit 1
 fi

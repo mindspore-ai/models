@@ -22,5 +22,5 @@ if [ $# == 1 ];
 then
     python preprocess.py --train_data_dir=$1 &> preprocess.log & 
 else
-    echo "Usage: sh create_mindrecord.sh [TRAIN_DATA_DIR]"
+    echo "Usage: bash create_mindrecord.sh [TRAIN_DATA_DIR]"
 fi 

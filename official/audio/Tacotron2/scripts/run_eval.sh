@@ -20,7 +20,7 @@ then
 fi
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_eval.sh OUTPUT_PATH DATANAME MODEL_CKPT DEVICE_ID"
+echo "bash run_eval.sh OUTPUT_PATH DATANAME MODEL_CKPT DEVICE_ID"
 echo "for example: bash run_eval.sh /path/output /path/model.ckpt 0"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="

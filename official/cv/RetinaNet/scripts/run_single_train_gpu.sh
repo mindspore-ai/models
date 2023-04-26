@@ -16,14 +16,14 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh scripts/run_single_train.sh DEVICE_ID MINDRECORD_DIR CONFIG_PATH PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
-echo "for example: sh scripts/run_single_train.sh 0 /cache/mindrecord_dir/ /config/default_config.yaml /opt/retinanet-500_458.ckpt(optional) 200(optional)"
+echo "bash scripts/run_single_train.sh DEVICE_ID MINDRECORD_DIR CONFIG_PATH PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
+echo "for example: bash scripts/run_single_train.sh 0 /cache/mindrecord_dir/ /config/default_config.yaml /opt/retinanet-500_458.ckpt(optional) 200(optional)"
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 
 if [ $# != 3 ] && [ $# != 5 ]
 then
-    echo "Usage: sh scripts/run_single_train_GPU.sh [DEVICE_ID] [MINDRECORD_DIR] \
+    echo "Usage: bash scripts/run_single_train_GPU.sh [DEVICE_ID] [MINDRECORD_DIR] \
 [CONFIG_PATH] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)"
     exit 1
 fi

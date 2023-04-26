@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh run_distribute_train_gpu.sh [DATASET_PATH] [PRETRAINED_BACKBONE]"
+    echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [PRETRAINED_BACKBONE]"
 exit 1
 fi
 

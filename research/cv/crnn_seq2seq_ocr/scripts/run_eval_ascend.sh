@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then 
-    echo "Usage: sh run_eval_ascend.sh [TEST_DATA_DIR] [CHECKPOINT_PATH]"
+    echo "Usage: bash run_eval_ascend.sh [TEST_DATA_DIR] [CHECKPOINT_PATH]"
 exit 1
 fi
 

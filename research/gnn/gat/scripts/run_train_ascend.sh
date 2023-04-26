@@ -16,7 +16,7 @@
 
 if [[ $# != 2 && $# != 3 ]]
 then 
-    echo "Usage: sh run_train_ascend.sh [DATASET_NAME] [DATASET_DIR] [DEVICE_ID](optional)"
+    echo "Usage: bash run_train_ascend.sh [DATASET_NAME] [DATASET_DIR] [DEVICE_ID](optional)"
 exit 1
 fi
 

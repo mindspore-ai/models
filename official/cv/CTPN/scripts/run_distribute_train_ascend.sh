@@ -16,7 +16,7 @@
 
 if [ $# -ne 3 ]
 then 
-    echo "Usage: sh scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH]"
+    echo "Usage: bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH]"
 exit 1
 fi
 

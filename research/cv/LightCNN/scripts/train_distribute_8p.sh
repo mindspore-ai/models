@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 1 ]; then
-  echo "Usage: sh train_distribute_8p [RANK_TABLE_FILE]"
+  echo "Usage: bash train_distribute_8p [RANK_TABLE_FILE]"
   exit 1
 fi
 
