@@ -79,6 +79,7 @@ class DBNetMonitor(Callback):
         self.train_start = time.time()
         self.cur_steps = cur_steps
         self.all_fps = []
+        self.epoch_num = config.train.total_epochs
 
     def load_parameter(self):
         param_dict = dict()
@@ -188,4 +189,4 @@ class DBNetMonitor(Callback):
         samples = self.batch_size * self.device_num * cb_params.batch_num
         all_cost = time.time() - self.train_start
         self.config.logger.info(f'training total cost {all_cost} s, samples {samples}, '
-                                f'avg fps is {all_cost / samples} FPS')
+                                f'avg fps is {samples * self.epoch_num / all_cost} FPS')
