@@ -79,7 +79,7 @@ class DBNetMonitor(Callback):
         self.train_start = time.time()
         self.cur_steps = cur_steps
         self.all_fps = []
-        self.epoch_num = config.train.total_epochs
+        self.epoch_num = config.train.total_epochs - config.train.start_epoch_num
 
     def load_parameter(self):
         param_dict = dict()
