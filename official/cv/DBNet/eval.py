@@ -18,7 +18,7 @@ import sys
 
 import mindspore as ms
 
-from src.datasets.load import create_dataset, save_mindrecord
+from src.datasets.load import create_dataset
 from src.utils.eval_utils import WithEval
 from src.utils.env import init_env
 from src.modules.model import get_dbnet
@@ -43,7 +43,6 @@ def evaluate(cfg, path):
     cfg.logger = get_logger(cfg.log_dir, cfg.rank_id)
     cfg.backbone.pretrained = False
 
-    save_mindrecord(config)
     val_dataset, _ = create_dataset(cfg, False)
     val_dataset = val_dataset.create_dict_iterator(output_numpy=True)
     paths = [path]
