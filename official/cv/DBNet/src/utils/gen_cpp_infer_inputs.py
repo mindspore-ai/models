@@ -20,11 +20,13 @@ from tqdm import tqdm
 
 from src.datasets.load import create_dataset
 from src.model_utils.config import config
+from src.utils.logger import get_logger
 
 sys.path.insert(0, os.path.join("../..", os.path.dirname(os.path.abspath(__file__))))
 
 
 def main():
+    config.logger = get_logger(os.path.join(config.output_dir, 'log'), config.device_id)
     val_dataset, _ = create_dataset(config, False)
     val_dataset = val_dataset.create_dict_iterator(output_numpy=True)
 
