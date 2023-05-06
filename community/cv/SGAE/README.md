@@ -52,7 +52,7 @@ arXiv:2109.04684, 2021.
 
 > attack: [https://research.unsw.edu.au/projects/unsw-nb15-dataset](https://research.unsw.edu.au/projects/unsw-nb15-dataset)
 >
-> bcsc:<https://www.bcsc-research.org/data/rfdatasetCreditcard:>
+> bcsc:<https://www.bcsc-research.org>
 >
 > creditcard:<https://www.kaggle.com/mlg-ulb/creditcardfraud>
 >

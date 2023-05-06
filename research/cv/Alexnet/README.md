@@ -476,7 +476,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 7.2 ms/step                                                 | 7.4 ms/step                                     | 60.9 ms/step                              |
 | Total time                 | 6 mins                                                      | 6 mins                                          | 96 mins                                 |
 | Checkpoint for Fine tuning | 428M (.ckpt file)                                           | 428M (.ckpt file)                                | 459M (.ckpt file)                        |
-| Scripts                    | [AlexNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/Alexnet) | [AlexNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/Alexnet) | [AlexNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/Alexnet) |
+| Scripts                    | [AlexNet Script](https://gitee.com/mindspore/models/tree/master/research/cv/Alexnet) | [AlexNet Script](https://gitee.com/mindspore/models/tree/master/research/cv/Alexnet) | [AlexNet Script](https://gitee.com/mindspore/models/tree/master/research/cv/Alexnet) |
 
 ## [Description of Random Situation](#contents)
 
