@@ -147,7 +147,7 @@ def load_model(args_opt):
         predict_layout = None
     elif args_opt.eval_task:
         # Compiling only needs the shape
-        predict_layout = model_predict.infer_predict_layout(inputs_np, inputs_np)
+        predict_layout = model_predict.infer_predict_layout(inputs_np, inputs_np, inputs_np)
     elif config.use_past:
         batch_valid_length = Tensor(np.array([0]), mstype.int32)
         init_true = Tensor([True], mstype.bool_)

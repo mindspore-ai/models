@@ -31,6 +31,7 @@ from mindformers.modules.layers import LayerNorm
 
 class EmbeddingLayer(nn.Cell):
     r"""Embedding layer of the PanGUAlpha Model"""
+
     def __init__(self, config):
         super(EmbeddingLayer, self).__init__()
         # Only for the pipeline mode, the embedding needs to be row sliced.
@@ -71,6 +72,7 @@ class EmbeddingLayer(nn.Cell):
 
 class QueryLayer(TransformerEncoderLayer):
     r"""Query Layer at the final layer."""
+
     def __init__(self, batch_size,
                  hidden_size,
                  ffn_hidden_size,
@@ -202,7 +204,7 @@ def set_parallel_configure_for_layer(network, layer_id, offset, parallel_config,
     # As the final layer is not included here, so we need to manually add here.
     # original:  if set two stages, layers on two stages will be [15, 16+1]
     # with 1 added, the layers on two stages will be [16, 15 +1]
-    pp_dis = max(int((layers + 1)/ parallel_config.pipeline_stage), 1)
+    pp_dis = max(int((layers + 1) / parallel_config.pipeline_stage), 1)
     # the pipeline stage must be in [0, parallel_config.pipeline_stage - 1]
     pp_id = min((layer_id + offset) // pp_dis, parallel_config.pipeline_stage - 1)
     network.pipeline_stage = pp_id
@@ -226,6 +228,7 @@ def set_parallel_configure_for_layer(network, layer_id, offset, parallel_config,
 
 class PanguAlpha_Model(Cell):
     r"""The base backbone of the PanGuAlpha model"""
+
     def __init__(self, config):
         super(PanguAlpha_Model, self).__init__()
         self.is_pipeline = config.parallel_config.pipeline_stage > 1
@@ -346,6 +349,7 @@ class PanguAlpha_Model(Cell):
 
     def load_embedding_from_ckpt(self, load_ckpt_path):
         r"""load the weights from the checkpoint"""
+
         def load_param(path):
             if os.path.exists(path):
                 p_table = np.load(path)
@@ -493,7 +497,7 @@ class PanGUAlphaLossWithPrompt(Cell):
         self.equal = P.Equal()
         self.expand = P.ExpandDims()
 
-    def construct(self, input_ids, prompt_ids):
+    def construct(self, input_ids, prompt_ids, labels):
         r"""Forward process of the pangu alpha model"""
         tokens = input_ids
         input_mask = F.cast(self.not_equal(tokens, self.pad_token), mstype.float32)
@@ -507,7 +511,15 @@ class PanGUAlphaLossWithPrompt(Cell):
 
         log_probs = self.log_softmax(logits)
         input_mask_b = input_mask * input_mask_a
-        return log_probs, input_mask_b
+
+        # compute loss for c3 dataset
+        labels = labels.astype(mstype.int32)
+        index = labels[0]
+        index = index.reshape(-1, 1)
+        select = P.GatherD()(log_probs, 1, index).squeeze()
+        loss = -select * input_mask_b
+        loss = P.ReduceMean()(loss)
+        return loss
 
 
 class EvalNet(nn.Cell):
