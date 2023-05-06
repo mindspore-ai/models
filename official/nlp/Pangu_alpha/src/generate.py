@@ -57,10 +57,8 @@ def get_scores(model_predict, item, tokenizer, pad_length=1024):
     prompt_ids = convert_text_to_ids(prompt, tokenizer, pad_length, pad=tokenizer.pad_id, plus=0)
     labels = np.concatenate((tokens[:, 1:], np.ones((tokens.shape[0], 1)) * tokenizer.pad_id), axis=-1)
 
-    logits, mask = model_predict.predict(Tensor(np.array(tokens, np.int32)),
-                                         Tensor(np.array(prompt_ids, np.int32)))
-    loss = compute_loss(logits.asnumpy(), labels, mask.asnumpy())
-
+    loss = model_predict.predict(Tensor(np.array(tokens, np.int32)),
+                                 Tensor(np.array(prompt_ids, np.int32)), Tensor(labels))
     return loss
 
 

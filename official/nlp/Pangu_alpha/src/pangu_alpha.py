@@ -493,7 +493,7 @@ class PanGUAlphaLossWithPrompt(Cell):
         self.equal = P.Equal()
         self.expand = P.ExpandDims()
 
-    def construct(self, input_ids, prompt_ids):
+    def construct(self, input_ids, prompt_ids, labels):
         r"""Forward process of the pangu alpha model"""
         tokens = input_ids
         input_mask = F.cast(self.not_equal(tokens, self.pad_token), mstype.float32)
@@ -507,7 +507,15 @@ class PanGUAlphaLossWithPrompt(Cell):
 
         log_probs = self.log_softmax(logits)
         input_mask_b = input_mask * input_mask_a
-        return log_probs, input_mask_b
+
+        # compute loss for c3 dataset
+        labels = labels.astype(mstype.int32)
+        index = labels[0]
+        index = index.reshape(-1, 1)
+        select = P.GatherD()(log_probs, 1, index).squeeze()
+        loss = -select * input_mask_b
+        loss = P.ReduceMean()(loss)
+        return loss
 
 
 class EvalNet(nn.Cell):
