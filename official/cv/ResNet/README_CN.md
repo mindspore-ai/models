@@ -37,6 +37,8 @@
             - [Ascend处理器环境运行](#ascend处理器环境运行-2)
             - [GPU处理器环境运行](#gpu处理器环境运行-1)
         - [结果](#结果-2)
+    - [预测过程](#预测过程)
+        - [预测](#预测)
     - [推理过程](#推理过程)
         - [导出MindIR](#导出mindir)
         - [ONNX的导出与推理](#onnx的导出与推理)
@@ -261,6 +263,7 @@ bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]  [CONFIG_PATH]
   ├── quick_start.py                       # quick start演示文件（cpu）
   ├── requirements.txt                     # 第三方依赖
   ├── eval.py                              # 评估网络
+  ├── predict.py                           # 预测网络
   └── train.py                             # 训练网络
 ```
 
@@ -737,6 +740,23 @@ result: {'top_5_accuracy': 0.9438420294494239, 'top_1_accuracy': 0.78817221518} 
 ```bash
 result:{'top_5_accuracy':0.9342589628681178, 'top_1_accuracy':0.768065781049936} ckpt=train_parallel0/resnet-24_5004.ckpt
 
+```
+
+## 预测过程
+
+### 预测
+
+在运行以下命令之前，请检查用于评估的检查点路径和图片路径。
+
+```bash
+python predict.py --checkpoint_file_path train_parallel0/resnet-90_625.ckpt --config_path config/resnet18_imagenet2012_config_gpu.yaml --img_path test.png > log.txt 2>&1 &  
+```
+
+您可以通过log.txt文件查看结果。预测结果和平均预测时间如下：
+
+```bash
+Prediction res: 5
+Prediction avg time: 5.360 ms
 ```
 
 ## 推理过程
