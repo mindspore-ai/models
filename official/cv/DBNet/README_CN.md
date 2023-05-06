@@ -133,7 +133,7 @@ bash scripts/run_standalone_train.sh config/dbnet/config_mobilenetv3_1p.yaml 0 d
 
 ```shell
 # 1.8之前Ascend上使用for循环启动
-bash scripts/run_distribution_train.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
+bash scripts/run_distribution_train_ascend.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
 
 # 1.8之后Ascend和GPU一样可以用mpirun启动
 bash scripts/run_distribution_train.sh [DEVICE_NUM] [CONFIG_PATH] [LOG_NAME](optional)
