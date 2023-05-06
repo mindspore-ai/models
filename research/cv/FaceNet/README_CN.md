@@ -34,7 +34,7 @@ FaceNet总体网络架构如下：
 
 # 数据集
 
-VGGFace2训练集：[VGGFACE2](https://112.95.163.82:443/nanhang/shenao/data/dataset.zip?AWSAccessKeyId=ZQMSJWHQSZAKGA1LD2WR&Expires=1671081389&Signature=0w2hd7GtIHkZkzEpDIqTfjjWi3Q%3D)
+VGGFace2训练集：[VGGFACE2](https://www.robots.ox.ac.uk/~vgg/data/vgg_face2)
 
 LFW测试集和已生成的三元组：[LFW](https://pan.baidu.com/s/1BqiMaK-jp0Wi0Ez1Exdg8g?pwd=vfka)
 

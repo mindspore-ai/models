@@ -365,7 +365,7 @@ bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 | 速度 | 7.2毫秒/步 | 7.4毫秒/步 | 60.9毫秒/步 |
 | 总时间 | 6分钟 | 6分钟| 96分钟 |
 | 微调检查点 | 428M （.ckpt文件） | 428M （.ckpt文件） | 459M （.ckpt文件）|
-| 脚本 | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/Alexnet) | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/Alexnet) | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/Alexnet) |
+| 脚本 | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/Alexnet) | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/Alexnet) | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/Alexnet) |
 
 ## 随机情况说明
 
