@@ -131,7 +131,7 @@ bash scripts/run_standalone_train.sh config/dbnet/config_mobilenetv3_1p.yaml 0 d
 
 ```shell
 # Starting with the for loop on Ascend before MindSpore1.8
-bash scripts/run_distribution_train.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
+bash scripts/run_distribution_train_ascend.sh [RANK_TABLE_FILE] [DEVICE_NUM] [CONFIG_PATH]
 
 # After 1.8, on Ascend, like on GPU, can be started using mpirun
 bash scripts/run_distribution_train.sh [DEVICE_NUM] [CONFIG_PATH] [LOG_NAME](optional)
