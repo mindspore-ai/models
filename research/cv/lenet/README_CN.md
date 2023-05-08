@@ -15,6 +15,8 @@
         - [训练](#训练)
     - [评估过程](#评估过程)
         - [评估](#评估)
+    - [预测过程](#预测过程)
+        - [预测](#预测)
     - [推理过程](#推理过程)
         - [导出MindIR](#导出mindir)
         - [在Ascend310执行推理](#在ascend310执行推理)
@@ -187,6 +189,7 @@ bash run_standalone_eval_ascend.sh [DATA_PATH] [CKPT_NAME]
         |      └──moxing_adapter.py  // 参数处理
         ├── default_config.yaml      // 训练参数配置文件
         ├── train.py                 // 训练脚本
+        ├── predict.py               // 单数据推理脚本
         ├── eval.py                  //  评估脚本  
         ├── postprocess.py           //  310推理后处理脚本
         ├── preprocess.py           //  310推理前处理脚本
@@ -241,7 +244,7 @@ epoch:1 step:1538, loss is 1.0221305
 在运行以下命令之前，请检查用于评估的检查点路径。
 
 ```bash
-python eval.py --data_path Data --ckpt_path ckpt/checkpoint_lenet-1_1875.ckpt > log.txt 2>&1 &  
+python eval.py --data_path Data --ckpt_file ckpt/checkpoint_lenet-1_1875.ckpt > log.txt 2>&1 &  
 # or enter script dir, and run the script
 bash run_standalone_eval_ascend.sh [DATA_PATH] [CKPT_NAME]
 # example: bash run_standalone_eval_ascend.sh /home/DataSet/MNIST/ /home/model/lenet/ckpt/checkpoint_lenet-1_1875.ckpt
@@ -252,6 +255,23 @@ bash run_standalone_eval_ascend.sh [DATA_PATH] [CKPT_NAME]
 ```bash
 # grep "Accuracy:" log.txt
 'Accuracy':0.9842
+```
+
+## 预测过程
+
+### 预测
+
+在运行以下命令之前，请检查用于评估的检查点路径和图片路径。
+
+```bash
+python predict.py --ckpt_file ckpt/checkpoint_lenet-1_1875.ckpt --img_path test.png > log.txt 2>&1 &  
+```
+
+您可以通过log.txt文件查看结果。预测结果和平均预测时间如下：
+
+```bash
+Prediction res: 5
+Prediction avg time: 0.4899 ms
 ```
 
 ## 推理过程

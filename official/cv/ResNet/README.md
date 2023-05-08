@@ -25,6 +25,8 @@
             - [Running on Ascend](#running-on-ascend-1)
             - [Running on GPU](#running-on-gpu-1)
         - [Result](#result-1)
+    - [Prediction Process](#prediction-process)
+        - [Prediction](#prediction)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
@@ -261,6 +263,7 @@ If you want to run in modelarts, please check the official documentation of [mod
   ├── export.py                            # export model for inference
   ├── mindspore_hub_conf.py                # mindspore hub interface
   ├── eval.py                              # eval net
+  ├── predict.py                           # predict net
   ├── train.py                             # train net
   └── gpu_resent_benchmark.py              # GPU benchmark for resnet50
 ```
@@ -714,6 +717,23 @@ result: {'top_5_accuracy': 0.9438420294494239, 'top_1_accuracy': 0.78817221518} 
 ```bash
 result: {'top_5_accuracy': 0.9342589628681178, 'top_1_accuracy': 0.768065781049936} ckpt=train_parallel0/resnet-24_5004.ckpt
 
+```
+
+## [Prediction Process](#contents)
+
+### Prediction
+
+Before running the command below, please check the checkpoint path and image path used for prediction.
+
+```bash
+python predict.py --checkpoint_file_path train_parallel0/resnet-90_625.ckpt --config_path config/resnet18_imagenet2012_config_gpu.yaml --img_path test.png > log.txt 2>&1 &  
+```
+
+You can view the results through the file "log.txt". The prediction res and averaget prediction time will be logged:
+
+```bash
+Prediction res: 5
+Prediction avg time: 5.360 ms
 ```
 
 ## Inference Process

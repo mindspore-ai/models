@@ -82,6 +82,15 @@ has_trained_step: 0
 result_path: ''
 label_path: ''
 
+# prediction
+img_path: ''
+
+# lite inference
+enable_predict_lite_backend: False
+enable_predict_lite_mindir: False
+lite_context_config: {"target": "gpu", "device_id": 0, "precision_mode": "preferred_fp16"}
+
+
 ---
 # Help description for each configuration
 enable_modelarts: "Whether training on modelarts, default: False"
@@ -99,3 +108,4 @@ checkpoint_path: "The location of the checkpoint file."
 checkpoint_file_path: "The location of the checkpoint file."
 save_graphs: "Whether save graphs during training, default: False."
 save_graphs_path: "Path to save graphs."
+img_path: "image file path."

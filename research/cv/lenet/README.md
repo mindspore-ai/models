@@ -13,6 +13,8 @@
         - [Training](#training)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
+    - [Prediction Process](#prediction-process)
+        - [Prediction](#prediction)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
@@ -188,6 +190,7 @@ bash run_standalone_eval_ascend.sh [DATA_PATH] [CKPT_NAME]
         ├── default_config.yaml            // Training parameter profile(ascend)
         ├── train.py               // training script
         ├── eval.py               //  evaluation script
+        ├── predict.py            //  prediction script
         ├── postprocess.py        //  postprocess script
         ├── preprocess.py        //  preprocess script
 ```
@@ -252,6 +255,23 @@ You can view the results through the file "log.txt". The accuracy of the test da
 ```bash
 # grep "Accuracy: " log.txt
 'Accuracy': 0.9842
+```
+
+## [Prediction Process](#contents)
+
+### Prediction
+
+Before running the command below, please check the checkpoint path and image path used for prediction.
+
+```bash
+python predict.py --ckpt_file ckpt/checkpoint_lenet-1_1875.ckpt --img_path test.png > log.txt 2>&1 &  
+```
+
+You can view the results through the file "log.txt". The prediction res and averaget prediction time will be logged:
+
+```bash
+Prediction res: 5
+Prediction avg time: 0.4899 ms
 ```
 
 ## [Inference Process](#contents)
