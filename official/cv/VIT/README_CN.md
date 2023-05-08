@@ -388,7 +388,7 @@ python export.py --config_path=[CONFIG_PATH]
 
 ### 推理
 
-在还行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
+在进行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
 
 - 使用ImageNet数据集进行推理
 
