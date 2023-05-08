@@ -458,11 +458,11 @@ bash scripts/run_distribute_train_gpu.sh [RANKSIZE] [DATASET] [CONFIG_PATH]
 
 ## 推理过程
 
-### 导出AIR、MindIRonically、ONNX模型
+### 导出AIR、MindIR、ONNX
 
 在执行导出前需要修改配置文件中的checkpoint_file_path和batch_size参数。checkpoint_file_path为ckpt文件路径，batch_size设置为1。
 
-#### 本地导出AIR、MindIRonically、ONNX
+#### 本地导出AIR、MindIR、ONNX
 
 ```shell
 python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[model_name] --file_format=[EXPORT_FORMAT]
@@ -470,7 +470,7 @@ python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_
 
 `EXPORT_FORMAT` 可选 ["AIR", "MINDIR", "ONNX"]. BATCH_SIZE 目前仅支持batch_size为1的推理
 
-#### ModelArts导出mindir
+#### ModelArts导出MindIR
 
 ```text
 # (1) 把训练好的模型地方到桶的对应位置。
