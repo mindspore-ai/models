@@ -86,7 +86,7 @@ R-CNN的整体网络架构详情，请参考链接: [Link](https://arxiv.org/abs
 
 ### [准备](#contents)
 
-准备AlexNet在ImageNet2012上的预训练模型，可直接通过链接下载[link](https://download.mindspore.cn/)；也可自己训练，脚本参考[ModelZoo](https://gitee.com/mindspore/models/tree/master/official/cv/Alexnet)，并将checkpoints文件保存在“models”文件夹中。您还需要创建一个名为“data”的文件夹来存放数据集和处理后的数据。训练集和测试集分别在两个文件夹中，一个是“VOC2007”，另一个是“VOCtest_06-Nov-2007”。 路径也在“src/paths.py”中设置。
+准备AlexNet在ImageNet2012上的预训练模型，可直接通过链接下载[link](https://download.mindspore.cn/)；也可自己训练，脚本参考[ModelZoo](https://gitee.com/mindspore/models/tree/master/research/cv/Alexnet)，并将checkpoints文件保存在“models”文件夹中。您还需要创建一个名为“data”的文件夹来存放数据集和处理后的数据。训练集和测试集分别在两个文件夹中，一个是“VOC2007”，另一个是“VOCtest_06-Nov-2007”。 路径也在“src/paths.py”中设置。
 
 ### [数据预处理](#contents)
 
