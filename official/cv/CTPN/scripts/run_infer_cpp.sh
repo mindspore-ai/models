@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 4 || $# -gt 5 ]]; then 
-    echo "Usage: bash run_infer_cpp.sh [MODEL_PATH] [DATA_PATH] [LABEL_PATH] [DEVICE_TYPE] [DEVICE_ID]
+if [ $# != 5 ] && [ $# != 6 ]; then
+    echo "Usage: bash run_infer_cpp.sh [MODEL_PATH] [DATA_PATH] [LABEL_PATH] [DEVICE_TYPE] [DEVICE_ID] [CONFIG_PATH](optional)
     DEVICE_TYPE can choose from [Ascend, GPU, CPU]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
@@ -46,7 +46,13 @@ fi
 if [ $4 == 'GPU' ]; then
     device_id=0
 fi
-
+BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
+CONFIG_PATH=$BASE_PATH/../default_config.yaml
+if [ $# == 6 ]
+then
+    CONFIG_PATH=$(get_real_path $6)
+    echo $CONFIG_PATH
+fi
 echo $model
 echo $data_path
 echo $label_path
@@ -113,7 +119,8 @@ function cal_acc()
     fi
     mkdir output
     mkdir output_img
-    python ../postprocess.py --export_dataset_path=$data_path --result_path=result_Files --label_path=$label_path &> acc.log
+    python ../postprocess.py --export_dataset_path=$data_path --result_path=result_Files --label_path=$label_path \
+       --config_path=$CONFIG_PATH &> acc.log
     if [ $? -ne 0 ]; then
         echo "calculate accuracy failed"
         exit 1

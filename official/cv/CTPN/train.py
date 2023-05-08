@@ -121,8 +121,6 @@ def train():
 
     print("CHECKING MINDRECORD FILES DONE!")
 
-    # loss_scale = float(config.loss_scale)
-
     # When create MindDataset, using the fitst mindrecord file, such as ctpn_pretrain.mindrecord0.
     dataset = create_ctpn_dataset(mindrecord_file, \
         batch_size=config.batch_size, device_num=device_num, rank_id=rank)
@@ -174,8 +172,8 @@ def train():
         eval_dataset = create_ctpn_dataset(config.eval_dataset_path, \
             batch_size=config.batch_size, is_training=False)
         eval_net = net
-        eval_param_dict = {"eval_network": eval_net, "eval_dataset": eval_dataset, \
-            "eval_image_path": config.eval_image_path}
+        eval_param_dict = {"eval_network": eval_net, "eval_dataset": eval_dataset,
+                           "eval_image_path": config.eval_image_path}
         eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=config.eval_interval,
                                eval_start_epoch=config.eval_start_epoch, save_best_ckpt=True,
                                ckpt_directory=save_checkpoint_path, besk_ckpt_name="best_acc.ckpt",

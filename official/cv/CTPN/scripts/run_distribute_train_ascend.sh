@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -ne 3 ]
-then 
-    echo "Usage: bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH]"
+if [ $# != 3 ] && [ $# != 4 ]
+then
+    echo "Usage: bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH] [CONFIG_PATH](optional)"
 exit 1
 fi
 
@@ -45,6 +45,14 @@ then
 exit 1
 fi
 
+BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
+CONFIG_PATH=$BASE_PATH/../default_config.yaml
+if [ $# == 4 ]
+then
+    CONFIG_PATH=$(get_real_path $4)
+    echo $CONFIG_PATH
+fi
+
 ulimit -u unlimited
 export DEVICE_NUM=8
 export RANK_SIZE=8
@@ -64,6 +72,6 @@ do
     cd ./train_parallel$i || exit
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     env > env.log
-    python train.py --run_distribute=True --task_type=$TASK_TYPE --pre_trained=$PATH2 &> log &
+    python train.py --run_distribute=True --task_type=$TASK_TYPE --pre_trained=$PATH2 --config_path=$CONFIG_PATH &> log &
     cd ..
 done

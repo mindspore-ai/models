@@ -47,6 +47,9 @@
 训练集：包括约4500个可读单词的1000张图像。
 测试集：约2000个可读单词。
 
+另外，我们使用 [ICDAR 2017: ICDAR2017 Competition on Multi-lingual scene text detection and script identification](https://rrc.cvc.uab.es/?ch=8&com=tasks) 用于多语言检测训练。
+该数据集由9000张（训练7200，测试1800）多种混合语言标注的自然场景图片构成（中文，日文，韩文，英文，法文，阿拉伯文，意大利文，德文和印度文 9种语言），标注形式为四点标注，坐标格式顺时针坐标。
+
 下载得到的训练和推理数据解压后备用，不需要转为mindrecord数据
 
 # 预训练模型
@@ -100,10 +103,30 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib64
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
+修改config文件里的为下载的数据集的路径：
+
+```text
+TRAINDATA_IMG: ""
+TRAINDAT_GT: ""
+EVALDATA_IMG: ""
+EVALDATA_GT: ""
+```
+
+下载[ICDAR2015的评估处理脚本](https://rrc.cvc.uab.es/standalones/script_test_ch4_t1_e1-1577983151.zip), 下载脚本后，解压得到以下文件：
+
+```text
+gt.zip
+readme.txt
+rrc_evalulation_funcs_1_1.py
+script.py
+```
+
+执行训练和推理
+
 ```shell
 # 分布式训练运行示例
-# 第一个参数为rank_table文件，第二个参数为生成的预训练模型，第三个参数为下载的训练数据集
-bash scripts/run_distribute_train.sh [RANK_FILE] [PRETRAINED_PATH] [TRAIN_ROOT_DIR]
+# 第一个参数为rank_table文件，第二个参数为生成的预训练模型，第三个参数为配置文件路径
+bash scripts/run_distribute_train.sh [RANK_FILE] [PRETRAINED_PATH] [CONFIG_PATH]
 
 # 进入路径，运行Makefile
 cd ./src/PSENET/pse/;make clean&&make
@@ -139,7 +162,7 @@ bash scripts/run_eval_ascend.sh
 #       a. 设置 "enable_modelarts=True"
 #          设置 "run_distribute=True"
 #          设置 "TRAIN_MODEL_SAVE_PATH=/cache/train/outputs/"
-#          设置 "TRAIN_ROOT_DIR=/cache/data/ic15/"
+#          设置 "CONFIG_PATH=default_config.yaml"
 #          设置 "pre_trained=/cache/data/train_predtrained/pred file name" 如果没有预训练权重 pre_trained=""
 
 #       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
@@ -235,8 +258,8 @@ bash scripts/run_eval_ascend.sh
   请遵循链接中的说明：[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
 
 ```shell
-# 第一个参数为rank_table文件，第二个参数为生成的预训练模型，第三个参数为下载的训练数据集
-bash scripts/run_distribute_train.sh [RANK_FILE] [PRETRAINED_PATH] [TRAIN_ROOT_DIR]
+# 第一个参数为rank_table文件，第二个参数为生成的预训练模型，第三个参数为配置文件路径
+bash scripts/run_distribute_train.sh [RANK_FILE] [PRETRAINED_PATH] [CONFIG_PATH]
 ```
 
 上述shell脚本将在后台运行分布训练。可以通过`device[X]/test_*.log`文件查看结果。
@@ -257,8 +280,8 @@ device_1/log:epcoh： 2, step: 40，loss is 0.76629
 ### 运行测试代码
 
 ```shell
-# 第一个参数为训练得到的模型文件，第二个参数为下载得到的推理数据集
-python test.py --ckpt [CKPK_PATH] --TEST_ROOT_DIR [TEST_DATA_DIR]
+# 第一个参数为训练得到的模型文件
+python test.py --ckpt [CKPK_PATH]
 
 # 单击[此处](https://rrc.cvc.uab.es/?ch=4&com=tasks#TextLocalization)下载评估方法
 # 点击"My Methods"按钮，选择Offline evaluation -> Evaluation Scripts
@@ -353,6 +376,68 @@ python ./script.py -s=submit.zip -g=gt.zip
 
 在运行目录的上一级目录将生成`res`文件夹，最终精度计算过程，请参照[ICDAR2015评估脚本](#icdar2015评估脚本).
 
+## 在多语言数据集上做迁移学习
+
+我们使用ICDAR 2017 MLT数据集作为迁移学习使用的数据集，该数据集包含中文，日文，韩文，英文，法文，阿拉伯文，意大利文，德文和印度文 9种语言的标注数据，由于该数据集不仅仅有水平的标签。
+
+1. 修改config文件里的为下载的数据集的路径：
+
+```text
+TRAINDATA_IMG: ""
+TRAINDAT_GT: ""
+EVALDATA_IMG: ""
+EVALDATA_GT: ""
+```
+
+修改finetune的超参：
+
+```text
+BASE_LR: 2e-3  ->  1e-3
+WARMUP_STEP: 620  ->  100
+EPOCH_NUM: 1800  ->  500
+```
+
+2. 下载训练好的[pasnet的参数文件](https://download.mindspore.cn/models/r1.9/psenet_ascend_v190_icdar2015_official_cv_acc81.ckpt)。
+
+3. 执行训练：
+
+```text
+# 第一个参数为rank_table文件，第二个参数为生成的预训练模型，第三个参数为配置文件路径
+bash scripts/run_distribute_train.sh [RANK_FILE] psenet_ascend_v190_icdar2015_official_cv_acc81.ckpt default_config.yaml
+```
+
+4. 推理验证：
+
+```shell
+# 第一个参数为训练得到的模型文件
+python test.py --ckpt [CKPK_PATH]
+
+# 单击 https://rrc.cvc.uab.es/?ch=4&com=tasks#TextLocalization 下载评估方法
+# 点击"My Methods"按钮，选择Offline evaluation -> Evaluation Scripts
+# 下载完成后，将数据放在/path_to_data路径
+mkdir eval_ic15
+ln -s /path_to_data/script_test_ch4_t1_e1-1577983151.zip eval_ic15/script_test_ch4_t1_e1-1577983151.zip
+
+cd eval_ic15
+unzip script_test_ch4_t1_e1-1577983151.zip
+修改 `script.py` 195 行代码为：
+dontCare = "###" in transcription
+cd ..
+
+cd /path/val_gt  # ic17验证集的标签数据
+zip -r gt.zip *.txt
+cd -
+mv /path/val_gt/gt.zip eval_ic15/
+
+bash ./scripts/run_eval_ascend.sh
+```
+
+最后得到结果
+
+```text
+Calculated!{"precision": 0.8134195274186358, "recall": 0.6715538923992393, "hmean": 0.7357102053160388, "AP": 0}
+```
+
 # 模型描述
 
 ## 性能
@@ -389,51 +474,3 @@ python ./script.py -s=submit.zip -g=gt.zip
 | 数据集| ICDAR2015 |
 | 输出 | 概率 |
 | 准确性 | 1卡：81%; 8卡：81% |
-
-## 使用方法
-
-### 推理
-
-如果您需要使用已训练模型在GPU、Ascend 910、Ascend 310等多个硬件平台上进行推理，可参考[此处](https://www.mindspore.cn/tutorials/experts/zh-CN/master/infer/inference.html)。操作示例如下：
-
-```python
-# 加载未知数据集进行推理
-dataset = dataset.create_dataset(cfg.data_path, 1, False)
-
-# 定义模型
-config.INFERENCE = False
-net = PSENet(config)
-net = net.set_train()
-param_dict = load_checkpoint(args.pre_trained)
-load_param_into_net(net, param_dict)
-print('Load Pretrained parameters done!')
-
-criterion = DiceLoss(batch_size=config.TRAIN_BATCH_SIZE)
-
-lrs = lr_generator(start_lr=1e-3, lr_scale=0.1, total_iters=config.TRAIN_TOTAL_ITER)
-opt = nn.SGD(params=net.trainable_params(), learning_rate=lrs, momentum=0.99, weight_decay=5e-4)
-
-# 模型变形
-net = WithLossCell(net, criterion)
-net = TrainOneStepCell(net, opt)
-
-time_cb = TimeMonitor(data_size=step_size)
-loss_cb = LossCallBack(per_print_times=20)
-
-# 设置并应用检查点参数
-ckpoint_cf = CheckpointConfig(save_checkpoint_steps=1875, keep_checkpoint_max=2)
-ckpoint_cb = ModelCheckpoint(prefix="PSENet", config=ckpoint_cf, directory=config.TRAIN_MODEL_SAVE_PATH)
-
-model = Model(net)
-model.train(config.TRAIN_REPEAT_NUM, ds, dataset_sink_mode=False, callbacks=[time_cb, loss_cb, ckpoint_cb])
-
-# 加载预训练模型
-param_dict = load_checkpoint(cfg.checkpoint_path)
-load_param_into_net(net, param_dict)
-net.set_train(False)
-
-# 对未知数据集进行预测
-acc = model.eval(dataset)
-print("accuracy: ", acc)
-```
-

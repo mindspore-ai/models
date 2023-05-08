@@ -34,16 +34,15 @@ def convert():
         label_name = os.path.basename(file)
         for each_label in gt:
             print(file)
+            each_label = each_label.strip()
             spt = each_label.split(',')
             print(spt)
-            if "###" in spt[8]:
-                continue
-            else:
-                x1 = min(int(spt[0]), int(spt[6]))
-                y1 = min(int(spt[1]), int(spt[3]))
-                x2 = max(int(spt[2]), int(spt[4]))
-                y2 = max(int(spt[5]), int(spt[7]))
-                label_list.append([x1, y1, x2, y2])
+            x1 = min(int(spt[0]), int(spt[2]), int(spt[4]), int(spt[6]))
+            y1 = min(int(spt[1]), int(spt[3]), int(spt[5]), int(spt[7]))
+            x2 = max(int(spt[0]), int(spt[2]), int(spt[4]), int(spt[6]))
+            y2 = max(int(spt[1]), int(spt[3]), int(spt[5]), int(spt[7]))
+            label = "###" if "#" in spt[-1] else "XXX"
+            label_list.append([x1, y1, x2, y2, label])
         annos[label_name] = label_list
     # write
     if not os.path.exists(args.target_label_path):
@@ -53,6 +52,7 @@ def convert():
         f = open(tgt_anno_file, 'w', encoding='UTF-8-sig')
         for tgt_label in pos:
             str_pos = str(tgt_label[0]) + ',' + str(tgt_label[1]) + ',' + str(tgt_label[2]) + ',' + str(tgt_label[3])
+            str_pos = str_pos + ',' + tgt_label[-1]
             f.write(str_pos)
             f.write("\n")
         f.close()

@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -ne 2 ]
-then 
-    echo "Usage: bash scripts/run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH]"
+if [ $# != 2 ] && [ $# != 3 ]
+then
+    echo "Usage: bash scripts/run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [CONFIG_PATH](optional)"
 exit 1
 fi
 
@@ -36,7 +36,13 @@ then
     echo "error: PRETRAINED_PATH=$PATH2 is not a file"
 exit 1
 fi
-
+BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
+CONFIG_PATH=$BASE_PATH/../default_config.yaml
+if [ $# == 3 ]
+then
+    CONFIG_PATH=$(get_real_path $3)
+    echo $CONFIG_PATH
+fi
 rm -rf ./train_parallel
 mkdir ./train_parallel
 cp ./*.py ./train_parallel
@@ -50,5 +56,6 @@ export RANK_SIZE=8
 
 echo "start training"
 mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
-    python train.py --run_distribute=True --task_type=$TASK_TYPE --pre_trained=$PATH2 --device_target="GPU" &> log &
+    python train.py --run_distribute=True --task_type=$TASK_TYPE --pre_trained=$PATH2 --device_target="GPU" \
+      --config_path=$CONFIG_PATH &> log &
 cd ..

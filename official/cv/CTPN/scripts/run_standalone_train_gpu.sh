@@ -15,14 +15,14 @@
 # ============================================================================
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run_standalone_train.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]"
+echo "sh run_standalone_train.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID] [CONFIG_PATH](optional)"
 echo "for example: bash run_standalone_train.sh Pretraining /path/vgg16_backbone.ckpt 0"
 echo "when device id is occupied, choose for another one"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
-if [ $# -ne 3 ]
-then 
-    echo "Usage: bash scripts/run_standalone_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]"
+if [ $# != 3 ] && [ $# != 4 ]
+then
+    echo "Usage: bash scripts/run_standalone_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID] [CONFIG_PATH](optional)"
 exit 1
 fi
 
@@ -42,7 +42,13 @@ then
     echo "error: PRETRAINED_PATH=$PRETRAINED_PATH is not a file"
 exit 1
 fi
-
+BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
+CONFIG_PATH=$BASE_PATH/../default_config.yaml
+if [ $# == 4 ]
+then
+    CONFIG_PATH=$(get_real_path $4)
+    echo $CONFIG_PATH
+fi
 rm -rf ./train
 mkdir ./train
 cp ./*.py ./train
@@ -58,5 +64,6 @@ export RANK_SIZE=1
 echo "start training for device $3"
 export CUDA_VISIBLE_DEVICES=$3
 env > env.log
-python train.py --task_type=$TASK_TYPE --pre_trained=$PRETRAINED_PATH --device_target="GPU" &> log &
+python train.py --task_type=$TASK_TYPE --pre_trained=$PRETRAINED_PATH --device_target="GPU" \
+    --config_path=$CONFIG_PATH &> log &
 cd ..

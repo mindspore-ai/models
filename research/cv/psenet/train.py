@@ -27,7 +27,7 @@ from mindspore.common import set_seed
 from src.dataset import train_dataset_creator
 from src.PSENET.psenet import PSENet
 from src.PSENET.dice_loss import DiceLoss
-from src.network_define import WithLossCell, TrainOneStepCell, LossCallBack
+from src.network_define import WithLossCell, LossCallBack
 from src.lr_schedule import dynamic_lr
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
@@ -105,17 +105,14 @@ def train():
 
     criterion = DiceLoss(batch_size=config.TRAIN_BATCH_SIZE)
 
-    lrs = dynamic_lr(config.BASE_LR, config.TRAIN_TOTAL_ITER,
+    lrs = dynamic_lr(config.BASE_LR, config.EPOCH_NUM * step_size,
                      config.WARMUP_STEP, config.WARMUP_RATIO)
     opt = nn.SGD(params=net.trainable_params(), learning_rate=lrs,
                  momentum=0.99, weight_decay=5e-4)
 
     # warp model
     net = WithLossCell(net, criterion)
-    if config.run_distribute:
-        net = TrainOneStepCell(net, opt, reduce_flag=True, mean=True, degree=device_num)
-    else:
-        net = TrainOneStepCell(net, opt)
+    net = nn.TrainOneStepWithLossScaleCell(network=net, optimizer=opt, scale_sense=nn.FixedLossScaleUpdateCell(1024.))
 
     time_cb = TimeMonitor(data_size=step_size)
     loss_cb = LossCallBack(per_print_times=step_size)
@@ -127,7 +124,7 @@ def train():
                                                                rank_id))
 
     model = Model(net)
-    model.train(config.TRAIN_REPEAT_NUM,
+    model.train(config.EPOCH_NUM,
                 ds,
                 dataset_sink_mode=True,
                 callbacks=[time_cb, loss_cb, ckpoint_cb])

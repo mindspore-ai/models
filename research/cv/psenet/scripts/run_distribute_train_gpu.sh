@@ -16,7 +16,7 @@
 
 if [ $# != 1 ] && [ $# != 2 ]
 then
-  echo "Usage: bash run_distribute_train.sh [PRETRAINED_PATH] [TRAIN_ROOT_DIR]"
+  echo "Usage: bash run_distribute_train.sh [PRETRAINED_PATH] [CONFIG_PATH]"
 exit 1
 fi
 
@@ -36,9 +36,9 @@ else
 fi
 
 PATH2=$(get_real_path $2)
-if [ ! -d $PATH2 ]
+if [ ! -f $PATH2 ]
 then
-    echo "error: TRAIN_ROOT_DIR=$PATH2 is not a directory"
+    echo "error: CONFIG_PATH=$PATH2 is not a file"
 exit 1
 fi
 
@@ -61,9 +61,9 @@ env > env.log
 if [ -f $PATH1 ]
 then
   mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
-    python train.py --run_distribute=True --device_target="GPU" --pre_trained=$PATH1 --TRAIN_ROOT_DIR=$PATH2 > log 2>&1 &
+    python train.py --run_distribute=True --device_target="GPU" --pre_trained=$PATH1 --config_path=$PATH2 > log 2>&1 &
 else
   mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
-    python train.py --device_target="GPU" --run_distribute=True --TRAIN_ROOT_DIR=$PATH2 > log 2>&1 &
+    python train.py --device_target="GPU" --run_distribute=True --config_path=$PATH2 > log 2>&1 &
 fi
 cd .. || exit

@@ -50,22 +50,19 @@ parser.add_argument('--run_distribute', type=str, default=True,
                     help='run_distribute')
 parser.add_argument('--TRAIN_MODEL_SAVE_PATH', type=str, default='/cache/train/outputs/',
                     help='TRAIN_MODEL_SAVE_PATH')
-parser.add_argument('--TRAIN_ROOT_DIR', type=str, default='/cache/data/ic15/',
-                    help='TRAIN_ROOT_DIR')
 parser.add_argument('--pre_trained', type=str, default='',
                     help='pre_trained')
 
-parser.add_argument('--TRAIN_REPEAT_NUM', type=int, default=1,
-                    help='TRAIN_REPEAT_NUM')
+parser.add_argument('--EPOCH_NUM', type=int, default=1,
+                    help='EPOCH_NUM')
 
 
 args = parser.parse_args()
 mox.file.copy_parallel(args.data_url, '/cache')
 config.enable_modelarts = args.enable_modelarts
 config.TRAIN_MODEL_SAVE_PATH = args.TRAIN_MODEL_SAVE_PATH
-config.TRAIN_ROOT_DIR = args.TRAIN_ROOT_DIR
 config.pre_trained = args.pre_trained
-config.TRAIN_REPEAT_NUM = args.TRAIN_REPEAT_NUM
+config.EPOCH_NUM = args.EPOCH_NUM
 
 set_seed(1)
 
@@ -138,7 +135,7 @@ def train():
 
     criterion = DiceLoss(batch_size=config.TRAIN_BATCH_SIZE)
 
-    lrs = dynamic_lr(config.BASE_LR, config.TRAIN_TOTAL_ITER,
+    lrs = dynamic_lr(config.BASE_LR, config.EPOCH_NUM,
                      config.WARMUP_STEP, config.WARMUP_RATIO)
     opt = nn.SGD(params=net.trainable_params(), learning_rate=lrs,
                  momentum=0.99, weight_decay=5e-4)
@@ -160,7 +157,7 @@ def train():
                                                                rank_id))
 
     model = Model(net)
-    model.train(config.TRAIN_REPEAT_NUM,
+    model.train(config.EPOCH_NUM,
                 ds,
                 dataset_sink_mode=True,
                 callbacks=[time_cb, loss_cb, ckpoint_cb])
