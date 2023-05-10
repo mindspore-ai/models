@@ -17,6 +17,8 @@
         - [分布式训练](#分布式训练)
     - [评估过程](#评估过程)
         - [评估](#评估)
+    - [预测过程](#预测过程)
+        - [预测](#预测)
     - [导出过程](#导出过程)
         - [导出](#导出)
     - [推理过程](#推理过程)
@@ -373,6 +375,27 @@ RetinaFace可以使用ResNet50或MobileNet0.25骨干提取图像特征进行检�
   Easy   Val AP : 0.8877
   Medium Val AP : 0.8698
   Hard   Val AP : 0.8005
+  ```
+
+## 预测过程
+
+### 预测
+
+  当前预测支持ResNet50作为backbone输入单张图片进行预测。
+
+  CKPT_FILE是用于评估的检查点路径。如'./train_parallel3/checkpoint/ckpt_3/RetinaFace-56_201.ckpt'。
+
+  IMG_PATH是用于预测的图片。如'./test.png'
+
+  ```bash
+  python predict.py --ckpt_file [CKPT_FILE] --img_path [IMG_PATH] > ./predict.log 2>&1 &
+  ```
+
+  上述python命令在后台运行，可通过"predict.log"文件查看结果，样例如下：
+
+  ```python
+  Prediction res: [[60.0, 40.0, 67.0, 94.0, 0.9995]]
+  Prediction avg time: 11.9745 ms
   ```
 
 ## 导出过程

@@ -82,7 +82,6 @@ def predict_backend_lite(data_input):
     """
     # model predict using backend lite
     ms_model = create_model()
-    ms.set_context(lite_context=lite_context_config)
     output = ms_model.predict(data_input, backend="lite")
     t_start = time.time()
     for _ in range(100):
@@ -112,26 +111,19 @@ def predict_mindir(data_input):
             "gpu": ["device_id", "precision_mode"],
             "ascend": ["device_id", "precision_mode", "provider", "rank_id"]
         }
-        lite_device_target = config.lite_context_config.get("target")
+        lite_device_target = ms.get_context('device_target').lower()
+        if lite_device_target not in ['cpu', 'gpu', 'ascend']:
+            raise RuntimeError(f"Device target should be in ['cpu', 'gpu', 'ascend'], but got {lite_device_target}")
         l_context.target = [lite_device_target]
-        if lite_device_target == 'cpu':
-            for single_property in lite_context_properties.get('cpu'):
-                context_value = config.lite_context_config.get(single_property)
+        l_context_device_dict = {'cpu': l_context.cpu, 'gpu': l_context.gpu, 'ascend': l_context.ascend}
+        for single_property in lite_context_properties.get(lite_device_target):
+            try:
+                context_value = ms.get_context(single_property)
                 if context_value:
-                    setattr(l_context.cpu, single_property, context_value)
-        elif lite_device_target == 'gpu':
-            for single_property in lite_context_properties.get('gpu'):
-                context_value = config.lite_context_config.get(single_property)
-                if context_value:
-                    setattr(l_context.gpu, single_property, context_value)
-        elif lite_device_target == 'ascend':
-            for single_property in lite_context_properties.get('ascend'):
-                context_value = config.lite_context_config.get(single_property)
-                if context_value:
-                    setattr(l_context.ascend, single_property, context_value)
-        else:
-            raise RuntimeError(f"For set Lite Context, target should be in ['cpu', 'gpu', 'ascend'], "
-                               f"but got {lite_device_target}")
+                    setattr(l_context_device_dict.get(lite_device_target), single_property, context_value)
+            except ValueError:
+                print(f'For set lite context, fail to get parameter {single_property} from ms.context.'
+                      f' Will use default value')
         return l_context
 
     try:

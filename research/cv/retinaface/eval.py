@@ -127,7 +127,7 @@ class DetectionEngine:
             event_name, img_name = image_path.split('/')
             self.results[event_name][img_name[:-4]] = {'img_path': image_path,
                                                        'bboxes': []}
-            return
+            return []
 
         boxes = decode_bbox(np.squeeze(boxes.asnumpy(), 0), priors, self.var)
         boxes = boxes * scale / resize
@@ -151,13 +151,14 @@ class DetectionEngine:
         dets[:, 2:4] = (dets[:, 2:4].astype(np.int) - dets[:, 0:2].astype(np.int)).astype(np.float) # int
         dets[:, 0:4] = dets[:, 0:4].astype(np.int).astype(np.float)                                 # int
 
-
         # add to result
         event_name, img_name = image_path.split('/')
         if event_name not in self.results.keys():
             self.results[event_name] = {}
         self.results[event_name][img_name[:-4]] = {'img_path': image_path,
                                                    'bboxes': dets[:, :5].astype(np.float).tolist()}
+
+        return dets[:, :5].astype(np.float).tolist()
 
     def _get_gt_boxes(self):
         """_get_gt_boxes"""
@@ -183,8 +184,8 @@ class DetectionEngine:
         min_score = 1
 
         for event in self.results:
-            for name in self.results[event].keys():
-                bbox = np.array(self.results[event][name]['bboxes']).astype(np.float)
+            for name in self.results.get(event).keys():
+                bbox = np.array(self.results.get(event).get(name).get('bboxes')).astype(np.float)
                 if bbox.shape[0] <= 0:
                     continue
                 max_score = max(max_score, np.max(bbox[:, -1]))
@@ -192,8 +193,8 @@ class DetectionEngine:
 
         length = max_score - min_score
         for event in self.results:
-            for name in self.results[event].keys():
-                bbox = np.array(self.results[event][name]['bboxes']).astype(np.float)
+            for name in self.results.get(event).keys():
+                bbox = np.array(self.results.get(event).get(name).get('bboxes')).astype(np.float)
                 if bbox.shape[0] <= 0:
                     continue
                 bbox[:, -1] -= min_score
@@ -397,16 +398,16 @@ def val_with_resnet(args_opt):
         img = np.expand_dims(img, 0)
         img = Tensor(img)
 
-        timers['forward_time'].start()
+        timers.get('forward_time').start()
         boxes, confs, _ = network(img)
-        timers['forward_time'].end()
-        timers['misc'].start()
+        timers.get('forward_time').end()
+        timers.get('misc').start()
         detection.detect(boxes, confs, resize, scale, img_name, priors)
-        timers['misc'].end()
+        timers.get('misc').end()
 
         print('im_detect: {:d}/{:d} forward_pass_time: {:.4f}s misc: {:.4f}s'.format(i + 1, num_images,
-                                                                                     timers['forward_time'].diff,
-                                                                                     timers['misc'].diff))
+                                                                                     timers.get('forward_time').diff,
+                                                                                     timers.get('misc').diff))
     print('Predict box done.')
     print('Eval starting')
 
@@ -523,16 +524,16 @@ def val_with_mobilenet(args_opt):
         img = np.expand_dims(img, 0)
         img = Tensor(img)
 
-        timers['forward_time'].start()
+        timers.get('forward_time').start()
         boxes, confs, _ = network(img)
-        timers['forward_time'].end()
-        timers['misc'].start()
+        timers.get('forward_time').end()
+        timers.get('misc').start()
         detection.detect(boxes, confs, resize, scale, img_name, priors)
-        timers['misc'].end()
+        timers.get('misc').end()
 
         print('im_detect: {:d}/{:d} forward_pass_time: {:.4f}s misc: {:.4f}s'.format(i + 1, num_images,
-                                                                                     timers['forward_time'].diff,
-                                                                                     timers['misc'].diff))
+                                                                                     timers.get('forward_time').diff,
+                                                                                     timers.get('misc').diff))
     print('Predict box done.')
     print('Eval starting')
 
