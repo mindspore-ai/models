@@ -244,7 +244,7 @@ MindSpore models仓中提供了不同任务领域，经典的SOTA模型实现和
 | 图像 | 人脸识别 | [FaceNet](https://gitee.com/mindspore/models/tree/master/research/cv/FaceNet) |✅| ✅ |   |
 | 图像 | 图像分类 | [FaceQualityAssessment](https://gitee.com/mindspore/models/tree/master/research/cv/FaceQualityAssessment) |✅| ✅ | ✅ |
 | 图像 | 目标检测 | [FaceRecognition](https://gitee.com/mindspore/models/tree/master/official/cv/FaceRecognition) |✅| ✅ |   |
-| 图像 | 目标检测 | [FaceRecognitionForTracking](https://gitee.com/mindspore/models/tree/master/research/cv/FaceRecognitionForTracking) |✅| ✅ | ✅ |
+| 图像 | 目标检测 | [FaceRecognitionForTracking](https://gitee.com/mindspore/models/tree/master/research/cv/FaceRecognitionForTracking) |✅|   | ✅ |
 | 图像 | 目标检测 | [faster_rcnn_dcn](https://gitee.com/mindspore/models/tree/master/research/cv/faster_rcnn_dcn) |✅| ✅ |   |
 | 图像 | 图像抠图 | [FCANet](https://gitee.com/mindspore/models/tree/master/research/cv/FCANet) |✅|   |   |
 | 图像 | 图像分类 | [FDA-BNN](https://gitee.com/mindspore/models/tree/master/research/cv/FDA-BNN) |✅| ✅ |   |
