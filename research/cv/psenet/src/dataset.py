@@ -13,10 +13,9 @@
 # limitations under the License.
 # ============================================================================
 
-
-import math
 import os
 import random
+import multiprocessing
 import cv2
 from PIL import Image
 import numpy as np
@@ -52,7 +51,7 @@ def get_bboxes(img, gt_path):
         line = line.replace('\ufeff', '')
         line = line.replace('\n', '')
         gt = line.split(",", 8)
-        tag = gt[-1][0] != '#'
+        tag = '#' not in gt[-1]
         box = [int(gt[i]) for i in range(8)]
         box = np.asarray(box) / ([w * 1.0, h * 1.0] * 4)
         bboxes.append(box)
@@ -176,17 +175,15 @@ class TrainDataset:
         self.img_size = config.TRAIN_LONG_SIZE
         self.kernel_num = config.KERNEL_NUM
         self.min_scale = config.TRAIN_MIN_SCALE
-
-        root_dir = config.TRAIN_ROOT_DIR
-        ic15_train_data_dir = os.path.join(root_dir, 'ch4_training_images/')
-        ic15_train_gt_dir = os.path.join(root_dir, 'ch4_training_localization_transcription_gt/')
+        train_data_dir = config.TRAINDATA_IMG
+        train_gt_dir = config.TRAINDAT_GT
 
         self.img_size = self.img_size if \
             (self.img_size is None or isinstance(self.img_size, tuple)) \
             else (self.img_size, self.img_size)
 
-        data_dirs = [ic15_train_data_dir]
-        gt_dirs = [ic15_train_gt_dir]
+        data_dirs = [train_data_dir]
+        gt_dirs = [train_gt_dir]
 
         self.all_img_paths = []
         self.all_gt_paths = []
@@ -274,7 +271,7 @@ class TrainDataset:
 
 
 def IC15_TEST_Generator():
-    ic15_test_data_dir = os.path.join(config.TEST_ROOT_DIR, 'ch4_test_images/')
+    ic15_test_data_dir = config.EVALDATA_IMG
     img_size = config.INFER_LONG_SIZE
 
     img_size = img_size if (img_size is None or isinstance(img_size, tuple)) else (img_size, img_size)
@@ -312,45 +309,25 @@ def IC15_TEST_Generator():
         yield img, img_resized, img_name
 
 
-class DistributedSampler():
-    def __init__(self, dataset, rank, group_size, shuffle=True, seed=0):
-        self.dataset = dataset
-        self.rank = rank
-        self.group_size = group_size
-        self.dataset_len = len(self.dataset)
-        self.num_samplers = int(math.ceil(self.dataset_len * 1.0 / self.group_size))
-        self.total_size = self.num_samplers * self.group_size
-        self.shuffle = shuffle
-        self.seed = seed
-
-    def __iter__(self):
-        if self.shuffle:
-            self.seed = (self.seed + 1) & 0xffffffff
-            np.random.seed(self.seed)
-            indices = np.random.permutation(self.dataset_len).tolist()
-        else:
-            indices = list(range(len(self.dataset_len)))
-
-        indices += indices[:(self.total_size - len(indices))]
-        indices = indices[self.rank::self.group_size]
-        return iter(indices)
-
-    def __len__(self):
-        return self.num_samplers
-
-
 def train_dataset_creator(rank, group_size, shuffle=True):
-    cv2.setNumThreads(0)
+    os.environ["OPENBLAS_NUM_THREADS"] = "1"
+    num_parallel_workers = 6
+    cores = multiprocessing.cpu_count()
+    if cores < 4:
+        raise EnvironmentError("CPU cores are too small")
+    if cores // min(group_size, 8) - 2 < num_parallel_workers:
+        num_parallel_workers = max(cores // min(group_size, 8) - 2, 1)
+        print(f"The num_parallel_workers is set too large, now set it {num_parallel_workers}")
+    cv2.setNumThreads(2)
     dataset = TrainDataset()
-    sampler = DistributedSampler(dataset, rank, group_size, shuffle)
-    data_set = ds.GeneratorDataset(dataset, ['img', 'gt_text', 'gt_kernels', 'training_mask'], num_parallel_workers=8,
-                                   sampler=sampler)
+    data_set = ds.GeneratorDataset(dataset, ['img', 'gt_text', 'gt_kernels', 'training_mask'],
+                                   num_parallel_workers=num_parallel_workers, num_shards=group_size,
+                                   shard_id=rank, max_rowsize=64, shuffle=True)
     data_set = data_set.batch(config.TRAIN_BATCH_SIZE, drop_remainder=config.TRAIN_DROP_REMAINDER)
     return data_set
 
 
 def test_dataset_creator():
     data_set = ds.GeneratorDataset(IC15_TEST_Generator, ['img', 'img_resized', 'img_name'])
-    data_set = data_set.shuffle(config.TEST_BUFFER_SIZE)
     data_set = data_set.batch(1, drop_remainder=config.TEST_DROP_REMAINDER)
     return data_set

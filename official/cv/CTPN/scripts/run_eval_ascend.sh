@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 3 ]
-then 
-    echo "Usage: bash scripts/run_eval_ascend.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]"
+if [ $# != 3 ] && [ $# != 4 ]
+then
+    echo "Usage: bash scripts/run_eval_ascend.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH](optional)"
 exit 1
 fi
 
@@ -51,7 +51,13 @@ then
     echo "error: CHECKPOINT_PATH=$CHECKPOINT_PATH is not a directory"
 exit 1
 fi
-
+BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
+CONFIG_PATH=$BASE_PATH/../default_config.yaml
+if [ $# == 4 ]
+then
+    CONFIG_PATH=$(get_real_path $4)
+    echo $CONFIG_PATH
+fi
 ulimit -u unlimited
 export DEVICE_NUM=1
 export RANK_SIZE=$DEVICE_NUM
@@ -72,7 +78,8 @@ do
     env > env.log
     CHECKPOINT_FILE_PATH=$file
     echo "start eval for checkpoint file: ${CHECKPOINT_FILE_PATH}"
-    python eval.py --image_path=$IMAGE_PATH --dataset_path=$DATASET_PATH --checkpoint_path=$CHECKPOINT_FILE_PATH &> log
+    python eval.py --image_path=$IMAGE_PATH --dataset_path=$DATASET_PATH --checkpoint_path=$CHECKPOINT_FILE_PATH \
+        --config_path=$CONFIG_PATH&> log
     echo "end eval for checkpoint file: ${CHECKPOINT_FILE_PATH}"
     cd ./submit || exit
     file_base_name=$(basename $file)

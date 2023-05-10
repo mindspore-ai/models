@@ -50,6 +50,10 @@ Dataset used: [ICDAR2015](https://rrc.cvc.uab.es/?ch=4&com=tasks#TextLocalizatio
 A training set of 1000 images containing about 4500 readable words
 A testing set containing about 2000 readable words
 
+We use [ICDAR 2017: ICDAR2017 Competition on Multi-lingual scene text detection and script identification](https://rrc.cvc.uab.es/?ch=8&com=tasks) for multilingual detection training.
+
+This dataset consists of 9000 natural scene images annotated in multiple mixed languages (Chinese, Japanese, Korean, English, French, Arabic, Italian, German, and Hindi, with 7200 trained and 1800 tested). The annotation format is a four point annotation with a grid like clockwise coordinate.
+
 unzip dataset files and needn't transform to mindrecord.
 
 # [Pretrained Model](#contents)
@@ -100,9 +104,29 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib64
 
 After installing MindSpore via the official website, you can start training and evaluation as follows:
 
+Modify the path in the config file to the downloaded dataset:
+
+```text
+TRAINDATA_IMG: ""
+TRAINDAT_GT: ""
+EVALDATA_IMG: ""
+EVALDATA_GT: ""
+```
+
+Download the [evaluation processing script for ICDAR2015](https://rrc.cvc.uab.es/standalones/script_test_ch4_t1_e1-1577983151.zip), after downloading the script, extract the following files:
+
+```text
+gt.zip
+readme.txt
+rrc_evalulation_funcs_1_1.py
+script.py
+```
+
+Run training and evaluation
+
 ```shell
 # run distributed training example
-bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [PRED_TRAINED PATH] [TRAIN_ROOT_DIR]
+bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [PRED_TRAINED PATH] [CONFIG_PATH]
 
 #enter the path ,run Makefile
 cd ./src/PSENET/pse/;make
@@ -139,7 +163,7 @@ bash scripts/run_eval_ascend.sh
 #       a. set "enable_modelarts=True" 。
 #          set "run_distribute=True"
 #          set "TRAIN_MODEL_SAVE_PATH=/cache/train/outputs_imagenet/"
-#          set "TRAIN_ROOT_DIR=/cache/data/ic15/"
+#          set "CONFIG_PATH=default_config.yaml"
 #          set "pre_trained=/cache/data/train_predtrained/pred file name" Without pre-training weights  train_pretrained=""
 
 #       b. add "enable_modelarts=True" Parameters are on the interface of modearts。
@@ -241,7 +265,7 @@ Major parameters in default_config.yaml are:
   Please follow the instructions in the link below: <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
 
 ```shell
-bash scripts/run_distribute_train.sh [RANK_FILE] [PRETRAINED_PATH] [TRAIN_ROOT_DIR]
+bash scripts/run_distribute_train.sh [RANK_FILE] [PRETRAINED_PATH] [CONFIG_PATH]
 ```
 
 rank_table_file which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
@@ -261,7 +285,7 @@ device_1/log:epcoh: 2, step: 40, loss is 0.76629
 ### Distributed GPU Training
 
 ```shell
-bash scripts/run_distribute_train_gpu.sh [PRED_TRAINED PATH] [TRAIN_ROOT_DIR]
+bash scripts/run_distribute_train_gpu.sh [PRED_TRAINED PATH] [CONFIG_PATH]
 ```
 
 After training begins, log and loss.log file will be in train_parallel directory.
@@ -374,6 +398,68 @@ bash run_infer_onnx.sh [ONNX_PATH] [TEST_ROOT_DIR]
 
 The `res` folder is generated in the upper-level directory. For details about the final precision calculation, see [Eval Script for ICDAR2015](#eval-script-for-icdar2015).
 
+## Transfer learning on Multilingual Datasets
+
+We use the ICDAR 2017 MLT dataset as the dataset for transfer learning. The dataset contains annotation data in 9 languages, including Chinese, Japanese, Korean, English, French, Arabic, Italian, German and Hindi. Because the dataset does not only have horizontal labels.
+
+1. Modify the path in the config file to the downloaded dataset:
+
+```text
+TRAINDATA_IMG: ""
+TRAINDAT_GT: ""
+EVALDATA_IMG: ""
+EVALDATA_GT: ""
+```
+
+Modify finetune parameters：
+
+```text
+BASE_LR: 2e-3  ->  1e-3
+WARMUP_STEP: 620  ->  100
+EPOCH_NUM: 1800  ->  500
+```
+
+2. Download the trained [pasnet checkpoint file](https://download.mindspore.cn/models/r1.9/psenet_ascend_v190_icdar2015_official_cv_acc81.ckpt).
+
+3. Run fineturn：
+
+```shell
+# The first parameter is rank_table file, the second parameter is the generated pre trained model, and the third parameter is the configuration file path
+bash scripts/run_distribute_train.sh [RANK_FILE] psenet_ascend_v190_icdar2015_official_cv_acc81.ckpt default_config.yaml
+```
+
+4. Evaluation：
+
+```shell
+# The first parameter is the trained model file
+python test.py --ckpt [CKPK_PATH]
+
+# click https://rrc.cvc.uab.es/?ch=4&com=tasks#TextLocalization to download evaluation scripts
+# choose My Methods -> Offline evaluation -> Evaluation Scripts
+# download data and put it in /path_to_data
+mkdir eval_ic15
+ln -s /path_to_data/script_test_ch4_t1_e1-1577983151.zip eval_ic15/script_test_ch4_t1_e1-1577983151.zip
+
+cd eval_ic15
+unzip script_test_ch4_t1_e1-1577983151.zip
+Change `script.py` line 195 code to：
+dontCare = "###" in transcription
+cd ..
+
+cd /path/val_gt  # Label data for ic17 validation set
+zip -r gt.zip *.txt
+cd -
+mv /path/val_gt/gt.zip eval_ic15/
+
+bash ./scripts/run_eval_ascend.sh
+```
+
+Finally, the result is obtained:
+
+```text
+Calculated!{"precision": 0.8134195274186358, "recall": 0.6715538923992393, "hmean": 0.7357102053160388, "AP": 0}
+```
+
 # [Model Description](#contents)
 
 ## [Performance](#contents)
@@ -428,49 +514,3 @@ The `res` folder is generated in the upper-level directory. For details about th
 | Dataset             | ICDAR2015                   |
 | outputs             | probability                 |
 | Accuracy            | 1pc: 81%;  8pcs: 81%   |
-
-## [How to use](#contents)
-
-### Inference
-
-If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/master/infer/inference.html). Following the steps below, this is a simple example:
-
-```python
-# Load unseen dataset for inference
-dataset = dataset.create_dataset(cfg.data_path, 1, False)
-
-# Define model
-config.INFERENCE = False
-net = PSENet(config)
-net = net.set_train()
-param_dict = load_checkpoint(args.pre_trained)
-load_param_into_net(net, param_dict)
-print('Load Pretrained parameters done!')
-
-criterion = DiceLoss(batch_size=config.TRAIN_BATCH_SIZE)
-
-lrs = lr_generator(start_lr=1e-3, lr_scale=0.1, total_iters=config.TRAIN_TOTAL_ITER)
-opt = nn.SGD(params=net.trainable_params(), learning_rate=lrs, momentum=0.99, weight_decay=5e-4)
-
-# warp model
-net = WithLossCell(net, criterion)
-net = TrainOneStepCell(net, opt)
-
-time_cb = TimeMonitor(data_size=step_size)
-loss_cb = LossCallBack(per_print_times=20)
-# set and apply parameters of check point
-ckpoint_cf = CheckpointConfig(save_checkpoint_steps=1875, keep_checkpoint_max=2)
-ckpoint_cb = ModelCheckpoint(prefix="PSENet", config=ckpoint_cf, directory=config.TRAIN_MODEL_SAVE_PATH)
-
-model = Model(net)
-model.train(config.TRAIN_REPEAT_NUM, ds, dataset_sink_mode=False, callbacks=[time_cb, loss_cb, ckpoint_cb])
-
-# Load pre-trained model
-param_dict = load_checkpoint(cfg.checkpoint_path)
-load_param_into_net(net, param_dict)
-net.set_train(False)
-
-# Make predictions on the unseen dataset
-acc = model.eval(dataset)
-print("accuracy: ", acc)
-```

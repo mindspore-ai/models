@@ -17,7 +17,7 @@ import os
 import numpy as np
 from PIL import Image
 from mindspore.mindrecord import FileWriter
-from src.config import config
+from src.model_utils.config import config
 
 def create_coco_label():
     """Create image label."""
@@ -100,61 +100,105 @@ def create_icdar_svt_label(train_img_dir, train_txt_dir, prefix):
         file_path = os.path.join(train_txt_dir, file_name)
         gt = open(file_path, 'r', encoding='UTF-8-sig').read().splitlines()
         if not gt:
-            continue
-        for img_each_label in gt:
-            spt = img_each_label.replace(',', '').split(' ')
-            if ' ' not in img_each_label:
-                spt = img_each_label.split(',')
-            annos.append([spt[0], spt[1], spt[2], spt[3]] + [1])
+            annos.append([0, 0, 0, 0, 0])
+        else:
+            for img_each_label in gt:
+                spt = img_each_label.replace(',', '').split(' ')
+                if ' ' not in img_each_label:
+                    spt = img_each_label.split(',')
+                label = -1 if "#" in spt[-1] else 1
+                annos.append([int(spt[0]), int(spt[1]), int(spt[2]), int(spt[3]), label])
         if annos:
             image_anno_dict[image_path] = np.array(annos)
             image_files.append(image_path)
     return image_files, image_anno_dict
 
+
+def get_train_dataset_files_dicts(dataset, cfg):
+    if dataset == "coco":
+        return create_coco_label()
+    if dataset == "flick":
+        return create_anno_dataset_label(cfg.flick_train_path[0],
+                                         cfg.flick_train_path[1])
+    if dataset == "icdar11":
+        return create_icdar_svt_label(cfg.icdar11_train_path[0],
+                                      cfg.icdar11_train_path[1],
+                                      cfg.icdar11_prefix)
+    if dataset == "icdar13":
+        return create_icdar_svt_label(cfg.icdar13_train_path[0],
+                                      cfg.icdar13_train_path[1],
+                                      cfg.icdar13_prefix)
+    if dataset == "icdar15":
+        return create_icdar_svt_label(cfg.icdar15_train_path[0],
+                                      cfg.icdar15_train_path[1],
+                                      cfg.icdar15_prefix)
+    if dataset == "svt":
+        return create_icdar_svt_label(cfg.svt_train_path[0], cfg.svt_train_path[1], "")
+    if dataset == "icdar17_mlt":
+        return create_icdar_svt_label(cfg.icdar17_mlt_train_path[0],
+                                      cfg.icdar17_mlt_train_path[1],
+                                      cfg.icdar17_mlt_prefix)
+    raise ValueError(f"Do not support train dataset {dataset}")
+
+
+def get_eval_dataset_files_dicts(dataset, cfg):
+    if dataset == "icdar13":
+        return create_icdar_svt_label(cfg.icdar13_test_path[0],
+                                      cfg.icdar13_test_path[1],
+                                      "")
+    if dataset == "icdar15":
+        return create_icdar_svt_label(cfg.icdar15_test_path[0],
+                                      cfg.icdar15_test_path[1],
+                                      cfg.icdar15_prefix)
+    if dataset == "icdar17_mlt":
+        return create_icdar_svt_label(cfg.icdar17_mlt_test_path[0],
+                                      cfg.icdar17_mlt_test_path[1],
+                                      cfg.icdar17_mlt_prefix)
+    raise ValueError(f"Do not support eval dataset {dataset}")
+
+
 def create_train_dataset(dataset_type):
-    image_files = []
-    image_anno_dict = {}
     if dataset_type == "pretraining":
         # pretrianing: coco, flick, icdar2013 train, icdar2015, svt
-        coco_image_files, coco_anno_dict = create_coco_label()
-        flick_image_files, flick_anno_dict = create_anno_dataset_label(config.flick_train_path[0],
-                                                                       config.flick_train_path[1])
-        icdar13_image_files, icdar13_anno_dict = create_icdar_svt_label(config.icdar13_train_path[0],
-                                                                        config.icdar13_train_path[1], "gt_img_")
-        icdar15_image_files, icdar15_anno_dict = create_icdar_svt_label(config.icdar15_train_path[0],
-                                                                        config.icdar15_train_path[1], "gt_")
-        svt_image_files, svt_anno_dict = create_icdar_svt_label(config.svt_train_path[0], config.svt_train_path[1], "")
-        image_files = coco_image_files + flick_image_files + icdar13_image_files + icdar15_image_files + svt_image_files
-        image_anno_dict = {**coco_anno_dict, **flick_anno_dict, \
-            **icdar13_anno_dict, **icdar15_anno_dict, **svt_anno_dict}
-        data_to_mindrecord_byte_image(image_files, image_anno_dict, config.pretrain_dataset_path, \
+        total_image_files = []
+        total_image_anno_dict = {}
+        for item in config.train_dataset:
+            image_files, anno_dict = get_train_dataset_files_dicts(item, config)
+            total_image_files += image_files
+            total_image_anno_dict.update(anno_dict)
+        data_to_mindrecord_byte_image(total_image_files, total_image_anno_dict, config.pretrain_dataset_path, \
             prefix="ctpn_pretrain.mindrecord", file_num=8)
     elif dataset_type == "finetune":
         # finetune: icdar2011, icdar2013 train, flick
-        flick_image_files, flick_anno_dict = create_anno_dataset_label(config.flick_train_path[0],
-                                                                       config.flick_train_path[1])
-        icdar11_image_files, icdar11_anno_dict = create_icdar_svt_label(config.icdar11_train_path[0],
-                                                                        config.icdar11_train_path[1], "gt_")
-        icdar13_image_files, icdar13_anno_dict = create_icdar_svt_label(config.icdar13_train_path[0],
-                                                                        config.icdar13_train_path[1], "gt_img_")
-        image_files = flick_image_files + icdar11_image_files + icdar13_image_files
-        image_anno_dict = {**flick_anno_dict, **icdar11_anno_dict, **icdar13_anno_dict}
-        data_to_mindrecord_byte_image(image_files, image_anno_dict, config.finetune_dataset_path, \
+        total_image_files = []
+        total_image_anno_dict = {}
+        for item in config.finetune_dataset:
+            image_files, anno_dict = get_train_dataset_files_dicts(item, config)
+            total_image_files += image_files
+            total_image_anno_dict.update(anno_dict)
+        data_to_mindrecord_byte_image(total_image_files, total_image_anno_dict, config.finetune_dataset_path, \
             prefix="ctpn_finetune.mindrecord", file_num=8)
     elif dataset_type == "test":
         # test: icdar2013 test
-        icdar_test_image_files, icdar_test_anno_dict = create_icdar_svt_label(config.icdar13_test_path[0],\
-            config.icdar13_test_path[1], "")
-        image_files = sorted(icdar_test_image_files)
-        image_anno_dict = icdar_test_anno_dict
-        data_to_mindrecord_byte_image(image_files, image_anno_dict, config.test_dataset_path, \
+        total_image_files = []
+        total_image_anno_dict = {}
+        for item in config.test_dataset:
+            image_files, anno_dict = get_eval_dataset_files_dicts(item, config)
+            total_image_files += image_files
+            total_image_anno_dict.update(anno_dict)
+        data_to_mindrecord_byte_image(total_image_files, total_image_anno_dict, config.test_dataset_path, \
             prefix="ctpn_test.mindrecord", file_num=1)
     else:
         print("dataset_type should be pretraining, finetune, test")
 
 def data_to_mindrecord_byte_image(image_files, image_anno_dict, dst_dir, prefix="cptn_mlt.mindrecord", file_num=1):
     """Create MindRecord file."""
+    os.makedirs(dst_dir, exist_ok=True)
     mindrecord_path = os.path.join(dst_dir, prefix)
+    snum = "" if file_num == 1 else "0"
+    if os.path.exists(mindrecord_path + snum + ".db"):
+        print(f"skip create {mindrecord_path}")
+        return
     writer = FileWriter(mindrecord_path, file_num)
 
     ctpn_json = {
@@ -162,6 +206,7 @@ def data_to_mindrecord_byte_image(image_files, image_anno_dict, dst_dir, prefix=
         "annotation": {"type": "int32", "shape": [-1, 5]},
     }
     writer.add_schema(ctpn_json, "ctpn_json")
+    image_files = sorted(image_files)
     for image_name in image_files:
         with open(image_name, 'rb') as f:
             img = f.read()

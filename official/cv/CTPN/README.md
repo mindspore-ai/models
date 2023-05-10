@@ -62,6 +62,10 @@ Here we used 6 datasets for training, and 1 datasets for Evaluation.
 - Dataset6: [SVT(The Street View Dataset)](https://www.kaggle.com/datasets/nageshsingh/the-street-view-text-dataset):
     - Train: 115MB, 349 images
 
+We use [ICDAR 2017: ICDAR2017 Competition on Multi-lingual scene text detection and script identification](https://rrc.cvc.uab.es/?ch=8&com=tasks) for multilingual detection training.
+
+This dataset consists of 9000 natural scene images annotated in multiple mixed languages (Chinese, Japanese, Korean, English, French, Arabic, Italian, German, and Hindi, with 7200 trained and 1800 tested). The annotation format is a four point annotation with a grid like clockwise coordinate.
+
 # [Features](#contents)
 
 # [Environment Requirements](#contents)
@@ -203,16 +207,16 @@ python src/create_dataset.py
 
     ```bash
     # distribute training
-    bash scripts/run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH]
+    bash scripts/run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [CONFIG_PATH](optional)
     # example: bash scripts/run_distribute_train_gpu.sh Pretraining(or Finetune) \
     # /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
 
     # standalone training
-    bash scrpits/run_standalone_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]
+    bash scrpits/run_standalone_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID] [CONFIG_PATH](optional)
     example: bash scrpits/run_standalone_train_gpu.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt 0
 
     # evaluation:
-    bash scripts/run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+    bash scripts/run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH](optional)
     # example: bash script/run_eval_gpu.sh /home/DataSet/ctpn_dataset/ICDAR2013/test \
     # /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
     ```
@@ -258,21 +262,21 @@ ICDAR2013, SCUT-FORU to improve precision and recall, and when doing Finetune, w
   shell:
     Ascend:
       # distribute training example(8p)
-      bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH]
+      bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH] [CONFIG_PATH](optional)
       # example: bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
 
       # standalone training
-      bash run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH]
+      bash run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH] [CONFIG_PATH](optional)
       # example: bash scrpits/run_standalone_train_ascend.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt 0
 
   shell:
     GPU:
       # distribute training example(8p)
-      bash run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH]
+      bash run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [CONFIG_PATH](optional)
       # example: bash scripts/run_distribute_train_gpu.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
 
       # standalone training
-      bash run_standalone_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH]
+      bash run_standalone_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [CONFIG_PATH](optional)
       # example: bash scrpits/run_standalone_train_gpu.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt 0
 ```
 
@@ -354,14 +358,14 @@ You can start training using python or shell scripts. The usage of shell scripts
 - Ascend:
 
     ```bash
-    bash run_eval_ascend.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+    bash run_eval_ascend.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH](optional)
     # example: bash script/run_eval_ascend.sh /home/DataSet/ctpn_dataset/ICDAR2013/test /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
     ```
 
 - GPU:
 
     ```bash
-    bash run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+    bash run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH](optional)
     # example: bash script/run_eval_gpu.sh /home/DataSet/ctpn_dataset/ICDAR2013/test /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
     ```
 
@@ -397,6 +401,80 @@ Evaluation result on GPU will be as follows:
 
 ```text
 {"precision": 0.9346, "recall": 0.8621, "hmean": 0.8969}
+```
+
+## Transfer learning on Multilingual Datasets
+
+We use the ICDAR 2017 MLT dataset as the dataset for transfer learning. The dataset contains annotation data in 9 languages, including Chinese, Japanese, Korean, English, French, Arabic, Italian, German and Hindi. Because the dataset does not only have horizontal labels.
+
+1. Process the dataset:
+
+```shell
+python src/convert_icdar2015.py --src_label_path=/path/train_gt --target_label_path=/path/train_gt_convert
+python src/convert_icdar2015.py --src_label_path=/path/val_gt --target_label_path=/path/val_gt_convert
+```
+
+2. Change `default_cn_finetune_config.yaml`：
+
+```text
+icdar17_mlt_train_path: ["icdar17_train_img_dir_path", "icdar17_train_gt_txt_dir_path"]
+icdar17_mlt_test_path: ["icdar17_val_img_dir_path", "icdar17_val_gt_txt_dir_path"]
+icdar17_mlt_prefix: "gt_"  # The prefix of gt_txt name compared to img name
+finetune_dataset_path: "/data/ctpn_mindrecord_ic17/finetune"  # Path to generate finetune mindrecord
+test_dataset_path: "/data/ctpn_mindrecord_ic17/test"          # Path to generate test mindrecord
+
+# training dataset
+finetune_dataset_file: "/data/ctpn_mindrecord_ic17/finetune/ctpn_finetune.mindrecord0"  # Mindrecord path generated by training set
+test_dataset_file: "/data/ctpn_mindrecord_ic17/test/ctpn_test.mindrecord"      # Mindrecord path generated by val set
+img_dir: "icdar17_val_img_dir_path"                # The original dataset path used for inference
+```
+
+3. Generate mindrecord：
+
+```shell
+python src/create_dataset.py --config_path=default_cn_finetune_config.yaml
+```
+
+If you encounter src path issues, you need to add the root directory of the CTPN network to `PYTHONPATH`:
+
+```shell
+export PYTHONPATH=/data/models/official/cv/CTPN:$PYTHONPATH
+```
+
+You can generate mindrecord files under the configuration above `default_cn_finetune_config.yaml`.
+
+4. Finetune
+
+Download the trained [parameter file](https://download.mindspore.cn/models/r1.9/ctpn_pretrain_ascend_v190_icdar2013_official_cv_acc87.69.ckpt), the training method of transfer learning is the same as that of training, such as:
+
+```shell
+bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json Finetune /home/DataSet/ctpn_dataset/ctpn_pretrain_ascend_v190_icdar2013_official_cv_acc87.69.ckpt /CTPN/default_cn_finetune_config.yaml
+```
+
+5. Evaluation
+
+The inference process is consistent with the training inference process, please note add the config path：
+
+```shell
+bash scripts/run_eval_ascend.sh icdar17_val_img_dir_path /data/ctpn_mindrecord_ic17/test/ctpn_test.mindrecord train_parallel0/ckpt_0/ default_cn_finetune_config.yaml
+```
+
+6. Because the ICDAR 2017 MLT does not provide offline evaluation packages, we use the processing script of ICDAR 2013 and change gt.zip to ICDAR 2017 MLT.
+
+Package the txt file processed in the first step and replace it with [link](https://rrc.cvc.uab.es/?com=downloads&action=download&ch=2&f=aHR0cHM6Ly9ycmMuY3ZjLnVhYi5lcy9zdGFuZGFsb25lcy9zY3JpcHRfdGVzdF9jaDJfdDFfZTItMTU3Nzk4MzA2Ny56aXA=) gt.zip：
+
+```shell
+cd /path/val_gt_convert
+zip -r gt.zip *.txt
+mv gt.zip ctpn_code_path   # ctpn_code_path is the root directory of the code, which contains the submit_ *. generated by eval zip file
+bash scripts/eval_res.sh
+```
+
+get
+
+```text
+eval result for submit_ctpn-50_1548.zip
+Calculated!{"precision": 0.7585255767301913, "recall": 0.6783185026081612, "hmean": 0.7161833921945736}.
 ```
 
 ## Model Export

@@ -19,7 +19,7 @@ echo 'current_exec_path: '${current_exec_path}
 
 if [ $# != 3 ]
 then
-    echo "Usage: bash run_distribute_train.sh [RANK_FILE] [PRETRAINED_PATH] [TRAIN_ROOT_DIR]"
+    echo "Usage: bash run_distribute_train.sh [RANK_FILE] [PRETRAINED_PATH] [CONFIG_PATH]"
 exit 1
 fi
 
@@ -46,9 +46,9 @@ else
 fi
 
 PATH3=$(get_real_path $3)
-if [ ! -d $PATH3 ]
+if [ ! -f $PATH3 ]
 then
-    echo "error: TRAIN_ROOT_DIR=$PATH3 is not a directory"
+    echo "error: CONFIG_PATH=$PATH3 is not a file"
 exit 1
 fi
 
@@ -81,6 +81,6 @@ do
     cd ${current_exec_path}/device_$i || exit
     export RANK_ID=$i
     export DEVICE_ID=$i
-    python ${current_exec_path}/train.py --run_distribute=True --pre_trained=$PATH2 --TRAIN_ROOT_DIR=$PATH3 >test_deep$i.log 2>&1 &
+    python ${current_exec_path}/train.py --run_distribute=True --pre_trained=$PATH2 --config_path=$PATH3 >test_deep$i.log 2>&1 &
     cd ${current_exec_path} || exit
 done

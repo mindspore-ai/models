@@ -16,16 +16,10 @@
 
 import time
 
-import numpy as np
-
 import mindspore.nn as nn
-from mindspore import ParameterTuple
-from mindspore.common.tensor import Tensor
-from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
-from mindspore.ops import composite as C
 from mindspore.train.callback import Callback
 
-__all__ = ['LossCallBack', 'WithLossCell', 'TrainOneStepCell']
+__all__ = ['LossCallBack', 'WithLossCell']
 
 class AverageMeter():
     """Computes and stores the average and current value"""
@@ -65,7 +59,13 @@ class LossCallBack(Callback):
 
     def step_end(self, run_context):
         cb_params = run_context.original_args()
-        loss = cb_params.net_outputs.asnumpy()
+        loss = cb_params.net_outputs
+        if isinstance(loss, tuple):
+            overflow = loss[1].asnumpy()
+            if overflow:
+                print("overflow!!!")
+            loss = loss[0]
+        loss = loss.asnumpy()
         cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
         cur_num = cb_params.cur_step_num
 
@@ -112,36 +112,3 @@ class WithLossCell(nn.Cell):
             Cell, return backbone network.
         """
         return self._backbone
-
-class TrainOneStepCell(nn.Cell):
-    """
-    Network training package class.
-
-    Append an optimizer to the training network after that the construct function
-    can be called to create the backward graph.
-
-    Args:
-        network (Cell): The training network.
-        optimizer (Cell): Optimizer for updating the weights.
-        sens (Number): The adjust parameter. Default value is 1.0.
-    """
-    def __init__(self, network, optimizer, sens=1.0, reduce_flag=False, mean=True, degree=None):
-        super(TrainOneStepCell, self).__init__(auto_prefix=False)
-        self.network = network
-        self.weights = ParameterTuple(network.trainable_params())
-        self.optimizer = optimizer
-        self.grad = C.GradOperation(get_by_list=True,
-                                    sens_param=True)
-        self.sens = Tensor((np.ones(1, dtype=np.float32)) * sens)
-        self.reducer_flag = reduce_flag
-        if self.reducer_flag:
-            self.grad_reducer = DistributedGradReducer(optimizer.parameters, mean, degree)
-
-    def construct(self, img, gt_text, gt_kernels, training_mask):
-        weights = self.weights
-        loss = self.network(img, gt_text, gt_kernels, training_mask)
-        grads = self.grad(self.network, weights)(img, gt_text, gt_kernels, training_mask, self.sens)
-        if self.reducer_flag:
-            grads = self.grad_reducer(grads)
-        self.optimizer(grads)
-        return loss

@@ -51,6 +51,9 @@ CTPN是一种基于目标检测方法的文本检测模型。在Faster R-CNN的�
 - 数据集6：[SVT（街景数据集）](https://www.kaggle.com/datasets/nageshsingh/the-street-view-text-dataset)：
     - 训练集：115 MB，349张图像
 
+另外，我们使用 [ICDAR 2017: ICDAR2017 Competition on Multi-lingual scene text detection and script identification](https://rrc.cvc.uab.es/?ch=8&com=tasks) 用于多语言检测训练。
+该数据集由9000张（训练7200，测试1800）多种混合语言标注的自然场景图片构成（中文，日文，韩文，英文，法文，阿拉伯文，意大利文，德文和印度文 9种语言），标注形式为四点标注，坐标格式顺时针坐标。
+
 # [特性](#目录)
 
 # [环境要求](#目录)
@@ -174,16 +177,16 @@ python src/create_dataset.py
 
     ```bash
     # 分布式训练
-    bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH]
+    bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH] [CONFIG_PATH](optional)
     # 示例：bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json Pretraining(or Finetune) \
     # /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
 
     # 单机训练
-    bash scrpits/run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]
+    bash scrpits/run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID] [CONFIG_PATH](optional)
     示例：bash scrpits/run_standalone_train_ascend.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt 0
 
     # 评估：
-    bash scripts/run_eval_ascend.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+    bash scripts/run_eval_ascend.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH](optional)
     # 示例：bash script/run_eval_ascend.sh /home/DataSet/ctpn_dataset/ICDAR2013/test \
     # /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
     ```
@@ -192,16 +195,16 @@ python src/create_dataset.py
 
     ```bash
     # 分布式训练
-    bash scripts/run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH]
+    bash scripts/run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [CONFIG_PATH](optional)
     # 示例：bash scripts/run_distribute_train_gpu.sh Pretraining(or Finetune) \
     # /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
 
     # 单机训练
-    bash scrpits/run_standalone_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]
+    bash scrpits/run_standalone_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID] [CONFIG_PATH](optional)
     示例：bash scrpits/run_standalone_train_gpu.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt 0
 
     # 评估：
-    bash scripts/run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+    bash scripts/run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH](optional)
     # 示例：bash script/run_eval_gpu.sh /home/DataSet/ctpn_dataset/ICDAR2013/test \
     # /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
     ```
@@ -247,21 +250,21 @@ ICDAR2013和SCU-FORU，可以提高精度和召回率。在执行微调时，我
   shell:
     Ascend处理器：
       # 分布式训练示例（8卡）
-      bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH]
+      bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH] [CONFIG_PATH](optional)
       # 示例：bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
 
       # 单机训练
-      bash run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH]
+      bash run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH] [CONFIG_PATH](optional)
       # 示例：bash scrpits/run_standalone_train_ascend.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt 0
 
   shell:
     GPU：
       # 分布式训练示例（8卡）
-      bash run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH]
+      bash run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [CONFIG_PATH](optional)
       # 示例：bash scripts/run_distribute_train_gpu.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
 
       # 单机训练
-      bash run_standalone_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH]
+      bash run_standalone_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [CONFIG_PATH](optional)
       # 示例：bash scrpits/run_standalone_train_gpu.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt 0
 ```
 
@@ -343,14 +346,14 @@ ICDAR2013和SCU-FORU，可以提高精度和召回率。在执行微调时，我
 - Ascend处理器：
 
     ```bash
-    bash run_eval_ascend.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+    bash run_eval_ascend.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH](optional)
     # 示例：bash script/run_eval_ascend.sh /home/DataSet/ctpn_dataset/ICDAR2013/test /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
     ```
 
 - GPU：
 
     ```bash
-    bash run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+    bash run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH](optional)
     # 示例：bash script/run_eval_gpu.sh /home/DataSet/ctpn_dataset/ICDAR2013/test /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
     ```
 
@@ -386,6 +389,80 @@ GPU评估结果如下：
 
 ```text
 {"precision": 0.9346, "recall": 0.8621, "hmean": 0.8969}
+```
+
+## 在多语言数据集上做迁移学习
+
+我们使用ICDAR 2017 MLT数据集作为迁移学习使用的数据集，该数据集包含中文，日文，韩文，英文，法文，阿拉伯文，意大利文，德文和印度文 9种语言的标注数据，由于该数据集不仅仅有水平的标签。
+
+1. 对数据集进行处理：
+
+```shell
+python src/convert_icdar2015.py --src_label_path=/path/train_gt --target_label_path=/path/train_gt_convert
+python src/convert_icdar2015.py --src_label_path=/path/val_gt --target_label_path=/path/val_gt_convert
+```
+
+2. 修改`default_cn_finetune_config.yaml`：
+
+```text
+icdar17_mlt_train_path: ["icdar17_train_img_dir_path", "icdar17_train_gt_txt_dir_path"]
+icdar17_mlt_test_path: ["icdar17_val_img_dir_path", "icdar17_val_gt_txt_dir_path"]
+icdar17_mlt_prefix: "gt_"  # gt_txt名字较img名字的前缀
+finetune_dataset_path: "/data/ctpn_mindrecord_ic17/finetune"  # 生成finetune mindrecord的路径
+test_dataset_path: "/data/ctpn_mindrecord_ic17/test"          # 生成test mindrecord的路径
+
+# training dataset
+finetune_dataset_file: "/data/ctpn_mindrecord_ic17/finetune/ctpn_finetune.mindrecord0"  # 训练集生成的mindrecord路径
+test_dataset_file: "/data/ctpn_mindrecord_ic17/test/ctpn_test.mindrecord"      # 验证集生成的mindrecord路径
+img_dir: ""                # 推理时使用的原始数据集路径
+```
+
+3. 生成mindrecord：
+
+```shell
+python src/create_dataset.py --config_path=default_cn_finetune_config.yaml
+```
+
+如果遇到src路径问题，需要将CTPN网络脚本的根目录加到PYTHONPATH里：
+
+```shell
+export PYTHONPATH=/data/models/official/cv/CTPN:$PYTHONPATH
+```
+
+可以在上面配置的`finetune_dataset_path`下生成mindrecord文件。
+
+4. 训练
+
+下载训练好的[参数文件](https://download.mindspore.cn/models/r1.9/ctpn_pretrain_ascend_v190_icdar2013_official_cv_acc87.69.ckpt), 迁移学习的训练方法同训练的，如：
+
+```shell
+bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json Finetune /home/DataSet/ctpn_dataset/ctpn_pretrain_ascend_v190_icdar2013_official_cv_acc87.69.ckpt /CTPN/default_cn_finetune_config.yaml
+```
+
+5. 推理
+
+推理过程和训练的推理过程一致，注意需要传入config_path：
+
+```shell
+bash scripts/run_eval_ascend.sh icdar17_val_img_dir_path /data/ctpn_mindrecord_ic17/test/ctpn_test.mindrecord train_parallel0/ckpt_0/ default_cn_finetune_config.yaml
+```
+
+6. 推理结果，由于ICDAR 2017 MLT没有提供离线的包，我们使用ICDAR 2013的处理脚本，将其中gt.zip改成ICDAR 2017 MLT的。
+
+将第一步处理的txt文件打包，然后替换[链接](https://rrc.cvc.uab.es/?com=downloads&action=download&ch=2&f=aHR0cHM6Ly9ycmMuY3ZjLnVhYi5lcy9zdGFuZGFsb25lcy9zY3JpcHRfdGVzdF9jaDJfdDFfZTItMTU3Nzk4MzA2Ny56aXA=) 的gt.zip：
+
+```shell
+cd /path/val_gt_convert
+zip -r gt.zip *.txt
+mv gt.zip ctpn_code_path   # ctpn_code_path是代码的根目录，下面有eval生成的submit_*.zip的文件
+bash scripts/eval_res.sh
+```
+
+得到
+
+```text
+eval result for submit_ctpn-50_1548.zip
+Calculated!{"precision": 0.7585255767301913, "recall": 0.6783185026081612, "hmean": 0.7161833921945736}.
 ```
 
 ## 模型导出

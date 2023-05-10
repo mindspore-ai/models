@@ -15,14 +15,14 @@
 # ============================================================================
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run_standalone_train.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]"
+echo "sh run_standalone_train.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID] [CONFIG_PATH](optional)"
 echo "for example: bash run_standalone_train.sh Pretraining /path/vgg16_backbone.ckpt 0"
 echo "when device id is occupied, choose for another one"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
-if [ $# -ne 3 ]
-then 
-    echo "Usage: bash scripts/run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]"
+if [ $# != 3 ] && [ $# != 4 ]
+then
+    echo "Usage: bash scripts/run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID] [CONFIG_PATH](optional)"
 exit 1
 fi
 
@@ -42,7 +42,13 @@ then
     echo "error: PRETRAINED_PATH=$PRETRAINED_PATH is not a file"
 exit 1
 fi
-
+BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
+CONFIG_PATH=$BASE_PATH/../default_config.yaml
+if [ $# == 4 ]
+then
+    CONFIG_PATH=$(get_real_path $4)
+    echo $CONFIG_PATH
+fi
 ulimit -u unlimited
 export DEVICE_NUM=1
 export DEVICE_ID=$3
@@ -58,5 +64,5 @@ cp -r ./src ./train
 cd ./train || exit
 echo "start training for device $DEVICE_ID"
 env > env.log
-python train.py --task_type=$TASK_TYPE --pre_trained=$PRETRAINED_PATH &> log &
+python train.py --task_type=$TASK_TYPE --pre_trained=$PRETRAINED_PATH --config_path=$CONFIG_PATH &> log &
 cd ..

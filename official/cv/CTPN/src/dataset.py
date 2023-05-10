@@ -15,6 +15,8 @@
 
 """CTPN dataset"""
 from __future__ import division
+import os
+import multiprocessing
 import numpy as np
 from numpy import random
 import cv2
@@ -26,8 +28,10 @@ from src.model_utils.config import config
 
 if config.device_target == "Ascend":
     mtype = mstype.float16
+    ntype = np.float16
 else:
     mtype = mstype.float32
+    ntype = np.float32
 
 class PhotoMetricDistortion:
     """Photo Metric Distortion"""
@@ -101,6 +105,7 @@ class Expand:
         boxes += np.tile((left, top), 2)
         return img, boxes, labels
 
+
 def rescale_with_tuple(img, scale):
     h, w = img.shape[:2]
     scale_factor = min(max(scale) / max(h, w), min(scale) / min(h, w))
@@ -108,6 +113,7 @@ def rescale_with_tuple(img, scale):
     rescaled_img = cv2.resize(img, new_size, interpolation=cv2.INTER_LINEAR)
 
     return rescaled_img, scale_factor
+
 
 def rescale_column(img, gt_bboxes, gt_label, gt_num, img_shape):
     """rescale operation for image"""
@@ -170,6 +176,7 @@ def resize_column_test(img, gt_bboxes, gt_label, gt_num, img_shape):
 
     return (img_data, gt_bboxes, gt_label, gt_num, img_shape)
 
+
 def flipped_generation(img, gt_bboxes, gt_label, gt_num, img_shape):
     """flipped generation"""
     img_data = img
@@ -179,9 +186,11 @@ def flipped_generation(img, gt_bboxes, gt_label, gt_num, img_shape):
     flipped[..., 2::4] = w - gt_bboxes[..., 0::4] - 1
     return (img_data, flipped, gt_label, gt_num, img_shape)
 
+
 def image_bgr_rgb(img, gt_bboxes, gt_label, gt_num, img_shape):
     img_data = img[:, :, ::-1]
     return (img_data, gt_bboxes, gt_label, gt_num, img_shape)
+
 
 def photo_crop_column(img, gt_bboxes, gt_label, gt_num, img_shape):
     """photo crop operation for image"""
@@ -190,12 +199,14 @@ def photo_crop_column(img, gt_bboxes, gt_label, gt_num, img_shape):
 
     return (img_data, gt_bboxes, gt_label, gt_num, img_shape)
 
+
 def expand_column(img, gt_bboxes, gt_label, gt_num, img_shape):
     """expand operation for image"""
     expand = Expand()
     img, gt_bboxes, gt_label = expand(img, gt_bboxes, gt_label)
 
     return (img, gt_bboxes, gt_label, gt_num, img_shape)
+
 
 def split_gtbox_label(gt_bbox_total):
     """split ground truth box label"""
@@ -212,6 +223,7 @@ def split_gtbox_label(gt_bbox_total):
             gtbox_list.append([x0, gt_bbox[1], x0+15, gt_bbox[3], 1])
     return np.array(gtbox_list)
 
+
 def pad_label(img, gt_bboxes, gt_label, gt_valid, img_shape):
     """pad ground truth label"""
     pad_max_number = 256
@@ -223,14 +235,16 @@ def pad_label(img, gt_bboxes, gt_label, gt_valid, img_shape):
         gt_label = np.pad(gt_label, ((0, pad_max_number - gt_bboxes.shape[0])), mode="constant", constant_values=-1)
         gt_valid = np.pad(gt_valid, ((0, pad_max_number - gt_bboxes.shape[0])), mode="constant", constant_values=0)
     else:
-        print("WARNING label num is high than 256")
         gt_box = gt_bboxes[0:pad_max_number]
         gt_label = gt_label[0:pad_max_number]
         gt_valid = gt_valid[0:pad_max_number]
     return (img, gt_box[:, :4], gt_label, gt_valid, img_shape)
 
+
 def preprocess_fn(image, box, is_training):
     """Preprocess function for dataset."""
+    if not box.any():
+        box = np.array([[0, 0, 0, 0, 0]], np.float32)
     def _infer_data(image_bgr, gt_box_new, gt_label_new, gt_valid, image_shape):
         image_shape = image_shape[:2]
         input_data = image_bgr, gt_box_new, gt_label_new, gt_valid, image_shape
@@ -252,7 +266,7 @@ def preprocess_fn(image, box, is_training):
         image_shape = image_bgr.shape[:2]
         gt_box = box[:, :4]
         gt_label = box[:, 4]
-        gt_valid = box[:, 4]
+        gt_valid = int(box[:, 4] != 0)
         input_data = image_bgr, gt_box, gt_label, gt_valid, image_shape
         if not is_training:
             return _infer_data(image_bgr, gt_box, gt_label, gt_valid, image_shape)
@@ -269,7 +283,11 @@ def preprocess_fn(image, box, is_training):
         output_data = input_data
         return output_data
 
-    return _data_aug(image, box, is_training)
+
+    image_bgr, gt_box, gt_label, gt_valid, image_shape = _data_aug(image, box, is_training)
+    return image_bgr, gt_box.astype(ntype), gt_label.astype(np.int32),\
+           gt_valid.astype(np.bool_), image_shape.astype(ntype)
+
 
 def anno_parser(annos_str):
     """Parse annotation from string to list."""
@@ -279,46 +297,36 @@ def anno_parser(annos_str):
         annos.append(anno)
     return annos
 
+
 def create_ctpn_dataset(mindrecord_file, batch_size=1, device_num=1, rank_id=0,
                         is_training=True, num_parallel_workers=12):
     """Creatr ctpn dataset with MindDataset."""
     cv2.setNumThreads(2)
-    ds = de.MindDataset(mindrecord_file, columns_list=["image", "annotation"], num_shards=device_num, shard_id=rank_id,\
-        num_parallel_workers=num_parallel_workers, shuffle=is_training)
+    os.environ["OPENBLAS_NUM_THREADS"] = "1"
+    cores = multiprocessing.cpu_count()
+    if cores < 4:
+        raise EnvironmentError("CPU cores are too small")
+    if cores // min(device_num, 8) - 2 < num_parallel_workers:
+        num_parallel_workers = max(cores // min(device_num, 8) - 2, 1)
+        print(f"The num_parallel_workers is set too large, now set it {num_parallel_workers}")
+    ds = de.MindDataset(mindrecord_file, columns_list=["image", "annotation"],
+                        num_shards=device_num, shard_id=rank_id,
+                        num_parallel_workers=num_parallel_workers, shuffle=is_training)
     decode = C.Decode()
     ds = ds.map(operations=decode, input_columns=["image"], num_parallel_workers=num_parallel_workers)
     compose_map_func = (lambda image, annotation: preprocess_fn(image, annotation, is_training))
     hwc_to_chw = C.HWC2CHW()
     # Computed from random subset of ImageNet training images
     normalize_op = C.Normalize((123.675, 116.28, 103.53), (58.395, 57.12, 57.375))
-    type_cast0 = CC.TypeCast(mstype.float32)
-    type_cast1 = CC.TypeCast(mtype)
-    type_cast2 = CC.TypeCast(mstype.int32)
-    type_cast3 = CC.TypeCast(mstype.bool_)
-    if is_training:
-        ds = ds.map(operations=compose_map_func, input_columns=["image", "annotation"],
-                    output_columns=["image", "box", "label", "valid_num", "image_shape"],
-                    num_parallel_workers=num_parallel_workers,
-                    python_multiprocessing=True,
-                    max_rowsize=32)
-        ds = ds.map(operations=[normalize_op, type_cast0], input_columns=["image"],
-                    num_parallel_workers=num_parallel_workers,
-                    python_multiprocessing=True)
-        ds = ds.map(operations=[hwc_to_chw, type_cast1], input_columns=["image"],
-                    num_parallel_workers=num_parallel_workers,
-                    python_multiprocessing=True)
-    else:
-        ds = ds.map(operations=compose_map_func,
-                    input_columns=["image", "annotation"],
-                    output_columns=["image", "box", "label", "valid_num", "image_shape"],
-                    num_parallel_workers=8,
-                    python_multiprocessing=True)
-        ds = ds.map(operations=[normalize_op, hwc_to_chw, type_cast1], input_columns=["image"],
-                    num_parallel_workers=8)
-    # transpose_column from python to c
-    ds = ds.map(operations=[type_cast1], input_columns=["image_shape"])
-    ds = ds.map(operations=[type_cast1], input_columns=["box"])
-    ds = ds.map(operations=[type_cast2], input_columns=["label"])
-    ds = ds.map(operations=[type_cast3], input_columns=["valid_num"])
-    ds = ds.batch(batch_size, drop_remainder=True)
+    type_cast = CC.TypeCast(mtype)
+    ds = ds.map(operations=compose_map_func, input_columns=["image", "annotation"],
+                output_columns=["image", "box", "label", "valid_num", "image_shape"],
+                column_order=["image", "box", "label", "valid_num", "image_shape"],
+                num_parallel_workers=num_parallel_workers,
+                python_multiprocessing=True,
+                max_rowsize=64)
+    ds = ds.map(operations=[normalize_op, hwc_to_chw, type_cast], input_columns=["image"],
+                num_parallel_workers=num_parallel_workers)
+    ds = ds.project(["image", "box", "label", "valid_num", "image_shape"])
+    ds = ds.batch(batch_size, drop_remainder=True, num_parallel_workers=num_parallel_workers)
     return ds
