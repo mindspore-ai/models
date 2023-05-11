@@ -13,30 +13,10 @@
 # limitations under the License.
 # ============================================================================
 """auto mixed precision"""
-from collections.abc import Iterable
 import mindspore.nn as nn
 from mindspore.ops import functional as F
 from mindspore.common import dtype as mstype
 
-
-def check_type_name(arg_name, arg_type, valid_types, prim_name):
-    """Checks whether a type in some specified types"""
-    valid_types = valid_types if isinstance(valid_types, Iterable) else (valid_types,)
-
-    def raise_error_msg():
-        """func for raising error message when check failed"""
-        type_names = [t.__name__ if hasattr(t, '__name__') else t for t in valid_types]
-        num_types = len(valid_types)
-        msg_prefix = f"For '{prim_name}', the" if prim_name else "The"
-        raise TypeError(f"{msg_prefix} '{arg_name}' should be {'one of ' if num_types > 1 else ''}"
-                        f"{type_names if num_types > 1 else type_names[0]}, "
-                        f"but got {arg_type.__name__ if hasattr(arg_type, '__name__') else repr(arg_type)}.")
-
-    if isinstance(arg_type, type(mstype.tensor)):
-        arg_type = arg_type.element_type()
-    if arg_type not in valid_types:
-        raise_error_msg()
-    return arg_type
 
 class OutputTo(nn.Cell):
     """Cast cell output back to float16 or float32"""
@@ -44,7 +24,9 @@ class OutputTo(nn.Cell):
     def __init__(self, op, to_type=mstype.float16):
         super(OutputTo, self).__init__(auto_prefix=False)
         self._op = op
-        check_type_name('to_type', to_type, [mstype.float16, mstype.float32], None)
+        if to_type not in [mstype.float16, mstype.float32]:
+            raise TypeError(f"The to_type must be mstype.float16 or mstype.float32, "
+                            f"but got {to_type}")
         self.to_type = to_type
 
     def construct(self, x):
