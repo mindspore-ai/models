@@ -244,7 +244,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Image | Face Recognition | [FaceNet](https://gitee.com/mindspore/models/tree/master/research/cv/FaceNet) |✅| ✅ |   |
 | Image | Image Classification | [FaceQualityAssessment](https://gitee.com/mindspore/models/tree/master/research/cv/FaceQualityAssessment) |✅| ✅ | ✅ |
 | Image | Object Detection | [FaceRecognition](https://gitee.com/mindspore/models/tree/master/official/cv/FaceRecognition) |✅| ✅ |   |
-| Image | Object Detection | [FaceRecognitionForTracking](https://gitee.com/mindspore/models/tree/master/research/cv/FaceRecognitionForTracking) |✅| ✅ | ✅ |
+| Image | Object Detection | [FaceRecognitionForTracking](https://gitee.com/mindspore/models/tree/master/research/cv/FaceRecognitionForTracking) |✅|   | ✅ |
 | Image | Object Detection | [faster_rcnn_dcn](https://gitee.com/mindspore/models/tree/master/research/cv/faster_rcnn_dcn) |✅| ✅ |   |
 | Image | Image Matting | [FCANet](https://gitee.com/mindspore/models/tree/master/research/cv/FCANet) |✅|   |   |
 | Image | Image Classification | [FDA-BNN](https://gitee.com/mindspore/models/tree/master/research/cv/FDA-BNN) |✅| ✅ |   |
