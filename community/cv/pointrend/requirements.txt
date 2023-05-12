@@ -1,0 +1,5 @@
+pip install opencv-python
+pip install Cython
+pip install pycocotools
+pip install mmcv=0.2.14
+pip install pandas
