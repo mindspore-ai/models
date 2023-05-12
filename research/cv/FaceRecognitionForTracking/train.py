@@ -183,9 +183,9 @@ def run_train():
         cfg.logger.info('load model %s success', cfg.pretrained)
 
     # mixed precision training
-    if cfg.device_target == 'CPU':
-        network.add_flags_recursive(fp32=True)
+    if cfg.device_target != 'Ascend':
         head.add_flags_recursive(fp32=True)
+        network.add_flags_recursive(fp32=True)
     else:
         network.add_flags_recursive(fp16=True)
         head.add_flags_recursive(fp16=True)
