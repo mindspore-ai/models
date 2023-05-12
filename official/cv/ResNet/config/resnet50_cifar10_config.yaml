@@ -85,7 +85,6 @@ img_path: ''
 # lite inference
 enable_predict_lite_backend: False
 enable_predict_lite_mindir: False
-lite_context_config: {"target": "gpu", "device_id": 0, "precision_mode": "preferred_fp16"}
 
 
 ---
