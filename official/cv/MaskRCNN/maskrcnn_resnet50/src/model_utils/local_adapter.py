@@ -22,6 +22,8 @@ def get_device_id():
     cuda_visible_devices = os.getenv('CUDA_VISIBLE_DEVICES', None)
     if cuda_visible_devices is None:
         return int(device_id)
+    if not isinstance(cuda_visible_devices, int):
+        return 0
     if int(device_id) != 0 and int(device_id) != int(cuda_visible_devices):
         raise ValueError(f"CUDA_VISIBLE_DEVICES:{cuda_visible_devices} is different from "
                          f"DEVICE_ID:{device_id}, please unset CUDA_VISIBLE_DEVICES")
