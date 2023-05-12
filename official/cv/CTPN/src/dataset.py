@@ -321,7 +321,6 @@ def create_ctpn_dataset(mindrecord_file, batch_size=1, device_num=1, rank_id=0,
     type_cast = CC.TypeCast(mtype)
     ds = ds.map(operations=compose_map_func, input_columns=["image", "annotation"],
                 output_columns=["image", "box", "label", "valid_num", "image_shape"],
-                column_order=["image", "box", "label", "valid_num", "image_shape"],
                 num_parallel_workers=num_parallel_workers,
                 python_multiprocessing=True,
                 max_rowsize=64)

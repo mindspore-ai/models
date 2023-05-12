@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 5 ] && [ $# != 6 ]; then
+if [[ $# -lt 4 || $# -gt 6 ]]; then
     echo "Usage: bash run_infer_cpp.sh [MODEL_PATH] [DATA_PATH] [LABEL_PATH] [DEVICE_TYPE] [DEVICE_ID] [CONFIG_PATH](optional)
     DEVICE_TYPE can choose from [Ascend, GPU, CPU]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
