@@ -110,7 +110,7 @@ def train():
     cb_default = list()
     if config.rank_id == 0:
         ckpt_append_info = [{'epoch_num': 0}]
-        ckpt_config = CheckpointConfig(save_checkpoint_steps=steps_pre_epoch,
+        ckpt_config = CheckpointConfig(save_checkpoint_steps=steps_pre_epoch * 50,
                                        keep_checkpoint_max=config.train.max_checkpoints, append_info=ckpt_append_info)
         cb_default.append(ModelCheckpoint(config=ckpt_config, directory=config.save_ckpt_dir,
                                           prefix=config.net + '-' + config.backbone.initializer))
