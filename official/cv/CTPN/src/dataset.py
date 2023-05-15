@@ -266,7 +266,7 @@ def preprocess_fn(image, box, is_training):
         image_shape = image_bgr.shape[:2]
         gt_box = box[:, :4]
         gt_label = box[:, 4]
-        gt_valid = int(box[:, 4] != 0)
+        gt_valid = box[:, 4]
         input_data = image_bgr, gt_box, gt_label, gt_valid, image_shape
         if not is_training:
             return _infer_data(image_bgr, gt_box, gt_label, gt_valid, image_shape)
