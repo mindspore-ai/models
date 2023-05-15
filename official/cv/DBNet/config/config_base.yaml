@@ -53,8 +53,8 @@ dataset:
     max_rowsize: 64
     short_side: 736
     random_angle: [-10, 10]
-    mean: [122.67891434, 116.66876762, 104.00698793]
-    std: [255., 255., 255.]
+    mean: [123.675, 116.28, 103.53]
+    std: [58.395, 57.12, 57.375]
     random_crop:
         max_tries: 100
         min_crop_side_ratio: 0.1
