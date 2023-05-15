@@ -154,10 +154,11 @@ class BboxAssignSample(nn.Cell):
 
         valid_pos_index = self.cast(valid_pos_index, ms.int32)
         valid_neg_index = self.cast(valid_neg_index, ms.int32)
+        total_index = self.concat((pos_index, neg_index))
+        pos_index = self.cast(pos_index, ms.int64)
         bbox_targets_total = self.scatterNd(pos_index, pos_bbox_targets_, (self.num_bboxes, 4))
         bbox_weights_total = self.scatterNd(pos_index, valid_pos_index, (self.num_bboxes,))
         labels_total = self.scatterNd(pos_index, pos_gt_labels, (self.num_bboxes,))
-        total_index = self.concat((pos_index, neg_index))
         total_valid_index = self.concat((valid_pos_index, valid_neg_index))
         label_weights_total = self.scatterNd(total_index, total_valid_index, (self.num_bboxes,))
 
