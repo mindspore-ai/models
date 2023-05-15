@@ -1,5 +1,7 @@
 net: DBnet
 device_num: 8
+eval_start_epoch: 1000
+eval_interval: 50
 backbone:
     initializer: resnet18
     pretrained: True
