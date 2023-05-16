@@ -24,7 +24,8 @@ DEVICE_ID=$1
 ACLIMDB_DIR=$2
 GLOVE_DIR=$3
 
-mkdir -p train
+rm -rf train
+mkdir train
 cd train || exit
 mkdir -p ms_log
 CUR_DIR=`pwd`
