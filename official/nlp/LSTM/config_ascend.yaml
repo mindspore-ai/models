@@ -24,7 +24,7 @@ embed_size: 300
 num_hiddens: 128
 num_layers: 2
 bidirectional: True
-save_checkpoint_steps: 7800
+save_checkpoint_steps: 390
 keep_checkpoint_max: 10
 dynamic_lr: True
 lr_init: 0.05
