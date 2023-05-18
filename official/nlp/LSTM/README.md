@@ -65,7 +65,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
   bash run_train_ascend.sh 0 ./aclimdb ./glove_dir
 
   # run evaluation example
-  bash run_eval_ascend.sh 0 ./preprocess lstm-20_390.ckpt
+  bash run_eval_ascend.sh 0 ./preprocess lstm_best_acc.ckpt
   ```
 
 - running on GPU
@@ -75,7 +75,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
   bash run_train_gpu.sh 0 ./aclimdb ./glove_dir
 
   # run evaluation example
-  bash run_eval_gpu.sh 0 ./aclimdb ./glove_dir lstm-20_390.ckpt
+  bash run_eval_gpu.sh 0 ./aclimdb ./glove_dir lstm_best_acc.ckpt
   ```
 
 - running on CPU
@@ -85,7 +85,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
   bash run_train_cpu.sh ./aclimdb ./glove_dir
 
   # run evaluation example
-  bash run_eval_cpu.sh ./aclimdb ./glove_dir lstm-20_390.ckpt
+  bash run_eval_cpu.sh ./aclimdb ./glove_dir lstm_best_acc.ckpt
   ```
 
 - Running on [ModelArts](https://support.huaweicloud.com/modelarts/)
@@ -395,7 +395,7 @@ Ascend:
   Run `bash run_eval_ascend.sh` for evaluation.
 
   ``` bash
-  bash run_eval_ascend.sh 0 ./preprocess lstm-20_390.ckpt
+  bash run_eval_ascend.sh 0 ./preprocess lstm_best_acc.ckpt
   ```
 
 - evaluation on GPU
@@ -403,7 +403,7 @@ Ascend:
   Run `bash run_eval_gpu.sh` for evaluation.
 
   ``` bash
-  bash run_eval_gpu.sh 0 ./aclimdb ./glove_dir lstm-20_390.ckpt
+  bash run_eval_gpu.sh 0 ./aclimdb ./glove_dir lstm_best_acc.ckpt
   ```
 
 - evaluation on CPU
@@ -411,7 +411,7 @@ Ascend:
   Run `bash run_eval_cpu.sh` for evaluation.
 
   ``` bash
-  bash run_eval_cpu.sh ./aclimdb ./glove_dir lstm-20_390.ckpt
+  bash run_eval_cpu.sh ./aclimdb ./glove_dir lstm_best_acc.ckpt
   ```
 
 ## [Export MindIR](#contents)
