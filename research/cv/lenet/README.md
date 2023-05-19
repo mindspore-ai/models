@@ -263,6 +263,12 @@ You can view the results through the file "log.txt". The accuracy of the test da
 
 Before running the command below, please check the checkpoint path and image path used for prediction.
 
+```shell
+python predict.py --ckpt_file [CKPT_PATH] --img_path [IMG_PATH] > log.txt 2>&1 &  
+```
+
+for example:
+
 ```bash
 python predict.py --ckpt_file ckpt/checkpoint_lenet-1_1875.ckpt --img_path test.png > log.txt 2>&1 &  
 ```
@@ -272,6 +278,18 @@ You can view the results through the file "log.txt". The prediction res and aver
 ```bash
 Prediction res: 5
 Prediction avg time: 0.4899 ms
+```
+
+If you want to predict by inference backend MindSpore Lite, you can directly set parameter `backend` to 'lite' in interface `predict` , which is an experimental feature, the corresponding running example is shown as follows:
+
+```bash
+python predict.py --ckpt_file [CKPT_PATH] --img_path [IMG_PATH] --enable_predict_lite_backend True > log.txt 2>&1 &  
+```
+
+Or you can predict by using MindSpore Lite Python interface, which is shown as follows, please refer to [Using Python Interface to Perform Cloud-side Inference](https://www.mindspore.cn/lite/docs/en/master/use/cloud_infer/runtime_python.html) for details.
+
+```bash
+python predict.py --ckpt_file [CKPT_PATH] --img_path [IMG_PATH] --enable_predict_lite_mindir True > log.txt 2>&1 &  
 ```
 
 ## [Inference Process](#contents)

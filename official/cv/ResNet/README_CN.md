@@ -748,6 +748,12 @@ result:{'top_5_accuracy':0.9342589628681178, 'top_1_accuracy':0.768065781049936}
 
 在运行以下命令之前，请检查用于评估的检查点路径和图片路径。
 
+```shell
+python predict.py --checkpoint_file_path [CKPT_PATH] --config_path [CONFIG_PATH] --img_path [IMG_PATH] > log.txt 2>&1 &  
+```
+
+示例如下：
+
 ```bash
 python predict.py --checkpoint_file_path train_parallel0/resnet-90_625.ckpt --config_path config/resnet18_imagenet2012_config_gpu.yaml --img_path test.png > log.txt 2>&1 &  
 ```
@@ -757,6 +763,18 @@ python predict.py --checkpoint_file_path train_parallel0/resnet-90_625.ckpt --co
 ```bash
 Prediction res: 5
 Prediction avg time: 5.360 ms
+```
+
+如果你想调用MindSpore Lite后端进行推理，你可以直接设置接口 `predict` 的参数 `backend` 为'lite'，这是一个实验性质的特性，相应的运行示例如下：
+
+```bash
+predict.py --checkpoint_file_path [CKPT_PATH] --config_path [CONFIG_PATH] --img_path [IMG_PATH] --enable_predict_lite_backend True > log.txt 2>&1 &  
+```
+
+或者你可以调用MindSpore Lite Python接口进行推理，示例如下，具体细节参考[使用Python接口执行云侧推理](https://www.mindspore.cn/lite/docs/zh-CN/master/use/cloud_infer/runtime_python.html) 。
+
+```bash
+predict.py --checkpoint_file_path [CKPT_PATH] --config_path [CONFIG_PATH] --img_path [IMG_PATH] --enable_predict_lite_mindir True > log.txt 2>&1 &  
 ```
 
 ## 推理过程

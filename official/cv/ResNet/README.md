@@ -726,6 +726,12 @@ result: {'top_5_accuracy': 0.9342589628681178, 'top_1_accuracy': 0.7680657810499
 Before running the command below, please check the checkpoint path and image path used for prediction.
 
 ```bash
+python predict.py --checkpoint_file_path [CKPT_PATH] --config_path [CONFIG_PATH] --img_path [IMG_PATH] > log.txt 2>&1 &  
+```
+
+for example:
+
+```bash
 python predict.py --checkpoint_file_path train_parallel0/resnet-90_625.ckpt --config_path config/resnet18_imagenet2012_config_gpu.yaml --img_path test.png > log.txt 2>&1 &  
 ```
 
@@ -734,6 +740,18 @@ You can view the results through the file "log.txt". The prediction res and aver
 ```bash
 Prediction res: 5
 Prediction avg time: 5.360 ms
+```
+
+If you want to predict by inference backend MindSpore Lite, you can directly set parameter `backend` to 'lite', which is an experimental feature, the corresponding running example is shown as follows:
+
+```bash
+python predict.py --checkpoint_file_path [CKPT_PATH] --config_path [CONFIG_PATH] --img_path [IMG_PATH] --enable_predict_lite_backend True > log.txt 2>&1 &  
+```
+
+Or you can predict by using MindSpore Lite Python interface, which is shown as follows, please refer to [Using Python Interface to Perform Cloud-side Inference](https://www.mindspore.cn/lite/docs/en/master/use/cloud_infer/runtime_python.html) for details.
+
+```bash
+python predict.py --checkpoint_file_path [CKPT_PATH] --config_path [CONFIG_PATH] --img_path [IMG_PATH] --enable_predict_lite_mindir True > log.txt 2>&1 &  
 ```
 
 ## Inference Process
