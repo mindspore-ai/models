@@ -12,16 +12,13 @@
     - [脚本及样例代码](#脚本及样例代码)
     - [脚本参数](#脚本参数)
 - [训练和测试](#训练和测试)
-    - [导出过程](#导出过程)
-        - [导出](#导出)
-    - [推理过程](#推理过程)
-        - [推理](#推理)
+    - [在 Ascend 上运行](#在-Ascend-上运行)
+    - [在 GPU 上运行](#在-GPU-上运行)
+- [推理过程](#推理过程)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
-            - [ImageNet-1k上的DDRNet](#imagenet-1k上的DDRNet)
         - [推理性能](#推理性能)
-            - [ImageNet-1k上的DDRNet](#imagenet-1k上的DDRNet-1)
 - [ModelZoo主页](#modelzoo主页)
 
 <!-- /TOC -->
@@ -58,8 +55,7 @@
 
 ## [环境要求](#目录)
 
-- 硬件（Ascend）
-    - 使用Ascend来搭建硬件环境。
+- 硬件（Ascend|GPU)
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
@@ -70,37 +66,39 @@
 
 ### 脚本及样例代码
 
-```bash
+```text
 ├── DDRNet
   ├── README_CN.md                        // DDRNet相关说明
   ├── ascend310_infer                     // Ascend310推理需要的文件
   ├── scripts
       ├──run_standalone_train_ascend.sh   // 单卡Ascend910训练脚本
       ├──run_distribute_train_ascend.sh   // 多卡Ascend910训练脚本
-      ├──run_eval_ascend.sh               // 测试脚本
-      ├──run_infer_310.sh                 // 310推理脚本
-      ├──run_eval_onnx.sh                 // onnx推理脚本
+      ├──run_eval_ascend.sh               // 测试脚本 Ascend
+      ├──run_standalone_train_gpu.sh      // 单卡GPU训练脚本
+      ├──run_distribute_train_gpu.sh      // 多卡GPU训练脚本
+      ├──run_eval_gpu.sh                  // 测试脚本 GPU
+      └──run_infer_310.sh                 // 310推理脚本
   ├── src
       ├──configs                          // DDRNet的配置文件
       ├──data                             // 数据集配置文件
           ├──imagenet.py                  // imagenet配置文件
           ├──augment                      // 数据增强函数文件
-          ┕──data_utils                   // modelarts运行时数据集复制函数文件
-  │   ├──models                           // DDRNet定义文件
-  │   ├──trainers                         // 自定义TrainOneStep文件
-  │   ├──tools                            // 工具文件夹
+          └──data_utils                   // modelarts运行时数据集复制函数文件
+      ├──models                           // DDRNet定义文件
+      ├──trainers                         // 自定义TrainOneStep文件
+      ├──tools                            // 工具文件夹
           ├──callback.py                  // 自定义回调函数，训练结束测试
           ├──cell.py                      // 一些关于cell的通用工具函数
           ├──criterion.py                 // 关于损失函数的工具函数
           ├──get_misc.py                  // 一些其他的工具函数
           ├──optimizer.py                 // 关于优化器和参数的函数
-          ┕──schedulers.py                // 学习率衰减的工具函数
+          └──schedulers.py                // 学习率衰减的工具函数
   ├── train.py                            // 训练文件
   ├── eval.py                             // 评估文件
   ├── eval_onnx.py                        // ONNX评估文件
   ├── export.py                           // 导出模型文件
   ├── postprocess.py                      // 推理计算精度文件
-  ├── preprocess.py                       // 推理预处理图片文件
+  └──preprocess.py                       // 推理预处理图片文件
 
 ```
 
@@ -110,7 +108,7 @@
 
 - 配置DDRNet和ImageNet-1k数据集。
 
-  ```python
+  ```text
     # Architecture Top1-75.9%
     arch: DDRNet23                              # 模型结构
     # ===== Dataset ===== #
@@ -164,7 +162,7 @@
 
 ## [训练和测试](#目录)
 
-- Ascend处理器环境运行
+## 在 Ascend 上运行
 
   ```bash
   # 使用python启动单卡训练
@@ -194,11 +192,19 @@
 
 [hccl工具](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
 
-## 导出过程
+## 在 GPU 上运行
 
-### 导出
+```bash
+  bash ./scripts/run_standalone_train_gpu.sh [DEVICE_ID] [CONFIG_PATH]
+  #OR
+  bash ./scripts/run_distribute_train_gpu.sh [CONFIG_PATH]
 
-  ```shell
+  bash ./scripts/run_eval_gpu.sh [DEVICE_ID] [CONFIG_PATH] [CHECKPOINT_PATH]
+```
+
+### 推理过程
+
+  ```bash
   python export.py --pretrained [CKPT_FILE] --ddr_config [CONFIG_PATH] --device_target [DEVICE_TARGET]
   ```
 
@@ -223,44 +229,43 @@
   Top5 acc: 0.9331
   ```
 
-## [模型描述](#目录)
+# 型号说明
 
-### 性能
+## 性能
 
-#### 评估性能
+### 训练表现
 
-##### ImageNet-1k上的DDRNet
+#### ImageNet2012 上的 DDRNet
 
-| 参数                 | Ascend                                                       |
-| -------------------------- | ----------------------------------------------------------- |
-|模型|DDRNet|
-| 模型版本              | DDRNet23                                                |
-| 资源                   | Ascend 910               |
-| 上传日期              | 2021-12-04                                 |
-| MindSpore版本          | 1.3.0                                                 |
-| 数据集                    | ImageNet-1k Train，共1,281,167张图像                                              |
-| 训练参数        | epoch=300, batch_size=512            |
-| 优化器                  | Momentum                                                    |
-| 损失函数              | SoftTargetCrossEntropy                                       |
-| 损失| 1.313|
-| 输出                    | 概率                                                 |
-| 分类准确率             | 八卡：top1:76.598% top5:93.312%                   |
-| 速度                      | 八卡：940.911 ms毫秒/步                        |
-| 训练耗时          |34h50min07s（run on ModelArts）|
+| 参数 | GPU | Ascend |
+| -------------------------- | ---------------------------------------------------------- | ------- |
+| 模型版本 | DDRNet-23 | DDRNet-23 |
+| 资源 | GPU: 8xRTX3090 24G; CPU: Intel(R) Xeon(R) Gold 6226R; RAM: 252G | Ascend 910 |
+| 上传日期 | 2021-03-23 | 2021-12-04 |
+| MindSpore版本 | 1.6.0 | 1.3.0 |
+| 数据集 | ImageNet-1k train | ImageNet-1k train |
+| 训练设置  | ddrnet23_imagenet_gpu.yaml | ddrnet23_imagenet_ascend.yaml |
+| 参数 | batch_size=256, epoch=300 | batch_size=512, epoch=300 |
+| 优化器 | Momentum | Momentum |
+| 损失函数 | SoftTargetCrossEntropy | SoftTargetCrossEntropy |
+| 输出 | ckpt file | ckpt file |
+| 最终损失  | 2.44 | - |
+| 速度 | eight cards: mean 5000 ms/step | eight cards: mean 940 ms/step |
+| 训练耗时 | eight cards: 240 h | eight cards: 35 h （run on ModelArts) |
 
-### 推理性能
+### 评价表现
 
-| 参数                 | Ascend                                                       |
-| -------------------------- | ----------------------------------------------------------- |
-|模型                 |DDRNet|
-| 模型版本              | DDRNet23|                                                |
-| 资源                   | Ascend 310               |
-| 上传日期              | 2021-12-04                                 |
-| MindSpore版本          | 1.3.0                                                 |
-| 数据集                    | ImageNet-1k Val，共50,000张图像                                                 |
-| 分类准确率             | top1:76.578%,top5:93.31%                      |
-| 速度                      | 平均耗时3.29687 ms每张|
-| 推理耗时| 约38min|
+#### ImageNet2012 上的 DDRNet
+
+| 参数 | GPU | Ascend |
+| -------------------------- | ----------------- | ---------- |
+| 模型版本 | DDRNet-23 | DDRNet-23 |
+| 资源 |  GPU: 8xRTX3090 24G; CPU: Intel(R) Xeon(R) Gold 6226R; RAM: 252G  | Ascend 310 |
+| 上传日期 | 2021-03-23 | 2021-12-04 |
+| MindSpore版本 | 1.6.0 | 1.3.0 |
+| 数据集 | ImageNet-1k val | ImageNet-1k val |
+| Eval 损失 | 1.2 | 1.313 |
+| 分类准确率 | eight cards: top1:76.6% top5:93.4% | eight cards: top1:76.598% top5:93.312% |
 
 ## ONNX推理
 

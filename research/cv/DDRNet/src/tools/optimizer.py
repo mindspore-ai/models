@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ def get_optimizer(args, model, batch_num):
     params = get_param_groups(model)
     learning_rate = get_learning_rate(args, batch_num)
     step = int(args.start_epoch * batch_num)
+    learning_rate = learning_rate[step:]
     accumulation_step = int(args.accumulation_step)
     learning_rate = learning_rate * args.batch_size * int(os.getenv("DEVICE_NUM", args.device_num)) / 256
     train_step = len(learning_rate)

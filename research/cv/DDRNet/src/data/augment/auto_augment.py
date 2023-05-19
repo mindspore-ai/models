@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,16 +18,16 @@ This code implements the searched ImageNet policies with various tweaks and impr
 does not include any of the search code.
 
 AA and RA Implementation adapted from:
-    https://github.com/tensorflow/tpu/blob/master/models/official/efficientnet/autoaugment.py
+    github.com/tensorflow/tpu/blob/master/models/official/efficientnet/autoaugment.py
 
 AugMix adapted from:
-    https://github.com/google-research/augmix
+    github.com/google-research/augmix
 
 Papers:
-    AutoAugment: Learning Augmentation Policies from Data - https://arxiv.org/abs/1805.09501
-    Learning Data Augmentation Strategies for Object Detection - https://arxiv.org/abs/1906.11172
-    RandAugment: Practical automated data augmentation... - https://arxiv.org/abs/1909.13719
-    AugMix: A Simple Data Processing Method to Improve Robustness and Uncertainty - https://arxiv.org/abs/1912.02781
+    AutoAugment: Learning Augmentation Policies from Data - arxiv.org/abs/1805.09501
+    Learning Data Augmentation Strategies for Object Detection - arxiv.org/abs/1906.11172
+    RandAugment: Practical automated data augmentation... - arxiv.org/abs/1909.13719
+    AugMix: A Simple Data Processing Method to Improve Robustness and Uncertainty - arxiv.org/abs/1912.02781
 
 Hacked together by / Copyright 2020 Ross Wightman
 """
@@ -481,7 +481,7 @@ def auto_augment_policy_v0r(hparams):
 
 def auto_augment_policy_original(hparams):
     """auto_augment_policy_original"""
-    # ImageNet policy from https://arxiv.org/abs/1805.09501
+    # ImageNet policy from arxiv.org/abs/1805.09501
     policy = [
         [('PosterizeOriginal', 0.4, 8), ('Rotate', 0.6, 9)],
         [('Solarize', 0.6, 5), ('AutoContrast', 0.6, 5)],
@@ -777,9 +777,8 @@ def augmix_ops(magnitude=10, hparams=None, transforms=None):
 
 class AugMixAugment:
     """ AugMix Transform
-    Adapted and improved from impl here: https://github.com/google-research/augmix/blob/master/imagenet.py
-    From paper: 'AugMix: A Simple Data Processing Method to Improve Robustness and Uncertainty -
-    https://arxiv.org/abs/1912.02781
+    Adapted and improved from impl here: github.com/google-research/augmix/blob/master/imagenet.py
+    From paper: 'AugMix: A Simple Data Processing Method to Improve Robustness and Uncertainty
     """
 
     def __init__(self, ops, alpha=1., width=3, depth=-1, blended=False):

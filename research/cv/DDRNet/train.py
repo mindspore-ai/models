@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,12 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""
-train
-code: https://github.com/ydhongHIT/DDRNet
-paper: https://arxiv.org/pdf/2101.06085.pdf
-Acc: ImageNet1k-75.9%
-"""
 import os
 
 import numpy as np
@@ -62,6 +56,7 @@ def main():
 
     data = get_dataset(args)
     batch_num = data.train_dataset.get_dataset_size()
+    print(f"=> dataset_size {batch_num}")
     optimizer = get_optimizer(args, net, batch_num)
     # save a yaml file to read to record parameters
 
@@ -83,15 +78,16 @@ def main():
 
     ckpoint_cb = ModelCheckpoint(prefix=args.arch + str(rank), directory=ckpt_save_dir,
                                  config=config_ck)
-    loss_cb = LossMonitor()
+    loss_cb = LossMonitor(100)
     eval_cb = EvaluateCallBack(model, eval_dataset=data.val_dataset, src_url=ckpt_save_dir,
                                train_url=os.path.join(args.train_url, "ckpt_" + str(rank)),
                                save_freq=args.save_every)
 
     print("begin train")
+    dataset_sink_mode = args.device_target != "GPU"
     model.train(int(args.epochs - args.start_epoch), data.train_dataset,
                 callbacks=[time_cb, ckpoint_cb, loss_cb, eval_cb],
-                dataset_sink_mode=True)
+                dataset_sink_mode=dataset_sink_mode)
     print("train success")
 
     if args.run_modelarts:
