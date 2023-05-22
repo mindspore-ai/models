@@ -40,7 +40,6 @@ def data2mindrecord(cls_name, mindrecord_dir, pvnet_path):
                  "farthest": {"type": "float64", "shape": [-1, vote_num * 2]}
                  }
     writer.add_schema(cv_schema, "cv_schema")
-    writer.open_and_set_header()
     save_data = []
     linemod_dir = os.path.join(pvnet_path, 'LINEMOD')
     # render dataset
