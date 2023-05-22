@@ -41,6 +41,7 @@ set_seed(1)
 def modelarts_pre_process():
     config.ckpt_path = os.path.join(config.output_path, config.ckpt_path)
 
+
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_lstm():
     """ train lstm """
@@ -115,17 +116,15 @@ def train_lstm():
                                  keep_checkpoint_max=config.keep_checkpoint_max)
     ckpoint_cb = ModelCheckpoint(prefix="lstm", directory=config.ckpt_path, config=config_ck)
     time_cb = TimeMonitor(data_size=ds_train.get_dataset_size())
-    cb = [time_cb, ckpoint_cb, loss_cb]
-    if config.run_eval and rank == 0:
-        eval_net = network
-        eval_net.set_train(False)
+    cb = [time_cb, loss_cb]
+    if config.run_eval:
         eval_dataset = lstm_create_dataset(config.preprocess_path, config.batch_size, training=False)
-        eval_param_dict = {"net": eval_net, "dataset": eval_dataset}
-        eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=config.eval_interval,
-                               eval_start_epoch=config.eval_start_epoch, save_best_ckpt=True,
-                               ckpt_directory=config.ckpt_path, besk_ckpt_name="lstm_best_f1.ckpt",
-                               metrics_name="f1")
-        cb += [eval_cb]
+        eval_param_dict = {"net": model, "dataset": eval_dataset}
+        ckpoint_cb = EvalCallBack(apply_eval, eval_param_dict, interval=config.eval_interval,
+                                  eval_start_epoch=config.eval_start_epoch, save_best_ckpt=True,
+                                  ckpt_directory=config.ckpt_path, besk_ckpt_name='lstm_best_acc.ckpt')
+    if rank == 0:
+        cb.append(ckpoint_cb)
 
     model.train(config.num_epochs, ds_train, callbacks=cb, dataset_sink_mode=(config.device_target != "CPU"))
     print("============== Training Success ==============")

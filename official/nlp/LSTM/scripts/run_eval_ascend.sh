@@ -17,7 +17,7 @@
 echo "=============================================================================================================="
 echo "Please run the script as: "
 echo "bash run_eval_ascend.sh DEVICE_ID PREPROCESS_DIR CKPT_FILE"
-echo "for example: bash run_eval_ascend.sh 0 ./preprocess lstm-20_390.ckpt"
+echo "for example: bash run_eval_ascend.sh 0 ./preprocess lstm_best_acc.ckpt"
 echo "=============================================================================================================="
 
 DEVICE_ID=$1

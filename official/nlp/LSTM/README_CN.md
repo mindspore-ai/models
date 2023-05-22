@@ -66,7 +66,7 @@ LSTM模型包含嵌入层、编码器和解码器这几个模块，编码器模�
   bash run_train_ascend.sh 0 ./aclimdb ./glove_dir
 
   # 运行评估示例
-  bash run_eval_ascend.sh 0 ./preprocess lstm-20_390.ckpt
+  bash run_eval_ascend.sh 0 ./preprocess lstm_best_acc.ckpt
   ```
 
 - 在GPU处理器上运行
@@ -76,7 +76,7 @@ LSTM模型包含嵌入层、编码器和解码器这几个模块，编码器模�
   bash run_train_gpu.sh 0 ./aclimdb ./glove_dir
 
   # 运行评估示例
-  bash run_eval_gpu.sh 0 ./aclimdb ./glove_dir lstm-20_390.ckpt
+  bash run_eval_gpu.sh 0 ./aclimdb ./glove_dir lstm_best_acc.ckpt
   ```
 
 - 在CPU处理器上运行
@@ -86,7 +86,7 @@ LSTM模型包含嵌入层、编码器和解码器这几个模块，编码器模�
   bash run_train_cpu.sh ./aclimdb ./glove_dir
 
   # 运行评估示例
-  bash run_eval_cpu.sh ./aclimdb ./glove_dir lstm-20_390.ckpt
+  bash run_eval_cpu.sh ./aclimdb ./glove_dir lstm_best_acc.ckpt
   ```
 
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
@@ -397,7 +397,7 @@ Ascend:
   执行`bash run_eval_ascend.sh`进行评估。
 
   ``` bash
-  bash run_eval_ascend.sh 0 ./preprocess lstm-20_390.ckpt
+  bash run_eval_ascend.sh 0 ./preprocess lstm_best_acc.ckpt
   ```
 
 - 在GPU处理器上进行评估
@@ -405,7 +405,7 @@ Ascend:
   执行`bash run_eval_gpu.sh`进行评估。
 
   ``` bash
-  bash run_eval_gpu.sh 0 ./aclimdb ./glove_dir lstm-20_390.ckpt
+  bash run_eval_gpu.sh 0 ./aclimdb ./glove_dir lstm_best_acc.ckpt
   ```
 
 - 在CPU处理器上进行评估
@@ -413,7 +413,7 @@ Ascend:
   执行`bash run_eval_cpu.sh`进行评估。
 
   ``` bash
-  bash run_eval_cpu.sh 0 ./aclimdb ./glove_dir lstm-20_390.ckpt
+  bash run_eval_cpu.sh 0 ./aclimdb ./glove_dir lstm_best_acc.ckpt
   ```
 
 ## 导出模型

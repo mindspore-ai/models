@@ -12,7 +12,7 @@ device_target: Ascend
 enable_profiling: False
 eval_start_epoch: 1
 eval_interval: 1
-run_eval: False
+run_eval: True
 
 # ==============================================================================
 # LSTM CONFIG IN ASCEND for 8p training
