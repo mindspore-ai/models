@@ -301,7 +301,7 @@ def run_eval(model, target, ckpt_save_dir):
                            eval_start_epoch=args_opt.eval_start_epoch,
                            save_best_ckpt=args_opt.save_best_ckpt,
                            ckpt_directory=ckpt_save_dir,
-                           besk_ckpt_name="best_acc.ckpt",
+                           best_ckpt_name="best_acc.ckpt",
                            metrics_name="acc")
     return eval_cb
 

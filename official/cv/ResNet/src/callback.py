@@ -107,7 +107,7 @@ class EvalCallBack(Callback):
         interval (int): run evaluation interval, default is 1.
         eval_start_epoch (int): evaluation start epoch, default is 1.
         save_best_ckpt (bool): Whether to save best checkpoint, default is True.
-        besk_ckpt_name (str): bast checkpoint name, default is `best.ckpt`.
+        best_ckpt_name (str): best checkpoint name, default is `best.ckpt`.
         metrics_name (str): evaluation metrics name, default is `acc`.
 
     Returns:
@@ -118,7 +118,7 @@ class EvalCallBack(Callback):
     """
 
     def __init__(self, eval_function, eval_param_dict, interval=1, eval_start_epoch=1, rank_id=0, save_best_ckpt=True,
-                 ckpt_directory="./", besk_ckpt_name="best.ckpt", metrics_name="acc", logger=None):
+                 ckpt_directory="./", best_ckpt_name="best.ckpt", metrics_name="acc", logger=None):
         super(EvalCallBack, self).__init__()
         self.eval_param_dict = eval_param_dict
         self.eval_function = eval_function
@@ -133,7 +133,7 @@ class EvalCallBack(Callback):
         self.rank_id = rank_id
         if not os.path.isdir(ckpt_directory):
             os.makedirs(ckpt_directory)
-        self.bast_ckpt_path = os.path.join(ckpt_directory, besk_ckpt_name)
+        self.best_ckpt_path = os.path.join(ckpt_directory, best_ckpt_name)
         self.metrics_name = metrics_name
 
     def remove_ckpoint_file(self, file_name):
@@ -156,14 +156,18 @@ class EvalCallBack(Callback):
             eval_cost = time.time() - eval_start
             self.logger.info("epoch: {}, {}: {}, eval_cost:{:.2f}".format(cur_epoch, self.metrics_name, res, eval_cost))
             if res >= self.best_res:
+                if ms.context.get_context("enable_ge"):
+                    from mindspore.train.callback import _set_cur_net
+                    _set_cur_net(cb_params.train_network)
+                    cb_params.train_network.exec_checkpoint_graph()
                 self.best_res = res
                 self.best_epoch = cur_epoch
                 self.logger.info("update best result: %s", res)
                 if self.save_best_ckpt and self.rank_id == 0:
-                    if os.path.exists(self.bast_ckpt_path):
-                        self.remove_ckpoint_file(self.bast_ckpt_path)
-                    save_checkpoint(cb_params.train_network, self.bast_ckpt_path)
-                    self.logger.info("update best checkpoint at: %s", self.bast_ckpt_path)
+                    if os.path.exists(self.best_ckpt_path):
+                        self.remove_ckpoint_file(self.best_ckpt_path)
+                    save_checkpoint(cb_params.train_network, self.best_ckpt_path)
+                    self.logger.info("update best checkpoint at: %s", self.best_ckpt_path)
 
     def on_train_end(self, run_context):
         self.logger.info("End training, the best %s is: %s, the best %s epoch is %s" % (

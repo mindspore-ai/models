@@ -347,7 +347,7 @@ def main(args):
     eval_param_dict = {"model": model, "dataset": val_dataset, "metrics_name": "Top1-Acc"}
     eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=1,
                            eval_start_epoch=0, save_best_ckpt=False,
-                           ckpt_directory=ckpt_save_dir, besk_ckpt_name="best_acc.ckpt",
+                           ckpt_directory=ckpt_save_dir, best_ckpt_name="best_acc.ckpt",
                            metrics_name="Top1-Acc")
 
     callbacks = [loss_cb, eval_cb, time_cb]

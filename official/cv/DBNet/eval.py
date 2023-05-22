@@ -33,6 +33,8 @@ def set_default():
     config.output_dir = os.path.join(config.output_dir, config.net, config.backbone.initializer)
     config.save_ckpt_dir = os.path.join(config.output_dir, 'ckpt')
     config.log_dir = os.path.join(config.output_dir, 'log')
+    os.makedirs(config.save_ckpt_dir, exist_ok=True)
+    os.makedirs(config.log_dir, exist_ok=True)
 
 
 @moxing_wrapper()

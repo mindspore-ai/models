@@ -109,7 +109,7 @@ def train():
         network_eval = Model(f_model, loss_fn=loss_f, metrics={"DiceMetric": DiceMetric()})
         eval_cb = EvalCallBack(network_eval, val_dataset, interval=cfg.eval_steps,
                                eval_start_epoch=cfg.eval_start_epoch, save_best_ckpt=True,
-                               ckpt_directory=cfg.save_dir, besk_ckpt_name=str(cfg.rank)+"_best_map.ckpt")
+                               ckpt_directory=cfg.save_dir, best_ckpt_name=str(cfg.rank)+"_best_map.ckpt")
         callbacks.append(eval_cb)
 
     model = UNet3PlusWithLossCell(f_model)

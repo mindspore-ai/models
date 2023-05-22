@@ -73,6 +73,8 @@ class DBNetMonitor(Callback):
             val_dataset, _ = create_dataset(config, False)
             self.val_dataset = val_dataset.create_dict_iterator(output_numpy=True)
             self.max_f = 0.0
+            self.early_stop = config.early_stop
+            self.stop_value = config.stop_value.__dict__
         self.train_net = train_net
         self.epoch_start_time = time.time()
         self.step_start_time = time.time()
@@ -177,9 +179,27 @@ class DBNetMonitor(Callback):
                 cur_epoch, fps, metrics['recall'].avg, metrics['precision'].avg, metrics['fmeasure'].avg))
             if cur_f >= self.max_f and self.rank_id == 0:
                 self.config.logger.info('update best ckpt at epoch: %s, best fmeasure is: %s' % (cur_epoch, cur_f))
+                if ms.context.get_context("enable_ge"):
+                    from mindspore.train.callback import _set_cur_net
+                    _set_cur_net(cb_params.train_network)
+                    cb_params.train_network.exec_checkpoint_graph()
                 ms.save_checkpoint(self.eval_net.model,
                                    os.path.join(self.save_ckpt_dir, f"best_rank{self.config.rank_id}.ckpt"))
                 self.max_f = cur_f
+            if self.early_stop and isinstance(self.stop_value, dict) and self.stop_value:
+                stop = True
+                for key in self.stop_value.keys():
+                    if metrics[key].avg < self.stop_value[key]:
+                        stop = False
+                if stop:
+                    self.config.logger.info(f"early stop! update best ckpt at epoch: {cur_epoch}, "
+                                            f"best recall: {metrics['recall'].avg}, "
+                                            f"precision: {metrics['precision'].avg}, "
+                                            f"fmeasure: {metrics['fmeasure'].avg}")
+                    ms.save_checkpoint(self.eval_net.model,
+                                       os.path.join(self.save_ckpt_dir, f"best_rank{self.config.rank_id}.ckpt"))
+                    run_context.request_stop()
+
 
     def on_train_end(self, run_context):
         cb_params = run_context.original_args()

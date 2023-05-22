@@ -1,4 +1,5 @@
 net: DBnet
+stop_value: {"recall": 0.77, "precision": 0.85, "fmeasure": 0.81}
 backbone:
     initializer: resnet50
     pretrained: True

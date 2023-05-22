@@ -2,6 +2,7 @@ net: DBnet
 device_num: 8
 eval_start_epoch: 1000
 eval_interval: 50
+stop_value: {"fmeasure": 0.72}
 backbone:
     initializer: mobilenetv3
     pretrained: True

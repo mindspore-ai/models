@@ -71,7 +71,7 @@ def run_eval(test_dataset, model, net, ckpt_save_dir, cb, rank):
     eval_param_dict = {"model": model, "net": net, "dataset": test_dataset, "metrics_name": "acc"}
     eval_cb = EvalCallBack(apply_eval, eval_param_dict, rank, interval=1,
                            eval_start_epoch=1, save_best_ckpt=True,
-                           ckpt_directory=ckpt_save_dir, besk_ckpt_name="best_acc3.ckpt",
+                           ckpt_directory=ckpt_save_dir, best_ckpt_name="best_acc3.ckpt",
                            metrics_name="acc")
     cb += [eval_cb]
 

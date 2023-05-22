@@ -243,7 +243,7 @@ def run_train():
                            "anno_json": ann_val_file, "input_shape": input_val_shape, "args": config}
         eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=config.eval_interval,
                                eval_start_epoch=config.eval_start_epoch, save_best_ckpt=True,
-                               ckpt_directory=save_ckpt_path, besk_ckpt_name="best_map.ckpt",
+                               ckpt_directory=save_ckpt_path, best_ckpt_name="best_map.ckpt",
                                metrics_name="mAP")
 
     old_progress = -1

@@ -31,7 +31,7 @@ class EvalCallBack(Callback):
         interval (int): run evaluation interval, default is 1.
         eval_start_epoch (int): evaluation start epoch, default is 1.
         save_best_ckpt (bool): Whether to save best checkpoint, default is True.
-        besk_ckpt_name (str): bast checkpoint name, default is `best.ckpt`.
+        best_ckpt_name (str): best checkpoint name, default is `best.ckpt`.
         metrics_name (str): evaluation metrics name, default is (`mAP`,`CMC`).
 
     Returns:

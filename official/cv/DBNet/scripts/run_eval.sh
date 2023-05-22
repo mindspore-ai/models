@@ -38,7 +38,6 @@ then
 fi
 
 BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
-export RANK_SIZE=$1
 
 echo "start inferring for device $DEVICE_ID"
 python $BASE_PATH/../eval.py --config_path=$CONFIG_PATH --ckpt_path=$CKPT_PATH --device_id=$3 \

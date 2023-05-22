@@ -310,7 +310,7 @@ def run_eval(target, model, ckpt_save_dir, cb):
                            "dataset": eval_dataset, "metrics_name": "acc"}
         eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=config.eval_interval,
                                eval_start_epoch=config.eval_start_epoch, save_best_ckpt=config.save_best_ckpt,
-                               ckpt_directory=ckpt_save_dir, besk_ckpt_name="best_acc.ckpt",
+                               ckpt_directory=ckpt_save_dir, best_ckpt_name="best_acc.ckpt",
                                metrics_name="acc")
         cb += [eval_cb]
 

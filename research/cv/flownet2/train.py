@@ -101,7 +101,7 @@ def add_eval_callback(model, ckpt_save_dir, cbs):
         eval_param_dict = {"model": model, "dataset": eval_dataset, "metrics_name": "FlowNetEPE"}
         eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=config.eval_interval,
                                eval_start_epoch=config.eval_start_epoch, save_best_ckpt=config.save_best_ckpt,
-                               ckpt_directory=ckpt_save_dir, besk_ckpt_name="best_acc.ckpt",
+                               ckpt_directory=ckpt_save_dir, best_ckpt_name="best_acc.ckpt",
                                metrics_name="FlowNetEPE")
         cbs += [eval_cb]
 

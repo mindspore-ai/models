@@ -189,7 +189,7 @@ def train_net():
         eval_param_dict = {"net": eval_net, "dataset": eval_dataset, "anno_json": anno_json}
         eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=config.eval_interval,
                                eval_start_epoch=config.eval_start_epoch, save_best_ckpt=True,
-                               ckpt_directory=ckpt_save_dir, besk_ckpt_name="best_map.ckpt",
+                               ckpt_directory=ckpt_save_dir, best_ckpt_name="best_map.ckpt",
                                metrics_name="mAP")
         callback.append(eval_cb)
     model = Model(net)
