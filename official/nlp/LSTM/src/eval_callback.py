@@ -16,23 +16,16 @@
 import os
 import stat
 
-from mindspore import nn, save_checkpoint
+from mindspore import save_checkpoint
 from mindspore import log as logger
 from mindspore.train.callback import Callback
 
 
 def apply_eval(eval_param_dict):
-    metric = nn.F1()
     net = eval_param_dict["net"]
     eval_dataset = eval_param_dict["dataset"]
-
-    for _, data in enumerate(eval_dataset.create_dict_iterator(num_epochs=1)):
-        feature = data["feature"]
-        label = data["label"]
-        prediction = net(feature)
-        metric.update(prediction, label)
-    res = metric.eval().mean()
-    net.set_train(True)
+    res = net.eval(eval_dataset)
+    res = res.get('acc')
     return res
 
 
