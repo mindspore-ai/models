@@ -24,4 +24,4 @@ python eval.py  \
     --checkpoint_file_path=$PATH_CHECKPOINT \
     --device_target=$PLATFORM \
     --data_path=$DATA_DIR \
-    --device_target=$PLATFORM > log.txt 2>&1 &
+    --device_target=$PLATFORM > eval.txt 2>&1 &
