@@ -419,6 +419,17 @@ img_dir: ""                # 推理时使用的原始数据集路径
 
 3. 生成mindrecord：
 
+由于这个过程没有涉及pretrain的数据集，需要将`src/create_dataset.py`里的`create_train_dataset("pretraining")`注释掉：
+
+```python
+if __name__ == "__main__":
+    # create_train_dataset("pretraining")
+    create_train_dataset("finetune")
+    create_train_dataset("test")
+```
+
+之后执行：
+
 ```shell
 python src/create_dataset.py --config_path=default_cn_finetune_config.yaml
 ```

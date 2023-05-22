@@ -431,6 +431,17 @@ img_dir: "icdar17_val_img_dir_path"                # The original dataset path u
 
 3. Generate mindrecord：
 
+Since this process does not involve a pre-trained dataset, it is necessary to comment out `create_train_dataset("pretraining")` in `src/create_dataset.py`:
+
+```python
+if __name__ == "__main__":
+    # create_train_dataset("pretraining")
+    create_train_dataset("finetune")
+    create_train_dataset("test")
+```
+
+And run:
+
 ```shell
 python src/create_dataset.py --config_path=default_cn_finetune_config.yaml
 ```
