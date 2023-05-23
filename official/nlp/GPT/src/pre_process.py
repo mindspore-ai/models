@@ -21,7 +21,8 @@ import glob
 import json
 import os
 import re
-from multiprocessing import Pool, current_process
+import time
+from multiprocessing import current_process, Process
 import numpy as np
 
 try:
@@ -143,8 +144,10 @@ def tokenize_lambada(file_path):
             yield sample
 
 
-def task_unit(iterator, parallel_writer=True):
-    """task for each process"""
+def task_unit(iterator, mindrecord_filename, schema):
+    writer = FileWriter(file_name=mindrecord_filename, shard_num=1)
+    writer.add_schema(schema, args.dataset_type)
+
     p = current_process()
     index = p.pid if p.pid else 0
 
@@ -157,16 +160,16 @@ def task_unit(iterator, parallel_writer=True):
             for _ in range(batch_size):
                 data_batch.append(next(item_iter))
                 count += 1
-            writer.write_raw_data(data_batch, parallel_writer=parallel_writer)
+            writer.write_raw_data(data_batch)
             print("Process {} transformed {} records.".format(
                 index, count))
         except StopIteration:
             if data_batch:
-                writer.write_raw_data(data_batch,
-                                      parallel_writer=parallel_writer)
+                writer.write_raw_data(data_batch)
                 print("Process {} transformed {} records.".format(
                     index, count))
             break
+    writer.commit()
 
 
 if __name__ == '__main__':
@@ -184,32 +187,42 @@ if __name__ == '__main__':
     out_dir, out_file = os.path.split(os.path.abspath(args.output_file))
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
-    schema = {"input_ids": {"type": "int32", "shape": [-1]},}
-    writer = FileWriter(file_name=args.output_file,
-                        shard_num=args.file_partition)
-    writer.add_schema(schema, args.dataset_type)
-    writer.open_and_set_header()
+    mindrecord_schema = {"input_ids": {"type": "int32", "shape": [-1]},}
     ###
     transforms_count = 0
     if args.dataset_type == 'wiki':
+        wiki_writer = FileWriter(file_name=args.output_file, shard_num=args.file_partition)
+        wiki_writer.add_schema(mindrecord_schema, args.dataset_type)
         for x in tokenize_wiki(args.input_glob):
             transforms_count += 1
-            writer.write_raw_data([x])
+            wiki_writer.write_raw_data([x])
+        wiki_writer.commit()
         print("Transformed {} records.".format(transforms_count))
     elif args.dataset_type == 'lambada':
+        lambada_writer = FileWriter(file_name=args.output_file, shard_num=args.file_partition)
+        lambada_writer.add_schema(mindrecord_schema, args.dataset_type)
         for x in tokenize_lambada(args.input_glob):
             transforms_count += 1
-            writer.write_raw_data([x])
+            lambada_writer.write_raw_data([x])
         print("Transformed {} records.".format(transforms_count))
+        lambada_writer.commit()
     elif args.dataset_type == 'openwebtext':
+        SUFFIX = len(str(args.file_partition - 1))
+        file_names = ["{}{}".format(args.output_file, str(x).rjust(SUFFIX, '0'))
+                      for x in range(args.file_partition)]
         file_iter = glob.iglob(args.input_glob)
-        with Pool(processes=args.num_process) as pool:
-            pool.map(task_unit, package_file(file_iter, args.file_batch_size))
+        process_list = {}
+        for file in file_names:
+            p1 = Process(target=task_unit, args=(file_iter, file, mindrecord_schema))
+            p1.start()
+            process_list[file] = p1
+        for process in process_list.values():
+            while process.is_alive(): # wait child process exit
+                time.sleep(0.01)
     else:
         raise ValueError(
             "Not support dataset type: {}".format(args.dataset_type))
 
-    writer.commit()
     out_file = args.output_file
     if args.file_partition > 1:
         out_file += '0'
