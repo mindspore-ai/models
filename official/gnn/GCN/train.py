@@ -31,6 +31,7 @@ from mindspore.train.serialization import save_checkpoint, load_checkpoint
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor, LossMonitor
 from mindspore import Model, context
 
+from src.eval_callback import EvalCallBack
 from src.gcn import GCN, GCN_GPU
 from src.metrics import LossAccuracyWrapper, TrainNetWrapper, Loss_Gpu
 from src.config import ConfigGCN
@@ -141,13 +142,22 @@ def run_gpu_train():
     criterion = Loss_Gpu(eval_mask, config.weight_decay, gcn_net.trainable_params()[0])
     model = Model(gcn_net, loss_fn=criterion, optimizer=opt, amp_level="O3")
     if default_args.train_with_eval:
-        GCN_metric = GCNAccuracy(eval_mask)
-        eval_model = Model(gcn_net, loss_fn=criterion, metrics={'GCNAccuracy': GCN_metric})
-        eval_param_dict = {"model": eval_model, "dataset": dataset, "metrics_name": "GCNAccuracy"}
+        metrics_name = "Acc"
+        eval_metrics = {metrics_name: nn.Accuracy()}
+        eval_model = Model(gcn_net, loss_fn=criterion, metrics=eval_metrics)
+        eval_param_dict = {"model": eval_model, "dataset": ds.NumpySlicesDataset(data=data),
+                           "metrics_name": metrics_name}
+
+        def apply_eval(eval_param):
+            apply_eval_model = eval_param["model"]
+            apply_eval_dataset = eval_param["dataset"]
+            res = apply_eval_model.eval(apply_eval_dataset, dataset_sink_mode=True)
+            return res[eval_param["metrics_name"]]
+
         eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=config.eval_interval,
                                eval_start_epoch=default_args.eval_start_epoch, save_best_ckpt=config.save_best_ckpt,
-                               ckpt_directory=config.best_ckpt_dir, besk_ckpt_name=config.best_ckpt_name,
-                               metrics_name="GCNAccuracy")
+                               ckpt_directory=config.best_ckpt_dir, best_ckpt_name=config.best_ckpt_name,
+                               metrics_name=metrics_name)
         cb.append(eval_cb)
     model.train(config.epochs, dataset, callbacks=cb, dataset_sink_mode=True)
 
