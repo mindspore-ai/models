@@ -19,7 +19,7 @@ from mindspore import Parameter, ParameterTuple
 import mindspore.common.dtype as mstype
 import mindspore.ops as ops
 from mindspore.nn import Dropout
-from mindspore.nn.optim import Adam, FTRL, LazyAdam
+from mindspore.nn.optim import Adam, FTRL
 from mindspore.common.initializer import Uniform, initializer
 from mindspore.context import ParallelMode
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
@@ -401,8 +401,8 @@ class TrainStepWrap(nn.Cell):
         self.weights_d = ParameterTuple(weights_d)
 
         if sparse and is_auto_parallel:
-            self.optimizer_d = LazyAdam(
-                self.weights_d, learning_rate=0.0001, eps=1e-8, loss_scale=sens)
+            self.optimizer_d = Adam(
+                self.weights_d, learning_rate=0.0001, eps=1e-8, loss_scale=sens, use_lazy=True)
             self.optimizer_w = FTRL(learning_rate=0.0001, params=self.weights_w,
                                     l1=1e-8, l2=1e-8, initial_accum=1.0, loss_scale=sens)
         else:
