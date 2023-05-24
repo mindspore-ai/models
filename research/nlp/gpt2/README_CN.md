@@ -165,7 +165,7 @@ GPT-2脚本及代码结构如下：
 
 - [WikiText2数据集下载](https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-2-v1.zip) 解压后使用`wikitext-2 /wiki.test.tokens`作为测试集
 - [WikiText103数据集下载](https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip) 解压后使用`wikitext-103 /wiki.test.tokens`作为测试集
-- [PTB数据集下载](http://www.fit.vutbr.cz/~imikolov/rnnlm/simple-examples.tgz) 解压后使用`/simple-examples/data/ptb.test.txt` 测试集，使用 `/simple-examples/data/ptb.test.txt`作为训练集
+- [PTB数据集下载](http://www.fit.vutbr.cz/~imikolov/rnnlm/simple-examples.tgz) 解压后使用`/simple-examples/data/ptb.test.txt` 测试集，使用 `/simple-examples/data/ptb.train.txt`作为训练集
 - [1BW数据集下载](https://github.com/ciprian-chelba/1-billion-word-language-modeling-benchmark) 根据README说明下载[单语义语言模型训练数据集](http://statmt.org/wmt11/training-monolingual.tgz)，使用get-data.sh脚本对数据进行预处理，使用`heldout-monolingual.tokenized.shuffled/news.en.heldout-00000-of-00050`作为测试集，使用`training-monolingual.tokenized.shuffled/news.en-00001-of-00100`作为原始训练集，进行随机采样后得到30000条训练集样本
 
 使用`task_dataset_preprocess.py`可以对以上数据集进行清洗。
