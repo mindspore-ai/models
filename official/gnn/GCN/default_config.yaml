@@ -21,6 +21,7 @@ test_nodes_num: 1000
 save_TSNE: False
 save_ckptpath: "ckpts/"
 train_with_eval: False
+eval_start_epoch: 1
 
 
 ---
