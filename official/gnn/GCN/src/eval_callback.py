@@ -41,7 +41,7 @@ class EvalCallBack(Callback):
     """
 
     def __init__(self, eval_function, eval_param_dict, interval=1, eval_start_epoch=1, save_best_ckpt=True,
-                 ckpt_directory="./", besk_ckpt_name="best.ckpt", metrics_name="acc"):
+                 ckpt_directory="./", best_ckpt_name="best.ckpt", metrics_name="acc"):
         super(EvalCallBack, self).__init__()
         self.eval_param_dict = eval_param_dict
         self.eval_function = eval_function
@@ -54,9 +54,8 @@ class EvalCallBack(Callback):
         self.best_epoch = 0
         if not os.path.isdir(ckpt_directory):
             os.makedirs(ckpt_directory)
-        self.bast_ckpt_path = os.path.join(ckpt_directory, besk_ckpt_name)
+        self.bast_ckpt_path = os.path.join(ckpt_directory, best_ckpt_name)
         self.metrics_name = metrics_name
-        self.save_TSNE = save_TSNE
 
     def remove_ckpoint_file(self, file_name):
         """Remove the specified checkpoint file from this checkpoint manager and also from the directory."""
