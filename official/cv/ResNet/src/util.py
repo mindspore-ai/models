@@ -44,7 +44,7 @@ def eval_callback(model, cfg, eval_dataset):
     eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=cfg.eval_interval,
                            eval_start_epoch=cfg.eval_start_epoch, rank_id=cfg.rank_id,
                            save_best_ckpt=cfg.save_best_ckpt, ckpt_directory=cfg.save_ckpt_dir,
-                           besk_ckpt_name="best_acc.ckpt", metrics_name="acc", logger=cfg.logger)
+                           best_ckpt_name="best_acc.ckpt", metrics_name="acc", logger=cfg.logger)
     return eval_cb
 
 

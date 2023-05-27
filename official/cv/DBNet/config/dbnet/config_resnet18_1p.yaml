@@ -1,4 +1,5 @@
 net: DBnet
+stop_value: {"fmeasure": 0.79}
 backbone:
     initializer: resnet18
     pretrained: True

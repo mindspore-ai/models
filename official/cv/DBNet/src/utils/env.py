@@ -43,10 +43,10 @@ def init_env(cfg):
         cfg.device_num = 1
         cfg.rank_id = 0
 
-    if cfg.device_num > 1:
-        if cfg.device_target == 'Ascend':
-            ms.set_context(device_id=cfg.device_id)
+    if cfg.device_target == 'Ascend':
+        ms.set_context(device_id=cfg.device_id, ascend_config={"precision_mode": "allow_fp32_to_fp16"})
 
+    if cfg.device_num > 1:
         init()
         group_size = get_group_size()
         if cfg.device_num != group_size:

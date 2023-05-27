@@ -120,7 +120,7 @@ def train_net(cross_valid_ind=1,
         eval_param_dict = {"model": eval_model, "dataset": valid_dataset, "metrics_name": config.eval_metrics}
         eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=config.eval_interval,
                                eval_start_epoch=config.eval_start_epoch, save_best_ckpt=True,
-                               ckpt_directory=ckpt_save_dir, besk_ckpt_name="best.ckpt",
+                               ckpt_directory=ckpt_save_dir, best_ckpt_name="best.ckpt",
                                metrics_name=config.eval_metrics)
         callbacks.append(eval_cb)
     model.train(int(epochs / repeat), train_dataset, callbacks=callbacks, dataset_sink_mode=dataset_sink_mode)

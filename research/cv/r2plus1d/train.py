@@ -140,7 +140,7 @@ def train():
         eval_cb = EvalCallBack(network_eval, val_dataloader, interval=cfg.eval_steps, \
                                eval_start_epoch=max(0, cfg.eval_start_epoch-cfg.resume_epoch), \
                                ckpt_directory=cfg.save_dir, save_best_ckpt=True, \
-                               besk_ckpt_name=str(cfg.rank)+"_best_map.ckpt", \
+                               best_ckpt_name=str(cfg.rank)+"_best_map.ckpt", \
                                f_model=f_model)
         callbacks.append(eval_cb)
 

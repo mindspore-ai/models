@@ -203,7 +203,7 @@ def train():
 
             eval_cb = EvalCallBack(network_eval, val_dataset, interval=args.eval_steps,
                                    eval_start_epoch=args.eval_start_epoch, save_best_ckpt=True,
-                                   ckpt_directory=save_dir, besk_ckpt_name="best_map.ckpt",
+                                   ckpt_directory=save_dir, best_ckpt_name="best_map.ckpt",
                                    metrics_name=("pixAcc", "mIou"))
             callbacks.append(eval_cb)
     else:

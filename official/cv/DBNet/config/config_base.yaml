@@ -4,8 +4,11 @@ device_num: 1
 device_id: 0
 per_print_times: 10
 run_eval: True
+enabel_recovery: False
 eval_start_epoch: 100
 eval_interval: 20
+early_stop: False
+stop_value: {"fmeasure": 0.79}
 device_target: "None"
 context_mode: "graph"
 run_profiler: False
@@ -77,6 +80,8 @@ train:
     thresh_min: 0.3
     thresh_max: 0.7
     dataset_sink_mode: True
+    clip_grad: False
+    force_update: True
 eval:
     img_format: ['.jpg', '.png', '.JPG', '.PNG']
     img_dir: "~/ICDAR2015/ch4_test_images"  # use abspath

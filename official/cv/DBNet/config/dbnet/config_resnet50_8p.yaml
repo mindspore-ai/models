@@ -2,6 +2,7 @@ net: DBnet
 device_num: 8
 eval_start_epoch: 1000
 eval_interval: 50
+stop_value: {"recall": 0.77, "precision": 0.85, "fmeasure": 0.81}
 backbone:
     initializer: resnet50
     pretrained: True

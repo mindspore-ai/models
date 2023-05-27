@@ -176,7 +176,7 @@ def train():
                            "eval_image_path": config.eval_image_path}
         eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=config.eval_interval,
                                eval_start_epoch=config.eval_start_epoch, save_best_ckpt=True,
-                               ckpt_directory=save_checkpoint_path, besk_ckpt_name="best_acc.ckpt",
+                               ckpt_directory=save_checkpoint_path, best_ckpt_name="best_acc.ckpt",
                                metrics_name="hmean")
         cb += [eval_cb]
     model = Model(net_with_grads)

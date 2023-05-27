@@ -30,7 +30,7 @@ class EvalCallBack(Callback):
         interval (int): run evaluation interval, default is 1.
         eval_start_epoch (int): evaluation start epoch, default is 1.
         save_best_ckpt (bool): Whether to save best checkpoint, default is True.
-        besk_ckpt_name (str): bast checkpoint name, default is `best.ckpt`.
+        best_ckpt_name (str): best checkpoint name, default is `best.ckpt`.
         metrics_name (str): evaluation metrics name, default is `acc`.
 
     Returns:
@@ -41,7 +41,7 @@ class EvalCallBack(Callback):
     """
 
     def __init__(self, eval_function, eval_param_dict, interval=1, eval_start_epoch=1, save_best_ckpt=True,
-                 ckpt_directory="./", besk_ckpt_name="best.ckpt", metrics_name="MeanError"):
+                 ckpt_directory="./", best_ckpt_name="best.ckpt", metrics_name="MeanError"):
         super(EvalCallBack, self).__init__()
         self.eval_param_dict = eval_param_dict
         self.eval_function = eval_function
@@ -54,7 +54,7 @@ class EvalCallBack(Callback):
         self.best_epoch = 0
         if not os.path.isdir(ckpt_directory):
             os.makedirs(ckpt_directory)
-        self.bast_ckpt_path = os.path.join(ckpt_directory, besk_ckpt_name)
+        self.best_ckpt_path = os.path.join(ckpt_directory, best_ckpt_name)
         self.metrics_name = metrics_name
 
     def remove_ckpoint_file(self, file_name):
@@ -82,10 +82,10 @@ class EvalCallBack(Callback):
                 self.best_epoch = cur_epoch
                 print("update best result: {}".format(res), flush=True)
                 if self.save_best_ckpt:
-                    if os.path.exists(self.bast_ckpt_path):
-                        self.remove_ckpoint_file(self.bast_ckpt_path)
-                    save_checkpoint(cb_params.train_network, self.bast_ckpt_path)
-                    print("update best checkpoint at: {}".format(self.bast_ckpt_path), flush=True)
+                    if os.path.exists(self.best_ckpt_path):
+                        self.remove_ckpoint_file(self.best_ckpt_path)
+                    save_checkpoint(cb_params.train_network, self.best_ckpt_path)
+                    print("update best checkpoint at: {}".format(self.best_ckpt_path), flush=True)
 
     def end(self, run_context):
         print("End training, the best {0} is: {1}, the best {0} epoch is {2}".format(self.metrics_name,

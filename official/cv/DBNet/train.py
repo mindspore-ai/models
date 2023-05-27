@@ -20,7 +20,7 @@ import mindspore as ms
 from mindspore import nn
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint
 import src.modules.loss as loss
-from src.modules.model import get_dbnet, WithLossCell
+from src.modules.model import get_dbnet, WithLossCell, TrainOneStepCell
 from src.utils.callback import DBNetMonitor, ResumeCallback
 from src.utils.learning_rate import warmup_polydecay
 from src.utils.env import init_env
@@ -50,6 +50,8 @@ def set_default():
     config.output_dir = os.path.join(config.output_dir, config.net, config.backbone.initializer)
     config.save_ckpt_dir = os.path.join(config.output_dir, 'ckpt')
     config.log_dir = os.path.join(config.output_dir, 'log')
+    os.makedirs(config.save_ckpt_dir, exist_ok=True)
+    os.makedirs(config.log_dir, exist_ok=True)
 
 
 @moxing_wrapper()
@@ -103,12 +105,13 @@ def train():
         net.to_float(ms.float32)
         net.backbone.to_float(ms.float16)
     net_with_loss = WithLossCell(net, criterion)
-    train_net = nn.TrainOneStepWithLossScaleCell(net_with_loss,
-                                                 optimizer=opt,
-                                                 scale_sense=nn.FixedLossScaleUpdateCell(1024.))
+    train_net = TrainOneStepCell(net_with_loss, optimizer=opt, scale_sense=nn.FixedLossScaleUpdateCell(1024.),
+                                 clip_grad=config.train.clip_grad, force_update=config.train.force_update)
 
     cb_default = list()
-    if config.rank_id == 0:
+    # Recovery must be activated when not run evaluation
+    enabel_recovery = config.enabel_recovery if config.run_eval else True
+    if config.rank_id == 0 and enabel_recovery:
         ckpt_append_info = [{'epoch_num': 0}]
         ckpt_config = CheckpointConfig(save_checkpoint_steps=steps_pre_epoch * 50,
                                        keep_checkpoint_max=config.train.max_checkpoints, append_info=ckpt_append_info)

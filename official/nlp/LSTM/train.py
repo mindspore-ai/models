@@ -122,7 +122,7 @@ def train_lstm():
         eval_param_dict = {"net": model, "dataset": eval_dataset}
         ckpoint_cb = EvalCallBack(apply_eval, eval_param_dict, interval=config.eval_interval,
                                   eval_start_epoch=config.eval_start_epoch, save_best_ckpt=True,
-                                  ckpt_directory=config.ckpt_path, besk_ckpt_name='lstm_best_acc.ckpt')
+                                  ckpt_directory=config.ckpt_path, best_ckpt_name='lstm_best_acc.ckpt')
     if rank == 0:
         cb.append(ckpoint_cb)
 
