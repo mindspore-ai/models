@@ -55,8 +55,8 @@ def set_default():
     config.ann_val_file = os.path.join(config.data_dir, 'annotations/instances_val2017.json')
 
     device_id = int(os.getenv('DEVICE_ID', '0'))
-    context.set_context(mode=context.GRAPH_MODE,
-                        device_target=config.device_target, save_graphs=False, device_id=device_id)
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False,
+                        device_id=device_id, ascend_config={"precision_mode": "allow_fp32_to_fp16"})
 
     if config.need_profiler:
         profiler = Profiler(output_path=config.outputs_dir, is_detail=True, is_show_op_path=True)
