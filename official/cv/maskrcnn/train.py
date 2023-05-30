@@ -94,7 +94,8 @@ def modelarts_pre_process():
     config.pre_trained = os.path.join(config.coco_root, config.pre_trained)
     config.save_checkpoint_path = config.output_path
 
-def create_mindrecord_dir(prefix, mindrecord_dir):
+
+def create_mindrecord_file(prefix, mindrecord_dir, mindrecord_file):
     if not os.path.isdir(mindrecord_dir):
         os.makedirs(mindrecord_dir)
     if config.dataset == "coco":
@@ -111,7 +112,7 @@ def create_mindrecord_dir(prefix, mindrecord_dir):
             print("Create Mindrecord Done, at {}".format(mindrecord_dir))
         else:
             raise Exception("IMAGE_DIR or ANNO_PATH not exits.")
-    while not os.path.exists(mindrecord_file+".db"):
+    while not os.path.exists(mindrecord_file + ".db"):
         time.sleep(5)
 
 def load_pretrained_ckpt(net, load_path, device_target):
@@ -178,7 +179,7 @@ def train_maskrcnn():
     mindrecord_dir = config.mindrecord_dir
     mindrecord_file = os.path.join(mindrecord_dir, prefix + "0")
     if rank == 0 and not os.path.exists(mindrecord_file):
-        create_mindrecord_dir(prefix, mindrecord_dir)
+        create_mindrecord_file(prefix, mindrecord_dir, mindrecord_file)
 
     if not config.only_create_dataset:
         # loss_scale = float(config.loss_scale)
