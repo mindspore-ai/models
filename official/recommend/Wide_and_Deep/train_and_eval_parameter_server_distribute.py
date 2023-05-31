@@ -22,7 +22,6 @@ from mindspore import Model, context
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor
 from mindspore.context import ParallelMode
 from mindspore.communication.management import get_rank, get_group_size, init
-from mindspore.nn.wrap.cell_wrapper import VirtualDatasetCellTriple
 from mindspore.common import set_seed
 
 from src.wide_and_deep import PredictWithSigmoid, TrainStepWrap, NetWithLossClass, WideDeepModel
@@ -41,13 +40,9 @@ def get_wide_deep_net(config):
     """
     wide_deep_net = WideDeepModel(config)
     loss_net = NetWithLossClass(wide_deep_net, config)
-    if cache_enable:
-        loss_net = VirtualDatasetCellTriple(loss_net)
     train_net = TrainStepWrap(loss_net, parameter_server=bool(config.parameter_server),
                               sparse=config.sparse, cache_enable=(config.vocab_cache_size > 0))
     eval_net = PredictWithSigmoid(wide_deep_net)
-    if cache_enable:
-        eval_net = VirtualDatasetCellTriple(eval_net)
     return train_net, eval_net
 
 
@@ -155,7 +150,7 @@ cache_enable = cfg.vocab_cache_size > 0
 def train_wide_and_deep():
     """ train_wide_and_deep """
     if cache_enable and cfg.device_target != "GPU":
-        context.set_context(variable_memory_max_size="24GB")
+        context.set_context(max_device_memory="24GB")
     context.set_ps_context(enable_ps=True)
     init()
     context.set_context(save_graphs_path='./graphs_of_device_id_'+str(get_rank()))
