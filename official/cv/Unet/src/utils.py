@@ -188,12 +188,16 @@ class dice_coeff(nn.Metric):
 
 class StepLossTimeMonitor(Callback):
 
-    def __init__(self, batch_size, per_print_times=1):
+    def __init__(self, batch_size, per_print_times=1, rank=0):
         super(StepLossTimeMonitor, self).__init__()
         if not isinstance(per_print_times, int) or per_print_times < 0:
             raise ValueError("print_step must be int and >= 0.")
         self._per_print_times = per_print_times
         self.batch_size = batch_size
+        self.rank = rank
+        self.step_time = 0
+        self.epoch_start = 0
+        self.losses = []
 
     def step_begin(self, run_context):
         self.step_time = time.time()
@@ -232,8 +236,9 @@ class StepLossTimeMonitor(Callback):
         epoch_cost = time.time() - self.epoch_start
         step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
         step_fps = self.batch_size * 1.0 * step_in_epoch / epoch_cost
-        print("epoch: {:3d}, avg loss:{:.4f}, total cost: {:.3f} s, per step fps:{:5.3f}".format(
-            cb_params.cur_epoch_num, np.mean(self.losses), epoch_cost, step_fps), flush=True)
+        if self.rank == 0:
+            print("epoch: {:3d}, avg loss:{:.4f}, total cost: {:.3f} s, per step fps:{:5.3f}".format(
+                cb_params.cur_epoch_num, np.mean(self.losses), epoch_cost, step_fps), flush=True)
 
 
 def mask_to_image(mask):
