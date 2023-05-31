@@ -113,7 +113,7 @@ def train_net(cross_valid_ind=1,
     model = Model(net, loss_fn=criterion, loss_scale_manager=loss_scale_manager, optimizer=optimizer,
                   amp_level=amp_level)
     print("============== Starting Training ==============")
-    callbacks = [StepLossTimeMonitor(batch_size=batch_size, per_print_times=per_print_times), ckpoint_cb]
+    callbacks = [StepLossTimeMonitor(batch_size=batch_size, per_print_times=per_print_times, rank=rank), ckpoint_cb]
     if config.run_eval and rank == 0:
         eval_model = Model(UnetEval(net, need_slice=need_slice, eval_activate=config.eval_activate.lower()),
                            loss_fn=TempLoss(), metrics={"dice_coeff": dice_coeff(False, config.show_eval)})
