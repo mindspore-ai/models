@@ -1,0 +1,95 @@
+backbone: "yolox_darknet53" #option for backbone
+# path for local
+device_target: "Ascend"
+# ======================================================
+# Train option
+save_graphs: False
+lr_scheduler: "yolox_warm_cos_lr"
+aug_epochs: 285
+no_aug_epochs: 15
+data_dir: ""
+need_profiler: 0
+pretrained: ''  # use abspath
+resume_yolox: ''
+use_summary: False
+use_ema: True
+dataset_sink_mode: True
+start_epoch: 0
+
+# data aug
+flip_prob: 0.5
+hsv_prob: 1.0
+# ========================================================\
+# dataset related
+per_batch_size: 8
+
+# network configuration
+depth_wise: True
+max_gt: 70
+num_classes: 6
+input_size: [1280, 1280] # [h, w]
+fpn_strides: [8, 16, 32]
+use_l1: False
+use_syc_bn: True
+updates: 0.0
+nf: 16
+gamma_range: [6., 10.5]
+
+# dynamic_k
+n_candidate_k: 10
+
+# optimizer and lr related
+lr: 0.01
+min_lr_ratio: 0.05
+warmup_epochs: 5
+weight_decay: 0.0005
+momentum: 0.9
+# logging related
+log_interval: 10
+ckpt_interval: 1
+is_save_on_master: 1
+ckpt_max_num: 10
+opt: "SGD"
+
+# distributed related
+is_distributed: 0
+rank: 0
+group_size: 1
+bind_cpu: True
+device_num: 8
+
+# modelart
+is_modelArts: 0
+enable_modelarts: False
+
+need_modelarts_dataset_unzip: False
+modelarts_dataset_unzip_name: "coco2017"
+
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+data_path: "/home/work/user-job-dir/inputs/data/"
+output_path: "./"
+load_path: "/cache/checkpoint_path"
+ckpt_dir: '../'
+
+# Eval option
+log_path: "val/outputs/"
+val_ckpt: "0-2755_64.ckpt"
+conf_thre: 0.001
+nms_thre: 0.65
+eval_interval: 10
+run_eval: True
+eval_parallel: True  # Whether run eval in parallel, only valid when run_eval is True and is_distributed is 1
+eval_parallel_dir: "../eval_parallel"
+# modelarts
+is_modelart: False
+result_path: ''
+
+# export option
+file_format: 'MINDIR'
+export_bs: 1
+
+# predict
+img_path: ''
+save_img_path: ''
