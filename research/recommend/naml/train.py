@@ -159,7 +159,9 @@ def run_train():
     start_time = time.time()
     print("======================= Start Train ==========================", flush=True)
     model.train(epochs, dataset, callbacks=cb, dataset_sink_mode=config.sink_mode, sink_size=config.print_times)
-    save_checkpoint(net_with_loss, os.path.join(config.save_checkpoint_path, "naml_last.ckpt"))
+    if config.rank == 0:
+        os.makedirs(config.save_checkpoint_path, exist_ok=True)
+        save_checkpoint(net_with_loss, os.path.join(config.save_checkpoint_path, "naml_last.ckpt"))
     end_time = time.time()
     print("==============================================================")
     print("processor_name: {}".format(config.platform))
