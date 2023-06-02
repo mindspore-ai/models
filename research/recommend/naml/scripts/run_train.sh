@@ -22,7 +22,7 @@ echo "It is better to use absolute path."
 echo "=============================================================================================================="
 
 PLATFORM=$1
-export RANK_ID=$2
+export RANK_ID=0
 export DEVICE_ID=$2
 DATASET=$3
 DATASET_PATH=$4
