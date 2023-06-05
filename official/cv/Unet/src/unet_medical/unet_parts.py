@@ -31,10 +31,10 @@ class DoubleConv(nn.Cell):
             mid_channels = out_channels
         self.double_conv = nn.SequentialCell(
             [nn.Conv2d(in_channels, mid_channels, kernel_size=3, has_bias=True,
-                       weight_init=init_value_0, pad_mode="valid"),
+                       weight_init=init_value_0, bias_init="zeros", pad_mode="valid"),
              nn.ReLU(),
              nn.Conv2d(mid_channels, out_channels, kernel_size=3, has_bias=True,
-                       weight_init=init_value_1, pad_mode="valid"),
+                       weight_init=init_value_1, bias_init="zeros", pad_mode="valid"),
              nn.ReLU()]
         )
 
@@ -67,7 +67,8 @@ class Up1(nn.Cell):
         self.center_crop = CentralCrop(central_fraction=self.factor)
         self.print_fn = F.Print()
         self.conv = DoubleConv(in_channels, out_channels, in_channels // 2)
-        self.up = nn.Conv2dTranspose(in_channels, in_channels // 2, kernel_size=2, stride=2)
+        self.up = nn.Conv2dTranspose(in_channels, in_channels // 2, kernel_size=2, stride=2,
+                                     weight_init="normal", bias_init="zeros")
         self.relu = nn.ReLU()
 
     def construct(self, x1, x2):
@@ -87,7 +88,8 @@ class Up2(nn.Cell):
         self.factor = 104.0 / 136.0
         self.center_crop = CentralCrop(central_fraction=self.factor)
         self.conv = DoubleConv(in_channels, out_channels, in_channels // 2)
-        self.up = nn.Conv2dTranspose(in_channels, in_channels // 2, kernel_size=2, stride=2)
+        self.up = nn.Conv2dTranspose(in_channels, in_channels // 2, kernel_size=2, stride=2,
+                                     weight_init="normal", bias_init="zeros")
         self.relu = nn.ReLU()
 
     def construct(self, x1, x2):
@@ -108,7 +110,8 @@ class Up3(nn.Cell):
         self.center_crop = CentralCrop(central_fraction=self.factor)
         self.print_fn = F.Print()
         self.conv = DoubleConv(in_channels, out_channels, in_channels // 2)
-        self.up = nn.Conv2dTranspose(in_channels, in_channels // 2, kernel_size=2, stride=2)
+        self.up = nn.Conv2dTranspose(in_channels, in_channels // 2, kernel_size=2, stride=2,
+                                     weight_init="normal", bias_init="zeros")
         self.relu = nn.ReLU()
 
     def construct(self, x1, x2):
@@ -128,7 +131,8 @@ class Up4(nn.Cell):
         self.factor = 392 / 568
         self.center_crop = CentralCrop(central_fraction=self.factor)
         self.conv = DoubleConv(in_channels, out_channels, in_channels // 2)
-        self.up = nn.Conv2dTranspose(in_channels, in_channels // 2, kernel_size=2, stride=2)
+        self.up = nn.Conv2dTranspose(in_channels, in_channels // 2, kernel_size=2, stride=2,
+                                     weight_init="normal", bias_init="zeros")
         self.relu = nn.ReLU()
 
     def construct(self, x1, x2):
@@ -143,7 +147,8 @@ class OutConv(nn.Cell):
     def __init__(self, in_channels, out_channels):
         super(OutConv, self).__init__()
         init_value = TruncatedNormal(0.06)
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=1, has_bias=True, weight_init=init_value)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=1, has_bias=True, weight_init=init_value,
+                              bias_init="zeros")
 
     def construct(self, x):
         x = self.conv(x)

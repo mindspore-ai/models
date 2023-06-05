@@ -60,10 +60,10 @@ class NestedUNet(nn.Cell):
         self.up_concat04 = UnetUp(filters[1], filters[0], self.use_deconv, 5)
 
         # Finale Convolution
-        self.final1 = nn.Conv2d(filters[0], n_class, 1)
-        self.final2 = nn.Conv2d(filters[0], n_class, 1)
-        self.final3 = nn.Conv2d(filters[0], n_class, 1)
-        self.final4 = nn.Conv2d(filters[0], n_class, 1)
+        self.final1 = nn.Conv2d(filters[0], n_class, 1, weight_init="normal", bias_init="zeros")
+        self.final2 = nn.Conv2d(filters[0], n_class, 1, weight_init="normal", bias_init="zeros")
+        self.final3 = nn.Conv2d(filters[0], n_class, 1, weight_init="normal", bias_init="zeros")
+        self.final4 = nn.Conv2d(filters[0], n_class, 1, weight_init="normal", bias_init="zeros")
         self.stack = P.Stack(axis=0)
 
     def construct(self, inputs):
@@ -128,7 +128,7 @@ class UNet(nn.Cell):
         self.up_concat4 = UnetUp(filters[4], filters[3], self.use_deconv, 2)
 
         # Finale Convolution
-        self.final = nn.Conv2d(filters[0], n_class, 1)
+        self.final = nn.Conv2d(filters[0], n_class, 1, weight_init="normal", bias_init="zeros")
 
     def construct(self, inputs):
         x0 = self.conv0(inputs)                   # channel = filters[0]
