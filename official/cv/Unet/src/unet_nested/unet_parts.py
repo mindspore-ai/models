@@ -22,7 +22,8 @@ import mindspore.ops.operations as P
 
 def conv_bn_relu(in_channel, out_channel, use_bn=True, kernel_size=3, stride=1, pad_mode="same", activation='relu'):
     output = []
-    output.append(nn.Conv2d(in_channel, out_channel, kernel_size, stride, pad_mode=pad_mode))
+    output.append(nn.Conv2d(in_channel, out_channel, kernel_size, stride, pad_mode=pad_mode,
+                            weight_init="normal", bias_init="zeros"))
     if use_bn:
         output.append(nn.BatchNorm2d(out_channel))
     if activation:
@@ -65,9 +66,10 @@ class UnetUp(nn.Cell):
         self.concat = P.Concat(axis=1)
         self.use_deconv = use_deconv
         if use_deconv:
-            self.up_conv = nn.Conv2dTranspose(in_channel, out_channel, kernel_size=2, stride=2, pad_mode="same")
+            self.up_conv = nn.Conv2dTranspose(in_channel, out_channel, kernel_size=2, stride=2, pad_mode="same",
+                                              weight_init="normal", bias_init="zeros")
         else:
-            self.up_conv = nn.Conv2d(in_channel, out_channel, 1)
+            self.up_conv = nn.Conv2d(in_channel, out_channel, 1, weight_init="normal", bias_init="zeros")
 
     def construct(self, high_feature, *low_feature):
         if self.use_deconv:

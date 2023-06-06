@@ -118,7 +118,7 @@ class SoftmaxCrossEntropyExpand(Cell):
 
 def make_conv_layer(kernel_size):
     return nn.Conv2d(in_channels=1, out_channels=96, kernel_size=kernel_size, padding=1,
-                     pad_mode="pad", has_bias=True)
+                     pad_mode="pad", has_bias=True, weight_init="normal", bias_init="zeros")
 
 
 class TextCNN(nn.Cell):
@@ -141,7 +141,7 @@ class TextCNN(nn.Cell):
 
         self.concat = ops.Concat(1)
 
-        self.fc = nn.Dense(96*3, self.num_classes)
+        self.fc = nn.Dense(96*3, self.num_classes, weight_init="normal", bias_init="zeros")
         self.drop = nn.Dropout(p=0.5)
         self.reducemax = ops.ReduceMax(keep_dims=False)
 
