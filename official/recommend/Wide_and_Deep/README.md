@@ -397,6 +397,8 @@ To train and evaluate the model in parameter server mode, command as follows:'''
 bash run_parameter_server_train.sh RANK_SIZE EPOCHS DATASET RANK_TABLE_FILE SERVER_NUM SCHED_HOST SCHED_PORT
 ```
 
+> Parameter Server training does not support `PyNative` mode.
+
 ## [Evaluation Process](#contents)
 
 To evaluate the model, command as follows:

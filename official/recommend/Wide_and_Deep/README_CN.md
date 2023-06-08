@@ -400,6 +400,8 @@ bash start_cluster.sh CLUSTER_CONFIG_PATH EPOCH_SIZE VOCAB_SIZE EMB_DIM
 bash run_parameter_server_train.sh RANK_SIZE EPOCHS DATASET RANK_TABLE_FILE SERVER_NUM SCHED_HOST SCHED_PORT
 ```
 
+> 参数服务器训练不支持`PyNative`模式。
+
 ## 评估过程
 
 运行如下命令评估模型：
