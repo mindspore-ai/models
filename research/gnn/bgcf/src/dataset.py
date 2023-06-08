@@ -48,6 +48,13 @@ class RandomBatchedSampler(ds.Sampler):
                 yield result
 
 
+def minus_filter(feature_array):
+    feature_array_mask = np.equal(feature_array, -1)
+    feature_process = np.ma.array(feature_array, mask=feature_array_mask)
+    feature_array = feature_process.filled(fill_value=0)
+    return feature_array
+
+
 class TrainGraphDataset():
     """Sample node neighbors on graphs for training"""
 
@@ -97,6 +104,7 @@ class TrainGraphDataset():
         i_neighs = train_graph.get_sampled_neighbors(
             node_list=i_group_nodes, neighbor_nums=[self.num_samples], neighbor_types=[0])
         i_neighs = i_neighs[:, 1:]
+
         i_gnew_neighs = sampled_graph.get_sampled_neighbors(
             node_list=i_group_nodes, neighbor_nums=[self.num_bgcn_neigh], neighbor_types=[0])
         i_gnew_neighs = i_gnew_neighs[:, 1:]
@@ -111,7 +119,20 @@ class TrainGraphDataset():
         neg_gnew_neighs = sampled_graph.get_sampled_neighbors(
             node_list=neg_group_nodes, neighbor_nums=[self.num_bgcn_neigh], neighbor_types=[0])
         neg_gnew_neighs = neg_gnew_neighs[:, 1:]
-
+        users = minus_filter(users)
+        items = minus_filter(items)
+        neg_item_id = minus_filter(neg_item_id)
+        pos_users = minus_filter(pos_users)
+        pos_items = minus_filter(pos_items)
+        u_group_nodes = minus_filter(u_group_nodes)
+        u_neighs = minus_filter(u_neighs)
+        u_gnew_neighs = minus_filter(u_gnew_neighs)
+        i_group_nodes = minus_filter(i_group_nodes)
+        i_neighs = minus_filter(i_neighs)
+        i_gnew_neighs = minus_filter(i_gnew_neighs)
+        neg_group_nodes = minus_filter(neg_group_nodes)
+        neg_neighs = minus_filter(neg_neighs)
+        neg_gnew_neighs = minus_filter(neg_gnew_neighs)
         return users, items, neg_item_id, pos_users, pos_items, u_group_nodes, u_neighs, u_gnew_neighs, \
                i_group_nodes, i_neighs, i_gnew_neighs, neg_group_nodes, neg_neighs, neg_gnew_neighs
 
@@ -142,6 +163,10 @@ class TestGraphDataset():
         u_gnew_neighs = sampled_graph.get_sampled_neighbors(
             node_list=users, neighbor_nums=[self.num_bgcn_neigh], neighbor_types=[1])
         u_gnew_neighs = u_gnew_neighs[:, 1:]
+
+        u_neighs = minus_filter(u_neighs)
+        u_gnew_neighs = minus_filter(u_gnew_neighs)
+
         return u_neighs, u_gnew_neighs
 
     def get_item_sampled_neighbor(self):
@@ -155,6 +180,10 @@ class TestGraphDataset():
         i_gnew_neighs = sampled_graph.get_sampled_neighbors(
             node_list=items, neighbor_nums=[self.num_bgcn_neigh], neighbor_types=[0])
         i_gnew_neighs = i_gnew_neighs[:, 1:]
+
+        i_neighs = minus_filter(i_neighs)
+        i_gnew_neighs = minus_filter(i_gnew_neighs)
+
         return i_neighs, i_gnew_neighs
 
 
