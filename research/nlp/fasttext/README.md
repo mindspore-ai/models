@@ -389,7 +389,9 @@ Some seeds have already been set in train.py to avoid the randomness of weight i
 
 ## [Others](#others)
 
-This model has been validated in the Ascend environment and is not validated on the CPU and GPU.
+This model has been validated in the `context.GRAPH_MODE` on Ascend environment and is not validated on the CPU and GPU.
+
+This model can not be run in `context.PYNATIVE_MODE`.
 
 ## [ModelZoo HomePage](#contents)
 
