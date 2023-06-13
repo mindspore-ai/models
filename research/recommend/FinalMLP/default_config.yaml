@@ -1,0 +1,126 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+data_path: "./dataset/Movielenslatest_x1/tfrecord_mind/"
+output_path: "./train"
+load_path: "./checkpoint_path"
+#device_target: 'Ascend'
+device_target: 'GPU'
+enable_profiling: False
+
+# ==============================================================================
+#"""data config"""
+train_num_of_parts: 21
+test_num_of_parts: 3
+batch_size: 4096
+data_format: 2
+data_vocab_size: 2006860
+data_field_size: 3
+dense_field_size: 0
+
+#"""model config"""
+data_emb_dim: 80
+#deep_layer_args: [[1024, 512, 256, 128], "relu"]
+init_args: [-0.01, 0.01]
+weight_bias_init: ['uniform', 'uniform']
+convert_dtype: True
+mlp1_hidden_units: [400]
+mlp1_hidden_activations: 'relu'
+mlp1_dropout: 0.4
+mlp1_batch_norm: True
+mlp2_hidden_units: [800]
+mlp2_hidden_activations: 'relu'
+mlp2_dropout: 0.2
+mlp2_batch_norm: True
+use_fs: True
+fs_hidden_units: [800]
+fs1_context: []
+fs2_context: []
+num_heads: 10
+earlystopping: {
+  monitor: ["loss", "auc"],
+  patience: 6,
+  mode: "min",
+}
+test: True
+
+
+# """train config"""
+weight_decay: 0.00001 # 1e-5
+# l2_coef: 0.001 # 8e-5
+learning_rate: 0.001 #
+epsilon: 0.00000001 # 1e-8
+loss_scale: 1.0
+train_epochs: 100
+save_checkpoint: True
+ckpt_file_name_prefix: "finalMLP"
+save_checkpoint_steps: 1
+keep_checkpoint_max: 50
+eval_callback: True
+loss_callback: True
+
+# train.py 'CTR Prediction'
+dataset_path: "./dataset/Movielenslatest_x1/tfrecord_mind"
+ckpt_path: "./train"
+eval_file_name: "./log/auc_finalMLP.log"
+loss_file_name: "./log/loss_finalMLP.log"
+do_eval: False #True
+
+# eval.py 'CTR Prediction'
+checkpoint_path: "./train/finalMLP_12-34_342.ckpt"
+
+# export.py "finalMLP export"
+device_id: 0
+ckpt_file: "./train/finalMLP_12-34_342.ckpt"
+file_name: "finalMLP"
+file_format: "MINDIR"
+
+# 'preprocess.'
+result_path: './preprocess_Result'
+
+# 'postprocess'
+# result_path: "./result_Files"
+label_path: ''
+
+# data_path: "./recommendation_dataset/"
+dense_dim: 13
+slot_dim: 26
+threshold: 100
+train_line_count: 45840617
+skip_id_convert: 0
+
+---
+# Config description for each option
+enable_modelarts: 'Whether training on modelarts, default: False'
+data_url: 'Dataset url for obs'
+train_url: 'Training output url for obs'
+data_path: 'Dataset path for local'
+output_path: 'Training output path for local'
+
+device_target: "device target, support Ascend, GPU and CPU."
+dataset_path: 'Dataset path'
+batch_size: "batch size"
+ckpt_path: 'Checkpoint path'
+eval_file_name: 'Auc log file path. Default: "./auc_finalMLP.log"'
+loss_file_name: 'Loss log file path. Default: "./loss_finalMLP.log"'
+do_eval: 'Do evaluation or not, only support "True" or "False". Default: "True"'
+checkpoint_path: 'Checkpoint file path'
+device_id: "Device id"
+ckpt_file: "Checkpoint file path."
+file_name: "output file name."
+file_format: "file format"
+result_path: 'Result path'
+label_path: 'label path'
+
+dense_dim: 'The number of your continues fields'
+slot_dim: 'The number of your sparse fields, it can also be called catelogy features.'
+threshold: 'Word frequency below this will be regarded as OOV. It aims to reduce the vocab size'
+train_line_count: 'The number of examples in your dataset'
+skip_id_convert: 'Skip the id convert, regarding the original id as the finalMLP id.'
+---
+device_target: ['Ascend', 'GPU', 'CPU']
+file_format: ["AIR", "ONNX", "MINDIR"]
+freeze_layer: ["", "none", "backbone"]
+skip_id_convert: [0, 1]
