@@ -59,7 +59,11 @@ models/official/audio/LPCNet/ascend310_infer/src/main.cc:main
 models/official/nlp/Bert/src/finetune_data_preprocess.py:process_msra
 models/official/nlp/Transformer/create_data.py:main
 models/official/nlp/GRU/src/create_data.py:main
-models/official/cv/FaceRecognition/src/init_network.py:init_net
+models/research/cv/FaceRecognition/src/init_network.py:init_net
+models/research/cv/PWCNet/src/sintel.py:__init__
+models/research/cv/C3D/train.py:train
+models/research/cv/SSIM-AE/src/network.py:__init__
+models/research/cv/FaceRecognition/eval.py:run_eval
 models/official/audio/LPCNet/ascend310_infer/src/main.cc:main
 models/research/nlp/ernie/run_ernie_classifier.py:run_classifier
 models/research/nlp/dgu/src/args.py:set_default_args
