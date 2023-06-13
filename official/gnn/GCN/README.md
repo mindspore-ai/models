@@ -52,6 +52,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+- Note: Using the MindSpore framework in the Ascend hardware environment does not support PYNATIVE mode execution.
 
 ## [Quick Start](#contents)
 
