@@ -358,7 +358,7 @@ bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/lenet_mnist_
 | 速度                 | 1.0毫秒/步                                             |
 | 总时长               | 32.1秒                                                  |
 | 微调检查点 | 482k (.ckpt文件)                                                  |
-| 脚本                 | [LeNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv2) |
+| 脚本                 | [LeNet脚本](https://gitee.com/mindspore/models/tree/r2.0/official/cv/MobileNet/mobilenetv2) |
 
 ### 推理性能
 

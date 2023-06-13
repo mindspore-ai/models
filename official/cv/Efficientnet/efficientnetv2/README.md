@@ -188,7 +188,7 @@ After installing MindSpore from the official website, you can perform the follow
 
   Follow the instructions in the following link:
 
-[HCCL Tool](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+[HCCL Tool](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 ## Export Process
 

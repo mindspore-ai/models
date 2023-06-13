@@ -101,7 +101,7 @@ StNet是兼顾局部时空联系以及全局时空联系的视频时空联合建
 # 快速入门
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估。对于分布式训练，需要提前创建JSON格式的hccl配置文件。请遵循以下链接中的说明：
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>
 
 - Ascend处理器环境运行
 
@@ -130,7 +130,7 @@ StNet是兼顾局部时空联系以及全局时空联系的视频时空联合建
 
 请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 - 在 ModelArts 上训练(如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
 

@@ -52,7 +52,7 @@ faster_rcnn_ssod：通过半监督+主动学习的方式，进行fasterrcnn检�
 
 ### 半监督
 
-本实验模型以[mindspore fasterrcnn](<https://gitee.com/mindspore/models/tree/master/research/cv/faster_rcnn_ssod>)模型为基础，在有限的标注数据上，充分利用大量无标注数据，进行伪标签的学习，提升模型能力。
+本实验模型以[mindspore fasterrcnn](<https://gitee.com/mindspore/models/tree/r2.0/research/cv/faster_rcnn_ssod>)模型为基础，在有限的标注数据上，充分利用大量无标注数据，进行伪标签的学习，提升模型能力。
 
 ## 数据集
 
@@ -400,7 +400,7 @@ bash run_distribute_train_model_ascend.sh $RANK_TABLE_FILE $DATA_ROOT $NEW_JSON 
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)中的说明。
 
 `select_valuable_sample.sh`执行脚本中的主要内容如下：
 

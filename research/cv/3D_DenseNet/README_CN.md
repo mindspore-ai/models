@@ -212,7 +212,7 @@ bash run_eval.sh 3D-DenseSeg-20000_36.ckpt data/data_val
 |-------------------|:-------------------:|:---------------------:|:-----:|:--------------:|
 |3D-SkipDenseSeg  | 93.66| 90.80 | 90.65 | 91.70 |
 
-Notes: 分布式训练需要一个RANK_TABLE_FILE，文件的删除方式可以参考该链接[Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html) ,device_ip的设置参考该链接 [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) 对于像InceptionV4这样的大模型来说, 最好导出一个外部环境变量，export HCCL_CONNECT_TIMEOUT=600，以将hccl连接检查时间从默认的120秒延长到600秒。否则，连接可能会超时，因为编译时间会随着模型大小的增加而增加。在1.3.0版本下，3D算子可能存在一些问题，您可能需要更改context.set_auto_parallel_context的部分代码:
+Notes: 分布式训练需要一个RANK_TABLE_FILE，文件的删除方式可以参考该链接[Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html) ,device_ip的设置参考该链接 [Link](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools) 对于像InceptionV4这样的大模型来说, 最好导出一个外部环境变量，export HCCL_CONNECT_TIMEOUT=600，以将hccl连接检查时间从默认的120秒延长到600秒。否则，连接可能会超时，因为编译时间会随着模型大小的增加而增加。在1.3.0版本下，3D算子可能存在一些问题，您可能需要更改context.set_auto_parallel_context的部分代码:
 
 in train.py：
 
@@ -432,7 +432,7 @@ python export.py
 
 ## 贡献指南
 
-如果你想参与贡献昇思的工作当中，请阅读 [昇思贡献指南](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md) 和 [how_to_contribute](https://gitee.com/mindspore/models/tree/master/how_to_contribute)
+如果你想参与贡献昇思的工作当中，请阅读 [昇思贡献指南](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md) 和 [how_to_contribute](https://gitee.com/mindspore/models/tree/r2.0/how_to_contribute)
 
 ## ModelZoo 主页
 

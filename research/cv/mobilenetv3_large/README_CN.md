@@ -183,7 +183,7 @@ bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [DEVICE_TYPE] 
 | 训练总时间 (8p)             | 40h                                    |
 | 评估总时间                  | 2min                                    |
 | 参数量 (M)                 | 43.4M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/mobilenetv3_large) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/mobilenetv3_large) |
 
 # 随机情况的描述
 

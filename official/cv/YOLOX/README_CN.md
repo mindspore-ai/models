@@ -427,7 +427,7 @@ YOLOX应用于118000张图像上（标注和数据格式必须与COCO 2017相同
 |速度| 1卡：25FPS；8卡：190FPS (shape=640)                                     |
 |总时长| 52小时                                                               |
 |微调检查点| 约1000M（.ckpt文件）                                                    |
-|脚本| <https://gitee.com/mindspore/models/tree/master/official/cv/YOLOX> |
+|脚本| <https://gitee.com/mindspore/models/tree/r2.0/official/cv/YOLOX> |
 
 |参数| YOLOX_x                                                            |
 | -------------------------- |--------------------------------------------------------------------|
@@ -443,7 +443,7 @@ YOLOX应用于118000张图像上（标注和数据格式必须与COCO 2017相同
 |速度| 1卡：12FPS；8卡：93FPS (shape=640)                                      |
 |总时长| 106小时                                                              |
 |微调检查点| 约1100M（.ckpt文件）                                                    |
-|脚本| <https://gitee.com/mindspore/models/tree/master/official/cv/YOLOX> |
+|脚本| <https://gitee.com/mindspore/models/tree/r2.0/official/cv/YOLOX> |
 
 ### 推理性能
 

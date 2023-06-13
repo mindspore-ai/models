@@ -304,7 +304,7 @@ bash scripts/run_standalone_train.sh [DEVICE_ID] [DATA_PATH] [CKPT_PATH]
 # example: bash scripts/run_standalone_train.sh 0 /home/DataSet/cifar10/ ./ckpt/
 ```
 
-> 1. RANK_TABLE_FILE可参考[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成。
+> 1. RANK_TABLE_FILE可参考[链接](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)生成。
 >
 > 2. 如不需要关于device_num和处理器总数的处理器核绑定操作，请删除scripts/run_distribute_train.sh中的taskset操作。
 
@@ -466,7 +466,7 @@ accuracy:78.742
 | 参数(M)                    | 103M                                                    |
 | 微调检查点                 | 313M                                                    |
 | 训练速度                   | 单卡：1200img/s;8卡：9500 img/s                         |
-| 脚本                       | [inceptionv3脚本](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv3) |
+| 脚本                       | [inceptionv3脚本](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Inception/inceptionv3) |
 
 ### 推理性能
 

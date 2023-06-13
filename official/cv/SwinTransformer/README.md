@@ -184,7 +184,7 @@ For details about configuration, see the `config.py`. After installing MindSpore
 
   For distributed training, you need to create an HCCL configuration file in JSON format in advance.
 
-  For details, please see [HCCL Tool](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+  For details, please see [HCCL Tool](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 - Running in the GPU Environment
 

@@ -531,7 +531,7 @@ result:{'accuracy': 0.9356, ckpt=~/mobilenetv2/train_parallel0/mobilenetv2-200_1
 | Total time                 | 753 min                                                    | 845 min                   |
 | Params (M)                 | 3.3 M                                                      | 3.3 M                     |
 | Checkpoint for Fine tuning | 27.3 M                                                     | 27.3 M                    |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv2)|
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/MobileNet/mobilenetv2)|
 
 ### Inference Performance
 

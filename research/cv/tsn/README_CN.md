@@ -178,7 +178,7 @@ Dataset used:
 
 - flow、warmup_flow、rgb三者之间是数据集不同(ucf101数据处理不同)
 
-  8P训练时需要将RANK_TABLE_FILE放在scripts文件夹中，RANK_TABLE_FILE[生成方法](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+  8P训练时需要将RANK_TABLE_FILE放在scripts文件夹中，RANK_TABLE_FILE[生成方法](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
   训练时，训练过程中的epch和step以及此时的loss和精确度会呈现在终端上：
 
@@ -406,7 +406,7 @@ cat acc.log
 | Loss                       | 0.183                                                    |0.1615
 | Speed                      | 8pc: 300.601 ms/step;                                    |8pc:250 ms/step|
 | Total time                 | 8pc: 4h;                                                 |8pc:2.5h|
-| Scripts                    | [TSN script](https://gitee.com/mindspore/models/tree/master/research/cv/tsn) |
+| Scripts                    | [TSN script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tsn) |
 
 ### Inference Performance
 

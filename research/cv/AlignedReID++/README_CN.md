@@ -384,7 +384,7 @@ market1501上训练AlignedReID++
 | 参数(M)       | 13.0                                                         |
 | ckpt模型      | 193M (.ckpt文件)                                             |
 | 推理模型      | 21.50M (.onnx文件),  21.60M(.air文件)                        |
-| 脚本          | [AlignedReID++脚本](https://gitee.com/mindspore/models/tree/master/research/cv/AlignedReID++) |
+| 脚本          | [AlignedReID++脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/AlignedReID++) |
 
 ### 推理性能
 

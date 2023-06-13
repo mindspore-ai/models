@@ -407,7 +407,7 @@ The inference result is saved in the current path. You can view the final accura
 | Total duration       | Single device: 65 hours; 8 devices: 8.5 hours                                   | 8 devices: 75 hours                                       |
 | Parameters (M)      | 85.2                                                         | 85.2                                         |
 | Finetuned checkpoint   | 1249 MB (.ckpt file)                                        | 1249 MB (.ckpt file)                           |
-| Script         | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/Arcface)| [Link](https://gitee.com/mindspore/models/tree/master/official/cv/Arcface)|
+| Script         | [Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Arcface)| [Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Arcface)|
 
 ### Evaluation Performance
 

@@ -192,7 +192,7 @@ dialogXL.mindir exported successfully!
 | 损失函数       | CrossEntropyLoss               |
 | 精度           | 59.28                          |
 | 速度 (per step)| 2109.034 ms                    |
-| 脚本 | [DialogXL脚本](https://gitee.com/mindspore/models/tree/master/research/nlp/dialogxl) |
+| 脚本 | [DialogXL脚本](https://gitee.com/mindspore/models/tree/r2.0/research/nlp/dialogxl) |
 
 # 随机情况说明
 

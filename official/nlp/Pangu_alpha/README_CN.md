@@ -557,7 +557,7 @@ python predict.py --enable_client --eval_task=$EVAL_TASK \
 
 ### Ascend 910上分布式运行Serving 13B或2.6B模型
 
-- 生成[rank table文件](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)。
+- 生成[rank table文件](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)。
 
   ```shell
   # 生成目录models/utils/hccl_tools/hccl_tools
@@ -638,7 +638,7 @@ python predict.py --enable_client --eval_task=$EVAL_TASK \
 
 ### Ascend 910上分布式运行8卡多机Serving
 
-- 生成[rank table文件](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)。
+- 生成[rank table文件](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)。
 - 在每台设备上，准备检查点文件和嵌入文件。我们也可以使用13B模型作为测试示例。
 - 在每台设备上，使用脚本/run_cluster_export.sh导出MindIR模型，并将所有设备*移动到
   'serving_increment/pangu_distributed/models/'目录下。

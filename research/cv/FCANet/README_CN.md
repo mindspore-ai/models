@@ -137,7 +137,7 @@ python generate_dataset_berkeley.py --src_berkeley_path [source berkeley path]
 ## 准备过程
 
 - 下载数据集 ,创建文件夹并放在对应目录位置,如`(./dataset/)`，该路径可在config中`"dataset_path"`项修改 。
-- 下载res2net101@imagenet预训练模型 [ [GoogleDrive](https://drive.google.com/file/d/1xmbYJOiYvYCp1i_gmif0R8F4Nbl0YupX/view?usp=sharing) | [BaiduYun](https://pan.baidu.com/s/1E9a6PkZ7w_qnOa3iU3ragQ) pwd: **1t4n** ] ,放在对应目录位置`(./src/model/res2net_pretrained.ckpt)`，该路径可在config中`"backbone_pretrained"`项修改 。预训练模型也可通过 [res2net 代码](https://gitee.com/mindspore/models/tree/master/research/cv/res2net)  训练得到。
+- 下载res2net101@imagenet预训练模型 [ [GoogleDrive](https://drive.google.com/file/d/1xmbYJOiYvYCp1i_gmif0R8F4Nbl0YupX/view?usp=sharing) | [BaiduYun](https://pan.baidu.com/s/1E9a6PkZ7w_qnOa3iU3ragQ) pwd: **1t4n** ] ,放在对应目录位置`(./src/model/res2net_pretrained.ckpt)`，该路径可在config中`"backbone_pretrained"`项修改 。预训练模型也可通过 [res2net 代码](https://gitee.com/mindspore/models/tree/r2.0/research/cv/res2net)  训练得到。
 
 ## 训练过程
 
@@ -215,7 +215,7 @@ Validation Robot: [Berkeley]
 | 评估总时间                  | 10 min                             |
 | 单step时间              | 0.8s/                   |
 | 卡数                  | 1                            |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/FCANet) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/FCANet) |
 
 # 随机情况的描述
 

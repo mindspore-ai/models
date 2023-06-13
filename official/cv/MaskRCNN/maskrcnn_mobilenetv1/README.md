@@ -127,7 +127,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 
     Note:
     1. To speed up data preprocessing, MindSpore provide a data format named MindRecord, hence the first step is to generate MindRecord files based on COCO2017 dataset before training. The process of converting raw COCO2017 dataset to MindRecord format may take about 4 hours.
-    2. For distributed training, a [hccl configuration file](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) with JSON format needs to be created in advance.
+    2. For distributed training, a [hccl configuration file](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools) with JSON format needs to be created in advance.
     3. For large models like maskrcnn_mobilenetv1, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 
 4. Execute eval script.
@@ -550,7 +550,7 @@ Usage: bash run_distribute_train_gpu.sh [DATA_PATH] [PRETRAINED_PATH] (optional)
     # example: bash run_distribute_train.sh ~/hccl_8p.json /home/DataSet/cocodataset/
     ```
 
-> hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+> hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 > As for PRETRAINED_MODEL, if not set, the model will be trained from the very beginning. Ready-made pretrained_models are not available now. Stay tuned.
 > This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 
@@ -715,7 +715,7 @@ Accumulating evaluation results...
 | Loss                       | 0.88387                                                     | 0.60763                                                     |
 | Speed                      | 8pcs: 249 ms/step                                           | 8pcs: 795.645 ms/step                                       |
 | Total time                 | 8pcs: 6.23 hours                                            | 8pcs: 19.6 hours                                            |
-| Scripts                    | [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/MaskRCNN/maskrcnn_mobilenetv1) |  [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/MaskRCNN/maskrcnn_mobilenetv1) |
+| Scripts                    | [maskrcnn script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/MaskRCNN/maskrcnn_mobilenetv1) |  [maskrcnn script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/MaskRCNN/maskrcnn_mobilenetv1) |
 
 ### Inference Performance
 

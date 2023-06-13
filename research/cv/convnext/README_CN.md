@@ -180,7 +180,7 @@
 
   请遵循以下链接中的说明：
 
-  [hccl工具](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+  [hccl工具](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 - GPU环境运行
 

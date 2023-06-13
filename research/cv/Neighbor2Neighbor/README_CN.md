@@ -108,7 +108,7 @@ bash ./scripts/run_eval_gpu.sh device_id
 e.g. bash ./scripts/run_eval_gpu.sh 0
 ```
 
-Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 ## 脚本说明
 
@@ -390,7 +390,7 @@ Validation for Neighbor2Neighbor
 | Accuracy                   | PSNR = 32.1240, SSIM = 0.8863                                | PSNR = 32.0975, SSIM = 0.8795                                |
 | Total time                 | 8p：3h50m (without validation)                               | 8p：5h54m (without validation)                               |
 | Checkpoint for Fine tuning | 8p: 18.60MB(.ckpt file)                                      | 8p: 14.90MB(.ckpt file)                                      |
-| Scripts                    | [Neighbor2Neighbor脚本](https://gitee.com/mindspore/models/tree/master/research/cv/Neighbor2Neighbor) | [Neighbor2Neighbor脚本](https://gitee.com/mindspore/models/tree/master/research/cv/Neighbor2Neighbor) |
+| Scripts                    | [Neighbor2Neighbor脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/Neighbor2Neighbor) | [Neighbor2Neighbor脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/Neighbor2Neighbor) |
 
 ## 随机情况说明
 

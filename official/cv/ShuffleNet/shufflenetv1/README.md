@@ -166,7 +166,7 @@ You can use Python or shell scripts for training.
 
   Follow the instructions in the following link:
 
-  [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+  [Link](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 ### Results
 
@@ -339,7 +339,7 @@ The following shows the inference results of the DenseNet-121 network using Imag
 | Total trainingduration (8-device)            | 7.0h                                    | 20.0h                                    |
 | Total evaluation duration                 | 99s                                    | 58s                                    |
 | Parameters (M)                | 44M                                   | 51.3M                                   |
-| Script                      | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/ShuffleNet/shufflenetv1)|
+| Script                      | [Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ShuffleNet/shufflenetv1)|
 
 # Random Seed Description
 

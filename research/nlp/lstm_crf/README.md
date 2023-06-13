@@ -115,7 +115,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 | Optimizer                  | AdamWeightDecay            |AdamWeightDecay             |
 | Loss Function              | CRF LOSS                   | CRF LOSS                   |
 | Checkpoint for inference   | 64.9M (.ckpt file)         | 64.9M (.ckpt file)         |
-| Scripts                    | [lstm script](https://gitee.com/mindspore/models/tree/master/research/nlp/lstm_crf) | [lstm script](https://gitee.com/mindspore/models/tree/master/research/nlp/lstm_crf) |
+| Scripts                    | [lstm script](https://gitee.com/mindspore/models/tree/r2.0/research/nlp/lstm_crf) | [lstm script](https://gitee.com/mindspore/models/tree/r2.0/research/nlp/lstm_crf) |
 
 ### Evaluation Performance
 

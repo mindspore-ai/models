@@ -236,7 +236,7 @@ Top5-Acc: 0.9169
 | 训练总时间 (8p)             | 20.8h                                    |  48h  |
 | 评估总时间                  | 1min                                    |  1min   |
 | 参数量 (M)                 | 61M                                   |     61M
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/mnasnet) | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/mnasnet) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/mnasnet) | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/mnasnet) |
 
 # 随机情况的描述
 

@@ -108,8 +108,8 @@ After installing MindSpore through the official website, you can follow the step
 Notice:
 
 1. It takes a long time to generate the MindRecord file for the first run.
-2. The pre-trained model is a ResNet-50 checkpoint trained on ImageNet2012. You can use the [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) script in ModelZoo to train.
-3. BACKBONE_MODEL is trained through the ResNet-50 [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) script in modelzoo.
+2. The pre-trained model is a ResNet-50 checkpoint trained on ImageNet2012. You can use the [resnet50](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet) script in ModelZoo to train.
+3. BACKBONE_MODEL is trained through the ResNet-50 [resnet50](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet) script in modelzoo.
 4. PRETRAINED_MODEL is the converted weight file. VALIDATION_JSON_FILE is a label file. CHECKPOINT_PATH is the checkpoint file after training.
 
 > For GPU training please use [GPU pretrained ResNet-50 model](https://download.mindspore.cn/model_zoo/r1.3/resnet50_gpu_v130_imagenet_official_cv_bs32_acc0/) (resnet50_gpu_v130_imagenet_official_cv_bs32_acc0)
@@ -300,7 +300,7 @@ bash run_distribute_train_gpu.sh [DEVICE_NUM] [PRETRAINED_MODEL] [COCO_ROOT] [MI
 
 Notes:
 
-1. The rank_table.json specified by RANK_TABLE_FILE is required to run distributed tasks. You can use [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) to generate this file.
+1. The rank_table.json specified by RANK_TABLE_FILE is required to run distributed tasks. You can use [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools) to generate this file.
 2. PRETRAINED_MODEL should be a trained ResNet-50 checkpoint. If you need to load the checkpoints of the trained FasterRcnn, you need to modify train.py as follows:
 
 ```python

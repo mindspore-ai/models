@@ -104,7 +104,7 @@ TSM应用了一种通用而有效的时间转移模块。  时间转移模块将
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 - GPU处理器环境运行
 

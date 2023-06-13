@@ -244,7 +244,7 @@ The model checkpoint will be saved into `[ckpt_path_to_save]`.
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>.
 
 Run `scripts/train_distributed.sh` to train the model distributed. The usage of the script is:
 

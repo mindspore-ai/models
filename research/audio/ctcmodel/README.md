@@ -337,7 +337,7 @@ path, the model saving path, and the distributed configuration file path.
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
-Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 - ModelArts training
 
@@ -506,7 +506,7 @@ READ:{'read': 0.3038}
 | Speed               | 6299.475 ms/step                                                               | 530 ms/step                                                                    | 1060 ms/step                                                                   |
 | Total time          | about 7h                                                                       | 190 mins                                                                       | 35 mins                                                                        |
 | Checkpoint          | 7.2M (.ckpt file)                                                              | 7.2M (.ckpt file)                                                              | 7.2M (.ckpt file)                                                              |
-| Script              | [Link](https://gitee.com/mindspore/models/tree/master/research/audio/ctcmodel) | [Link](https://gitee.com/mindspore/models/tree/master/research/audio/ctcmodel) | [Link](https://gitee.com/mindspore/models/tree/master/research/audio/ctcmodel) |
+| Script              | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/audio/ctcmodel) | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/audio/ctcmodel) | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/audio/ctcmodel) |
 
 **LER** - edit distance between predicted label sequence and true label sequence, the smaller the better.
 

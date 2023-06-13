@@ -96,7 +96,7 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 # 脚本说明
 

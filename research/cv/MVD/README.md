@@ -255,7 +255,7 @@ After running `bash run_eval_XXX.sh [DATASET_PATH] [CHECKPOINT_PATH]`, you will 
 | Total time                 | SYSU(1pcs, PyNative Mode) : about  13h; RegDB: about 3h30min | SYSU(1pcs, PyNative Mode) : about  14h; RegDB: about 4hmin |
 | Parameters (M)             | 161.9M                                     | 161.9M                        |
 | Checkpoint for Fine tuning | 329.2M (.ckpt file)                                     | 329.2M (.ckpt file)                     |
-| Scripts                    | [link](https://gitee.com/mindspore/models/tree/master/research/cv/MVD) ||
+| Scripts                    | [link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/MVD) ||
 
 ## Evaluation Performance
 

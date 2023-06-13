@@ -474,7 +474,7 @@ bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TAR
 | 损失                       | 0.12                       | 0.12                                                           | 0.12                       |
 | 参数（M）                  | 6.45                       | 6.45                                                           | 6.45                       |
 | 推理检查点                 | 292.9M（.ckpt文件）        | 292.9M（.ckpt文件）                                            | 292.9M（.ckpt文件）        |
-| 脚本 | [LSTM脚本](https://gitee.com/mindspore/models/tree/master/official/nlp/LSTM) | [LSTM脚本](https://gitee.com/mindspore/models/tree/master/official/nlp/LSTM) | [LSTM脚本](https://gitee.com/mindspore/models/tree/master/official/nlp/LSTM) |
+| 脚本 | [LSTM脚本](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/LSTM) | [LSTM脚本](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/LSTM) | [LSTM脚本](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/LSTM) |
 
 ### 评估性能
 

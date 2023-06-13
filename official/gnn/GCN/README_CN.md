@@ -295,7 +295,7 @@ Test set results: accuracy= 0.81300
 | 损失函数              | Softmax交叉熵                                          | Softmax交叉熵 |
 | 准确率                   | 81.5/70.3                                                      | 86.8/76.7 |
 | 参数(B)             | 92160/59344                                                    | 92160/59344 |
-| 脚本                    | [GCN](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) | [GCN](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) |
+| 脚本                    | [GCN](https://gitee.com/mindspore/models/tree/r2.0/official/gnn/GCN) | [GCN](https://gitee.com/mindspore/models/tree/r2.0/official/gnn/GCN) |
 
 ## 随机情况说明
 

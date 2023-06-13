@@ -220,7 +220,7 @@ We need five or seven parameters for this scripts.
 - `EPOCH_NUM`: epoch num for distributed train.
 - `LR`: learning rate init value for distributed train.
 - `DATASET`：the dataset mode for distributed train.
-- `RANK_TABLE_FILE :` the path of [rank_table.json](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools), it is better to use absolute path.
+- `RANK_TABLE_FILE :` the path of [rank_table.json](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools), it is better to use absolute path.
 - `PRE_TRAINED :` the path of pretrained checkpoint file, it is better to use absolute path.
 - `PRE_TRAINED_EPOCH_SIZE :` the epoch num of pretrained.
 

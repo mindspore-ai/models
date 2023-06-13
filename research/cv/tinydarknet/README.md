@@ -92,7 +92,7 @@ After installing MindSpore via the official website, you can start training and 
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+  <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 - running on GPU with gpu default parameters
 
@@ -508,7 +508,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Loss Function                   | Softmax Cross Entropy                                       | Softmax Cross Entropy                               |                   Softmax Cross Entropy                  |
 | Speed                       | 8pc: 104 ms/step                                            | 8pc: 255 ms/step                                          |                          1p：11081 ms/step                     |
 | Parameters(M)                    | 4.0;                                                        | 4.0;                               |                             4.0;                       |
-| Scripts                       | [Tiny-Darknet scripts](https://gitee.com/mindspore/models/tree/master/research/cv/tinydarknet)
+| Scripts                       | [Tiny-Darknet scripts](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tinydarknet)
 
 ### [Evaluation Performance](#contents)
 

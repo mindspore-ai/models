@@ -88,7 +88,7 @@ bash run_eval.sh [DEVICE_ID] [DATA_DIR] [PATH_CHECKPOINT]
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 Please follow the instructions in the link below:
-<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+<https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>
 
 ```bash
 # Train ImageNet 8p on ModelArts
@@ -206,7 +206,7 @@ bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_DIR] (option)[PATH_CHECKPOI
 bash run_standalone_train.sh [DEVICE_ID] [DATA_DIR] (option)[PATH_CHECKPOINT]
 ```
 
-> Notes: RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html), and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV3, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
+> Notes: RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html), and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools). For large models like InceptionV3, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 >
 > This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 
@@ -308,7 +308,7 @@ Total data: 50000, top1 accuracy: 0.78458, top5 accuracy: 0.94254
 | Total time (8p)            | 8ps: 14h                                       |
 | Checkpoint for Fine tuning | 217M (.ckpt file)                              |
 | Speed                      | 8pc: 3977 imgs/sec                             |
-| Scripts                    | [cspdarknet53 script](https://gitee.com/mindspore/models/tree/master/official/cv/ResNeXt) |
+| Scripts                    | [cspdarknet53 script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNeXt) |
 
 ### Inference Performance
 

@@ -29,7 +29,7 @@
 TextCNN是一种使用卷积神经网络对文本进行分类的算法，广泛应用于文本分类的各种任务。文本神经网络的各个模块可以独立完成文本分类任务，便于分布式配置和并行执行，非常适合对短文本进行语义分析，比如微博/新闻/电子商务评论/视频弹幕评论等。
 
 - 参考论文：[Kim Y. Convolutional neural networks for sentence classification[J]. arXiv preprint arXiv:1408.5882, 2014.](https://arxiv.org/abs/1408.5582)
-- 参考实现：[https://gitee.com/mindspore/models/tree/master/research/nlp/textcnn](https://gitee.com/mindspore/models/tree/master/research/nlp/textcnn)
+- 参考实现：[https://gitee.com/mindspore/models/tree/r2.0/research/nlp/textcnn](https://gitee.com/mindspore/models/tree/r2.0/research/nlp/textcnn)
 
 通过Git获取对应commit_id的代码方法如下：
 

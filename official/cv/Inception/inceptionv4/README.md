@@ -279,7 +279,7 @@ You can start training using python or shell scripts. The usage of shell scripts
     ```
 
 > Notes:
-> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
+> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 >
 > This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 
@@ -456,7 +456,7 @@ accuracy:80.044
 | Total time (8p)            | 20h                                           | 95h                              |
 | Params (M)                 | 153M                                          | 153M                             |
 | Checkpoint for Fine tuning | 2135M                                         | 489M                             |
-| Scripts                    | [inceptionv4 script](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv4) | [inceptionv4 script](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv4) |
+| Scripts                    | [inceptionv4 script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Inception/inceptionv4) | [inceptionv4 script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Inception/inceptionv4) |
 
 #### Inference Performance
 

@@ -219,7 +219,7 @@ python export.py --checkpoint_path [CHECKPOINT_PATH] --file_name [FILE_NAME] --f
 | Loss function            | CrossEntropySmooth        | CrossEntropySmooth                                   |
 | Training duration (8p)   | 28.7h                     | 55.8h                                                |
 | Parameter quantity (M)   | 296M                      | 296M                                                 |
-| Script                   | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/HRNetW48_cls) | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/HRNetW48_cls) |
+| Script                   | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/HRNetW48_cls) | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/HRNetW48_cls) |
 
 ## Inference Performance
 

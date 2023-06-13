@@ -220,9 +220,9 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 1pc(Ascend): 3463 ms/step(ddbpn), 800.41ms/step(dbpngan); 8pcs: 1781ms/step(ddbpn)  818.22ms/step(dbpngan) |
 | Total time                 | 8pcs: 12h43m50s(ddbpn), 13h50m28s(dbpngan)                                                    |
 | Checkpoint of DBPN models  | 58.8M (.ckpt file)                                           |
-| Scripts                    | [DBPN script](https://gitee.com/mindspore/models/tree/master/research/cv/DBPN) |
+| Scripts                    | [DBPN script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/DBPN) |
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/models/tree/master/)
+Please check the official [homepage](https://gitee.com/mindspore/models/tree/r2.0/)
 .

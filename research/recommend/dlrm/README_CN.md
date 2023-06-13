@@ -104,7 +104,7 @@ DLRM 可以分为底部和顶部两部分。底部包含一个用于处理数值
 
   具体操作，参见：
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>.
 
 ## 脚本说明
 

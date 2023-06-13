@@ -649,7 +649,7 @@ The inference result is saved in the current path. You can view the final accura
 | Loss| 0.0041095633 |0.003395824|
 | Performance| 187736.386 ms (single device, s16)<br>  44474.187 ms (8 devices, s16)|  1080 ms/step (single device, s16)|  
 | Finetuned checkpoint| 453 MB (.ckpt)| 454 MB (.ckpt)|
-| Script| [Link](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P)|[Link](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P)|
+| Script| [Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/DeepLabV3P)|[Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/DeepLabV3P)|
 
 #### Running ONNX evaluation
 

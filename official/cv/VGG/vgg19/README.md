@@ -118,7 +118,7 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --data_dir=[DATA_PATH]  --pre_tr
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 Please follow the instructions in the link below:
-<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+<https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>
 
 - Running on GPU
 

@@ -301,7 +301,7 @@ are saved in the `result_Files/` directory, and the time statistics results of i
 | Speed ​​            | 8p: 9h 26m 54ы; 1p: 76h 23m 39s; 1.1s/step                                     | 8: 10h 28m 37s; 1: 83h 45m 34s                                                 |
 | Convergence loss    | G:[-232.61 to 273.87] loss D:[-27.736 to 2.601]                                | G:[-232.61 to 273.87] D:[-27.736 to 2.601]                                     |
 | MS-SSIM metric      |                                                                                | 0.2948                                                                         |
-| Script              | [PGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/PGAN) | [PGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/PGAN) |
+| Script              | [PGAN script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/PGAN) | [PGAN script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/PGAN) |
 
 > Note: For measuring the metrics and generating the images we are using the checkpoint with prefix AvG (AvG_xxxx.ckpt)
 

@@ -198,7 +198,7 @@ Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
-Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 Training result will be stored in the example path, whose folder name begins with "train" or "train_parallel". Under this, you can find checkpoint file together with result like the following in log.
 
@@ -287,7 +287,7 @@ result: {'acc': 59.5400 %} ckpt=~/snn/train/output/checkpoint/lenet-5_250.ckpt
 | Total time                 | 7 mins                                                       |
 | Checkpoint for Fine tuning | 1.3M (.ckpt file)                                            |
 | Accuracy                   | 59.54%                                                       |
-| config                     | [Link](https://gitee.com/mindspore/models/tree/master/community/cv/snn/config)|
+| config                     | [Link](https://gitee.com/mindspore/models/tree/r2.0/community/cv/snn/config)|
 
 # [Description of Random Situation](#contents)
 

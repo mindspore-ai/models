@@ -53,7 +53,7 @@ Validation and eval evaluationdataset used: [Set5](http://people.rennes.inria.fr
 
 The process of training ESRGAN needs a pretrained VGG19 based on Imagenet.
 
-[Training scripts](<https://gitee.com/mindspore/models/tree/master/official/cv/VGG/vgg16>)|
+[Training scripts](<https://gitee.com/mindspore/models/tree/r2.0/official/cv/VGG/vgg16>)|
 [VGG19 pretrained model](<https://download.mindspore.cn/model_zoo/>)
 
 # [Environment Requirements](#contents)
@@ -263,7 +263,7 @@ avg PSNR: 28.85
 | Speed                      | 1pc(Ascend): 212,216 ms/step; 8pcs: 77,118 ms/step                                 | 8pcs:239ms/step + 409ms/step          |
 | Total time                 | 8pcs: 36h                                                                          |                                       |
 | Checkpoint for Fine tuning | 64.86M (.ckpt file)                                                                | 64.86M (.ckpt file)                   |
-| Scripts                    | [esrgan script](https://gitee.com/mindspore/models/tree/master/research/cv/ESRGAN) |
+| Scripts                    | [esrgan script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/ESRGAN) |
 
 ### Evaluation Performance
 

@@ -267,7 +267,7 @@ train.py和config.py中的主要涉及如下参数：
     ```
 
 > 注：
-> 有关RANK_TABLE_FILE，可参考[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html)。设备IP可参考[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)。对于像InceptionV4这样的大型模型，最好设置外部环境变量`export HCCL_CONNECT_TIMEOUT=600`，将hccl连接检查时间从默认的120秒延长到600秒。否则，可能会连接超时，因为编译时间会随着模型增大而增加。
+> 有关RANK_TABLE_FILE，可参考[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html)。设备IP可参考[链接](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)。对于像InceptionV4这样的大型模型，最好设置外部环境变量`export HCCL_CONNECT_TIMEOUT=600`，将hccl连接检查时间从默认的120秒延长到600秒。否则，可能会连接超时，因为编译时间会随着模型增大而增加。
 >
 > 绑核操作取决于`device_num`参数值及处理器总数。如果不需要，删除`scripts/run_distribute_train.sh`脚本中的`taskset`操作任务集即可。
 
@@ -445,7 +445,7 @@ accuracy:80.044
 | 总时长（8卡）           | 20h                                          | 95h                             |
 | 参数量（M）                | 153M                                         | 153M                            |
 | 微调检查点| 2135M                                        | 489M                            |
-| 脚本                   | [Inceptionv4脚本](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv4) | [Inceptionv4脚本](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv4)|
+| 脚本                   | [Inceptionv4脚本](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Inception/inceptionv4) | [Inceptionv4脚本](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Inception/inceptionv4)|
 
 #### 推理性能
 

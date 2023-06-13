@@ -525,7 +525,7 @@ bash scripts/run_infer_310.sh art_track.mindir y 0
 | 速度          | 1292.854毫秒/步(8卡)                                                        |    189.02毫秒/步(8卡)             |
 | 总时长        | 3.2小时                                                                     |      0.5小时          |
 | 微调检查点    | 496M (.ckpt文件)                                                            |496M (.ckpt文件)          |
-| 脚本          | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/ArtTrack) |[链接](https://gitee.com/mindspore/models/tree/master/research/cv/ArtTrack) |
+| 脚本          | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/ArtTrack) |[链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/ArtTrack) |
 
 # ModelZoo主页
 

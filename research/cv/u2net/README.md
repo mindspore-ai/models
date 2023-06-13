@@ -178,7 +178,7 @@ bash scripts/run_distribute_gpu.sh [/path/to/content] [/path/to/label]
 - Notes
 
 1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it
-   by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+   by using the [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 ## [Model Export](#contents)
 
 ```bash

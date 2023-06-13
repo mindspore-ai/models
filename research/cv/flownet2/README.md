@@ -402,7 +402,7 @@ epoch time: 860035.718 ms, per step time: 2402.334 ms
 | Total time                 | 8pcs: 8.8 hours                                                                                   |
 | Parameters                 | 162,518,834                                                                                       |
 | Checkpoint for Fine tuning | 260M (.ckpt file)                                                                                 |
-| Scripts                    | [flownet2 script](https://gitee.com/mindspore/models/tree/master/research/cv/flownet2) |
+| Scripts                    | [flownet2 script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/flownet2) |
 
 ### Inference Performance
 

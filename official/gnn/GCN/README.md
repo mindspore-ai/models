@@ -288,7 +288,7 @@ Test set results: accuracy= 0.81300
 | Loss Function       | Softmax Cross Entropy                                        | Softmax Cross Entropy                                                |
 | Accuracy            | 81.5/70.3                                                    | 86.8/76.7                                                    |
 | Parameters (B)      | 92160/59344                                                  | 92160/59344                                                  |
-| Scripts             | [GCN Script](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) | [GCN Script](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) |
+| Scripts             | [GCN Script](https://gitee.com/mindspore/models/tree/r2.0/official/gnn/GCN) | [GCN Script](https://gitee.com/mindspore/models/tree/r2.0/official/gnn/GCN) |
 
 ## [Description of Random Situation](#contents)
 

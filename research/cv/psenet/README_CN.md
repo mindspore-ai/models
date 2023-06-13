@@ -232,7 +232,7 @@ bash scripts/run_eval_ascend.sh
 
   分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-  请遵循链接中的说明：[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+  请遵循链接中的说明：[链接](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 ```shell
 # 第一个参数为rank_table文件，第二个参数为生成的预训练模型，第三个参数为下载的训练数据集
@@ -376,7 +376,7 @@ python ./script.py -s=submit.zip -g=gt.zip
 | 总时间 | 1卡：75.48小时；8卡：7.11小时|
 | 参数(M) | 27.36 |
 | 微调检查点 | 109.44M （.ckpt file） |
-| 脚本 | <https://gitee.com/mindspore/models/tree/master/research/cv/psenet> |
+| 脚本 | <https://gitee.com/mindspore/models/tree/r2.0/research/cv/psenet> |
 
 ### 推理性能
 

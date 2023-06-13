@@ -210,7 +210,7 @@ bash ./scripts/run_eval.sh [DEVICE_ID]
 | 优化器                | Adam                                                        |
 | 损失函数              | 自定义损失函数                                                |
 | 检查点                | 8914KB, .ckpt文件                                            |
-| 脚本 | [gan脚本](https://gitee.com/mindspore/models/tree/master/research/cv/gan)     |
+| 脚本 | [gan脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/gan)     |
 
 # ModelZoo主页  
 

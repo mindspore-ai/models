@@ -291,7 +291,7 @@ bash run_310_infer.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [DEVICE_ID]
 | 总时间 | 1卡：44秒 | 1卡：44秒 |
 | 参数(M) | 1.30 | 1.30 |
 | 微调检查点 | 15M （.ckpt file） | 15M （.ckpt file） |
-| 脚本 | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/gnn/sdne) | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/gnn/sdne) |
+| 脚本 | [脚本路径](https://gitee.com/mindspore/models/tree/r2.0/research/gnn/sdne) | [脚本路径](https://gitee.com/mindspore/models/tree/r2.0/research/gnn/sdne) |
 
 | 参数          | SDNE                                         |
 | ------------- | ----------------------------------------------- |
@@ -309,7 +309,7 @@ bash run_310_infer.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [DEVICE_ID]
 | 总时间 | 1卡：28秒 |
 | 参数(M) | 1.05 |
 | 微调检查点 | 13M （.ckpt file） |
-| 脚本 | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/gnn/sdne) |
+| 脚本 | [脚本路径](https://gitee.com/mindspore/models/tree/r2.0/research/gnn/sdne) |
 
 ### 评估性能
 

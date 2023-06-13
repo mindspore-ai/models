@@ -184,7 +184,7 @@ RepVGG是由清华大学&旷世科技等提出的一种新颖的CNN设计范式�
 
   请遵循以下链接中的说明：
 
-  [hccl工具](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+  [hccl工具](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 ## 导出过程
 

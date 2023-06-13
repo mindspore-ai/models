@@ -112,7 +112,7 @@ After installing MindSpore via the official website, you can start training and 
 
   For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
-  Please follow the instructions in the link below: https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.
+  Please follow the instructions in the link below: https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.
 
 - running on CPU
 
@@ -546,7 +546,7 @@ If you need to use the trained model to perform inference on multiple hardware p
 
 # [Contribution to guide](#contents)
 
-If you want to be a part of this effort,Please read[Ascend Contribution to guide](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/master/how_to_contribute)
+If you want to be a part of this effort,Please read[Ascend Contribution to guide](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/r2.0/how_to_contribute)
 
 # [ModelZoo Homepage](#contents)  
 

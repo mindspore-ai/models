@@ -348,7 +348,7 @@ mean IoU 0.6388868594659682
 | 最终损失 | 0.036                                                        |
 | 速度     | 1pc: 455.460 ms/step;                                        |
 | mean IoU | 0.6388868594659682                                           |
-| 脚本     | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/FCN8s) |
+| 脚本     | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/FCN8s) |
 
 # 随机情况的描述
 

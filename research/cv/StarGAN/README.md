@@ -159,7 +159,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 | Total time                 | 1pc: 10h;                                                 |
 | Parameters (M)             | 8.423  M                                                   |
 | Checkpoint for Fine tuning | 32.15M (.ckpt file)                                            |
-| Scripts                    | [StarGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/StarGAN) |
+| Scripts                    | [StarGAN script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/StarGAN) |
 
 ### Inference Performance
 

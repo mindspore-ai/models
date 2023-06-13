@@ -299,7 +299,7 @@ The evaluation results can be viewed in the window：
 | Total time                 | 4pcs: 6.4 hours                                               |
 | Parameters (M)             | 27.29M                                                        |
 | Checkpoint for Fine tuning | 336.3M (.ckpt file)                                           |
-| Scripts                    | [retinaface script](https://gitee.com/mindspore/models/tree/master/official/cv/RetinaFace_ResNet50) |
+| Scripts                    | [retinaface script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/RetinaFace_ResNet50) |
 
 ### Inference Performance
 

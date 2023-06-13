@@ -270,7 +270,7 @@ bash run_infer_cpp.sh [MINDIR_PATH] [CONFIG_PATH] [NEED_PREPROCESS] [NIMAGES] [D
 | 参数(M)             | 6.57                                                        |
 | 微调检查点 | 13.98M (.ckpt文件)                                         |
 | 推理模型        | 14.00M (.mindir文件)                     |
-| 脚本                    | [WGAN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/WGAN) |
+| 脚本                    | [WGAN脚本](https://gitee.com/mindspore/models/tree/r2.0/official/cv/WGAN) |
 
 生成图片效果如下：
 
@@ -293,7 +293,7 @@ bash run_infer_cpp.sh [MINDIR_PATH] [CONFIG_PATH] [NEED_PREPROCESS] [NIMAGES] [D
 | 参数(M)             | 6.45                                                        |
 | 微调检查点 | 13.98M (.ckpt文件)                                         |
 | 推理模型        | 14.00M (.mindir文件)                     |
-| 脚本                    | [WGAN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/WGAN) |
+| 脚本                    | [WGAN脚本](https://gitee.com/mindspore/models/tree/r2.0/official/cv/WGAN) |
 
 生成图片效果如下：
 

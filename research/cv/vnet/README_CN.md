@@ -100,7 +100,7 @@ VNet适用于医学图像分割，使用3D卷积，能够处理3D MR图像数据
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 - 生成config json文件用于多卡训练。
-    - [简易教程](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+    - [简易教程](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
     - 详细配置方法请参照[官网教程](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html#配置分布式环境变量)。
 
 # 快速入门
@@ -179,7 +179,7 @@ cd vnet/scripts
 bash train_distribute.sh hccl.json DEVICE_NUM DATA_PATH TRAIN_SPLIT_FILE_PATH
 ```
 
-hccl.json用[此方法](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成并放在script文件夹下
+hccl.json用[此方法](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)生成并放在script文件夹下
 
 评估步骤如下：
 
@@ -491,7 +491,7 @@ bash run_infer_310.sh MINDIR_PATH DATA_PATH SPLIT_FILE_PATH DEVICE_ID
 | 损失 | 0.036 | 0.036 |
 | 性能 | 1080ms/step（单卡）;1017ms/step（八卡） | 1870ms/step（单卡）;2170ms/step（八卡） |
 | 总时长 | 1.5h（单卡）;15m（八卡） | 2.6h（单卡）;22m（八卡） |
-| 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/vnet) | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/vnet) |
+| 脚本 | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/vnet) | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/vnet) |
 
 # ModelZoo主页
 

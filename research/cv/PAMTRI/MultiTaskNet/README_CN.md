@@ -138,7 +138,7 @@ pip install -r requirements.txt
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 - GPU处理器环境运行
 
@@ -478,7 +478,7 @@ python export.py --root /path/dataset --ckpt_path /path/ckpt --segmentaware --he
 | 总时长                 | 8卡：2小时50分钟(segment)  2小时50分钟(heatmap)                       | 单卡：1小时58分钟(segment) 8卡：1小时10分钟(segment) 单卡：5小时20分钟(heatmap) 8卡：3小时15分钟(heatmap) |
 | 微调检查点 | 118M (.ckpt文件)                                         | 114M(.ckpt文件  segment)  115M(.ckpt文件  heatmap) |
 | 推理模型        | 40M (.mindir文件)                     |  |
-| 脚本                    | [MultiTaskNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/MultiTaskNet) | [MultiTaskNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/MultiTaskNet) |
+| 脚本                    | [MultiTaskNet脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/PAMTRI/MultiTaskNet) | [MultiTaskNet脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/PAMTRI/MultiTaskNet) |
 
 ### 推理性能
 

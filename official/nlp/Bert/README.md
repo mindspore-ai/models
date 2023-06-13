@@ -269,9 +269,9 @@ If you want to run in modelarts, please check the official documentation of [mod
 For distributed training on Ascend, an hccl configuration file with JSON format needs to be created in advance.
 
 Please follow the instructions in the link below to create an hccl.json file in need:
-[https://gitee.com/mindspore/models/tree/master/utils/hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+[https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
-For distributed training among multiple machines, training command should be executed on each machine in a small time interval. Thus, an hccl.json is needed on each machine. [merge_hccl](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools#merge_hccl) is a tool to create hccl.json for multi-machine case.
+For distributed training among multiple machines, training command should be executed on each machine in a small time interval. Thus, an hccl.json is needed on each machine. [merge_hccl](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools#merge_hccl) is a tool to create hccl.json for multi-machine case.
 
 # [Script Description](#contents)
 
@@ -1072,7 +1072,7 @@ python run_eval_onnx.py --config_path [/path/*.yaml] --eval_data_file_path [EVAL
 | Total time                 | 63H                                                        | 610H                      |
 | Params (M)                 | 110M                                                       | 110M                      |
 | Checkpoint for Fine tuning | 1.2G(.ckpt file)                                           | 1.2G(.ckpt file)          |
-| Scripts                    | [BERT_base](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert)  | [BERT_base](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert)     |
+| Scripts                    | [BERT_base](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/Bert)  | [BERT_base](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/Bert)     |
 
 | Parameters                 | Ascend                                                     |
 | -------------------------- | ---------------------------------------------------------- |
@@ -1092,7 +1092,7 @@ python run_eval_onnx.py --config_path [/path/*.yaml] --eval_data_file_path [EVAL
 | Total time                 | 180h                                                       |
 | Params (M)                 | 340M                                                       |
 | Checkpoint for Fine tuning | 3.2G(.ckpt file)                                           |
-| Scripts                    | [BERT_NEZHA](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert)  |
+| Scripts                    | [BERT_NEZHA](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/Bert)  |
 
 #### Inference Performance
 

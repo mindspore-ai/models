@@ -295,7 +295,7 @@ Onnx infer results is saved in `infer_onnx_log.log`
 | Speed                      | 1pc: 400 ms/step;  8pcs:  143 ms/step                       | 1pc: 369 ms/step;  8pcs:  68 ms/step |
 | Total time                 | 1pc: 41:36:07                                               | 1pc: 29:15:09 |
 | Checkpoint for Fine tuning | 170.55M(.ckpt file)                                         | 283.76M(.ckpt file) |
-| Scripts                    | [STGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/STGAN) | [STGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/STGAN) |
+| Scripts                    | [STGAN script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/STGAN) | [STGAN script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/STGAN) |
 
 ## [Model Description](#contents)
 

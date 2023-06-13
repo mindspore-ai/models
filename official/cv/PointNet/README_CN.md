@@ -160,7 +160,7 @@ train.py中主要的参数如下：
     bash scripts/run_distribute_gpu.sh ./ckpts ../shapenetcore_partanno_segmentation_benchmark_v0
     ```
 
-分布式训练需要提前创建JSON格式的HCCL配置文件。具体操作请参考：[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+分布式训练需要提前创建JSON格式的HCCL配置文件。具体操作请参考：[hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 训练后得到如下损失值：
 

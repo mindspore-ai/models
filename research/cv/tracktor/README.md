@@ -79,7 +79,7 @@ After installing MindSpore via the official website, you can start training and 
 Note:
 
 1. the first run will generate the mindrecord file, which will take a long time.
-2. pretrained model is a faster rcnn resnet50 checkpoint that trained over COCO. you can train it with [faster_rcnn](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) scripts in modelzoo. Or you can download it from [hub](https://download.mindspore.cn/model_zoo/r1.3/fasterrcnnresnetv1550_ascend_v130_coco2017_official_cv_bs2_acc61.7/)
+2. pretrained model is a faster rcnn resnet50 checkpoint that trained over COCO. you can train it with [faster_rcnn](https://gitee.com/mindspore/models/tree/r2.0/official/cv/FasterRCNN) scripts in modelzoo. Or you can download it from [hub](https://download.mindspore.cn/model_zoo/r1.3/fasterrcnnresnetv1550_ascend_v130_coco2017_official_cv_bs2_acc61.7/)
 
 ## Run on GPU
 
@@ -278,7 +278,7 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --device_ta
 | Speed               | 1pcs 256.678 ms/step 8pcs: 357.489 ms/step                                                               |
 | Total time          | 1pcs 5 hours 8pcs: 1 hour                                                                                |
 | Parameters (M)      | 250                                                                                                      |
-| Scripts             | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) |
+| Scripts             | [fasterrcnn script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/FasterRCNN) |
 
 ### Inference Performance
 

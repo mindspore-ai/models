@@ -178,7 +178,7 @@ python sort_dataset_label.py
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 # 脚本说明
 
@@ -404,7 +404,7 @@ dataset_path为数据集路径，result_path为输出路径。
 | 参数(M)             | 25.5                                                        |
 | 微调检查点 | 284.72M (.ckpt文件)                                         |
 | 推理模型        | 94.15M (.mindir文件)                     |
-| 脚本                    | <https://gitee.com/mindspore/models/tree/master/research/cv/VehicleNet> |
+| 脚本                    | <https://gitee.com/mindspore/models/tree/r2.0/research/cv/VehicleNet> |
 
 #### VeRi-776上的VehicleNet
 
@@ -424,7 +424,7 @@ dataset_path为数据集路径，result_path为输出路径。
 | 参数(M)             | 25.5                                                        |
 | 微调检查点 | 284.72M (.ckpt文件)                                         |
 | 推理模型        | 94.15M (.mindir文件)                     |
-| 脚本                    | <https://gitee.com/mindspore/models/tree/master/research/cv/VehicleNet> |
+| 脚本                    | <https://gitee.com/mindspore/models/tree/r2.0/research/cv/VehicleNet> |
 
 ### 推理性能
 

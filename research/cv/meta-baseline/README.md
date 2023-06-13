@@ -257,7 +257,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | about  50min |about 50min |
 | Parameters (M)             | 8.7M                                     | 8.7M                        |
 | Checkpoint for Fine tuning | 31.4M (.ckpt file)                                     | 31.4M (.ckpt file)                     |
-| Scripts                    | [link](https://gitee.com/mindspore/models/tree/master/research/cv/meta-baseline) ||
+| Scripts                    | [link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/meta-baseline) ||
 
 ### Inference Performance
 

@@ -238,13 +238,13 @@ Major parameters in default_config.yaml are:
 
   For distributed ascend training, a hccl configuration file with JSON format needs to be created in advance.
 
-  Please follow the instructions in the link below: <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  Please follow the instructions in the link below: <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>.
 
 ```shell
 bash scripts/run_distribute_train.sh [RANK_FILE] [PRETRAINED_PATH] [TRAIN_ROOT_DIR]
 ```
 
-rank_table_file which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+rank_table_file which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 The above shell script will run distribute training in the background. You can view the results through the file
 `device[X]/test_*.log`. The loss value will be achieved as follows:
 
@@ -397,7 +397,7 @@ The `res` folder is generated in the upper-level directory. For details about th
 | Total time                 | 1pc: 75.48 h;  8pcs: 7.11 h                                 |
 | Parameters (M)             | 27.36                                                       |
 | Checkpoint for Fine tuning | 109.44M (.ckpt file)                                        |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/cv/psenet> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/r2.0/research/cv/psenet> |
 
 | Parameters                 | GPU                                                   |
 | -------------------------- | ----------------------------------------------------------- |
@@ -415,7 +415,7 @@ The `res` folder is generated in the upper-level directory. For details about th
 | Total time                 | 1pc: 335.6 h;  8pcs: 41.95 h                                |
 | Parameters (M)             | 27.36                                                       |
 | Checkpoint for Fine tuning | 109.44M (.ckpt file)                                        |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/cv/psenet> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/r2.0/research/cv/psenet> |
 
 ### Inference Performance
 

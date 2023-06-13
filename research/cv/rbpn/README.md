@@ -226,7 +226,7 @@ If you set --future_frame=True , then it is recommended to delete the first thre
 | Speed                     | 1pc(Ascend): 277 ms/step                                     |
 | Total time                | 8pcs: 81h                                                    |
 | Checkpoint of RBPN models | 49M (.ckpt file)                                             |
-| Scripts                   | [RBPN script](https://gitee.com/mindspore/models/tree/master/research/cv/rbpn) |
+| Scripts                   | [RBPN script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/rbpn) |
 
 ### evaling Performance
 
@@ -244,4 +244,4 @@ If you set --future_frame=True , then it is recommended to delete the first thre
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/models/tree/master/)
+Please check the official [homepage](https://gitee.com/mindspore/models/tree/r2.0/)

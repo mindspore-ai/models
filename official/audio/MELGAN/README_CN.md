@@ -122,7 +122,7 @@ MelGAN模型是非自回归全卷积模型。它的参数比同类模型少得�
 
   请遵循以下链接中的说明:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>.
 
 如果要在modelarts上进行模型的训练，可以参考modelarts的官方指导文档(https://support.huaweicloud.com/modelarts/)，具体操作如下：
 
@@ -349,4 +349,4 @@ dataset.py中设置了“create_dataset”函数内的种子，同时还使用�
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/models/tree/master).
+ 请浏览官网[主页](https://gitee.com/mindspore/models/tree/r2.0).

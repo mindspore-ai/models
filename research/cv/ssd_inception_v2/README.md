@@ -327,7 +327,7 @@ The ckpt_file parameter is required,
 | Speed               | 1pcs: 141 ms/step                                                             |8pcs: 383 ms/step                                                             |
 | Total time          | 1pcs: 50.4 hours                                                              |8pcs: 17hours                                                                 |
 | Parameters (M)      | 14M                                                                           |14M                                                                           |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/research/cv/ssd_inception_v2>  | <https://gitee.com/mindspore/models/tree/master/research/cv/ssd_inception_v2> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/r2.0/research/cv/ssd_inception_v2>  | <https://gitee.com/mindspore/models/tree/r2.0/research/cv/ssd_inception_v2> |
 
 #### Inference Performance
 

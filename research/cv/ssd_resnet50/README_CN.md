@@ -179,7 +179,7 @@ bash run_eval.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
 - `EPOCH_NUM`：分布式训练的轮次数。
 - `LR`：分布式训练的学习率初始值。
 - `DATASET`：分布式训练的数据集模式。
-- `RANK_TABLE_FILE`：[rank_table.json](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)的路径。最好使用绝对路径。
+- `RANK_TABLE_FILE`：[rank_table.json](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)的路径。最好使用绝对路径。
 - `PRE_TRAINED`：预训练检查点文件的路径。最好使用绝对路径。
 - `PRE_TRAINED_EPOCH_SIZE`：预训练的轮次数。
 

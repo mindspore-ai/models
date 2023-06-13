@@ -102,7 +102,7 @@
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 - 在 ModelArts 进行训练 (参考文档 [modelarts](https://support.huaweicloud.com/modelarts/))
 
@@ -321,7 +321,7 @@
 | 总时长                     | 8卡：41小时                                                  |
 | 参数(M)                    | 6.0                                                        |
 | 精度                       | 75.61                                                        |
-| 脚本                    | [hlg脚本](https://gitee.com/mindspore/models/tree/master/research/cv/hlg) |
+| 脚本                    | [hlg脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/hlg) |
 
 ### 推理性能
 

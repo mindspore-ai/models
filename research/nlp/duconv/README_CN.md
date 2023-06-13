@@ -142,7 +142,7 @@ Proactive Conversation模型包含四个部分：
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 - GPU处理器环境运行
 

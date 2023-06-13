@@ -141,7 +141,7 @@ bash run_train_gpu.sh [DATASET_NAME] [DEVICE_ID]
 bash run_train_8p_gpu.sh [DATASET_NAME] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
 ```
 
-- rank_table用[此方法](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成并放在script文件夹下
+- rank_table用[此方法](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)生成并放在script文件夹下
 - 注意：代码中early_stopping机制可能会导致训练早停，但不影响实验结果
 
 ##### 启动
@@ -321,7 +321,7 @@ Test set results: accuracy= 0.82800
 | 训练时间      | 3分钟/3分钟/8分钟                                            | 2分钟/2分钟/7分钟                                            |
 | 卡数          | 单卡                                                         | 单卡                                                         |
 | 准确率        | 82.8/72.2/80.3                                               | 82.8/72.2/80.2                                               |
-| 脚本          | [DGCN脚本](https://gitee.com/mindspore/models/tree/master/research/gnn/dgcn) | [DGCN脚本](https://gitee.com/mindspore/models/tree/master/research/gnn/dgcn) |
+| 脚本          | [DGCN脚本](https://gitee.com/mindspore/models/tree/r2.0/research/gnn/dgcn) | [DGCN脚本](https://gitee.com/mindspore/models/tree/r2.0/research/gnn/dgcn) |
 
 ## 随机情况说明
 

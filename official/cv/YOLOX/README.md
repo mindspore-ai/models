@@ -428,7 +428,7 @@ YOLOX is applied to 118,000 images (the annotation and data format must be the s
 |Speed| Single device: 25 FPS; 8 devices: 190 FPS (shape = 640)                                    |
 |Total duration| 52 hours                                                              |
 |Finetuned checkpoint| About 1000 MB (.ckpt file)                                                   |
-|Script| <https://gitee.com/mindspore/models/tree/master/official/cv/YOLOX> |
+|Script| <https://gitee.com/mindspore/models/tree/r2.0/official/cv/YOLOX> |
 
 |Parameter| YOLOX-X                                                           |
 | -------------------------- |--------------------------------------------------------------------|
@@ -444,7 +444,7 @@ YOLOX is applied to 118,000 images (the annotation and data format must be the s
 |Speed| Single device: 12 FPS; 8 devices: 93 FPS (shape = 640)                                     |
 |Total duration| 106 hours                                                             |
 |Finetuned checkpoint| About 1100 MB (.ckpt file)                                                   |
-|Script| <https://gitee.com/mindspore/models/tree/master/official/cv/YOLOX> |
+|Script| <https://gitee.com/mindspore/models/tree/r2.0/official/cv/YOLOX> |
 
 ### Inference Performance
 

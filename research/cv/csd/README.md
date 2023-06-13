@@ -133,8 +133,8 @@ Major parameters in scripts as follows:
 
 ### Train CSD
 
-[VGG19](https://gitee.com/mindspore/models/tree/master/official/cv/VGG/vgg19) pre-trained on ImageNet is used in our contrastive loss.
-You could download the pre-trained model from [https://download.mindspore.cn/model_zoo/](https://download.mindspore.cn/model_zoo/) or train according to [VGG19](https://gitee.com/mindspore/models/tree/master/official/cv/VGG/vgg19) and place it in `./` .
+[VGG19](https://gitee.com/mindspore/models/tree/r2.0/official/cv/VGG/vgg19) pre-trained on ImageNet is used in our contrastive loss.
+You could download the pre-trained model from [https://download.mindspore.cn/model_zoo/](https://download.mindspore.cn/model_zoo/) or train according to [VGG19](https://gitee.com/mindspore/models/tree/r2.0/official/cv/VGG/vgg19) and place it in `./` .
 You should specify the VGG ckpt file in `[VGG_MODEL]`.
 
 Since we use the outputs of teacher model as the positive samples, it is necessary to pre-train the teacher model.

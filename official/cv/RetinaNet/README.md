@@ -209,7 +209,7 @@ bash scripts/run_single_train.sh DEVICE_ID MINDRECORD_DIR CONFIG_PATH PRE_TRAINE
 
 > Note:
 
-  For details about RANK_TABLE_FILE, see [Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html). For details about how to obtain device IP address, see [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+  For details about RANK_TABLE_FILE, see [Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html). For details about how to obtain device IP address, see [Link](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 #### Running
 
@@ -497,7 +497,7 @@ mAP: 0.3499478734634595
 | Final loss                   | 0.582                                  |0.57|
 | Accuracy (8-device)                | mAP[0.3475]               |mAP[0.3499]               |
 | Total duration (8-device)            | 23h16m54s                              |51h39m6s|
-| Script                      | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/RetinaNet)|[Link](https://gitee.com/mindspore/models/tree/master/official/cv/RetinaNet)|
+| Script                      | [Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/RetinaNet)|[Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/RetinaNet)|
 
 #### Inference Performance
 

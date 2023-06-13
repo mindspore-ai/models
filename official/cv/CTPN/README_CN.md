@@ -231,7 +231,7 @@ imagenet_cfg = edict({
 
 然后，您可以使用ImageNet2012训练它。
 > 注：
-> RANK_TABLE_FILE文件，请参考[链接](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html)。如需获取设备IP，请点击[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)。对于InceptionV4等大模型，最好导出外部环境变量`export HCCL_CONNECT_TIMEOUT=600`，将hccl连接检查时间从默认的120秒延长到600秒。否则，连接可能会超时，因为随着模型增大，编译时间也会增加。
+> RANK_TABLE_FILE文件，请参考[链接](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html)。如需获取设备IP，请点击[链接](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)。对于InceptionV4等大模型，最好导出外部环境变量`export HCCL_CONNECT_TIMEOUT=600`，将hccl连接检查时间从默认的120秒延长到600秒。否则，连接可能会超时，因为随着模型增大，编译时间也会增加。
 >
 > 处理器绑核操作取决于`device_num`和总处理器数。如果不希望这样做，请删除`scripts/run_distribute_train.sh`中的`taskset`操作。
 >
@@ -473,7 +473,7 @@ bash eval_res.sh
 | 损失函数             | SoftmaxCrossEntropyWithLogits用于分类, SmoothL2Loss用于bbox回归| SoftmaxCrossEntropyWithLogits用于分类, SmoothL2Loss用于bbox回归|
 | 损失                      | ~0.04                                                        | ~0.04                                                       |
 | 总时长（8卡）           | 6h                                                           | 11h                                                           |
-| 脚本                   | [ctpn](https://gitee.com/mindspore/models/tree/master/official/cv/ShuffleNet/shufflenetv1) | [ctpn](https://gitee.com/mindspore/models/tree/master/official/cv/ShuffleNet/shufflenetv1)    |
+| 脚本                   | [ctpn](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ShuffleNet/shufflenetv1) | [ctpn](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ShuffleNet/shufflenetv1)    |
 
 #### 推理性能
 

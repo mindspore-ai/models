@@ -300,7 +300,7 @@ FC_att:   Rank-1: 57.42% | Rank-5: 82.59% | Rank-10: 90.91%| Rank-20: 96.17%| mA
 | Total time                 | About 5h                                              | About                          |
 | Parameters (M)             | 122.7                                           | 122.7                                 |
 | Checkpoint for Fine tuning | 197M (.ckpt file)                                          | 196 (.ckpt file)                          |
-| Scripts                    | [link](https://gitee.com/mindspore/models/tree/master/research/cv/DDAG) ||
+| Scripts                    | [link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/DDAG) ||
 
 *Note: Modified resnet-50 incorporates a modal-specific first layer. For more details, please read the [original paper](https://arxiv.org/pdf/2007.09314.pdf)  or original [pytorch implementation](https://github.com/mangye16/DDAG).
 

@@ -296,7 +296,7 @@ Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
-Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 Training result will be stored in the example path, whose folder name begins with "train" or "train_parallel". Under this, you can find checkpoint file together with result like the following in log.
 
@@ -558,7 +558,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 114 mins                          | 260 mins|
 | Parameters (M)             | 25.5                                                         | 25.5 |
 | Checkpoint for Fine tuning | 197M (.ckpt file)                                         |197M (.ckpt file)     |
-| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) | [Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) |
 
 ### Inference Performance
 

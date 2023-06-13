@@ -253,7 +253,7 @@ bash scripts/run_infer_onnx.sh [ONNX_PATH] [DATA_PATH] [DEVICE_TARGET]
 | 训练总时间 (8p)             | 25.1h                                    |
 | 评估总时间                  | 84s                                    |
 | 参数量 (M)                 | 30M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/Efficientnet/efficientnet-b1) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Efficientnet/efficientnet-b1) |
 
 # 随机情况的描述
 

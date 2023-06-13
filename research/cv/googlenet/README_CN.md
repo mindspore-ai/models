@@ -123,7 +123,7 @@ GoogleNet由多个inception模块串联起来，可以更加深入。  降维的
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 - GPU处理器环境运行
 
@@ -543,7 +543,7 @@ python export.py --config_path [CONFIG_PATH]
 | 参数(M)             | 13.0                                                        | 13.0                   |
 | 微调检查点 | 43.07M (.ckpt文件)                                         | 43.07M (.ckpt文件)    |
 | 推理模型        | 21.50M (.onnx文件),  21.60M(.air文件)                     |      |
-| 脚本                    | [googlenet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/googlenet) | [googlenet 脚本](https://gitee.com/mindspore/models/tree/master/research/cv/googlenet) |
+| 脚本                    | [googlenet脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/googlenet) | [googlenet 脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/googlenet) |
 
 #### ImageNet2012上训练GoogleNet
 
@@ -563,7 +563,7 @@ python export.py --config_path [CONFIG_PATH]
 | 总时长                 | 8卡：8.8小时                                             |
 | 参数(M)             | 13.0                                                        |
 | 微调检查点 | 52M (.ckpt文件)                                            |
-| 脚本                    | [googlenet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/googlenet) |
+| 脚本                    | [googlenet脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/googlenet) |
 
 ### 评估性能
 

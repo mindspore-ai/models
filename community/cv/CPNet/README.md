@@ -184,7 +184,7 @@ Eval result: mIoU/mAcc/allAcc 0.7052/0.7712/0.9347
 |loss function          |AffinityLoss,SoftmaxCrossEntropyLoss   |
 |training speed         |epoch time: 128350.305 ms, per step time: 526.026 ms|
 |total time             |10h58m26s(1pcs)    |
-|Script URL             |https://gitee.com/mindspore/models/tree/master/community/cv/CPNet|
+|Script URL             |https://gitee.com/mindspore/models/tree/r2.0/community/cv/CPNet|
 |Random number seed     |set_seed = 1234     |
 
 ## Inference Performance

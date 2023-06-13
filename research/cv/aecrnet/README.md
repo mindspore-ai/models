@@ -21,7 +21,7 @@ This is the MindSpore version of [Contrastive Learning for Compact Single Image 
 
 The official PyTorch implementation, pretrained models and examples are available at [https://github.com/GlassyWu/AECR-Net](https://github.com/GlassyWu/AECR-Net)
 
-The DCN_v2 module is based on <https://gitee.com/mindspore/models/tree/master/research/cv/centernet>. We thank the authors for sharing the codes.
+The DCN_v2 module is based on <https://gitee.com/mindspore/models/tree/r2.0/research/cv/centernet>. We thank the authors for sharing the codes.
 
 ## Abstract
 

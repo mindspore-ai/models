@@ -562,7 +562,7 @@ YOLOv4 on 118K images(The annotation and data format must be the same as coco201
 | Speed                      | 1p 53FPS 8p 390FPS(shape=416) 220FPS(dynamic shape)         |
 | Total time                 | 48h(dynamic shape)                                          |
 | Checkpoint for Fine tuning | about 500M (.ckpt file)                                     |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/official/cv/YOLOv4> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/r2.0/official/cv/YOLOv4> |
 
 ### Inference Performance
 

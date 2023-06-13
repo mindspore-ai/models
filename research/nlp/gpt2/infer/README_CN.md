@@ -1,11 +1,11 @@
 # GPT-2 MindX推理及mx Base推理
 
 - 脚本说明
-    - [脚本及样例代码](https://gitee.com/mindspore/models/tree/master/research/cv/r2plus1d/infer#脚本及样例代码)
-    - [数据集准备](https://gitee.com/mindspore/models/tree/master/research/cv/r2plus1d/infer#数据集准备)
-    - [模型转换](https://gitee.com/mindspore/models/tree/master/research/cv/r2plus1d/infer#模型转换)
-    - [MindX SDK 启动流程](https://gitee.com/mindspore/models/tree/master/research/cv/r2plus1d/infer#mindx-sdk-启动流程)
-    - [mx Base 推理流程](https://gitee.com/mindspore/models/tree/master/research/cv/r2plus1d/infer#mx-base-推理流程)
+    - [脚本及样例代码](https://gitee.com/mindspore/models/tree/r2.0/research/cv/r2plus1d/infer#脚本及样例代码)
+    - [数据集准备](https://gitee.com/mindspore/models/tree/r2.0/research/cv/r2plus1d/infer#数据集准备)
+    - [模型转换](https://gitee.com/mindspore/models/tree/r2.0/research/cv/r2plus1d/infer#模型转换)
+    - [MindX SDK 启动流程](https://gitee.com/mindspore/models/tree/r2.0/research/cv/r2plus1d/infer#mindx-sdk-启动流程)
+    - [mx Base 推理流程](https://gitee.com/mindspore/models/tree/r2.0/research/cv/r2plus1d/infer#mx-base-推理流程)
 
 ## 脚本说明
 

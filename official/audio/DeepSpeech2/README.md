@@ -286,7 +286,7 @@ python quick_start.py --pretrain_ckpt=[PRETRAINED_BACKBONE]
 | Speed                      | 2p 2.139s/step                                   |
 | Total time: training       | 2p: around 1 week;                                  |
 | Checkpoint                 | 991M (.ckpt file)                                              |
-| Scripts                    | [DeepSpeech script](https://gitee.com/mindspore/models/tree/master/official/audio/DeepSpeech2) |
+| Scripts                    | [DeepSpeech script](https://gitee.com/mindspore/models/tree/r2.0/official/audio/DeepSpeech2) |
 
 ### Inference Performance
 

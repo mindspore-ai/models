@@ -102,7 +102,7 @@ HarDNet指的是Harmonic DenseNet: A low memory traffic network，其突出的�
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 - GPU环境运行
 
@@ -428,7 +428,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 | 总时长                | 单卡：72小时50分钟;  8卡：10小时14分钟 | 8卡：71小时14分钟         |
 | 参数(M)               | 13.0                       | 13.0                   |
 | 微调检查点            | 280M (.ckpt文件)  | 281M (.ckpt文件)  |
-| 脚本                  | [hardnet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/hardnet) | [hardnet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/hardnet) |
+| 脚本                  | [hardnet脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/hardnet) | [hardnet脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/hardnet) |
 
 ### 推理性能
 

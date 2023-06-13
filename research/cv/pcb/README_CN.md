@@ -439,7 +439,7 @@ bash run_distribute_train.sh ../hccl_8p_01234567_127.0.0.1.json RPP cuhk03 ../..
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，参见[hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)中的说明。
 
 训练结果保存在脚本目录的output文件夹下，其中日志文件保存在./output/log/{MODEL_NAME}/{DATASET_NAME}/train下，断点文件保存在./output/checkpoint/{MODEL_NAME}/{DATASET_NAME}/train下，您可以在其中找到所需的信息。
 

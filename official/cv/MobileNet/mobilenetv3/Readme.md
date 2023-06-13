@@ -256,7 +256,7 @@ ACC_TOP5 = 0.91762
 | Total time                 | 1433 min                  |
 | Params (M)                 | 5.48 M                    |
 | Checkpoint for Fine tuning | 44 M                      |
-|  Scripts                   | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv3)|
+|  Scripts                   | [Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/MobileNet/mobilenetv3)|
 
 # [Description of Random Situation](#contents)
 

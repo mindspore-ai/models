@@ -292,7 +292,7 @@ bash run_distribute_train.sh DEVICE_ID EPOCH_SIZE LR DATASET PRE_TRAINED(optiona
 ```
 
 > Note: RANK_TABLE_FILE related reference materials see in this [link](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html),
-> for details on how to get device_ip check this [link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+> for details on how to get device_ip check this [link](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 - GPU:
 
@@ -485,7 +485,7 @@ mAP: 0.35625723922139957
 | Final loss                 | 0.69                                                                                   | 0.84                                                                                   | 0.84                                                                                   |
 | Speed                      |                                                                                        | 860 ms/step                                                                            | 1205 ms/step                                                                           |
 | Total training time (8p)   | 41h 32m 20s                                                                            | 440h                                                                                   | 72h                                                                                    |
-| Script                     | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet152) | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet152) | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet152) |
+| Script                     | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/retinanet_resnet152) | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/retinanet_resnet152) | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/retinanet_resnet152) |
 
 #### Evaluation Performance
 

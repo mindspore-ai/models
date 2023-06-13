@@ -74,7 +74,7 @@ AlphaPose的总体网络架构如下：
 
 - 预训练模型
 
-  当开始训练之前需要获取mindspore图像网络预训练模型，可通过在[official model zoo](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet)中运行Resnet训练脚本来获取模型权重文件，预训练文件名称为resnet50.ckpt。
+  当开始训练之前需要获取mindspore图像网络预训练模型，可通过在[official model zoo](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet)中运行Resnet训练脚本来获取模型权重文件，预训练文件名称为resnet50.ckpt。
 
 - 数据集准备
 

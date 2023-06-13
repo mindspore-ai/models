@@ -212,7 +212,7 @@ Training performance in the following tables is obtained by the Lite-HRNet model
 | Average checkpoint (.ckpt file) size | 4.6 MB |
 | Speed | 588 ms/step, 172 s/epoch |
 | Total time | 9 hours 59 minutes |
-| Scripts | [Lite-HRNet training script](https://gitee.com/mindspore/models/tree/master/research/cv/lite-hrnet/train.py) |
+| Scripts | [Lite-HRNet training script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/lite-hrnet/train.py) |
 
 | Parameters | Lite-HRNet-30-256x192 (8GPU) |
 | ------------------- | -------------------|
@@ -229,7 +229,7 @@ Training performance in the following tables is obtained by the Lite-HRNet model
 | Average checkpoint (.ckpt file) size | 7.1 MB |
 | Speed | 953 ms/step, 278 s/epoch |
 | Total time | 15 hours 9 minutes |
-| Scripts | [Lite-HRNet training script](https://gitee.com/mindspore/models/tree/master/research/cv/lite-hrnet/train.py) |
+| Scripts | [Lite-HRNet training script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/lite-hrnet/train.py) |
 
 #### Evaluation Performance
 
@@ -248,7 +248,7 @@ Training performance in the following tables is obtained by the Lite-HRNet model
 | AP75 | 0.705 |
 | AR | 0.689 |
 | AR50 | 0.903 |
-| Scripts | [Lite-HRNet evaluation script](https://gitee.com/mindspore/models/tree/master/research/cv/lite-hrnet/eval.py) |
+| Scripts | [Lite-HRNet evaluation script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/lite-hrnet/eval.py) |
 
 | Parameters | Lite-HRNet-30-256x192 (8GPU) |
 | ------------------- | ------------------- |
@@ -263,7 +263,7 @@ Training performance in the following tables is obtained by the Lite-HRNet model
 | AP75 | 0.735 |
 | AR | 0.715 |
 | AR50 | 0.915 |
-| Scripts | [Lite-HRNet evaluation script](https://gitee.com/mindspore/models/tree/master/research/cv/lite-hrnet/eval.py) |
+| Scripts | [Lite-HRNet evaluation script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/lite-hrnet/eval.py) |
 
 ## [Description of Random Situation](#contents)
 

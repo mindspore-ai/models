@@ -218,7 +218,7 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
 
@@ -320,7 +320,7 @@ cat acc.log
 | 速度 | 8卡：625毫秒/步 | 8卡：296毫秒/步  |
 | 总时长 | 8卡：12.3小时 | 8卡： 5.8小时|
 | 调优检查点 |    247.58MB（.ckpt 文件）               | 247.44MB（.ckpt 文件）|
-| 脚本                | [siamRPN脚本](https://gitee.com/mindspore/models/tree/master/research/cv/siamRPN) | [siamRPN脚本](https://gitee.com/mindspore/models/tree/master/research/cv/siamRPN) |
+| 脚本                | [siamRPN脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/siamRPN) | [siamRPN脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/siamRPN) |
 
 ### 评估性能
 

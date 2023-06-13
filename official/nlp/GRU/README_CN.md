@@ -504,7 +504,7 @@ perl multi-bleu.perl target.txt.forbleu < output.txt.forbleu
 | 损失| 3.86888 | 2.533958 | 2.9340835 |
 | 参数量 （M）| 21 | 21 | 21 |
 | 推理检查点| 272M（.ckpt）| 272M（.ckpt）| 321M（.ckpt）|
-| 脚本| [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/GRU) | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/GRU) | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/GRU) |
+| 脚本| [gru](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/GRU) | [gru](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/GRU) | [gru](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/GRU) |
 
 ### 推理性能
 

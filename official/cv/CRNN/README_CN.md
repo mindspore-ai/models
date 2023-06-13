@@ -122,7 +122,7 @@ CRNN使用vgg16结构进行特征提取，附加两层双向LSTM，最后使用C
         对于分布式训练，需要提前创建JSON格式的hccl配置文件。
 
         请按照以下链接中的说明操作：
-        [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+        [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 - 在Docker上运行
 
@@ -449,7 +449,7 @@ result CRNNAccuracy is: 0.806666666666
 | 总时长                | 557 mins                                          | 189 mins                                          |
 | 参数量（M）            | 83M (.ckpt)                                 | 96M                                              |
 | 微调检查点| 20.3M (.ckpt)                                |                                                   |
-| 脚本                   | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) |
+| 脚本                   | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/DeepLabV3P) | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/DeepLabV3P) |
 
 #### [评估性能](#目录)
 

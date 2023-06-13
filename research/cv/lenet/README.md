@@ -356,7 +356,7 @@ Evaluation result will be stored in the example path, whose folder name is "eval
 | Speed                      | 1.071 ms/step                          |
 | Total time                 | 32.1s                          |                                       |
 | Checkpoint for Fine tuning | 482k (.ckpt file)                                         |
-| Scripts                    | [LeNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv2)s |
+| Scripts                    | [LeNet Script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/MobileNet/mobilenetv2)s |
 
 #### Inference Performance
 

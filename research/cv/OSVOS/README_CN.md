@@ -335,7 +335,7 @@ epoch time: 240.559 ms, per step time: 240.559 ms
 | 输出 | 视频序列分割掩膜 |
 | 性能 | 695ms/step（单卡）;722ms/step（八卡） |
 | 总时长 | 8.1h（单卡）;1h（八卡） |
-| 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/OSVOS) |
+| 脚本 | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/OSVOS) |
 
 # ModelZoo主页
 

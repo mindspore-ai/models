@@ -289,7 +289,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 | Datasets          | MNIST                 | MNIST                 |
 | Optimizer         | Adam                  | Adam                  |
 | Loss Function     | Softmax Cross Entropy | Softmax Cross Entropy |
-| Script            | [AttentionCluster](https://gitee.com/mindspore/models/tree/master/research/cv/AttentionCluster) | [AttentionCluster](https://gitee.com/mindspore/models/tree/master/research/cv/AttentionCluster) |
+| Script            | [AttentionCluster](https://gitee.com/mindspore/models/tree/r2.0/research/cv/AttentionCluster) | [AttentionCluster](https://gitee.com/mindspore/models/tree/r2.0/research/cv/AttentionCluster) |
 
 Results:
 

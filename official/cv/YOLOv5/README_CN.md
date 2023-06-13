@@ -386,7 +386,7 @@ YOLOv5应用于118000张图像上（标注和数据格式必须与COCO 2017相�
 | 速度                     | 8卡，约450FPS                                            | 8卡，约290FPS                                            |
 | 总时长                | 8卡，21小时28分钟                                                 | 8卡，35小时                                                      |
 | 微调检查点| 53.62MB（.ckpt文件）                                         | 58.87MB（.ckpt文件）                                         |
-| 脚本                   | https://gitee.com/mindspore/models/tree/master/official/cv/YOLOv5| https://gitee.com/mindspore/models/tree/master/official/cv/YOLOv5|
+| 脚本                   | https://gitee.com/mindspore/models/tree/r2.0/official/cv/YOLOv5| https://gitee.com/mindspore/models/tree/r2.0/official/cv/YOLOv5|
 
 ### 推理性能
 

@@ -165,7 +165,7 @@ Major parameters in train.py are as follows:
 
 Distributed training requires the creation of an HCCL configuration file in JSON format in advance. For specific
 operations, see the instructions
-in [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+in [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 After training, the loss value will be achieved as follows:
 

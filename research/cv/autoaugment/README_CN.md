@@ -100,7 +100,7 @@ cifar-10-batches-bin
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，请参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，请参见[hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)中的说明。
 
 ## 脚本说明
 

@@ -126,7 +126,7 @@ After installing MindSpore via the official website, you can start training and 
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>.
 
 If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training and evaluation as follows:
 
@@ -316,7 +316,7 @@ python export.py --ckpt_file path/to/checkpoint --file_format file_format
 | Parameters (M)             | 13.0                                                        |
 | Checkpoint for Fine tuning | 147M (.ckpt file)                                         |
 | Model for inference        | 49M (.mindir file),  49M(.air file)                     |
-| Scripts                    | [Pafnucy script](https://gitee.com/mindspore/models/tree/master/research/hpc/pafnucy) |
+| Scripts                    | [Pafnucy script](https://gitee.com/mindspore/models/tree/r2.0/research/hpc/pafnucy) |
 
 ### Inference Performance
 

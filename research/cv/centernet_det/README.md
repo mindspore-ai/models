@@ -655,7 +655,7 @@ CenterNet on 11.8K images(The annotation and data format must be the same as coc
 | Total time: training       | 8p: 44 h                                                     | 8p: 95 h                                                     |
 | Total time: evaluation     | keep res: test 1h, val 0.25h; fix res: test 40 min, val 8 min| keep res: test 1h, val 0.25h; fix res: test 40 min, val 8 min|
 | Checkpoint                 | 2.3G (.ckpt file)                                            | 2.3G (.ckpt file)                                            |
-| Scripts                    | [centernet_det script](https://gitee.com/mindspore/models/tree/master/research/cv/centernet_det) |
+| Scripts                    | [centernet_det script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/centernet_det) |
 
 ### Inference Performance
 

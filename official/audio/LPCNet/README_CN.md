@@ -253,7 +253,7 @@ bash run_infer_310.sh [ENCODER_PATH] [DECODER_PATH] [DATA_PATH] [DEVICE_ID]（�
 | 总时长| 单卡：17.5小时；8卡：2.5小时                              |
 | 参数量（M）| 120M                                                       |
 | 微调检查点| 15.7M（.ckpt文件）                                              |
-| 脚本  | [LPCNet](https://gitee.com/mindspore/models/tree/master/official/cv/OctSqueeze)|
+| 脚本  | [LPCNet](https://gitee.com/mindspore/models/tree/r2.0/official/cv/OctSqueeze)|
 
 ### 推理性能
 

@@ -256,7 +256,7 @@ The inference result is saved in the current path where the script is executed. 
 | Total training duration (8-device)            | 25.1h                                    |
 | Total evaluation duration                 | 84s                                    |
 | Parameters (M)                | 30M                                   |
-| Script                      | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/Efficientnet/efficientnet-b1)|
+| Script                      | [Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Efficientnet/efficientnet-b1)|
 
 # Random Seed Description
 

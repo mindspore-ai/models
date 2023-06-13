@@ -224,7 +224,7 @@ To train the model, run `train.py`. If the `mindrecord_dir` is empty, it will ge
 
 We need five or six parameters for this scripts.
 
-- `RANK_TABLE_FILE :` the path of [rank_table.json](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools), it is better to use absolute path.
+- `RANK_TABLE_FILE :` the path of [rank_table.json](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools), it is better to use absolute path.
 - `DATASET`：the dataset mode for distributed train.
 - `DATASET_PATH`：the dataset path for distributed train.
 - `MINDRECIRD_PATH`：the mindrecord path for distributed train.

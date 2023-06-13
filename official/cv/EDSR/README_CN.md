@@ -114,7 +114,7 @@ EDSR是由多个优化后的residual blocks串联而成，相比原始版本的r
 # 快速入门
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估。对于分布式训练，需要提前创建JSON格式的hccl配置文件。请遵循以下链接中的说明：
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>
 
 - Ascend-910处理器环境运行单卡训练DIV2K
 

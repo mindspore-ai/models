@@ -41,7 +41,7 @@ log file dir: ./LOG6/training_log.txt
 
 ## Note
 
-1. Note that `hccl_2p_56_x.x.x.x.json` can use [hccl_tools.py](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) to generate.
+1. Note that `hccl_2p_56_x.x.x.x.json` can use [hccl_tools.py](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools) to generate.
 
 2. For hyper parameter, please note that you should customize the scripts `hyper_parameter_config.ini`. Please note that these two hyper parameters are not allowed to be configured here:
     - device_id

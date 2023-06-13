@@ -88,7 +88,7 @@ After installing MindSpore via the official website, you can start training and 
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>.
 
 - ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows)
 
@@ -284,7 +284,7 @@ Parameters for both training and evaluation can be set in [DATASET]_config.yaml
 | Speed|1264ms/step|
 | Total time: training       | 8p: 24h/19m/41s;;                                  |
 | Checkpoint                 | 328.9M (.ckpt file)                                              |
-| Scripts                    | [Tacotron2 script](https://gitee.com/mindspore/models/tree/master/official/audio/Tacotron2) |
+| Scripts                    | [Tacotron2 script](https://gitee.com/mindspore/models/tree/r2.0/official/audio/Tacotron2) |
 
 ### Inference Performance
 

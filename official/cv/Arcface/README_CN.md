@@ -406,7 +406,7 @@ bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TYP
 | 总时间        | 1卡：65小时；8卡：8.5小时                                    | 8卡：75小时                                        |
 | 参数(M)       | 85.2                                                         | 85.2                                         |
 | 微调检查点    | 1249M （.ckpt file）                                         | 1249M （.ckpt file）                            |
-| 脚本          | [脚本路径](https://gitee.com/mindspore/models/tree/master/official/cv/Arcface) | [脚本路径](https://gitee.com/mindspore/models/tree/master/official/cv/Arcface) |
+| 脚本          | [脚本路径](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Arcface) | [脚本路径](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Arcface) |
 
 ### 评估性能
 

@@ -185,7 +185,7 @@ GhostNet的总体网络架构如下：[链接](https://arxiv.org/pdf/1911.11907.
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)中的说明。
 
 训练结果保存在示例路径中，文件夹名称以“train”或“train_parallel”开头。您可在此路径下的日志中找到检查点文件以及结果，如下所示。
 
@@ -420,7 +420,7 @@ result: {'top_1_accuracy': 0.9308035714285714, 'top_5_accuracy': 1.0} ckpt= ./ck
 |总时长   |  39小时 |
 |参数(M)   | 5.18 |
 |  微调检查点 | 42.05M（.ckpt文件）  |
-| 脚本  | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/ghostnet)  |
+| 脚本  | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/ghostnet)  |
 
 | 参数 | GPU; CPU  |
 |:---:|:---:|
@@ -438,7 +438,7 @@ result: {'top_1_accuracy': 0.9308035714285714, 'top_5_accuracy': 1.0} ckpt= ./ck
 |总时长   |  2.79小时 |
 |参数(M)   | 5.18 |
 |  微调检查点 | 29.9M（.ckpt文件）  |
-| 脚本  | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/ghostnet)  |
+| 脚本  | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/ghostnet)  |
 
 # 随机情况说明
 

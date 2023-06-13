@@ -108,7 +108,7 @@ Configure paths to datasets and other parameters in configuration file (```defau
   bash scripts/run_eval.sh Ascend 0 ../r2plus1d_best.ckpt
   ```
 
-  Ascend training: generate [RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+  Ascend training: generate [RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 - GPU environment:
 
@@ -561,7 +561,7 @@ Validation for R(2+1)D
 | Accuracy | top_1=0.9786, top_5=0.9981 | top_1=0.9771, top_5=0.9969 |
 | Total time | 8p: 1h58m (without validation), 1p: 3h (without validation) | 8p: 1h24m (without validation) |
 | Checkpoint for Fine tuning | 8p: 706MB(.ckpt file) | 8p: 706MB(.ckpt file) |
-| Scripts | [R(2+1)D Script](https://gitee.com/mindspore/models/tree/master/research/cv/r2plus1d) | [R(2+1)D Script](https://gitee.com/mindspore/models/tree/master/research/cv/r2plus1d) |
+| Scripts | [R(2+1)D Script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/r2plus1d) | [R(2+1)D Script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/r2plus1d) |
 
 ## random situation description
 

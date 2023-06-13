@@ -126,7 +126,7 @@ MaskRCNN是一个两阶段目标检测网络，通过添加与现有边界框平
 
     注：
     1. 为了加快数据预处理速度，MindSpore提供了一种名为MindRecord的数据格式，因此第一步是在训练前根据COCO2017数据集生成MindRecord文件。将原始COCO2017数据集转换为MindRecord格式的过程可能需要4小时左右。
-    2. 对于分布式训练，需要提前创建JSON格式的[HCCL配置文件](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)。
+    2. 对于分布式训练，需要提前创建JSON格式的[HCCL配置文件](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)。
     3. 对于像maskrcnn_Mobilenetv1这样的大模型，最好设置外部环境变量`export HCCL_CONNECT_TIMEOUT=600`，将hccl连接检查时间从默认的120秒延长到600秒。否则，可能会连接超时，因为编译时间会随着模型增大而增加。
 
 4. 执行评估脚本。
@@ -549,7 +549,7 @@ test_batch_size": 2,                                                          # 
     # 示例：bash run_distribute_train.sh ~/hccl_8p.json /home/DataSet/cocodataset/
     ```
 
-> 运行分布式训练时，需要使用RANK_TABLE_FILE指定的hccl.json。您可以使用[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)来生成该文件。
+> 运行分布式训练时，需要使用RANK_TABLE_FILE指定的hccl.json。您可以使用[hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)来生成该文件。
 > 至于PRETRAINED_MODEL，如果未设置，模型将从头开始训练。暂无预训练模型可用，请持续关注。
 > 绑核操作取决于`device_num`参数值及处理器总数。如果不需要，删除`scripts/run_distribute_train.sh`脚本中的`taskset`操作任务集即可。
 
@@ -715,7 +715,7 @@ Accumulating evaluation results...
 | 损失                      | 0.88387                                                     | 0.60763                                                     |
 | 速度                     | 8卡: 249 ms/step                                           | 8卡: 795.645 ms/step                                      |
 | 总时长                | 8卡：6.23小时                                           | 8卡：19.6小时                                           |
-| 脚本                   | [Mask R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/MaskRCNN/maskrcnn_mobilenetv1) |  [Mask R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/MaskRCNN/maskrcnn_mobilenetv1)|
+| 脚本                   | [Mask R-CNN脚本](https://gitee.com/mindspore/models/tree/r2.0/official/cv/MaskRCNN/maskrcnn_mobilenetv1) |  [Mask R-CNN脚本](https://gitee.com/mindspore/models/tree/r2.0/official/cv/MaskRCNN/maskrcnn_mobilenetv1)|
 
 ### 推理性能
 

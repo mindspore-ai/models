@@ -163,7 +163,7 @@ python train.py --device_target="Ascend" --train_url="" --data_url="" --run_dist
 bash scripts/run_distribute_train.sh train_code_path data_path n_pred graph_conv_type rank_table
 ```
 
-> Note: To train on 8p Ascend put `RANK_TABLE_FILE` in `scripts` folder. [How to generate RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+> Note: To train on 8p Ascend put `RANK_TABLE_FILE` in `scripts` folder. [How to generate RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 - running on GPU
 
@@ -286,7 +286,7 @@ The inference result is saved in the current path, and you can find the result i
 | Final loss                 | 0.183                                            | 0.23 |
 | Speed                      | 45.601 ms/step                                   | 44 ms/step |
 | Total time                 | 56min                                            | 5 min |
-| Scripts                    | [STGCN script](https://gitee.com/mindspore/models/tree/master/research/cv/stgcn#https://arxiv.org/abs/1709.04875) | [STGCN script](https://gitee.com/mindspore/models/tree/master/research/cv/stgcn#https://arxiv.org/abs/1709.04875) | [STGCN script](https://gitee.com/mindspore/models/tree/master/research/cv/stgcn#https://arxiv.org/abs/1709.04875) |
+| Scripts                    | [STGCN script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/stgcn#https://arxiv.org/abs/1709.04875) | [STGCN script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/stgcn#https://arxiv.org/abs/1709.04875) | [STGCN script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/stgcn#https://arxiv.org/abs/1709.04875) |
 
 ### Evaluation Performance
 

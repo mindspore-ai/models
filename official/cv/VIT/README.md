@@ -108,7 +108,7 @@ After installing MindSpore via the official website, you can start training and 
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>.
 
 - ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows)
 
@@ -427,7 +427,7 @@ Current batch_ Size can only be set to 1.
 | Total time                 | 8pcs: 13 hours                                              |
 | Parameters (M)             | 86.0                                                        |
 | Checkpoint for Fine tuning | 1000M (.ckpt file)                                          |
-| Scripts                    | [vit script](https://gitee.com/mindspore/models/tree/master/official/cv/VIT) |
+| Scripts                    | [vit script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/VIT) |
 
 ### Inference Performance
 

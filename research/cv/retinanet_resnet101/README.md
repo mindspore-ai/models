@@ -287,7 +287,7 @@ bash run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [RANK_TABL
 bash run_single_train.sh [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
 ```
 
-> Note: RANK_TABLE_FILE related reference materials see in this [link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html), for details on how to get device_ip check this [link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+> Note: RANK_TABLE_FILE related reference materials see in this [link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html), for details on how to get device_ip check this [link](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 - GPU
 
@@ -484,7 +484,7 @@ mAP: 0.36858371862143824
 | Final loss                     | 0.43                                                                                   | 0.49                                                                                   | 0.49                                                                                   |
 | Speed                          |                                                                                        | 696 ms/step                                                                            | 881 ms/step                                                                            |
 | Total training time            | 34h 50m 20s                                                                            | 708h                                                                                   | 120h                                                                                    |
-| Script                         | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet101) | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet101) | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet101) |
+| Script                         | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/retinanet_resnet101) | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/retinanet_resnet101) | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/retinanet_resnet101) |
 
 #### Evaluation Performance
 

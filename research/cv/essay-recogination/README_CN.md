@@ -153,7 +153,7 @@ bash run_eval.sh [TEST_DATA_DIR] [DEVICE_TARGET]
 | 总时长                 | 15小时(1pcs)|
 | 参数(M)             | 12.6 |
 | 微调检查点 | 10.59M (.ckpt文件) |
-| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/essay-recogination) |
+| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/essay-recogination) |
 
 #### 评估性能
 

@@ -132,7 +132,7 @@ __
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)中的说明。
 
 # 脚本说明
 
@@ -307,7 +307,7 @@ eval_data_dir           # directory of evaluating corpus
 | 总时长 | 249 min (1卡); 101 min (8卡) | 675 min
 | 参数(M)   | 146.2 | 146.2 |
 |  微调检查点 | 497M（.ckpt文件） | 497M（.ckpt文件） |
-| 脚本  | [Skip-gram脚本](https://gitee.com/mindspore/models/tree/master/research/nlp/skipgram) | [Skip-gram脚本](https://gitee.com/mindspore/models/tree/master/research/nlp/skipgram) |
+| 脚本  | [Skip-gram脚本](https://gitee.com/mindspore/models/tree/r2.0/research/nlp/skipgram) | [Skip-gram脚本](https://gitee.com/mindspore/models/tree/r2.0/research/nlp/skipgram) |
 
 # 随机情况说明
 

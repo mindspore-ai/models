@@ -230,7 +230,7 @@ bash script/run_ascend_distribute.sh [TRAIN_DATA_DIR]
 bash script/run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
 ```
 
-- 分布式训练需要提前创建JSON格式的HCCL配置文件。具体操作，参见：<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+- 分布式训练需要提前创建JSON格式的HCCL配置文件。具体操作，参见：<https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>
 
 ## 评估过程
 
@@ -322,7 +322,7 @@ bash script/run_eval_onnx.sh [TEST_DATA_DIR] [ONNX_PATH] [DATASET_TYPE]
 | 速度 | 8卡：205毫秒/步 |
 | 总时长 | 8卡：14.74小时 |
 | 调优检查点 |    0.2 GB（.ckpt 文件）               |
-| 脚本                  |[RCAN](https://gitee.com/mindspore/models/tree/master/research/cv/RCAN) |                   |
+| 脚本                  |[RCAN](https://gitee.com/mindspore/models/tree/r2.0/research/cv/RCAN) |                   |
 
 ### 评估性能
 
