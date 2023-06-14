@@ -40,7 +40,7 @@ fs1_context: []
 fs2_context: []
 num_heads: 10
 earlystopping: {
-  monitor: ["loss", "auc"],
+  monitor: "loss",
   patience: 6,
   mode: "min",
 }

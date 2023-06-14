@@ -21,8 +21,14 @@ import stat
 from mindspore.train.callback import Callback
 
 
+def check_path(path):
+    dir_path = os.path.dirname(path)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path, exist_ok=True)
+
+
 def add_write(file_path, out_str):
-    with os.fdopen(os.open(file_path, os.O_WRONLY, stat.S_IWUSR | stat.S_IRUSR), "a+") as file_out:
+    with os.fdopen(os.open(file_path, os.O_RDWR | os.O_CREAT, stat.S_IWUSR | stat.S_IRUSR), "a+") as file_out:
         file_out.write(out_str + '\n')
 
 
@@ -40,6 +46,7 @@ class EvalCallBack(Callback):
         self.auc_metric = auc_metric
         self.auc_metric.clear()
         self.eval_file_path = eval_file_path
+        check_path(eval_file_path)
 
     def epoch_end(self, run_context):
         start_time = time.time()
@@ -67,6 +74,7 @@ class LossCallBack(Callback):
             raise ValueError("print_step must be int and >= 0.")
         self.loss_file_path = loss_file_path
         self._per_print_times = per_print_times
+        check_path(loss_file_path)
 
     def step_end(self, run_context):
         """Monitor the loss in training."""
@@ -75,13 +83,10 @@ class LossCallBack(Callback):
         cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
         cur_num = cb_params.cur_step_num
         if self._per_print_times != 0 and cur_num % self._per_print_times == 0:
-            with os.fdopen(os.open(self.loss_file_path, os.O_WRONLY, stat.S_IWUSR | stat.S_IRUSR),
-                           "a+") as loss_file:
-                time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-                loss_file.write("{} epoch: {} step: {}, loss is {}".format(
-                    time_str, cb_params.cur_epoch_num, cur_step_in_epoch, loss))
-            print("\nepoch: {} step: {}, loss is {}".format(
-                cb_params.cur_epoch_num, cur_step_in_epoch, loss))
+            time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            out_str = "{} epoch: {} step: {}, loss is {}".format(
+                time_str, cb_params.cur_epoch_num, cur_step_in_epoch, loss)
+            add_write(self.loss_file_path, out_str)
 
 
 class TimeMonitor(Callback):

@@ -80,10 +80,9 @@ For more information, please check the resources below：
 - Quick run the models
 - Training Configuration in `default_config.yaml`
 
-For example: run finalMLP model
+For example: run FinalMLP model
 
 ```bash
-#run finalMLP
 python train.py --config_path default_config.yaml
 ```
 
@@ -92,10 +91,9 @@ python train.py --config_path default_config.yaml
 ## [Script and Sample Code](#contents)
 
 ```text
-├── finalMLP
-├── README.md                   // descriptions about finalMLP
+├── README.md                   // descriptions about FinalMLP
 ├── dataset                     // dataset
-|   ├──data_for_tfrecord.py        // original data format to tfrecord
+|   ├──data_for_tfrecord.py     // original data format to tfrecord
 │   ├──Movielenslatest_x1       // MovielensLatest_x1 dataset
 |       ├──data                 // the preprocessed data are available
 |       ├──tfrecord_mind        // csv format to tfrecord
@@ -108,7 +106,7 @@ python train.py --config_path default_config.yaml
 │   ├── __init__.py             // python init file
 │   ├── callback.py             // Define the callback function.
 │   ├── dataset.py              // Creating a Dataset
-│   ├── finalMLP.py             // finalMLP NetWork
+│   ├── final_mlp.py            // FinalMLP NetWork
 ├── export.py                   // export network
 ├── infer.py                    // inference network
 ├── train.py                    // Training network
@@ -149,7 +147,7 @@ An introduction of key parameters for both training and evaluation.
 ## [Training &amp; Evaluation Process](#contents)
 
 We unify the training process and evaluation process into one execution file, and evaluate the performance of the best learned model after the training is completed, which is also the mode usually used by most developers.
-Next we will give an illustration by running finalMLP model to demonstrate the flow of training, evaluation and inference.
+Next we will give an illustration by running FinalMLP model to demonstrate the flow of training, evaluation and inference.
 
 - Execute running file on command line
 
@@ -284,7 +282,7 @@ infer test_dataset: 2023-06-01 10:25:57 AUC: 0.9669892411201504, use time: 8.624
 
 | Parameters          | GPU                                  |
 | ------------------- | ------------------------------------ |
-| Model Version       | finalMLP                             |
+| Model Version       | FinalMLP                             |
 | Resource            | NVIDIA-SMI 470.57.02      CUDA11.4   |
 | uploaded Date       | 06/03/2023 (month/day/year)          |
 | MindSpore Version   | 1.9.0                                |

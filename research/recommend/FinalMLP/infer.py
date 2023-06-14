@@ -20,7 +20,7 @@ from mindspore import context
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
-from src.finalMLP import ModelBuilder, AUCMetric
+from src.final_mlp import ModelBuilder, AUCMetric
 from src.dataset import create_dataset, DataType
 
 from src.model_utils.config import config

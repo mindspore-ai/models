@@ -15,15 +15,13 @@
 """train_criteo."""
 import os
 import sys
-
 from mindspore import context
 from mindspore.context import ParallelMode
 from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.model import Model
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor, EarlyStopping
 from mindspore.common import set_seed
-
-from src.finalMLP import ModelBuilder, AUCMetric
+from src.final_mlp import ModelBuilder, AUCMetric
 from src.dataset import create_dataset, DataType
 from src.callback import EvalCallBack, LossCallBack
 from src.model_utils.config import config
@@ -101,7 +99,7 @@ def train_model():
 
     if config.save_checkpoint:
         if config.rank_size:
-            config.ckpt_file_name_prefix = config.ckpt_file_name_prefix + str(get_rank())
+            config.ckpt_file_name_prefix += str(get_rank())
             config.ckpt_path = os.path.join(config.ckpt_path, 'ckpt_' + str(get_rank()) + '/')
         if config.device_target != "Ascend":
             config_ck = CheckpointConfig(save_checkpoint_steps=steps_size,
@@ -109,6 +107,8 @@ def train_model():
         else:
             config_ck = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_steps,
                                          keep_checkpoint_max=config.keep_checkpoint_max)
+        if not os.path.exists(config.ckpt_path):
+            os.makedirs(config.ckpt_path, exist_ok=True)
         ckpt_cb = ModelCheckpoint(prefix=config.ckpt_file_name_prefix,
                                   directory=config.ckpt_path,
                                   config=config_ck)
@@ -123,14 +123,12 @@ def train_model():
                                      eval_file_path=config.eval_file_name)
         callback_list.append(eval_callback)
 
-    # add by hwx1090220
     es_config = config.get('earlystopping', {})
     if es_config:
         callback_list.append(EarlyStopping(**es_config))
     print("callback_list={}".format(callback_list))
     model.train(config.train_epochs, ds_train, callbacks=callback_list, dataset_sink_mode=True)
 
-    # add by hwx1090220
     is_test = config.get('test', False)
     if is_test:
         import time

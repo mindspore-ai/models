@@ -18,7 +18,7 @@ import numpy as np
 from mindspore import context, Tensor
 from mindspore.train.serialization import export, load_checkpoint
 
-from src.finalMLP import ModelBuilder
+from src.final_mlp import ModelBuilder
 from src.model_utils.config import config
 from src.model_utils.device_adapter import get_device_id
 from src.model_utils.moxing_adapter import moxing_wrapper
