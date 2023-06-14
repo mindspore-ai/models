@@ -152,7 +152,7 @@ python preprocess.py --raw_path [RAW_PATH] --save_path [SAVE_PATH]
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)中的说明。
 
 训练结果保存在示例路径中，文件夹名称以“train”或“train_parallel”开头。您可在此路径下的日志中找到检查点文件以及结果，如下所示。
 
@@ -240,7 +240,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 | 总时长   |  132分钟 |
 | 参数(M)   | 60.19 |
 | 微调检查点 | 462M（.ckpt文件）  |
-| 脚本  | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/LearningToSeeInTheDark)  |
+| 脚本  | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/LearningToSeeInTheDark)  |
 
 # 随机情况说明
 

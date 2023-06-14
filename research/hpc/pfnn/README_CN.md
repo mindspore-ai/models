@@ -101,7 +101,7 @@ python eval.sh --problem [PROBLEM] --device [DEVICE]
 | Speed         | 12.2ms/step                                                   |
 | 精度          | 0.00043                                                      |
 | 训练耗时      | 55s                                                          |
-| Scripts       | [Link](https://gitee.com/mindspore/models/tree/master/research/hpc/pfnn) |
+| Scripts       | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/hpc/pfnn) |
 
 ## [ModelZoo主页](#目录)
 

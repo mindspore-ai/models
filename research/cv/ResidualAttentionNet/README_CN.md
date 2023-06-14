@@ -114,7 +114,7 @@ ResidualAttentionNet这项工作中，提出了残差注意网络，使用注意
 
   请遵循以下链接中的说明：
 
-https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.
+https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.
 
 - CPU处理器环境运行
 
@@ -546,7 +546,7 @@ python export.py --config_path [CONFIG_PATH] --data_path [DATA_PATH] --ckpt_file
 
 # 贡献指南
 
-如果你想参与贡献昇思的工作当中，请阅读[昇思贡献指南](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/master/how_to_contribute)
+如果你想参与贡献昇思的工作当中，请阅读[昇思贡献指南](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/r2.0/how_to_contribute)
 
 # ModelZoo主页
 

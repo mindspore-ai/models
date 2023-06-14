@@ -401,7 +401,7 @@ YOLOv5 on 118K images(The annotation and data format must be the same as coco201
 | Speed                      | 8p about 450 FPS                                             | 8p about 290 FPS                                             |
 | Total time                 | 8p 21h28min                                                  | 8p 35h                                                       |
 | Checkpoint for Fine tuning | 53.62M (.ckpt file)                                          | 58.87M (.ckpt file)                                          |
-| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/cv/YOLOv5 | https://gitee.com/mindspore/models/tree/master/official/cv/YOLOv5 |
+| Scripts                    | https://gitee.com/mindspore/models/tree/r2.0/official/cv/YOLOv5 | https://gitee.com/mindspore/models/tree/r2.0/official/cv/YOLOv5 |
 
 ### Inference Performance
 

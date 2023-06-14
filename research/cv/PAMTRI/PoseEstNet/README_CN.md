@@ -134,7 +134,7 @@ bash run_trans_gpu.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
 
 对于分布式训练，需要提前创建JSON格式的hccl配置文件。
 请遵循以下链接中的说明：
-<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+<https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 # 脚本说明
 
@@ -406,7 +406,7 @@ python3 export.py --cfg config.yaml --ckpt_path CKPT_PATH
 | 总时长                | 8卡：40分钟 | 单卡：6小时48分钟；8卡：1小时34分钟 |
 | 微调检查点 | 335M (.ckpt文件)                                         | 328M（.ckpt文件） |
 | 推理模型        | 113M (.mindir文件)                     |  |
-| 脚本                    | [PoseEstNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/PoseEstNet) | [PoseEstNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/PoseEstNet) |
+| 脚本                    | [PoseEstNet脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/PAMTRI/PoseEstNet) | [PoseEstNet脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/PAMTRI/PoseEstNet) |
 
 ####
 

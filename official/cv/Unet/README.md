@@ -587,7 +587,7 @@ Result on ONNX
 | Parameters (M)             | 93M                                                          | 93M                                                          |
 | Checkpoint for Fine tuning | 355.11M (.ckpt file)                                         | 355.11M (.ckpt file)                                         |
 | configuration              | unet_medical_config.yaml                                     | unet_medical_gpu_config.yaml                                 |
-| Scripts                    | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/Unet) | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/Unet) |
+| Scripts                    | [unet script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Unet) | [unet script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Unet) |
 
 | Parameters | Ascend | GPU |
 | -----| ----- | ----- |
@@ -608,7 +608,7 @@ Result on ONNX
 | Parameters (M)  | 27M | 27M |
 | Checkpoint for Fine tuning | 103.4M(.ckpt file) | 103.4M(.ckpt file) |
 | configuration | unet_nested_cell_config.yaml | unet_nested_cell_config.yaml|
-| Scripts | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/Unet) | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/Unet) |
+| Scripts | [unet script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Unet) | [unet script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Unet) |
 
 ## [How to use](#contents)
 

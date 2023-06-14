@@ -342,7 +342,7 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 | 运行速度                      | GPU: 8p 2.7s/step; Ascend: 8p 1.7s/step    |
 | 训练总时间       | GPU: 8p around 194h; Ascend 8p around 220h  |
 | Checkpoint文件大小                 | 991M (.ckpt file)                                              |
-| 代码                   | [Japser script](https://gitee.com/mindspore/models/tree/master/research/audio/jasper) |
+| 代码                   | [Japser script](https://gitee.com/mindspore/models/tree/r2.0/research/audio/jasper) |
 
 #### Inference Performance
 

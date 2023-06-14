@@ -147,7 +147,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [LABEL_FILE] [DEVICE_I
 | Total time                 | 4 mins                                                       | 11 minds                                      |
 | Parameters (M)             | 11.2                                                         | 11.2                                          |
 | Checkpoint for Fine tuning | 86M (.ckpt file)                                             | 85.4 (.ckpt file)                             |
-| Scripts                    | [link](https://gitee.com/mindspore/models/tree/master/official/cv/)                       |
+| Scripts                    | [link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/)                       |
 
 ### 推理性能
 
@@ -178,7 +178,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [LABEL_FILE] [DEVICE_I
 
 ## 贡献指南
 
-如果你想参与贡献昇思的工作当中，请阅读[昇思贡献指南](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/master/how_to_contribute)
+如果你想参与贡献昇思的工作当中，请阅读[昇思贡献指南](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/r2.0/how_to_contribute)
 
 ### 贡献者
 

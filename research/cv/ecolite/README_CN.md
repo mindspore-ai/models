@@ -115,7 +115,7 @@ ECO-Lite模型，发表于ECCV 2018，ECO: Efficient Convolutional Network for O
 
   对于分布式训练，需要提前创建JSON格式的hccl配置文件。
   请遵循以下链接中的说明：
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 默认使用ucf101数据集。
 
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))

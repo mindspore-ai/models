@@ -97,7 +97,7 @@ Shapely==1.5.9
 
     注：
     1. 为加快数据预处理速度，MindSpore提供了MindRecord数据格式。因此，训练前首先需要生成基于TotalText数据集的MindRecord文件。
-    2. 进行分布式训练前，需要提前创建JSON格式的[hccl配置文件](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)。
+    2. 进行分布式训练前，需要提前创建JSON格式的[hccl配置文件](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)。
     3. PRETRAINED_CKPT是一个ResNet101检查点，通过ImageNet2012训练。你可以使用ModelZoo中 [resnet101](https://download.mindspore.cn/model_zoo/r1.3/resnet101_ascend_v130_imagenet2012_official_cv_bs32_top1acc78.55__top5acc94.34/) 脚本来训练, 然后使用src/convert_checkpoint.py把训练好的resnet101的权重文件转换为可加载的权重文件。
     4.字符级别的标注，首先使用Synthtext数据集训练MaskRCNN得到模型M,然后使用M对TotalText字符级别标注进行补全。将数据集标注转化为 [COCO](https://cocodataset.org/) 格式
 
@@ -349,7 +349,7 @@ sh run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL]
 
 - Notes
 
-1. 运行分布式任务时要用到由RANK_TABLE_FILE指定的hccl.json文件。您可使用[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成该文件。
+1. 运行分布式任务时要用到由RANK_TABLE_FILE指定的hccl.json文件。您可使用[hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)生成该文件。
 2. PRETRAINED_MODEL应该是训练好的ResNet101检查点。如果此参数未设置，网络将从头开始训练。如果想要加载训练好的TextFuseNet检查点，需要对train.py作如下修改：
 
 ```python

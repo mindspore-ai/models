@@ -184,7 +184,7 @@ sh scripts/run_eval.sh [DEVICE_ID] [DATASET] [DATASET_PATH] [CHECKPOINT_PATH] [M
 
 此脚本需要五或六个参数。
 
-- `RANK_TABLE_FILE`：[rank_table.json](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)的路径。最好使用绝对路径。
+- `RANK_TABLE_FILE`：[rank_table.json](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)的路径。最好使用绝对路径。
 
 - `DATASET`：分布式训练的数据集模式。
 

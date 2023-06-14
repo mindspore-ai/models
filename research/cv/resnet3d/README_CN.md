@@ -231,7 +231,7 @@ python3 generate_hmdb51_json.py --dir_path ~/dataset/hmdb51/labels/ --video_path
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)中的说明。
 
 ### 结果
 
@@ -403,7 +403,7 @@ python export.py --ckpt_file=./saved_model/best.ckpt --file_format=MINDIR --n_cl
 | 总时长                 | 1.7小时 |
 | 参数(M)             | 210M |
 | 微调检查点| 401M（.ckpt文件）|
-| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/resnet3d) |
+| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/resnet3d) |
 
 #### hmdb51上的resnet3d
 
@@ -423,7 +423,7 @@ python export.py --ckpt_file=./saved_model/best.ckpt --file_format=MINDIR --n_cl
 | 总时长                 | 1.1小时 |
 | 参数(M)             | 210M |
 | 微调检查点| 401M（.ckpt文件）|
-| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/resnet3d) |
+| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/resnet3d) |
 
 # 随机情况说明
 

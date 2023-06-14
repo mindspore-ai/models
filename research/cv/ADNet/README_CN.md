@@ -76,7 +76,7 @@ bash scripts/run_standalone_train.sh /path/dataset DEVICE_ID
 bash scripts/run_distributed_test.sh RANK_TABLE_FILE RANT_SIZE 0 weight_file /path/dataset
 ```
 
-Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 ## 脚本说明
 

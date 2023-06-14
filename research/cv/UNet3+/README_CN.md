@@ -84,7 +84,7 @@ bash ./scripts/run_eval.sh [root path of code]
 #推理日志将输出到 eval_log.txt 文件
 ```
 
-Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 ## 脚本说明
 
@@ -297,7 +297,7 @@ UNet3+ on “LiTS2017 ”
 | Accuracy                   | 97.71%                                                       |
 | Total time                 | 8p：2h44m (without validation)                               |
 | Checkpoint for Fine tuning | 8p: 19.30MB(.ckpt file)                                      |
-| Scripts                    | [UNet3+脚本](https://gitee.com/mindspore/models/tree/master/research/cv/UNet3+) |
+| Scripts                    | [UNet3+脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/UNet3+) |
 
 ## 随机情况说明
 

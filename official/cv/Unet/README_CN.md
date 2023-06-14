@@ -578,7 +578,7 @@ bash ./scripts/run_eval_onnx.sh [DATASET_PATH] [ONNX_MODEL] [DEVICE_TARGET] [CON
 | 参数(M)  | 93M                                                       | 93M                                                    |
 | 微调检查点 | 355.11M (.ckpt文件)                                         | 355.11M (.ckpt文件)                        |
 | 配置文件 | unet_medical_config.yaml | unet_medical_gpu_config.yaml                                 |
-| 脚本| [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/Unet) | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/Unet) |
+| 脚本| [U-Net脚本](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Unet) | [U-Net脚本](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Unet) |
 
 | 参数 | Ascend | GPU |
 | ----- | ------ | ----- |
@@ -599,7 +599,7 @@ bash ./scripts/run_eval_onnx.sh [DATASET_PATH] [ONNX_MODEL] [DEVICE_TARGET] [CON
 | 参数(M)  | 27M | 27M |
 | 微调检查点 | 103.4M(.ckpt文件) | 103.4M(.ckpt文件) |
 | 配置文件 | unet_nested_cell_config.yaml | unet_nested_cell_config.yaml|
-| 脚本 | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/Unet) | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/Unet) |
+| 脚本 | [U-Net脚本](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Unet) | [U-Net脚本](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Unet) |
 
 ## 功能用法
 

@@ -103,7 +103,7 @@ At the top is an MLP that finally produces predictions through a sigmoid activat
 
   For specific operations, see:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>.
 
 ## Script description
 

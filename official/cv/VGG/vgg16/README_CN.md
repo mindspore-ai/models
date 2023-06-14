@@ -153,7 +153,7 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --data_dir=[DATA_PATH]  --pre_tr
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 具体操作，参见：
-<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+<https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>
 
 - GPU处理器环境运行
 
@@ -663,7 +663,7 @@ bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 | 速度 | 1卡：79 毫秒/步；8卡：104毫秒/步 |
 | 总时长 | 1卡：72分钟；8卡：11.8分钟 |
 | 调优检查点 | 1.1 GB（.ckpt 文件）                                           |
-| 脚本                  |[VGG16](https://gitee.com/mindspore/models/tree/master/official/cv/VGG/vgg16) |
+| 脚本                  |[VGG16](https://gitee.com/mindspore/models/tree/r2.0/official/cv/VGG/vgg16) |
 
 | 参数           | VGG16(Ascend)                                  | VGG16(GPU)                                      |
 | -------------------------- | ---------------------------------------------- |------------------------------------|
@@ -680,7 +680,7 @@ bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 | 速度 | 1卡：58 毫秒/步；8卡：58.2毫秒/步 | 1卡：81毫秒/步；8卡：94.4毫秒/步 |
 | 总时长 | 1卡：~32h；8卡：~4h | 8卡：19.7小时 |
 | 调优检查点 | 1.1 GB（.ckpt 文件）                                           |    1.1 GB（.ckpt 文件）               |
-| 脚本                  |[VGG16](https://gitee.com/mindspore/models/tree/master/official/cv/VGG/vgg16) |                   |
+| 脚本                  |[VGG16](https://gitee.com/mindspore/models/tree/r2.0/official/cv/VGG/vgg16) |                   |
 
 #### 评估性能
 

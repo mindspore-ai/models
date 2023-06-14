@@ -273,7 +273,7 @@ Training performance in the following tables is obtained by the M2Det-512-VGG16 
 | Average checkpoint (.ckpt file) size | 507 Mb |
 | Speed | 707 ms/step, 1493 s/epoch |
 | Total time | 2 days 18 hours 16 minutes |
-| Scripts | [M2Det training script](https://gitee.com/mindspore/models/tree/master/research/cv/m2det/train.py) |
+| Scripts | [M2Det training script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/m2det/train.py) |
 
 #### Evaluation Performance
 
@@ -288,7 +288,7 @@ Training performance in the following tables is obtained by the M2Det-512-VGG16 
 | Dataset | COCO |
 | Loss Function | Multibox MSE loss |
 | AP | 36.2 |
-| Scripts | [M2Det evaluation script](https://gitee.com/mindspore/models/tree/master/research/cv/m2det/eval.py) |
+| Scripts | [M2Det evaluation script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/m2det/eval.py) |
 
 ## [Description of Random Situation](#contents)
 

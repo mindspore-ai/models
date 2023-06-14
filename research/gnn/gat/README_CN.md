@@ -313,7 +313,7 @@ test acc=0.84199995
 | 准确率                             | 83.0/72.5                                 | 83.0/72.5                        |
 | 速度                                | 0.195s/epoch                              | 0.086s/epoch |
 | 总时长                           | 39s                                       | 17.2s |
-| 脚本                              | [GAT脚本](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) | [GAT脚本](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) |
+| 脚本                              | [GAT脚本](https://gitee.com/mindspore/models/tree/r2.0/official/gnn/GCN) | [GAT脚本](https://gitee.com/mindspore/models/tree/r2.0/official/gnn/GCN) |
 
 ## 随机情况说明
 

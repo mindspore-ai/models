@@ -193,7 +193,7 @@ Xception的整体网络架构如下：
     bash run_infer_310.sh MINDIR_PATH DATA_PATH LABEL_FILE DEVICE_ID
     ```
 
-> 注：RANK_TABLE_FILE可以参考[链接](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html)，device_ip可以参考[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)。
+> 注：RANK_TABLE_FILE可以参考[链接](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html)，device_ip可以参考[链接](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)。
 
 ### 启动
 
@@ -422,7 +422,7 @@ Top_1_Acc: 0.79886%, Top_5_Acc: 0.94882%
 | 速度（8卡）        | 479毫秒/步              | 282毫秒/步              |
 | 总时长（8卡）           | 42小时                      | 51小时                      |
 | 参数量（M）                | 180M                     | 180M                     |
-| 脚本                   | [Xception](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/xception)| [Xception](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/xception)|
+| 脚本                   | [Xception](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Inception/xception)| [Xception](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Inception/xception)|
 
 #### 推理性能
 

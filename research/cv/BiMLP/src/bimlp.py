@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 
-# Part of this file was copied from https://gitee.com/mindspore/models/tree/master/research/cv/wave_mlp
+# Part of this file was copied from https://gitee.com/mindspore/models/tree/r2.0/research/cv/wave_mlp
 
 import os
 from itertools import repeat

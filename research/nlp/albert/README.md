@@ -183,7 +183,7 @@ If you want to run in modelarts, please check the official documentation of [mod
 For distributed training, an hccl configuration file with JSON format needs to be created in advance.
 
 Please follow the instructions in the link below:
-[https://gitee.com/mindspore/models/tree/master/utils/hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+[https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 ```text
 For pretraining, schema file contains ["input_ids", "input_mask", "segment_ids", "next_sentence_labels", "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"].
@@ -659,7 +659,7 @@ acc_num 8096 , total_num 9815, accuracy 0.824860
 | Total time                 | 63H                                                        | 610H                      |
 | Params (M)                 | 110M                                                       | 110M                      |
 | Checkpoint for Fine tuning | 1.2G(.ckpt file)                                           | 1.2G(.ckpt file)          |
-| Scripts                    | [BERT_base](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert)  | [BERT_base](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert)     |
+| Scripts                    | [BERT_base](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/Bert)  | [BERT_base](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/Bert)     |
 
 | Parameters                 | Ascend                                                     |
 | -------------------------- | ---------------------------------------------------------- |
@@ -679,7 +679,7 @@ acc_num 8096 , total_num 9815, accuracy 0.824860
 | Total time                 | 180h                                                       |
 | Params (M)                 | 340M                                                       |
 | Checkpoint for Fine tuning | 3.2G(.ckpt file)                                           |
-| Scripts                    | [BERT_NEZHA](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert)  |
+| Scripts                    | [BERT_NEZHA](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/Bert)  |
 
 #### Inference Performance
 

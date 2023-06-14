@@ -171,7 +171,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 | 输出          | 概率                                                         |
 | 损失          | 3.3598282                                                    |
 | 总时间(8p)    | 41h                                                 |      |                                                              |
-| 脚本          | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/cv/lresnet100e_ir) |
+| 脚本          | [脚本路径](https://gitee.com/mindspore/models/tree/r2.0/research/cv/lresnet100e_ir) |
 
 ### 评估性能
 

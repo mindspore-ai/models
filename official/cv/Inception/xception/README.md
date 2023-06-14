@@ -193,7 +193,7 @@ You can start training using python or shell scripts. The usage of shell scripts
     bash run_infer_310.sh MINDIR_PATH DATA_PATH LABEL_FILE DEVICE_ID
     ```
 
-> Notes: RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html), and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+> Notes: RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html), and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 ### Launch
 
@@ -422,7 +422,7 @@ Top_1_Acc: 0.79886%, Top_5_Acc: 0.94882%
 | Per step time (8p)         | 479 ms/step               | 282 ms/step               |
 | Total time (8p)            | 42h                       | 51h                       |
 | Params (M)                 | 180M                      | 180M                      |
-| Scripts                    | [Xception script](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/xception) | [Xception script](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/xception) |
+| Scripts                    | [Xception script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Inception/xception) | [Xception script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Inception/xception) |
 
 #### Inference Performance
 

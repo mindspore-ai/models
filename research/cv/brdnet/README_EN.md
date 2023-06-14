@@ -87,7 +87,7 @@ cd scripts
 bash run_eval_gpu.sh [config_file] [test_dataset_path] [pretrain_path] [ckpt_name]
 ```
 
-Ascend training: generation of [RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+Ascend training: generation of [RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 ## Script description
 
@@ -491,7 +491,7 @@ BRDNet on “waterloo5050step40colorimage”
 | Speed                      | 8p about 7000FPS to 7400FPS                                                    | 8p 78ms/step |
 | Total time                 | 8p  about 2h 14min                                                             | 8p 5h |
 | Checkpoint for Fine tuning | 8p: 13.68MB , 1p: 19.76MB (.ckpt file)                                         | 14M (.ckpt file) |
-| Scripts                    | [BRDNet](https://gitee.com/mindspore/models/tree/master/official/cv/Arcface) | [BRDNet](https://gitee.com/mindspore/models/tree/master/official/cv/Arcface) |
+| Scripts                    | [BRDNet](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Arcface) | [BRDNet](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Arcface) |
 
 ## Random description
 

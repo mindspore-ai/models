@@ -166,7 +166,7 @@ this example.
 Distributed Ascend training requires the creation of an HCCL configuration
 file in JSON format in advance. For specific operations, please refer to the
 instructions in
-[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+[hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 ## Script description
 

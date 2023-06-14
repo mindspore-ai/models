@@ -289,7 +289,7 @@ EfficientDet d0应用于118000张图像上（标注和数据格式必须与COCO 
 | 准确性        | mAP=22.3%(shape=512)                                         |
 | 总时长        | 8卡: 70小时                                                  |
 | 参数(M)       | 3.9                                                          |
-| 脚本          | [EfficientDet d0脚本](https://gitee.com/mindspore/models/tree/master/research/cv/EfficientDet_d0) |
+| 脚本          | [EfficientDet d0脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/EfficientDet_d0) |
 
 # 随机情况说明
 

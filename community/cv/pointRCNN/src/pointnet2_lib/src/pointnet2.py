@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-# This file was copied from project [https://gitee.com/mindspore/models/tree/master/official/cv/PointNet2]
+# This file was copied from project [https://gitee.com/mindspore/models/tree/r2.0/official/cv/PointNet2]
 """network definition"""
 
 import mindspore.nn as nn

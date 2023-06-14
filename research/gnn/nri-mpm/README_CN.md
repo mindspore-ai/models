@@ -208,7 +208,7 @@ mindir/spring.mindir exported successfully!
 | 准确率         | 99.63 / 92.91 / 96.65                           |
 | 速度 (per step)| 364.377ms / 364.479ms / 316.452ms               |
 | 总时间        | 8745055.961ms / 8747495.238ms / 7594855.069ms    |
-| 脚本 | [NRI-MPM脚本](https://gitee.com/mindspore/models/tree/master/research/gnn/nri-mpm) |
+| 脚本 | [NRI-MPM脚本](https://gitee.com/mindspore/models/tree/r2.0/research/gnn/nri-mpm) |
 
 # 随机情况说明
 

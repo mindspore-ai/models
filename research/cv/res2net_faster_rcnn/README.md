@@ -373,7 +373,7 @@ bash run_distribute_train_gpu.sh [DEVICE_NUM] [PRETRAINED_MODEL] [BACKBONE] [COC
 
 Notes:
 
-1. Rank_table.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+1. Rank_table.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 2. As for PRETRAINED_MODEL，it should be a trained Res2Net50 checkpoint. If you need to load Ready-made pretrained FasterRcnn checkpoint, you may make changes to the train.py script as follows.
 
 ```bash

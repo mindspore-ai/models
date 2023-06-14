@@ -93,7 +93,7 @@ Training result will be stored in the current path, whose folder name begins wit
 | Outputs                    | numpy file
 | Speed                      | 17 ms/step
 | Total time                 | 3 mins
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/research/hpc/ocean_model)
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/hpc/ocean_model)
 
 ## Description of Random Situation
 

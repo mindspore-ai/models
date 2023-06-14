@@ -262,7 +262,7 @@ Inference result is saved in current path, you can find result in acc.log file.
 | Loss Function              | NT-Xent Loss                                                |
 | linear eval                | 84.505%                                                     |
 | Total time                 | 25m04s                                                      |
-| Scripts                    | [SimCLR Script](https://gitee.com/mindspore/models/tree/master/research/cv/simclr) | [SimCLR Script](https://gitee.com/mindspore/models/tree/master/research/cv/simclr) |
+| Scripts                    | [SimCLR Script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/simclr) | [SimCLR Script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/simclr) |
 
 ## [Description of Random Situation](#contents)
 

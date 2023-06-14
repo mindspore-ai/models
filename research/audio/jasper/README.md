@@ -343,7 +343,7 @@ After inference, you can view the result in `infer_output.txt`.
 | Speed                | GPU: 8p 2.7s/step; Ascend: 8p 1.7s/step             |
 | Total time: training | GPU: 8p around 194h; Ascend 8p around 220h                 |
 | Checkpoint           | 991M (.ckpt file)                                            |
-| Scripts              | [Jasper script](https://gitee.com/mindspore/models/tree/master/research/audio/jasper) |
+| Scripts              | [Jasper script](https://gitee.com/mindspore/models/tree/r2.0/research/audio/jasper) |
 
 #### Inference Performance
 

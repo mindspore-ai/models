@@ -253,7 +253,7 @@ You can start training using python or shell scripts. The usage of shell scripts
 
 For distributed training with Ascend, a hccl configuration file with JSON format needs to be created in advance.
 
-Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 ### Launch
 
@@ -404,7 +404,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 225 min                                                          | --                                         |
 | Params (M)                 | 3.3 M                                                            | --                                         |
 | Checkpoint for Fine tuning | 27.3 M                                                           | --                                         |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv1)
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/MobileNet/mobilenetv1)
 
 ## [Description of Random Situation](#contents)
 

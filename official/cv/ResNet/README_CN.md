@@ -440,7 +440,7 @@ bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]  [CONFIG_PATH]
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)中的说明。
 
 训练结果保存在示例路径中，文件夹名称以“train”或“train_parallel”开头。您可在此路径下的日志中找到检查点文件以及结果，如下所示。
 
@@ -1200,7 +1200,7 @@ result:{'top_1_accuracy': 0.928385416666666} prune_rate=0.45 ckpt=~/resnet50_cif
 | 总时长                 | 4分钟                          | 11分钟       |
 | 参数(M)             | 11.2                                                         | 11.2                         |
 | 微调检查点 | 86（.ckpt文件）                                         |
-| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) |
+| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) |
 
 #### ImageNet2012上的ResNet18
 
@@ -1220,7 +1220,7 @@ result:{'top_1_accuracy': 0.928385416666666} prune_rate=0.45 ckpt=~/resnet50_cif
 | 总时长                 | 110分钟                          | 130分钟       |
 | 参数(M)             | 11.7                                                         | 11.7 |
 | 微调检查点| 90M（.ckpt文件）                                         |  90M（.ckpt文件） |
-| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) |
+| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) |
 
 #### CIFAR-10上的ResNet50
 
@@ -1240,7 +1240,7 @@ result:{'top_1_accuracy': 0.928385416666666} prune_rate=0.45 ckpt=~/resnet50_cif
 | 总时长                 | 6分钟                          | 20.2分钟|
 | 参数(M)             | 25.5                                                         | 25.5 |
 | 微调检查点 | 179.7M（.ckpt文件）                                         | 179.7M（.ckpt文件） |
-| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) |
+| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) |
 
 #### ImageNet2012上的ResNet50
 
@@ -1260,7 +1260,7 @@ result:{'top_1_accuracy': 0.928385416666666} prune_rate=0.45 ckpt=~/resnet50_cif
 | 总时长                 | 114分钟                          | 500分钟|
 | 参数(M)             | 25.5                                                         | 25.5 |
 | 微调检查点| 197M（.ckpt文件）                                         | 197M（.ckpt文件）     |
-| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) |
+| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) |
 
 #### ImageNet2012上的ResNet34
 
@@ -1280,7 +1280,7 @@ result:{'top_1_accuracy': 0.928385416666666} prune_rate=0.45 ckpt=~/resnet50_cif
 | 总时长                 | 112分钟                          |
 | 参数(M)             | 20.79                                                         |
 | 微调检查点| 166M（.ckpt文件）                                         |
-| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config)|
+| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config)|
 
 #### flower_photos上的ResNet34
 
@@ -1300,7 +1300,7 @@ result:{'top_1_accuracy': 0.928385416666666} prune_rate=0.45 ckpt=~/resnet50_cif
 | 总时长                 | 70分钟                                                                          |
 | 参数(M)             | 20.28                                                                         |
 | 微调检查点| 81M（.ckpt文件）                                                                  |
-| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) |
+| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) |
 
 #### ImageNet2012上的ResNet101
 
@@ -1320,7 +1320,7 @@ result:{'top_1_accuracy': 0.928385416666666} prune_rate=0.45 ckpt=~/resnet50_cif
 | 总时长                 | 301分钟                          | 1100分钟|
 | 参数(M)             | 44.6                                                        | 44.6 |
 | 微调检查点| 343M（.ckpt文件）                                         | 343M（.ckpt文件）     |
-|配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) |
+|配置文件                    | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) |
 
 #### ImageNet2012上的ResNet152
 
@@ -1340,7 +1340,7 @@ result:{'top_1_accuracy': 0.928385416666666} prune_rate=0.45 ckpt=~/resnet50_cif
 |总时长   |  577分钟 |
 |参数(M)   | 60.19 |
 |  微调检查点 | 462M（.ckpt文件）  |
-| 配置文件  | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config)  |
+| 配置文件  | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config)  |
 
 #### ImageNet2012上的SE-ResNet50
 
@@ -1360,7 +1360,7 @@ result:{'top_1_accuracy': 0.928385416666666} prune_rate=0.45 ckpt=~/resnet50_cif
 | 总时长                 | 49.3分钟                                                  |
 | 参数(M)             | 25.5                                                         |
 | 微调检查点 | 215.9M （.ckpt文件）                                         |
-|配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) |
+|配置文件                    | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet/config) |
 
 # 随机情况说明
 

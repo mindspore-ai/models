@@ -447,7 +447,7 @@ python export.py --ckpt_file=[CKPT_FILE]
 | 速度                      | 单卡：593.460毫秒/步 ;  8卡：460.952毫秒/步                         | 单卡：569.524毫秒/步;  8卡：466.667毫秒/步       |
 | 总时长                 | 单卡：5h3m ;   8卡： 4h2m                         | 单卡：4h59m ;  8卡：4h5m     |
 | 微调检查点 | 412M (.ckpt文件)                                         | 426M (.ckpt文件)    |
-| 脚本                    | [EGNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/EGnet) | [EGNet 脚本](https://gitee.com/mindspore/models/tree/master/research/cv/EGnet) |
+| 脚本                    | [EGNet脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/EGnet) | [EGNet 脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/EGnet) |
 
 ##### DUTS-TR上的EGNet(GPU)
 
@@ -464,7 +464,7 @@ python export.py --ckpt_file=[CKPT_FILE]
 | 速度                      | 单卡：1148.571毫秒/步 ;  2卡：921.905毫秒/步                          | 单卡：1323.810毫秒/步;  2卡：1057.143毫秒/步      |
 | 总时长                 | 单卡：10h3m ;  2卡：8h4m                          | 单卡：11h35m ;  2卡：9h15m      |
 | 微调检查点 | 412M (.ckpt文件)                                         | 426M (.ckpt文件)    |
-| 脚本                    | [EGNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/EGnet) | [EGNet 脚本](https://gitee.com/mindspore/models/tree/master/research/cv/EGnet) |
+| 脚本                    | [EGNet脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/EGnet) | [EGNet 脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/EGnet) |
 
 #### 推理性能
 

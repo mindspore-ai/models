@@ -136,7 +136,7 @@ Then set the parameters in the default_config.yaml file, and finally execute ```
 # Quick start
 
 After installing MindSpore through the official website, you can follow the steps below for training and evaluation. For distributed training, you need to create an hccl configuration file in JSON format in advance. Please follow the instructions in the link below:
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>
 
 - Before start, you should configure following parameters in ```default_config.yaml``` file to train on UCF101 or Kinetics400:
 
@@ -153,7 +153,7 @@ After installing MindSpore through the official website, you can follow the step
 
 - Pre-trained models
 
-  StNet model uses ResNet-50 network trained on ImageNet as backbone. You can run the Resnet training script in [official model zoo](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) to get the model weight file or download trained checkpoint from [here](https://download.mindspore.cn/model_zoo/r1.3/resnet50_ascend_v130_imagenet2012_official_cv_bs32_acc77.06/). The pre-training file name should be resnet50.ckpt.
+  StNet model uses ResNet-50 network trained on ImageNet as backbone. You can run the Resnet training script in [official model zoo](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet) to get the model weight file or download trained checkpoint from [here](https://download.mindspore.cn/model_zoo/r1.3/resnet50_ascend_v130_imagenet2012_official_cv_bs32_acc77.06/). The pre-training file name should be resnet50.ckpt.
 
 - Ascend processor environment to run
 
@@ -182,7 +182,7 @@ After installing MindSpore through the official website, you can follow the step
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+  <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 - Train on ModelArts (if you want to run on modelarts, you can refer to the following document [modelarts](https://support.huaweicloud.com/modelarts/))
 

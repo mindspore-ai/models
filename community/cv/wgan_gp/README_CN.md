@@ -221,7 +221,7 @@ python eval.py   --dataset lsun --imageSize 64 --device_id $1 --ckpt_file $CKPT_
 
 # 代码说明
 
-基于mindspore的另一个实现版本在: [**WGAN_PG**](https://gitee.com/mindspore/models/tree/master/community/cv/wgan_gp)
+基于mindspore的另一个实现版本在: [**WGAN_PG**](https://gitee.com/mindspore/models/tree/r2.0/community/cv/wgan_gp)
 
 # reference
 

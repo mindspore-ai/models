@@ -117,7 +117,7 @@ bash run_distribute_train.sh RANK_TABLE_FILE DEVICE_NUMS
 | Accuracy            | 0                                                            |
 | Speed               | 1pc(Ascend): 10000 ms/step                                   |
 | Total time          | 1pc: 270days                                                 |
-| Scripts             | [Yolact++ script](https://gitee.com/mindspore/models/tree/master/research/cv/Yolact++) |
+| Scripts             | [Yolact++ script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/Yolact++) |
 
 # [ModelZoo Homepage](#目录)
 

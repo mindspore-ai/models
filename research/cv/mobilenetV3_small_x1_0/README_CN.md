@@ -220,7 +220,7 @@ bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
 | 速度                       |                                       | 430 ms/step                                                     | 3500 ms/step                       |
 | 训练总时间 (8p)             | 16.4h                                    | 80h (1 pcs)                                                     | 117h (6 pcs)                       |
 | 参数量 (M)                 | 36M                                   | 36M                                   | 36M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/mobilenetV3_small_x1_0) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/mobilenetV3_small_x1_0) |
 
 # 随机情况的描述
 

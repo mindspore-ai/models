@@ -226,7 +226,7 @@ bash run_distribute_train_model_ascend.sh [DEVICE_NUM] [EXP_DIR] [RANK_TABLE_FIL
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)中的说明。
 
 #### GPU处理器环境运行
 

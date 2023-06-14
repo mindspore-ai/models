@@ -425,7 +425,7 @@ YOLOv3-tiny应用于118000张图像上（标注和数据格式必须与COCO 2017
 | 速度                       | 单卡：130imgs/s;  8卡：980imgs/s                            |
 | 总时长                     | 8卡: 10小时                                                 |
 | 参数(M)                    | 69                                                          |
-| 脚本                       | [YOLOv3_Tiny脚本](https://gitee.com/mindspore/models/tree/master/research/cv/yolov3_tiny) |
+| 脚本                       | [YOLOv3_Tiny脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/yolov3_tiny) |
 
 > yolov3_tiny网络训练性能瓶颈在于CPU核数，CPU频率，内存大小，不同配置的环境得到不同的性能信息属于正常结果
 

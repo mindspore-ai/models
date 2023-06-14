@@ -92,7 +92,7 @@ Shapely==1.5.9
 
     Note:
     1. To speed up data preprocessing, MindSpore provide a data format named MindRecord, hence the first step is to generate MindRecord files based on TotalText dataset before training.
-    2. For distributed training, a [hccl configuration file](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) with JSON format needs to be created in advance.
+    2. For distributed training, a [hccl configuration file](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools) with JSON format needs to be created in advance.
     3. PRETRAINED_CKPT is a resnet101 checkpoint that trained over ImageNet2012.you can train it with [resnet101](https://download.mindspore.cn/model_zoo/r1.3/resnet101_ascend_v130_imagenet2012_official_cv_bs32_top1acc78.55__top5acc94.34/) scripts in modelzoo, and use src/convert_checkpoint.py to get the pretrain checkpoint file.
     4. For character-level labeling, first use Synthtext dataset to train MaskRCNN to obtain model M, and then use model M to complete TotalText character-level labeling. Convert the dataset annotations to [COCO](https://cocodataset.org/) format
 4. Execute eval script.
@@ -339,7 +339,7 @@ bash run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL]
 ```
 
 - Notes
-1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 2. As for PRETRAINED_MODEL，it should be a trained ResNet101 checkpoint. If not set, the model will be trained from the very beginning. If you need to load Ready-made pretrained TextFuseNet checkpoint, you may make changes to the train.py script as follows.
 
 ```python

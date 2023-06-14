@@ -75,7 +75,7 @@ bash wmt14_en_fr.sh
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 # 脚本说明
 

@@ -11,7 +11,7 @@
 
 ## 构建与运行
 
-1. 在Android Studio中加载本[示例源码](https://gitee.com/mindspore/models/tree/master/official/lite/image_segmentation)，并安装相应的SDK（指定SDK版本后，由Android Studio自动安装）。
+1. 在Android Studio中加载本[示例源码](https://gitee.com/mindspore/models/tree/r2.0/official/lite/image_segmentation)，并安装相应的SDK（指定SDK版本后，由Android Studio自动安装）。
 
     ![start_home](images/lite_quick_start_home.png)
 

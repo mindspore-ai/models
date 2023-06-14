@@ -112,7 +112,7 @@ Take the FP16 operator as an example. If the input data format is FP32, MindSpor
 # Quick Start
 
 After installing MindSpore from the official website, you can perform the following steps for training and evaluation. For distributed training, you need to create an HCCL configuration file in JSON format in advance. Follow the instructions in the following link:
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>
 
 - Training DIV2K on a single device (Ascend 910 AI Processor)
 

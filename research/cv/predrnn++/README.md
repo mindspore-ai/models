@@ -298,7 +298,7 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DE
 | Speed                      | 1000 ms/step(1pcs)                                |
 | Total time                 | 22h                                               |
 | Checkpoint for Fine tuning | 177.27M (.ckpt file)                              |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/predrnn++) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/predrnn++) |
 
 #### [Evaluation Performance](#contents)
 

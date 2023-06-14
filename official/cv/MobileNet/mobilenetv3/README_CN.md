@@ -260,7 +260,7 @@ ACC_TOP5 = 0.91762
 |总时长                 | 1433分钟                  |
 | 参数(M)                 | 5.48M |
 | 微调检查点 | 44M                      |
-|脚本                   | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv3)|
+|脚本                   | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/MobileNet/mobilenetv3)|
 
 # 随机情况说明
 

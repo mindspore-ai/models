@@ -223,7 +223,7 @@ bash ./scripts/run_distributed_train_ascend.sh ./rank_table_8pcs.json 8 0 ./data
 
 单卡训练中`[DEVICE_ID]`为训练所调用卡的卡号。
 
-Ascend多卡训练中`[RANK_TABLE]`为相应RANK_TABLE_FILE文件路径（如8卡训练使用的`./rank_table_8pcs.json`），RANK_TABLE_FILE可按[此方法](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成。`[RANK_SIZE]`为训练所调用卡的数量，`[DEVICE_START]`为起始卡号，`[DATA_PATH]`为数据集存放根目录。
+Ascend多卡训练中`[RANK_TABLE]`为相应RANK_TABLE_FILE文件路径（如8卡训练使用的`./rank_table_8pcs.json`），RANK_TABLE_FILE可按[此方法](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)生成。`[RANK_SIZE]`为训练所调用卡的数量，`[DEVICE_START]`为起始卡号，`[DATA_PATH]`为数据集存放根目录。
 
 ### [结果](#目录)
 
@@ -368,7 +368,7 @@ NN inference cost average time: 3.51738 ms of infer_count 591
 | 平均检查点（.ckpt 文件）大小 | 839 KB |
 | 平均性能 | 单卡：23毫秒/步，871毫秒/轮；8卡：25毫秒/步，101毫秒/轮 |
 | 平均总耗时 | 单卡：49分19秒；8卡：11分35秒 |
-| 脚本 | [训练脚本](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn/train.py) |
+| 脚本 | [训练脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tgcn/train.py) |
 
 - 下表中训练性能由T-GCN模型基于Los-loop数据集分别预测未来15分钟、30分钟、45分钟、60分钟（即pre_len分别取3、6、9、12）的交通速度得到，相关指标为4组训练任务平均值：
 
@@ -386,7 +386,7 @@ NN inference cost average time: 3.51738 ms of infer_count 591
 | 平均检查点（.ckpt 文件）大小 | 993KB |
 | 平均性能 | 单卡：44毫秒/步，1066毫秒/轮；8卡：46毫秒/步，139毫秒/轮 |
 | 平均总耗时 | 单卡：1时00分40秒；8卡：15分05秒 |
-| 脚本 | [训练脚本](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn/train.py) |
+| 脚本 | [训练脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tgcn/train.py) |
 
 ## [评估性能](#目录)
 
@@ -405,7 +405,7 @@ NN inference cost average time: 3.51738 ms of infer_count 591
 | 预测准确率（Accuracy）平均值 | 0.7144 |
 | R平方（$R^2$）平均值 | 0.8458 |
 | 可释方差（Explained Variance）平均值 | 0.8461 |
-| 脚本 | [评估脚本](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn/eval.py) |
+| 脚本 | [评估脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tgcn/eval.py) |
 
 - 下表中评估性能由T-GCN模型基于Los-loop数据集分别预测未来15分钟、30分钟、45分钟、60分钟（即pre_len分别取3、6、9、12）的交通速度得到，相关指标为4组评估任务平均值：
 
@@ -422,7 +422,7 @@ NN inference cost average time: 3.51738 ms of infer_count 591
 | 预测准确率（Accuracy）平均值 | 0.8946 |
 | R平方（$R^2$）平均值 | 0.8000 |
 | 可释方差（Explained Variance）平均值 | 0.8002 |
-| 脚本 | [评估脚本](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn/eval.py) |
+| 脚本 | [评估脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tgcn/eval.py) |
 
 ## [Ascend310推理性能](#目录)
 
@@ -464,4 +464,4 @@ NN inference cost average time: 3.51738 ms of infer_count 591
 
 # [ModelZoo主页](#目录)
 
- [T-GCN](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn)
+ [T-GCN](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tgcn)

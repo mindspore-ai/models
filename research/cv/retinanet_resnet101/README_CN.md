@@ -292,7 +292,7 @@ bash run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [RANK_TABL
 bash run_single_train.sh [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
 ```
 
-> 注意: RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+> 注意: RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 - GPU
 
@@ -487,7 +487,7 @@ mAP: 0.36858371862143824
 | 最终损失                    | 0.43                              | 0.49                 | 0.49 |
 | 速度                       |                                   | 696 毫秒/步           | 881 毫秒/步 |
 | 训练总时间 (8p)             | 34h50m20s                         | 708h                 | 120h |
-| 脚本                       | [Retianet script](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet101) |
+| 脚本                       | [Retianet script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/retinanet_resnet101) |
 
 #### 评估性能
 

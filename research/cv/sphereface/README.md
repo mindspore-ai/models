@@ -121,7 +121,7 @@ After installing MindSpore via the official website, you can start training and 
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>.
 
 We use CASIA-WebFace dataset by default. Your can also pass `$dataset_type` to the scripts so that select different datasets. For more details, please refer the specify script.
 
@@ -453,7 +453,7 @@ The accuracy of evaluating DenseNet121 on the test dataset of ImageNet will be a
 | Total time                 | 1pc: 469.85 mins;  8pcs: 68.79 mins                          |1pc: 412.39 mins;  8pcs: 220.69 mins                          |
 | Parameters (M)             | 13.0                                                        |13.0                                                        |
 | Checkpoint for Fine tuning | 214.58M (.ckpt file)                                         |214.58M (.ckpt file)                                         |
-| Scripts                    | [sphereface script](https://gitee.com/mindspore/models/tree/master/research/cv/sphereface) |[sphereface script](https://gitee.com/mindspore/models/tree/master/research/cv/sphereface) |
+| Scripts                    | [sphereface script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/sphereface) |[sphereface script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/sphereface) |
 
 ### Inference Performance
 

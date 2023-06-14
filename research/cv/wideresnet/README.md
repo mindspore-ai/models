@@ -190,7 +190,7 @@ Parameters for both training and evaluation can be set in config file.
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
-Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 Training result will be stored in the example path, whose folder name begins with "train" or "train_parallel". Under this, you can find checkpoint file together with result like the following in log.
 
@@ -366,7 +366,7 @@ The inference result is saved in the current path of the script execution. You c
 | Total time                 | 70 minutes                          | 16.8 h    | about 2.4h |
 | Parameters (M)             | 52.1                                                        | 52.1         |52.1         |
 | Checkpoint for Fine tuning | 426.49M (.ckpt file)                                         | 428M (.ckpt file)     |  427M (.ckpt file)
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/wideresnet) | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/wideresnet) | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/wideresnet) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/wideresnet) | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/wideresnet) | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/wideresnet) |
 
 ## [Description of Random Situation](#contents)
 

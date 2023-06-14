@@ -129,7 +129,7 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --data_dir=[DATA_PATH]  --pre_tr
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 具体操作，参见：
-<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+<https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>
 
 - GPU处理器环境运行
 
@@ -566,7 +566,7 @@ bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 | 速度 | 8卡：97.4毫秒/步 |
 | 总时长 | 8卡：6.1小时 |
 | 调优检查点 |    1.1 GB（.ckpt 文件）               |
-| 脚本                  |[VGG19](https://gitee.com/mindspore/models/tree/master/official/cv/VGG/vgg19) |                   |
+| 脚本                  |[VGG19](https://gitee.com/mindspore/models/tree/r2.0/official/cv/VGG/vgg19) |                   |
 
 ### 评估性能
 

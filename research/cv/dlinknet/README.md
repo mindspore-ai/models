@@ -44,7 +44,7 @@ In the DeepGlobe Road Extraction Challenge, the raw size of the images and masks
 
 D-linknet uses ResNet34, pre-trained on the ImageNet dataset, as its encoder. ResNet34 was originally designed for the classification of 256×256 medium resolution images, but in this challenge the task was to segment roads from 1024×1024 high resolution satellite images. Considering narrowness, connectivity, complexity, and long road spans, it is important to increase the perceived range of features of the central part of the network and retain details. Pooling layer can multiply the felt range of features, but may reduce the resolution of the central feature map and reduce the spatial information. The empty convolution layer may be an ideal alternative to the pooling layer. D-linknet uses several empty convolution layers with skip-connection in the middle.
 
-The code for the ResNet34 model under the MindSpore framework used in this project comes from [this website](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet). The corresponding pre-training weights can be found [here](https://download.mindspore.cn/model_zoo/r1.3/)
+The code for the ResNet34 model under the MindSpore framework used in this project comes from [this website](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet). The corresponding pre-training weights can be found [here](https://download.mindspore.cn/model_zoo/r1.3/)
 
 Empty convolution can be stacked in cascading mode. As shown in the figure above, if the expansion coefficients of the stacked cavity convolution layers are 1, 2, 4, 8 and 16 respectively, then the acceptance fields of each layer will be 3, 7, 15, 31 and 63. The encoder part (ResNet34) has five down-sampling layers. If the image of size 1024×1024 passes through the encoder part, the size of the output feature map will be 32×32. In this case, D-Linknet uses hollow convolution layers with expansion coefficients of 1, 2, 4 and 8 in the central part, so the feature points on the last central layer will see 31×31 points on the first central feature map, covering the main part of the first central feature map. Nevertheless, d-Linknet takes advantage of multi-resolution capabilities, and the central part of D-Linknet can be seen as parallel mode.
 
@@ -308,7 +308,7 @@ bash scripts/run_distribute_gpu_train.sh [DATASET] [CONFIG_PATH] [DEVICE_NUM] [C
 | Parameters (M)  | 31M| 31M |
 | Checkpoint for Fine tuning | 118.70M (.ckpt file)| 475M (.ckpt file) |
 | configuration | dlinknet_config.yaml | dlinknet_config.yaml |
-| Scripts| [D-LinkNet scripts](https://gitee.com/mindspore/models/tree/master/research/cv/dlinknet) | [D-LinkNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/dlinknet) |
+| Scripts| [D-LinkNet scripts](https://gitee.com/mindspore/models/tree/r2.0/research/cv/dlinknet) | [D-LinkNet脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/dlinknet) |
 
 ### infer-performance
 

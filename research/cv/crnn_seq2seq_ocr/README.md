@@ -123,7 +123,7 @@ For training and evaluation, we use the French Street Name Signs (FSNS) released
     For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
     Please follow the instructions in the link below:
-    [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+    [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
     - Running on ModelArts
 
@@ -327,7 +327,7 @@ Annotation precision precision = 0.746213
 | Speed                      | 1pc: 355 ms/step;  8pcs: 385 ms/step                  |
 | Total time                 | 1pc: 64 hours;  8pcs: 9 hours                       |
 | Parameters (M)             | 12                                                          |
-| Scripts                    | [crnn_seq2seq_ocr script](https://gitee.com/mindspore/models/tree/master/research/cv/crnn_seq2seq_ocr) |
+| Scripts                    | [crnn_seq2seq_ocr script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/crnn_seq2seq_ocr) |
 
 ### Inference Performance
 

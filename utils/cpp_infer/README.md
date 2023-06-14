@@ -97,7 +97,7 @@ A typical inference process includes:
 - Inference model compilation and execution
 - Inference result post-processing
 
-Please referring to [resnet](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet#%E6%8E%A8%E7%90%86%E8%BF%87%E7%A8%8B)(data processing with C++) and [DBNet](https://gitee.com/mindspore/models/tree/master/official/cv/DBNet#%E7%A6%BB%E7%BA%BF%E6%8E%A8%E7%90%86)(data processing with python to bin file).
+Please referring to [resnet](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet#%E6%8E%A8%E7%90%86%E8%BF%87%E7%A8%8B)(data processing with C++) and [DBNet](https://gitee.com/mindspore/models/tree/r2.0/official/cv/DBNet#%E7%A6%BB%E7%BA%BF%E6%8E%A8%E7%90%86)(data processing with python to bin file).
 
 ### Export MindIR
 

@@ -249,7 +249,7 @@ MobileNetV1的整体网络架构如下：
 
 对于使用Ascend进行分布式训练，需要提前创建JSON格式的hccl配置文件。
 
-请按照[https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明操作。
+请按照[https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)中的说明操作。
 
 ### 启动
 
@@ -399,7 +399,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 | 总时长                | 225min                                                         | --                                         |
 | 参数量（M）                | 3.3M                                                           | --                                         |
 | 微调检查点| 27.3M                                                          | --                                         |
-| 脚本                   | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv1)
+| 脚本                   | [链接](https://gitee.com/mindspore/models/tree/r2.0/official/cv/MobileNet/mobilenetv1)
 
 ## [随机情况说明](#目录)
 

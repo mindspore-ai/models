@@ -427,7 +427,7 @@ Test set results: auc= 0.87464 f1= 0.93635
 | Total time           | 8pcs: 64 s (Bitcoin-OTC) / 60 s (Bitcoin-Alpha)                          |
 | AUC                  | 0.8663 / 0.7979                                                          |
 | F1-Score             | 0.9309 / 0.9527                                                          |
-| Scripts              | [SGCN](https://gitee.com/mindspore/models/tree/master/research/gnn/sgcn) |
+| Scripts              | [SGCN](https://gitee.com/mindspore/models/tree/r2.0/research/gnn/sgcn) |
 
 ### [Training Performance on GPU](#contents)
 
@@ -456,7 +456,7 @@ Test set results: auc= 0.87464 f1= 0.93635
 | Loss function         | SoftmaxCrossEntropyWithLogits                                            |
 | AUC                   | 0.8746 / 0.8227                                                          |
 | F1-Score              | 0.9363 / 0.9543                                                          |
-| Scripts               | [SGCN](https://gitee.com/mindspore/models/tree/master/research/gnn/sgcn) |
+| Scripts               | [SGCN](https://gitee.com/mindspore/models/tree/r2.0/research/gnn/sgcn) |
 
 ## [Description of Random Situation](#contents)
 

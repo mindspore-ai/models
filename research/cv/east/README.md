@@ -134,7 +134,7 @@ bash run_eval_gpu.sh [DATASET_PATH] [CKPT_PATH] [DEVICE_ID]
 ```
 
 > Notes:
-> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
+> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 >
 > This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 >
@@ -372,7 +372,7 @@ Calculated!{"precision": 0.8214109521460287, "recall": 0.8016369764082811, "hmea
 | Loss Function       | Dice for classification, Iou for bbox regression             | Dice for classification, Iou for bbox regression             |
 | Loss                | ~0.27                                                        | ~0.27                                                        |
 | Total time (8p)     | 1h20m                                                        | 1h05m                                                        |
-| Scripts             | [east script](https://gitee.com/mindspore/models/tree/master/research/cv/PoseNet) |[east script](https://gitee.com/mindspore/models/tree/master/research/cv/PoseNet) |
+| Scripts             | [east script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/PoseNet) |[east script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/PoseNet) |
 
 #### Inference Performance
 

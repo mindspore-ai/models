@@ -577,7 +577,7 @@ CenterNet on 118K images(The annotation and data format must be the same as coco
 | Total time: training   | 8p: 23 h                                                     | 8p: 59h                                                      |
 | Total time: evaluation | keep res: test 1h, val 0.7h; fix res: test 40min, val 8min   | val 10min                                                    |
 | Checkpoint             | 591.70MB (.ckpt file)                                        | 591.70MB(.ckpt file)                                         |
-| Scripts                | [centernet_resnet101 script](https://gitee.com/mindspore/models/tree/master/research/cv/centernet_resnet101) | [centernet_resnet101 script](https://gitee.com/mindspore/models/tree/master/research/cv/centernet_resnet101) |
+| Scripts                | [centernet_resnet101 script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/centernet_resnet101) | [centernet_resnet101 script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/centernet_resnet101) |
 
 ### Inference Performance On Ascend 910
 

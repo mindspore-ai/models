@@ -398,7 +398,7 @@ The finetune performance and accuracy of single machine and 8 cards are as follo
 | Loss                   | 0.7                                           |
 | Params (M)               | 2597.1                                            |
 | Checkpoint for inference   | 76G （.ckpt file）                                            |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/nlp/cpm> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/r2.0/research/nlp/cpm> |
 
 The finetune performance and accuracy of 4 machines and 32 cards are as follows:
 
@@ -416,7 +416,7 @@ The finetune performance and accuracy of 4 machines and 32 cards are as follows:
 | Loss                  | 0.03                                                 |
 | Params (M)             | 2597.1                                                |
 | Checkpoint for inference   | 57G （.ckpt file）                                            |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/nlp/cpm> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/r2.0/research/nlp/cpm> |
 
 # Description of Random Situation
 

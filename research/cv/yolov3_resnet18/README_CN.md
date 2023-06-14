@@ -284,7 +284,7 @@ YOLOv3整体网络架构如下：
     bash run_distribute_train.sh 8 150 /data/Mindrecord_train /data /data/train.txt /data/hccl.json
     ```
 
-    输入变量为设备编号、轮次大小、MindRecord目录路径、数据集目录路径、训练TXT文件路径和[hccl_tools配置文件](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)。**最好使用绝对路径。**
+    输入变量为设备编号、轮次大小、MindRecord目录路径、数据集目录路径、训练TXT文件路径和[hccl_tools配置文件](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)。**最好使用绝对路径。**
 
 每步的损失值和时间如下：
 
@@ -379,7 +379,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 | 速度                      | 1pc：120毫秒/步;  8卡：160毫秒/步                        |
 | 总时长                 | 1pc：150分钟;  8卡: 70分钟                               |
 | 参数(M)             | 189                                                         |
-| 脚本                    | [yolov3_resnet18脚本](https://gitee.com/mindspore/models/tree/master/research/cv/yolov3_resnet18) | [yolov3_resnet18脚本](https://gitee.com/mindspore/models/tree/master/research/cv/yolov3_resnet18) |
+| 脚本                    | [yolov3_resnet18脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/yolov3_resnet18) | [yolov3_resnet18脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/yolov3_resnet18) |
 
 ### 推理性能
 

@@ -305,7 +305,7 @@ bash scripts/run_standalone_train.sh [DEVICE_ID] [DATA_PATH] [CKPT_PATH]
 bash scripts/run_standalone_train_cpu.sh DATA_PATH
 ```
 
-> 1. RANK_TABLE_FILE can refer to [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV3, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
+> 1. RANK_TABLE_FILE can refer to [Link](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools). For large models like InceptionV3, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 >
 > 2. This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 
@@ -467,7 +467,7 @@ accuracy:78.742
 | Checkpoint for Fine tuning | 313M                                           |
 | Model for inference        | 92M (.onnx file)                               |
 | Speed                      | 1pc:1200 img/s;8pc:9500 img/s                  |
-| Scripts                    | [inceptionv3 script](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv3) |
+| Scripts                    | [inceptionv3 script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Inception/inceptionv3) |
 
 ### Inference Performance
 

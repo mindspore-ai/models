@@ -93,7 +93,7 @@ After installing MindSpore through the official website, you can follow the step
 
   Please follow the instructions in the link below:
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 - GPU
 

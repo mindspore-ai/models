@@ -586,7 +586,7 @@ The following results are obtained by PanGu-Alpha 2.6B model.
 
 ### Serving 13B or 2.6B in Distributed mode [Ascend910 8 cards]
 
-- Generate [rank table file](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+- Generate [rank table file](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
   ```shell
   # models/utils/hccl_tools/hccl_tools.
@@ -668,7 +668,7 @@ The following results are obtained by PanGu-Alpha 2.6B model.
 
 ### Serving in Distributed mode [Ascend910 8 cards * N machine]
 
-- Generate [rank table file](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+- Generate [rank table file](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 - In every machine, prepare for checkpoint files and embedding files. We can also use 13B as a test example.
 - In every machine, use scripts/run_cluster_export.sh to export MindIR models, and move all device* to
   'serving_increment/pangu_distributed/models/'.

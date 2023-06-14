@@ -111,8 +111,8 @@ Faster R-CNN-DCN是一个两阶段目标检测网络，该网络采用RPN，可�
 注意：
 
 1. 第一次运行生成MindRecord文件，耗时较长。
-2. 预训练模型是在ImageNet2012上训练的ResNet-50检查点。你可以使用ModelZoo中 [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) 脚本来训练。
-3. BACKBONE_MODEL是通过modelzoo中的ResNet-50 [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) 脚本训练的。
+2. 预训练模型是在ImageNet2012上训练的ResNet-50检查点。你可以使用ModelZoo中 [resnet50](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet) 脚本来训练。
+3. BACKBONE_MODEL是通过modelzoo中的ResNet-50 [resnet50](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet) 脚本训练的。
 4. PRETRAINED_MODEL是经过转换后的权重文件。VALIDATION_JSON_FILE为标签文件。CHECKPOINT_PATH是训练后的检查点文件。
 
 ## 在Ascend上运行
@@ -280,7 +280,7 @@ bash run_distribute_train_gpu.sh [DEVICE_NUM] [PRETRAINED_MODEL] [COCO_ROOT] [MI
 
 Notes:
 
-1. 运行分布式任务时需要用到RANK_TABLE_FILE指定的rank_table.json。您可以使用[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成该文件。
+1. 运行分布式任务时需要用到RANK_TABLE_FILE指定的rank_table.json。您可以使用[hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)生成该文件。
 2. PRETRAINED_MODEL应该是训练好的ResNet-50检查点。如果需要加载训练好的FasterRcnn的检查点，需要对train.py作如下修改:
 
 ```python

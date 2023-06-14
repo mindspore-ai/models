@@ -145,7 +145,7 @@ bash scripts/run_standalone_train.sh [resnetv2_50|resnetv2_101|resnetv2_152] [ci
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)中的说明。
 
 ### GPU处理器环境运行
 
@@ -257,7 +257,7 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [DEVICE_ID]
 |速度|24.3毫秒/步（8卡） |
 |总时长   | 10分钟 |
 |  微调检查点 | 188.36M（.ckpt文件） |
-| 脚本  | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/resnetv2) |
+| 脚本  | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/resnetv2) |
 
 # 随机情况说明
 

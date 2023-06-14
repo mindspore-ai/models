@@ -176,7 +176,7 @@ bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATA_URL] [TRAIN_URL]
 ```
 
 - Notes
-1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 ### [Training Result](#content)
 
@@ -253,7 +253,7 @@ python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 | Speed                      | 1pc: 420 ms/step;  8pcs:  195 ms/step                        | 1pc: 104 ms/step;  8pcs:  178 ms/step                        |
 | Total time                 | 1pc: 25.32 hours                                             | 1pc: 5.79 hours;  8pcs:  1.24 hours                          |
 | Checkpoint for Fine tuning | 79.05M(.ckpt file)                                           | 69.67M(.ckpt file)                                           |
-| Scripts                    | [dcgan script](https://gitee.com/mindspore/models/tree/master/research/cv/dcgan) | [dcgan script](https://gitee.com/mindspore/models/tree/master/research/cv/dcgan) |
+| Scripts                    | [dcgan script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/dcgan) | [dcgan script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/dcgan) |
 
 # [Description of Random Situation](#contents)
 

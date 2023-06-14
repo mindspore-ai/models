@@ -418,7 +418,7 @@ For more configuration details, please refer the script `./default_config.yaml` 
 | Loss                       | 63.35                                                          | 55.42                                                         |
 | Params (M)                 | 613                                                            | 613                                                           |
 | Checkpoint for inference   | 1.8G (.ckpt file)                                              | 1.8G (.ckpt file)                                              |
-| Scripts                    | [gnmt_v2](https://gitee.com/mindspore/models/tree/master/research/nlp/gnmt_v2) | [gnmt_v2](https://gitee.com/mindspore/models/tree/master/research/nlp/gnmt_v2) |
+| Scripts                    | [gnmt_v2](https://gitee.com/mindspore/models/tree/r2.0/research/nlp/gnmt_v2) | [gnmt_v2](https://gitee.com/mindspore/models/tree/r2.0/research/nlp/gnmt_v2) |
 
 ### Inference Performance
 

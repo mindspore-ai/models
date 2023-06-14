@@ -100,7 +100,7 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
 
   请按照以下链接的指导进行设置:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+  <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 - running on GPU with gpu default parameters
 
@@ -517,7 +517,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_PATH] [DVPP] [DEVICE_ID]
 | 速度                       | 8卡: 104 ms/step                                            | 8卡: 255 ms/step                                    |                          单卡：11081 ms/step                     |
 | 总时间                     | 8卡: 17.8小时                                               | 8卡: 46.9小时                                       |                             > 200小时                    |
 | 参数(M)                    | 4.0;                                                        | 4.0;                                              |                             4.0;                       |
-| 脚本                       | [Tiny-Darknet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/tinydarknet)
+| 脚本                       | [Tiny-Darknet脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tinydarknet)
 
 ### [评估性能](#目录)
 

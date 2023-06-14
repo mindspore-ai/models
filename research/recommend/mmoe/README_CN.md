@@ -244,7 +244,7 @@ Usage: bash run_standalone_eval_gpu.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID] [CONF
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)中的说明。
 
 训练结果保存在示例路径中，文件夹名称以“train”或“train_parallel”开头。您可在此路径下的日志中找到检查点文件以及结果，如下所示。
 
@@ -433,7 +433,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 |参数   | 23.55KB |23.55KB|
 |精度指标   | best income_auc:0.9895    best marital_auc:0.9837 |best income_auc:0.9892    best marital_auc:0.9826|
 |  微调检查点 | 2.66MB（.ckpt文件）  |893.8KB（.ckpt文件）|
-| 脚本  | [链接](https://gitee.com/mindspore/models/tree/master/research/recommend/mmoe)  |[链接](https://gitee.com/mindspore/models/tree/master/research/recommend/mmoe)|
+| 脚本  | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/recommend/mmoe)  |[链接](https://gitee.com/mindspore/models/tree/r2.0/research/recommend/mmoe)|
 
 | 参数 | i5-10400 CPU  |
 |---|---|

@@ -194,7 +194,7 @@ bash run_standalone_train_ascend.sh [DATA_URL] [DEVICE_ID]
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
-Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 Training result will be stored in the example path, whose folder name begins with "train" or "train_parallel". Under this, you can find checkpoint file together with result like the following in log.
 
@@ -303,7 +303,7 @@ result: {'top_1_accuracy': 0.9449118589743589}
 | Total time                 | 1h11min    |1h42min|
 | Parameters (M)             | 27.5M|      27.5M|
 | Checkpoint for Fine tuning | 194.96M(.ckpt file)     |194.96M(.ckpt file)|
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/sknet) |[Link](https://gitee.com/mindspore/models/tree/master/research/cv/sknet)|
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/sknet) |[Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/sknet)|
 
 ### Inference Performance
 

@@ -74,7 +74,7 @@ After installing MindSpore through the official website, you can follow the step
 
 - Pre-trained models
 
-  AlphaPose model uses ResNet-50 network trained on ImageNet as backbone. You can run the Resnet training script in [official model zoo](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) to get the model weight file or download trained checkpoint from [here](https://download.mindspore.cn/model_zoo/r1.3/resnet50_ascend_v130_imagenet2012_official_cv_bs32_acc77.06/). The pre-training file name should be resnet50.ckpt.
+  AlphaPose model uses ResNet-50 network trained on ImageNet as backbone. You can run the Resnet training script in [official model zoo](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet) to get the model weight file or download trained checkpoint from [here](https://download.mindspore.cn/model_zoo/r1.3/resnet50_ascend_v130_imagenet2012_official_cv_bs32_acc77.06/). The pre-training file name should be resnet50.ckpt.
 
 - Dataset preparation
 

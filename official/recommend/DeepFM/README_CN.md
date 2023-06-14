@@ -99,7 +99,7 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
 
   具体操作，参见：
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>.
 
 - 在GPU上运行
 
@@ -415,7 +415,7 @@ auc : 0.8057789065281104
 | 总时长| 单卡：90 分钟;                                               | 待运行                 |
 | 参数(M)             | 16.5                                                        | 待运行                  |
 | 微调检查点 | 190M (.ckpt 文件)                                           | 待运行                  |
-| 脚本                    | [DeepFM脚本](https://gitee.com/mindspore/models/tree/master/official/recommend/DeepFM) | 待运行                  |
+| 脚本                    | [DeepFM脚本](https://gitee.com/mindspore/models/tree/r2.0/official/recommend/DeepFM) | 待运行                  |
 
 ### 推理性能
 

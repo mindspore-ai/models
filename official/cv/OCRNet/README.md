@@ -357,7 +357,7 @@ bash scripts/run_standalone_train.sh [DEVICE_ID] [DATASET_PATH] [TRAIN_OUTPUT_PA
 
 Distributed training requires creating an HCCL configuration file in JSON format in advance.
 
-For specific operations, see the instructions in [hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+For specific operations, see the instructions in [hccn_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 The training results are saved in the example path, and the folder name starts with "train" or "train_parallel".
 You can find the checkpoint file along with the results in the log at this path, as shown below.

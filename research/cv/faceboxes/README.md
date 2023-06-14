@@ -300,7 +300,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 4pcs: 7.6 hours                                              |
 | Parameters (M)             | 3.84M                                                        |
 | Checkpoint for Fine tuning | 13M (.ckpt file)                                             |
-| Scripts                    | [faceboxes script](https://gitee.com/mindspore/models/tree/master/research/cv/faceboxes) |
+| Scripts                    | [faceboxes script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/faceboxes) |
 
 ### Inference Performance
 

@@ -524,7 +524,7 @@ python infer_onnx.py --data_lst [DATA_LST] --onnx_path [ONNX_PATH] --device_targ
 | 损失 | 0.027490407 | 0.08345377 |
 | 性能 | 54294.528ms（Ascend八卡） 298406.836ms（Ascend单卡）| 723.160 ms（GPU单卡）|
 | 微调检查点 | 901M（.ckpt文件） | 900M（.ckpt文件）|
-| 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/RefineNet) | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/RefineNet)
+| 脚本 | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/RefineNet) | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/RefineNet)
 
 # 随机情况说明
 

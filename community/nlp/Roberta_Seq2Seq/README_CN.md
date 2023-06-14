@@ -81,7 +81,7 @@ XSum 数据集包含 226,711 条 Wayback 存档的 BBC 文章，涵盖了近十�
 
 请遵循以下链接中的说明：
 
-<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+<https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>
 
 # 脚本说明
 

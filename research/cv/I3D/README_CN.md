@@ -400,7 +400,7 @@ I3D的模型架构主要涉及 Two-stream构造，使用两个通过ImageNet预�
 
     分布式训练需要提前创建JSON格式的HCCL配置文件（即运行脚本所需的[rank_table_file]）。
 
-    具体操作，参见[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) 中的说明。
+    具体操作，参见[hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools) 中的说明。
 
 ### 结果
 

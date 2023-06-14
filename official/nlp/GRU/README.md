@@ -502,7 +502,7 @@ perl multi-bleu.perl target.txt.forbleu < output.txt.forbleu
 | Loss | 3.86888 | 2.533958 | 2.9340835 |
 | Params (M) | 21 | 21 | 21 |
 | Checkpoint for inference | 272M (.ckpt file) | 272M (.ckpt file) | 321M(.ckpt file) |
-| Scripts | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/GRU) | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/GRU) | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/GRU) |
+| Scripts | [gru](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/GRU) | [gru](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/GRU) | [gru](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/GRU) |
 
 ### Inference Performance
 

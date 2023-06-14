@@ -95,7 +95,7 @@ python eval.py \
 bash ./scripts/run_eval.sh [train_code_path] [dataset] [resume_path] [resume_name] [output_path]
 ```
 
-Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 ## 脚本说明
 
@@ -350,7 +350,7 @@ FastSCNN on “Cityscapes ”
 | Accuracy                   | 54.84%                                                       |
 | Total time                 | 8p：8h20m                                                    |
 | Checkpoint for Fine tuning | 8p: 14.51MB(.ckpt file)                                      |
-| Scripts                    | [FastSCNN脚本](https://gitee.com/mindspore/models/tree/master/research/cv/brdnet) |
+| Scripts                    | [FastSCNN脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/brdnet) |
 
 ## 随机情况说明
 

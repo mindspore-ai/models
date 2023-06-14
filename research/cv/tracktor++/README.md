@@ -87,7 +87,7 @@ After installing MindSpore via the official website, you can start training and 
 Note:
 
 1. the first run will generate the mindrecord file, which will take a long time.
-2. pretrained model is a faster rcnn resnet50 checkpoint that trained over COCO. you can train it with [faster_rcnn](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) scripts in modelzoo. Or you can download it from [hub](https://download.mindspore.cn/model_zoo/r1.3/fasterrcnnresnetv1550_ascend_v130_coco2017_official_cv_bs2_acc61.7/).  And place it in the tracktor++ directory.
+2. pretrained model is a faster rcnn resnet50 checkpoint that trained over COCO. you can train it with [faster_rcnn](https://gitee.com/mindspore/models/tree/r2.0/official/cv/FasterRCNN) scripts in modelzoo. Or you can download it from [hub](https://download.mindspore.cn/model_zoo/r1.3/fasterrcnnresnetv1550_ascend_v130_coco2017_official_cv_bs2_acc61.7/).  And place it in the tracktor++ directory.
 3. re-identification network model comes from the [official implementation model](https://vision.in.tum.de/webshare/u/meinhard/tracking_wo_bnw-output_v5.zip) of pytorch and converts it to mindspore's ckpt file. You can specify the pth file path in `pth2ckpt.py`, and run the program to get the ckpt file as:
 
 ```bash
@@ -329,7 +329,7 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --device_ta
 | Speed               | 1pcs: 161.673 ms/step 8pcs: 226.333 ms/step                                                 | 1pcs: 357.115 ms/step 8pcs: 471.408 ms/step                |
 | Total time          | 1pcs: 3.2 hours 8pcs: 0.5 hour                                                              | 1pcs: 7.1 hours  8pcs: 1.2 hours                           |
 | Parameters (M)      | 473                                                                                         | 473                                                        |
-| Scripts             | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) |
+| Scripts             | [fasterrcnn script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/FasterRCNN) | [fasterrcnn script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/FasterRCNN) |
 
 ### Evaluation Performance
 
@@ -346,4 +346,4 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --device_ta
 
 # [ModelZoo Homepage](#contents)  
 
- Please check the official [homepage](https://gitee.com/mindspore/models/tree/master).
+ Please check the official [homepage](https://gitee.com/mindspore/models/tree/r2.0).

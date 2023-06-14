@@ -103,8 +103,8 @@ export GLOG_v=2 # 0-DEBUG, 1-INFO, 2-WARNING, 3-ERROR, 4-CRITICAL, default level
 - 推理模型编译及执行
 - 推理结果后处理
 
-整个过程可以参考[resnet](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet#%E6%8E%A8%E7%90%86%E8%BF%87%E7%A8%8B)（使用C++进行数据处理）和
-[DBNet](https://gitee.com/mindspore/models/tree/master/official/cv/DBNet#%E7%A6%BB%E7%BA%BF%E6%8E%A8%E7%90%86)（使用python进行数据处理并转成bin文件）。
+整个过程可以参考[resnet](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet#%E6%8E%A8%E7%90%86%E8%BF%87%E7%A8%8B)（使用C++进行数据处理）和
+[DBNet](https://gitee.com/mindspore/models/tree/r2.0/official/cv/DBNet#%E7%A6%BB%E7%BA%BF%E6%8E%A8%E7%90%86)（使用python进行数据处理并转成bin文件）。
 
 ### 导出MindIR文件
 

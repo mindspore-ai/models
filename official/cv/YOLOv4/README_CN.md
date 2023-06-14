@@ -731,7 +731,7 @@ YOLOv4应用于118000张图像上（标注和数据格式必须与COCO 2017相�
 |速度| 1卡：53FPS；8卡：390FPS (shape=416) 220FPS (动态形状)|
 |总时长|48小时（动态形状）|
 |微调检查点|约500M（.ckpt文件）|
-|脚本| <https://gitee.com/mindspore/models/tree/master/official/cv/YOLOv4> |
+|脚本| <https://gitee.com/mindspore/models/tree/r2.0/official/cv/YOLOv4> |
 
 ### 推理性能
 

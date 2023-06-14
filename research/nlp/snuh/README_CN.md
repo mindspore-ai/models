@@ -219,7 +219,7 @@ mindir/reuters64.mindir exported successfully!
 | 准确率         | 85.44 / 77.10 / 67.51                               |
 | 速度 (per step)| 35.442ms / 135.676ms / 105.942ms                    |
 | 总时间         | 145810.402ms / 1036025.649ms / 391772.699ms         |
-| 脚本 | [SNUH脚本](https://gitee.com/mindspore/models/tree/master/research/nlp/snuh) |
+| 脚本 | [SNUH脚本](https://gitee.com/mindspore/models/tree/r2.0/research/nlp/snuh) |
 
 在所有实验中的模型精度如下：
 

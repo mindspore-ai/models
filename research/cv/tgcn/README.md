@@ -227,7 +227,7 @@ Training performance in the following tables is obtained by the T-GCN model base
 | Average checkpoint (.ckpt file) size | 839 KB |
 | Speed | 15 ms/step, 540 ms/epoch |
 | Total time | 27 minutes 30 seconds |
-| Scripts | [T-GCN training script](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn/train.py) |
+| Scripts | [T-GCN training script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tgcn/train.py) |
 
 | Parameters | T-GCN (8GPU) |
 | ------------------- | -------------------|
@@ -244,7 +244,7 @@ Training performance in the following tables is obtained by the T-GCN model base
 | Average checkpoint (.ckpt file) size | 839 KB |
 | Speed | 14 ms/step, 55 ms/epoch |
 | Total time | 2 minutes 56 seconds |
-| Scripts | [T-GCN training script](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn/train.py) |
+| Scripts | [T-GCN training script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tgcn/train.py) |
 
 Training performance in the following tables is obtained by the T-GCN model based on the Los-loop dataset, which predicts the traffic speed of the next 15 minutes, 30 minutes, 45 minutes, and 60 minutes (pre_len 3, 6, 9, 12 respectively), corresponding measurements are the average of 4 sets of training tasks. Loss values are given for separate pre_len, and averaged within last 50 entries in corresponding log files.
 
@@ -263,7 +263,7 @@ Training performance in the following tables is obtained by the T-GCN model base
 | Average checkpoint (.ckpt file) size | 993 KB |
 | Speed | 20 ms/step, 510 ms/epoch |
 | Total time | 26 minutes 10 seconds |
-| Scripts | [T-GCN training script](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn/train.py) |
+| Scripts | [T-GCN training script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tgcn/train.py) |
 
 | Parameters | T-GCN (8GPU) |
 | ------------------- | -------------------|
@@ -280,7 +280,7 @@ Training performance in the following tables is obtained by the T-GCN model base
 | Average checkpoint (.ckpt file) size | 993 KB |
 | Speed | 51 ms/step, 152 ms/epoch |
 | Total time | 7 minutes 29 seconds |
-| Scripts | [T-GCN training script](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn/train.py) |
+| Scripts | [T-GCN training script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tgcn/train.py) |
 
 #### Evaluation Performance
 
@@ -299,7 +299,7 @@ Training performance in the following tables is obtained by the T-GCN model base
 | Accuracy | 0.7144 |
 | $R^2$ | 0.8458 |
 | VAR | 0.8461 |
-| Scripts | [T-GCN evaluation script](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn/eval.py) |
+| Scripts | [T-GCN evaluation script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tgcn/eval.py) |
 
 | Parameters | T-GCN (8GPU) |
 | ------------------- | ------------------- |
@@ -314,7 +314,7 @@ Training performance in the following tables is obtained by the T-GCN model base
 | Accuracy | 0.7124 |
 | $R^2$ | 0.8437 |
 | VAR | 0.8438 |
-| Scripts | [T-GCN evaluation script](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn/eval.py) |
+| Scripts | [T-GCN evaluation script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tgcn/eval.py) |
 
 - Training performance in the following tables is obtained by the T-GCN model based on the Los-loop dataset, which predicts the traffic speed of the next 15 minutes, 30 minutes, 45 minutes, and 60 minutes (pre_len 3, 6, 9, 12 respectively), corresponding measurements are the average of 4 sets of training tasks:
 
@@ -331,7 +331,7 @@ Training performance in the following tables is obtained by the T-GCN model base
 | Accuracy |0.8916 |
 | $R^2$ | 0.7872 |
 | VAR | 0.7876 |
-| Scripts | [T-GCN evaluation script](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn/eval.py) |
+| Scripts | [T-GCN evaluation script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tgcn/eval.py) |
 
 | Parameters | T-GCN (8GPU) |
 | ------------------- | ------------------- |
@@ -346,7 +346,7 @@ Training performance in the following tables is obtained by the T-GCN model base
 | Accuracy | 0.8927 |
 | $R^2$ | 0.7924 |
 | VAR | 0.7925 |
-| Scripts | [T-GCN evaluation script](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn/eval.py) |
+| Scripts | [T-GCN evaluation script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/tgcn/eval.py) |
 
 ## [Description of Random Situation](#contents)
 

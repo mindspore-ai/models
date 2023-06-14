@@ -286,7 +286,7 @@ python export.py --preset=/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json -
 | Speed                | 1p 1.467s/step                                               |                                                              |
 | Total time: training | 1p(mol/gaussian): around 4 days; 2p(mulaw256):around 1 week  | 8p: around 1 week                                            |
 | Checkpoint           | 59.79MM/54.87M/54.83M (.ckpt file)                           | 42.73M (.ckpt file)                                          |
-| Scripts              | [WaveNet script](https://gitee.com/mindspore/models/tree/master/research/audio/wavenet) | [WaveNet script](https://gitee.com/mindspore/models/tree/master/research/audio/wavenet) |
+| Scripts              | [WaveNet script](https://gitee.com/mindspore/models/tree/r2.0/research/audio/wavenet) | [WaveNet script](https://gitee.com/mindspore/models/tree/r2.0/research/audio/wavenet) |
 
 ### Inference Performance
 

@@ -114,7 +114,7 @@ python train.py --model big_net --amp_level=O0 --autoaugment --batch-size=32 --c
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，参见[hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)中的说明。
 
 # 评估过程
 

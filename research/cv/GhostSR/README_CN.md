@@ -27,7 +27,7 @@ features，大幅减少参数量、flops和推理延迟的同时几乎性能无�
 
 # 环境配置/推理/导出
 
-本代码修改自 [EDSR(MindSpore)](https://gitee.com/mindspore/models/tree/master/official/cv/EDSR),
+本代码修改自 [EDSR(MindSpore)](https://gitee.com/mindspore/models/tree/r2.0/official/cv/EDSR),
 环境配置/推理/导出等操作可参考EDSR
 
 # 数据集
@@ -82,7 +82,7 @@ features，大幅减少参数量、flops和推理延迟的同时几乎性能无�
 # 快速入门
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估。对于分布式训练，需要提前创建JSON格式的hccl配置文件。请遵循以下链接中的说明：
-<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+<https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>
 
 - GPU环境运行单卡评估DIV2K
 

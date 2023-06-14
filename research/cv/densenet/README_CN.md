@@ -124,7 +124,7 @@ DenseNet-100使用的数据集： Cifar-10
 
   请遵循以下链接中的说明：
 
-  [链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+  [链接](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
 
 - 如果要在modelarts上进行模型的训练，可以参考modelarts的[官方指导文档](https://support.huaweicloud.com/modelarts/) 开始进行模型的训练和推理，具体操作如下：
 

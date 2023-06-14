@@ -271,7 +271,7 @@ During the running of the preceding command, you can view the log information in
 | Parameters (M)            | 6.57                                                        |
 | Finetuned checkpoint| 13.98 MB (.ckpt file)                                        |
 | Inference model       | 14.00 MB (.mindir file)                    |
-| Script                   | [WGAN Script](https://gitee.com/mindspore/models/tree/master/official/cv/WGAN)|
+| Script                   | [WGAN Script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/WGAN)|
 
 The following sample shows the generated image.
 
@@ -294,7 +294,7 @@ The following sample shows the generated image.
 | Parameters (M)            | 6.45                                                        |
 | Finetuned checkpoint| 13.98 MB (.ckpt file)                                        |
 | Inference model       | 14.00 MB (.mindir file)                    |
-| Script                   | [WGAN Script](https://gitee.com/mindspore/models/tree/master/official/cv/WGAN)|
+| Script                   | [WGAN Script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/WGAN)|
 
 The following sample shows the generated image.
 

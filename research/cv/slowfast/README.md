@@ -176,7 +176,7 @@ slowfast是由Facebook AI研究团队提出的一种新颖的方法来分析视�
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
 - GPU处理器环境运行
 

@@ -427,7 +427,7 @@ bash run_distribute_train.sh ../hccl_8p_01234567_127.0.0.1.json RPP cuhk03 ../..
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
-Please follow the instructions in the link [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+Please follow the instructions in the link [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 Training result will be stored in the "output" directory. specifically, the training log will be stored in "./output/log/{MODEL_NAME}/{DATASET_NAME}/train" and the checkpoints will be stored in "./output/checkpoint/{MODEL_NAME}/{DATASET_NAME}/train."
 

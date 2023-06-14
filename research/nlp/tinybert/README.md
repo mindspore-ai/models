@@ -747,7 +747,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 17.3h(3poch, 8p)                                           | 48h(3poch, 8p)            |
 | Params (M)                 | 15M                                                        | 15M                       |
 | Checkpoint for task distill| 74M(.ckpt file)                                            | 74M(.ckpt file)           |
-| Scripts                    | [TinyBERT](https://gitee.com/mindspore/models/tree/master/research/nlp/tinybert) |          |
+| Scripts                    | [TinyBERT](https://gitee.com/mindspore/models/tree/r2.0/research/nlp/tinybert) |          |
 
 #### Inference Performance
 

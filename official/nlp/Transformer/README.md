@@ -474,7 +474,7 @@ Inference result is saved in current path, 'output_file' will generate in path s
 | Loss                       | 2.8                                                                                            | 2.9                             |
 | Params (M)                 | 213.7                                                                                          | 213.7                           |
 | Checkpoint for inference   | 2.4G (.ckpt file)                                                                              | 2.4G (.ckpt file)               |
-| Scripts                    | [Transformer scripts](https://gitee.com/mindspore/models/tree/master/official/nlp/Transformer) |
+| Scripts                    | [Transformer scripts](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/Transformer) |
 | Model Version       | large                                                                                          |large|
 
 #### Evaluation Performance

@@ -261,7 +261,7 @@ bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_CKPT(o
 
 > 注意:
 
-  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 ### 训练结果
 
@@ -451,7 +451,7 @@ accuracy:  0.8427
 | 速度 | 1卡：300毫秒/步；8卡：310毫秒/步 | 1pc: 毫秒/步;  8pcs: 1180 毫秒/步 |
 | 总时间 | 1卡：18小时；8卡：2.3小时 | 1pc: 62.9 hours;  8pcs: 8.67 hours |
 | 参数(M) | 177 | 177 |
-| 脚本 | <https://gitee.com/mindspore/models/tree/master/research/cv/cnnctc> | <https://gitee.com/mindspore/models/tree/master/research/cv/cnnctc> |
+| 脚本 | <https://gitee.com/mindspore/models/tree/r2.0/research/cv/cnnctc> | <https://gitee.com/mindspore/models/tree/r2.0/research/cv/cnnctc> |
 
 ### 评估性能
 

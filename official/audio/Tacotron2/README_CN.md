@@ -88,7 +88,7 @@ Tacotron2实质上是一种包含编码器和解码器的序列到序列模型�
 
   请按照以下链接中的说明操作：
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+  <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>
 
 - 如果您想在Modelarts中运行，请查看[ModelArts](https://support.huaweicloud.com/modelarts/)的官方文档，并按照以下方式开始训练。
 
@@ -284,7 +284,7 @@ tacotron2/
 | 速度|1264毫秒/步|
 | 训练总时长      | 8卡：24小时19分钟41秒                                 |
 | 检查点                | 328.9M（.ckpt）                                             |
-| 脚本                   | [Tacotron2](https://gitee.com/mindspore/models/tree/master/official/audio/Tacotron2)|
+| 脚本                   | [Tacotron2](https://gitee.com/mindspore/models/tree/r2.0/official/audio/Tacotron2)|
 
 ### 推理性能
 

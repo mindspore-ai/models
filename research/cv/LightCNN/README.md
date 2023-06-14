@@ -137,7 +137,7 @@ reduce precision" to view the operators with reduced precision.
     - [MindSpore tutorial](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 - Generate config json file for 8-card training
-    - [Simple tutorial](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+    - [Simple tutorial](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)
     - For detailed configuration method, please refer to
       the [official website tutorial](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html#configuring-distributed-environment-variables).
 
@@ -589,7 +589,7 @@ Run the applicable training script to get the results. To get the same result, f
 | Loss | 0.10905003 |0.10246127|0.10246127|
 | Speed | - | 147.1 ms/step |191.5 ms/step|
 | Performance | 103h（1 card）<br>  24h（8 cards） |129h|21h|
-| Script | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/LightCNN) |[Link](https://gitee.com/mindspore/models/tree/master/research/cv/LightCNN)|[Link](https://gitee.com/mindspore/models/tree/master/research/cv/LightCNN)|
+| Script | [Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/LightCNN) |[Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/LightCNN)|[Link](https://gitee.com/mindspore/models/tree/r2.0/research/cv/LightCNN)|
 
 ### Evaluation Performance
 

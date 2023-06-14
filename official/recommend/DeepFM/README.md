@@ -95,7 +95,7 @@ After installing MindSpore via the official website, you can start training and 
 
   Please follow the instructions in the link below:
 
-  [hccl tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+  [hccl tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 - running on GPU
 
@@ -433,7 +433,7 @@ auc : 0.8057789065281104
 | Total time                 | 1pc: 90 mins;                                               | To do                  |
 | Parameters (M)             | 16.5                                                        | To do                  |
 | Checkpoint for Fine tuning | 190M (.ckpt file)                                           | To do                  |
-| Scripts                    | [deepfm script](https://gitee.com/mindspore/models/tree/master/official/recommend/DeepFM) | To do                  |
+| Scripts                    | [deepfm script](https://gitee.com/mindspore/models/tree/r2.0/official/recommend/DeepFM) | To do                  |
 
 ### Inference Performance
 

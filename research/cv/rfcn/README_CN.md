@@ -95,8 +95,8 @@ RFCN与Faster-RCNN类似，是一个两阶段的目标检测网络。RFCN以ResN
 注意：
 
 1. 第一次运行生成MindRecord文件，耗时较长。
-2. 预训练模型是在ImageNet2012上训练的ResNet-101检查点。你可以使用ModelZoo中 [resnet101](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) 脚本来训练, 然后使用src/convert_checkpoint.py把训练好的resnet101的权重文件转换为可加载的权重文件。也可以使用mindspore官方提供的[resnet101预训练模型](https://download.mindspore.cn/model_zoo/r1.3/resnet101_ascend_v130_imagenet2012_official_cv_bs32_acc78.58/)进行训练
-3. BACKBONE_MODEL是通过modelzoo中的[resnet101](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet)脚本训练的。PRETRAINED_MODEL是经过转换后的权重文件。VALIDATION_JSON_FILE为标签文件。CHECKPOINT_PATH是训练后的检查点文件。
+2. 预训练模型是在ImageNet2012上训练的ResNet-101检查点。你可以使用ModelZoo中 [resnet101](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet) 脚本来训练, 然后使用src/convert_checkpoint.py把训练好的resnet101的权重文件转换为可加载的权重文件。也可以使用mindspore官方提供的[resnet101预训练模型](https://download.mindspore.cn/model_zoo/r1.3/resnet101_ascend_v130_imagenet2012_official_cv_bs32_acc78.58/)进行训练
+3. BACKBONE_MODEL是通过modelzoo中的[resnet101](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet)脚本训练的。PRETRAINED_MODEL是经过转换后的权重文件。VALIDATION_JSON_FILE为标签文件。CHECKPOINT_PATH是训练后的检查点文件。
 
 ## 在GPU上运行
 
@@ -252,7 +252,7 @@ bash run_eval_gpu.sh [DEVICE_ID] [ANNO_PATH] [CHECKPOINT_PATH] [COCO_ROOT] [MIND
 | 速度 | 1卡：420毫秒/步；8卡：420毫秒/步 |
 | 总时间 |1卡：130小时；8卡：15.71小时 |
 | 参数(M) |670M |
-| 脚本 | [RFCN脚本](https://gitee.com/mindspore/models/tree/master/research/cv/rfcn) |
+| 脚本 | [RFCN脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/rfcn) |
 
 ### 评估性能
 

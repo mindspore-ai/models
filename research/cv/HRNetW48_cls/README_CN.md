@@ -178,7 +178,7 @@ bash scripts/run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
 | 训练总时间 (8p)             | 28.7h                                    |
 | 评估总时间                  | 5min                                    |
 | 参数量 (M)                 | 296M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/HRNetW48_cls) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/HRNetW48_cls) |
 
 # 随机情况的描述
 

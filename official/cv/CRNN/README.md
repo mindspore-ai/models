@@ -122,7 +122,7 @@ We provide `convert_ic03.py`, `convert_iiit5k.py`, `convert_svt.py` as exmples f
         For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
         Please follow the instructions in the link below:
-        [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+        [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 - Run on docker
 
@@ -449,7 +449,7 @@ result CRNNAccuracy is: 0.806666666666
 | Total time                 | 557 mins                                          | 189 mins                                          |
 | Parameters (M)             | 83M (.ckpt file)                                  | 96M                                               |
 | Checkpoint for Fine tuning | 20.3M (.ckpt file)                                |                                                   |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/DeepLabV3P) | [Link](https://gitee.com/mindspore/models/tree/r2.0/official/cv/DeepLabV3P) |
 
 #### [Evaluation Performance](#contents)
 

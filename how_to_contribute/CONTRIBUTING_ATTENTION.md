@@ -47,7 +47,7 @@ Remember to send a reply after the issue is selected to let others know that you
 
 Reference [CONTRIBUTING.md](../CONTRIBUTING.md), you should make sure your code is consistent with MindSpore's existing CodeStyle.
 
-For some details of implementations, you could refer to some recommended models such as [Resnet](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet), [Yolov5](https://gitee.com/mindspore/models/tree/master/official/cv/YOLOv5), [IPT](https://gitee.com/mindspore/models/tree/master/research/cv/IPT), [Transformer](https://gitee.com/mindspore/models/tree/master/official/nlp/Transformer), etc.
+For some details of implementations, you could refer to some recommended models such as [Resnet](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet), [Yolov5](https://gitee.com/mindspore/models/tree/r2.0/official/cv/YOLOv5), [IPT](https://gitee.com/mindspore/models/tree/r2.0/research/cv/IPT), [Transformer](https://gitee.com/mindspore/models/tree/r2.0/official/nlp/Transformer), etc.
 
 ### Directory Structure
 

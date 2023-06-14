@@ -106,7 +106,7 @@ After installing MindSpore from the official website, you can perform the follow
   None
   ```
 
-  For distributed training, you need to create an HCCL configuration file in JSON format in advance. For details, see [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+  For distributed training, you need to create an HCCL configuration file in JSON format in advance. For details, see [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools).
 
 - Perform training on ModelArts. (If you want to run the training on ModelArts, see [modelarts](https://support.huaweicloud.com/modelarts/).)
 

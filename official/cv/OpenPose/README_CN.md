@@ -103,7 +103,7 @@ OpenPose网络提出了一种利用部分亲和场（PAF）自下而上的人体
   # 示例：bash scripts/run_eval_ascend.sh /home/model/openpose/ckpt/0-8_663.ckpt /home/DataSet/coco/val2017 /home/DataSet/coco/annotations/person_keypoints_val2017.json 0
   ```
 
-[RANK_table_FILE]为多卡信息配置表在环境中的路径。配置表可以由工具[hccl_tool](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)自动生成。
+[RANK_table_FILE]为多卡信息配置表在环境中的路径。配置表可以由工具[hccl_tool](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)自动生成。
 
 # [脚本说明](#目录)
 

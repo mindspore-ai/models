@@ -204,7 +204,7 @@ sh scripts/run_ascend_distribute.sh [TRAIN_DATA_DIR] [DEVICE_ID]
 sh scripts/run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR] [DEVICE_NUM]
 ```
 
-- 分布式训练需要提前创建JSON格式的HCCL配置文件。具体操作，参见：<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+- 分布式训练需要提前创建JSON格式的HCCL配置文件。具体操作，参见：<https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>
 
 #### GPU处理器环境运行RDN
 

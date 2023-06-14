@@ -89,7 +89,7 @@ CelebFaces Attributes Dataset (CelebA) 是一个大规模的人脸属性数据�
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
   对于评估脚本，需要提前创建存放自定义图片(jpg)的目录以及属性编辑文件，关于属性编辑文件的说明见[脚本及样例代码](#脚本及样例代码)。目录以及属性编辑文件分别对应参数`custom_data`和`custom_attr`。checkpoint文件被训练脚本默认放置在
   `/output/{experiment_name}/checkpoint`目录下，执行脚本时需要将检查点文件（Generator）的名称作为参数传入。
@@ -284,7 +284,7 @@ bash run_infer_310.sh [GEN_MINDIR_PATH] [ATTR_FILE_PATH] [DATA_PATH] [NEED_PREPR
 | 优化器                     | Adam                                                        | Adam |
 | 生成器输出                 | image                                                       | image |
 | 速度                       | 5.56 step/s                                                 | 6.67 step/s |
-| 脚本                       | [AttGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/AttGAN) | [AttGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/AttGAN) |
+| 脚本                       | [AttGAN script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/AttGAN) | [AttGAN script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/AttGAN) |
 
 ### 推理性能
 

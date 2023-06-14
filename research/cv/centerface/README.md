@@ -123,7 +123,7 @@ step3 (ASCEND ONLY): prepare user rank_table
 
 ```python
 # user can use your own rank table file
-# or use the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) to generate rank table file
+# or use the [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools) to generate rank table file
 # e.g., python hccl_tools.py --device_num "[0,8)"
 python hccl_tools.py --device_num "[0,8)"
 ```
@@ -464,7 +464,7 @@ Major parameters eval.py as follows:
 
     ```python
     # user can use your own rank table file
-    # or use the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) to generate rank table file
+    # or use the [hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools) to generate rank table file
     # e.g., python hccl_tools.py --device_num "[0,8)"
     python hccl_tools.py --device_num "[0,8)"
     ```
@@ -869,7 +869,7 @@ CenterFace on 13K images(The annotation and data format must be the same as wide
 | Speed                      | 1p 65 img/s, 8p 475 img/s                                   | 1gpu 80 img/s, 8gpu 480 img/s |
 | Total time                 | train(8p) 1.1h, test 50min, eval 5-10min                    | train(8gpu) 1.0h, test 35 min, eval 5-10min |
 | Checkpoint for Fine tuning | 22M (.ckpt file)                                            | 23M (.ckpt file) |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/official/cv/CycleGAN> | <https://gitee.com/mindspore/models/tree/master/official/cv/CycleGAN> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/r2.0/official/cv/CycleGAN> | <https://gitee.com/mindspore/models/tree/r2.0/official/cv/CycleGAN> |
 
 ### Inference Performance
 

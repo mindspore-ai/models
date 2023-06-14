@@ -294,7 +294,7 @@ bash convert_model.sh [MODEL_NAME] [PTH_FILE] [MSP_FILE]
 
 ## 贡献指南
 
-如果你想参与贡献昇思的工作当中，请阅读[昇思贡献指南](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/master/how_to_contribute)
+如果你想参与贡献昇思的工作当中，请阅读[昇思贡献指南](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/r2.0/how_to_contribute)
 
 ## ModelZoo 主页
 

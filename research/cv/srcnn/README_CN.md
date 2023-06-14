@@ -149,7 +149,7 @@ python src/create_dataset.py --src_folder=/dataset/train --output_folder=/datase
 
     - 分布式训练
 
-    对于分布式训练，需要提前创建JSON格式的hccl配置文件。请遵循以下链接中的说明：<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+    对于分布式训练，需要提前创建JSON格式的hccl配置文件。请遵循以下链接中的说明：<https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools.>
 
     运行分布式训练脚本如下：
 

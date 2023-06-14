@@ -174,7 +174,7 @@ After installing MindSpore and python3, you can start training and evaluation as
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools>.
 
 # [Script Description](#contents)
 
@@ -388,4 +388,4 @@ Before performing inference, the mindir file must be exported by export.py. Curr
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/models/tree/master).
+Please check the official [homepage](https://gitee.com/mindspore/models/tree/r2.0).

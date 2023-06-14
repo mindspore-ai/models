@@ -308,7 +308,7 @@ Hard   Val AP : 0.8886
 | 总时长                 | 4卡: 6.4 小时                                               |
 | 参数 (M)             | 27.29M                                                        |
 | 调优检查点 | 336.3M (.ckpt 文件)                                           |
-| 脚本                    | [retinaface script](https://gitee.com/mindspore/models/tree/master/official/cv/RetinaFace_ResNet50) |
+| 脚本                    | [retinaface script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/RetinaFace_ResNet50) |
 
 ### 评估性能
 

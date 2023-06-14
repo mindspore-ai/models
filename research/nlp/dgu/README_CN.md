@@ -99,9 +99,9 @@ BERT的主干结构为Transformer。对于BERT_base，Transformer包含12个编�
 
 在Ascend设备上做分布式训练时，请提前创建JSON格式的HCCL配置文件。
 
-在Ascend设备上做单机分布式训练时，请参考[here](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)创建HCCL配置文件。
+在Ascend设备上做单机分布式训练时，请参考[here](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)创建HCCL配置文件。
 
-在Ascend设备上做多机分布式训练时，训练命令需要在很短的时间间隔内在各台设备上执行。因此，每台设备上都需要准备HCCL配置文件。请参考[here](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)创建多机的HCCL配置文件。
+在Ascend设备上做多机分布式训练时，训练命令需要在很短的时间间隔内在各台设备上执行。因此，每台设备上都需要准备HCCL配置文件。请参考[here](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools)创建多机的HCCL配置文件。
 
 ```text
 For pretraining, schema file contains ["input_ids", "input_mask", "segment_ids", "next_sentence_labels", "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"].

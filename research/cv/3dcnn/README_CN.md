@@ -231,7 +231,7 @@ BraTS 2017原始数据集的文件目录结构如下所示：
 
     分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-    具体操作，参见[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) 中的说明。
+    具体操作，参见[hccl_tools](https://gitee.com/mindspore/models/tree/r2.0/utils/hccl_tools) 中的说明。
 
 ### 结果
 
@@ -364,7 +364,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 | 速度          | 345毫秒/步(8卡)                                              | 339毫秒/步(8卡)                                              |
 | 总时长        | 2.9小时                                                      | 3.9小时                                                      |
 | 微调检查点    | 9.1M (.ckpt文件)                                             | 9.1M (.ckpt文件)                                             |
-| 脚本          | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/3dcnn) | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/3dcnn) |
+| 脚本          | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/3dcnn) | [链接](https://gitee.com/mindspore/models/tree/r2.0/research/cv/3dcnn) |
 
 ### 推理性能
 

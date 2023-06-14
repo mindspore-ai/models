@@ -44,7 +44,7 @@ D-LinkNet模型基于LinkNet架构构建。实现方式见论文[D-LinkNet: Link
 
 D-LinkNet使用在ImageNet数据集上预训练的ResNet34作为其编码器。ResNet34最初是为256×256尺寸的中分辨率图像分类而设计的，但在这一挑战中，任务是从1024×1024的高分辨率卫星图像中分割道路。考虑到狭窄性、连通性、复杂性和道路跨度长等方面，重要的是增加网络中心部分的特征的感受范围，并保留详细信息。使用池化层可以成倍增加特征的感受范围，但可能会降低中心特征图的分辨率并降低空间信息。空洞卷积层可能是池化层的理想替代方案。D-LinkNet使用几个空洞卷积层，中间部分带有skip-connection。
 
-本项目中使用的MindSpore框架下的ResNet34模型代码来自于[该网址](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet), 而对应的预训练权重可以在[这里找到](https://download.mindspore.cn/model_zoo/r1.3/) 。
+本项目中使用的MindSpore框架下的ResNet34模型代码来自于[该网址](https://gitee.com/mindspore/models/tree/r2.0/official/cv/ResNet), 而对应的预训练权重可以在[这里找到](https://download.mindspore.cn/model_zoo/r1.3/) 。
 
 空洞卷积可以级联模式堆叠。如果堆叠的空洞卷积层的膨胀系数分别为1、2、4、8、16，则每层的接受场将为3、7、15、31、63。编码器部分（ResNet34）具有5个下采样层，如果大小为1024×1024的图像通过编码器部分，则输出特征图的大小将为32×32。在这种情况下，D-LinkNet在中心部分使用膨胀系数为1、2、4、8的空洞卷积层，因此最后一个中心层上的特征点将在第一个中心特征图上看到31×31点，覆盖第一中心特征图的主要部分。尽管如此，D-LinkNet还是利用了多分辨率功能，D-LinkNet的中心部分可以看作是并行模式。
 
@@ -312,7 +312,7 @@ bash scripts/run_distribute_gpu_train.sh [DATASET] [CONFIG_PATH] [DEVICE_NUM] [C
 | 参数(M)  | 31M| 31M |
 | 微调检查点 | 118.70M (.ckpt文件)| 475M (.ckpt文件) |
 | 配置文件 | dlinknet_config.yaml | dlinknet_config.yaml |
-| 脚本| [D-LinkNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/dlinknet) | [D-LinkNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/dlinknet) |
+| 脚本| [D-LinkNet脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/dlinknet) | [D-LinkNet脚本](https://gitee.com/mindspore/models/tree/r2.0/research/cv/dlinknet) |
 
 ### 推理性能
 
