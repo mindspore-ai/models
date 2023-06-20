@@ -100,7 +100,7 @@ bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID]
         │   ├──run_distribute_train.sh         // 在Ascend中进行分布式训练（8卡）
         │   ├──run_distribute_train_gpu.sh     // 在GPU中进行分布式训练（8卡）
         │   ├──run_standalone_train.sh         // 进行单卡训练
-        │   ├──run_infer_310.sh                // 在310上评估的shell脚本
+        │   ├──run_infer_cpp.sh                // 在310上推理的shell脚本
         │   ├──run_eval.sh                     // 用于评估的shell脚本
         │   ├──run_eval_onnx.sh                // 用于onnx评估的shell脚本
         ├──model_utils
@@ -301,7 +301,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 
 ```shell
 # Ascend 310推理
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DVPP] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DVPP] [DEVICE_ID]
 ```
 
 - `DVPP`必填，可选值为DVPP或CPU，不区分大小写。DVPP硬件要求宽度为16对齐和高度为偶对齐。因此，网络需要使用CPU算子来处理图像。
