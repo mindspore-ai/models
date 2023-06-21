@@ -83,6 +83,9 @@ img_path: ''
 enable_predict_lite_backend: False
 enable_predict_lite_mindir: False
 
+# lite mindir inference
+mindir_path: 'net.mindir'
+
 ---
 # Help description for each configuration
 enable_modelarts: "Whether training on modelarts, default: False"

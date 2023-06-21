@@ -134,11 +134,8 @@ def predict_mindir(data_input):
     lite_context = mslite.Context()
     lite_context = _get_lite_context(lite_context)
 
-    ms_model = create_model()
-    ms.export(ms_model.predict_network, data_input, file_name="net", file_format="MINDIR")
-
     lite_model = mslite.Model()
-    lite_model.build_from_file("net.mindir", mslite.ModelType.MINDIR, lite_context)
+    lite_model.build_from_file(config.mindir_path, mslite.ModelType.MINDIR, lite_context)
 
     output = _predict_core(lite_model)
     t_start = time.time()

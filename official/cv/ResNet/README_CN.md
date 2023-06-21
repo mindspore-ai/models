@@ -774,7 +774,7 @@ predict.py --checkpoint_file_path [CKPT_PATH] --config_path [CONFIG_PATH] --img_
 或者你可以调用MindSpore Lite Python接口进行推理，示例如下，具体细节参考[使用Python接口执行云侧推理](https://www.mindspore.cn/lite/docs/zh-CN/master/use/cloud_infer/runtime_python.html) 。
 
 ```bash
-predict.py --checkpoint_file_path [CKPT_PATH] --config_path [CONFIG_PATH] --img_path [IMG_PATH] --enable_predict_lite_mindir True > log.txt 2>&1 &  
+predict.py --mindir_path [MINDIR_PATH] --config_path [CONFIG_PATH] --img_path [IMG_PATH] --enable_predict_lite_mindir True > log.txt 2>&1 &  
 ```
 
 ## 推理过程
