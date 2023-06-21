@@ -22,6 +22,7 @@ Usage:
     python predict.py --config_path [Your config path]
 """
 import time
+import os
 
 import numpy as np
 from PIL import Image
@@ -33,13 +34,21 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.train import Model
 from src.model_utils.config import config
 from src.lenet import LeNet5
+from src.dataset import create_dataset
 
 
 def create_model():
     """
     create model.
     """
-    network = LeNet5(config.num_classes, num_channel=3)
+    if config.dataset_name == "mnist":
+        num_channel = 1
+    elif config.dataset_name == "imagenet2012":
+        num_channel = 3
+    else:
+        raise RuntimeError(f'For lenet predict, input dataset only support mnist and imagenet2012, '
+                           f'but got {config.dataset_name}')
+    network = LeNet5(config.num_classes, num_channel=num_channel)
     if config.ckpt_file:
         param_dict = load_checkpoint(config.ckpt_file)
         load_param_into_net(network, param_dict)
@@ -117,11 +126,8 @@ def predict_mindir(data_input):
     lite_context = mslite.Context()
     lite_context = _get_lite_context(lite_context)
 
-    ms_model = create_model()
-    ms.export(ms_model.predict_network, data_input, file_name="net", file_format="MINDIR")
-
     lite_model = mslite.Model()
-    lite_model.build_from_file("net.mindir", mslite.ModelType.MINDIR, lite_context)
+    lite_model.build_from_file(config.mindir_path, mslite.ModelType.MINDIR, lite_context)
 
     output = _predict_core(lite_model)
     t_start = time.time()
@@ -155,18 +161,36 @@ def _get_max_index_from_res(data_input):
     return res_index[0][0]
 
 
+def get_mnist_val_input():
+    """
+    Get random single input from mnist validation dataset.
+    """
+    ds_val = create_dataset(os.path.join(config.data_path, "test"), 1, 2)
+    if ds_val.get_dataset_size() == 0:
+        raise ValueError("Please check dataset size > 0 and batch_size <= dataset size")
+    image, _ = next(ds_val.create_tuple_iterator())
+    return image
+
+
 if __name__ == "__main__":
-    image_input = read_image(config.img_path)
-    res, avg_t = predict_lenet(image_input)
+    if config.dataset_name == "imagenet2012":
+        test_data_input = read_image(config.img_path)
+    elif config.dataset_name == "mnist":
+        test_data_input = get_mnist_val_input()
+    else:
+        raise RuntimeError(f'For lenet predict, input dataset only support mnist and imagenet2012, '
+                           f'but got {config.dataset_name}')
+
+    res, avg_t = predict_lenet(test_data_input)
     print("Prediction res: ", _get_max_index_from_res(res))
     print(f"Prediction avg time: {avg_t * 1000} ms")
 
     if config.enable_predict_lite_backend:
-        res_lite, avg_t_lite = predict_backend_lite(image_input)
+        res_lite, avg_t_lite = predict_backend_lite(test_data_input)
         print("Predict using backend lite, res: ", _get_max_index_from_res(res_lite))
         print(f"Predict using backend lite, avg time: {avg_t_lite * 1000} ms")
 
     if config.enable_predict_lite_mindir:
-        res_mindir, avg_t_mindir = predict_mindir(image_input)
+        res_mindir, avg_t_mindir = predict_mindir(test_data_input)
         print("Predict by mindir, res: ", _get_max_index_from_res(res_mindir))
         print(f"Predict by mindir, avg time: {avg_t_mindir * 1000} ms")

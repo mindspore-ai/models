@@ -398,18 +398,6 @@ RetinaFace可以使用ResNet50或MobileNet0.25骨干提取图像特征进行检�
   Prediction avg time: 11.9745 ms
   ```
 
-  如果你想调用MindSpore Lite后端进行推理，你可以直接设置接口 `predict` 的参数 `backend` 为'lite'，这是一个实验性质的特性，相应的运行示例如下：
-
-  ```bash
-  python predict.py --ckpt_file [CKPT_FILE] --img_path [IMG_PATH] --enable_predict_lite_backend True > log.txt 2>&1 &  
-  ```
-
-  或者你可以调用MindSpore Lite Python接口进行推理，示例如下，具体细节参考[使用Python接口执行云侧推理](https://www.mindspore.cn/lite/docs/zh-CN/master/use/cloud_infer/runtime_python.html) 。
-
-  ```bash
-  python predict.py --ckpt_file [CKPT_FILE] --img_path [IMG_PATH] --enable_predict_lite_mindir True > log.txt 2>&1 &  
-  ```
-
 ## 导出过程
 
 ### 导出

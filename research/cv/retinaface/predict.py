@@ -127,7 +127,7 @@ def predict_backend_lite(data_input, info):
     return final_boxes, avg_time
 
 
-def predict_mindir(data_input, info):
+def predict_mindir(data_input, info, mindir_path):
     """
     predict by MindIR.
     """
@@ -172,11 +172,8 @@ def predict_mindir(data_input, info):
     lite_context = mslite.Context()
     lite_context = _get_lite_context(lite_context)
 
-    ms_model = create_model()
-    ms.export(ms_model.predict_network, data_input, file_name="net", file_format="MINDIR")
-
     lite_model = mslite.Model()
-    lite_model.build_from_file("net.mindir", mslite.ModelType.MINDIR, lite_context)
+    lite_model.build_from_file(mindir_path, mslite.ModelType.MINDIR, lite_context)
 
     boxes, confs, _ = _predict_core(lite_model)
     t_start = time.time()
@@ -193,8 +190,6 @@ if __name__ == '__main__':
     parser.add_argument('--ckpt_file', type=str, default='./train_parallel3/checkpoint/ckpt_3/RetinaFace-56_201.ckpt',
                         help='ckpt location')
     parser.add_argument('--img_path', type=str, default='./test.png', help='image location')
-    parser.add_argument('--enable_predict_lite_backend', type=bool, default=False, help='enable predict using lite')
-    parser.add_argument('--enable_predict_lite_mindir', type=bool, default=False, help='enable predict using MindIR')
     args = parser.parse_args()
 
     context.set_context(mode=context.GRAPH_MODE, device_target='GPU', save_graphs=False)
@@ -203,13 +198,3 @@ if __name__ == '__main__':
     res_boxes, res_avg_t = predict(image_input, img_info)
     print("Prediction res: ", res_boxes)
     print(f"Prediction avg time: {res_avg_t * 1000} ms")
-
-    if args.enable_predict_lite_mindir:
-        res_mindir, avg_t_mindir = predict_mindir(image_input, img_info)
-        print("Predict by mindir, res: ", res_mindir)
-        print(f"Predict by mindir, avg time: {avg_t_mindir * 1000} ms")
-
-    if args.enable_predict_lite_backend:
-        res_lite, avg_t_lite = predict_backend_lite(image_input, img_info)
-        print("Predict using backend lite, res: ", res_lite)
-        print(f"Predict using backend lite, avg time: {avg_t_lite * 1000} ms")

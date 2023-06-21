@@ -751,7 +751,7 @@ python predict.py --checkpoint_file_path [CKPT_PATH] --config_path [CONFIG_PATH]
 Or you can predict by using MindSpore Lite Python interface, which is shown as follows, please refer to [Using Python Interface to Perform Cloud-side Inference](https://www.mindspore.cn/lite/docs/en/master/use/cloud_infer/runtime_python.html) for details.
 
 ```bash
-python predict.py --checkpoint_file_path [CKPT_PATH] --config_path [CONFIG_PATH] --img_path [IMG_PATH] --enable_predict_lite_mindir True > log.txt 2>&1 &  
+python predict.py --mindir_path [MINDIR_PATH] --config_path [CONFIG_PATH] --img_path [IMG_PATH] --enable_predict_lite_mindir True > log.txt 2>&1 &  
 ```
 
 ## Inference Process
