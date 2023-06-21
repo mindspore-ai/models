@@ -289,7 +289,7 @@ python predict.py --ckpt_file [CKPT_PATH] --img_path [IMG_PATH] --enable_predict
 或者你可以调用MindSpore Lite Python接口进行推理，示例如下，具体细节参考[使用Python接口执行云侧推理](https://www.mindspore.cn/lite/docs/zh-CN/master/use/cloud_infer/runtime_python.html) 。
 
 ```bash
-python predict.py --mindir [MINDIR_PATH] --img_path [IMG_PATH] --enable_predict_lite_mindir True > log.txt 2>&1 &  
+python predict.py --ckpt_file [CKPT_PATH] --img_path [IMG_PATH] --enable_predict_lite_mindir True > log.txt 2>&1 &  
 ```
 
 ## 推理过程
