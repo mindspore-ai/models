@@ -256,15 +256,15 @@ def _get_mindrecord_dataset(directory, train_mode=True, batch_size=1000,
         data_set = ds.MindDataset(os.path.join(directory, file_prefix_name + file_suffix_name),
                                   columns_list=['feat_ids', 'feat_vals', 'label'],
                                   num_shards=rank_size, shard_id=rank_id, shuffle=shuffle,
-                                  num_parallel_workers=8)
+                                  num_parallel_workers=4)
     else:
         data_set = ds.MindDataset(os.path.join(directory, file_prefix_name + file_suffix_name),
                                   columns_list=['feat_ids', 'feat_vals', 'label'],
-                                  shuffle=shuffle, num_parallel_workers=8)
+                                  shuffle=shuffle, num_parallel_workers=4)
     data_set = data_set.batch(int(batch_size / line_per_sample), drop_remainder=True)
     data_set = data_set.map(_padding_func(batch_size, manual_shape, target_column),
                             input_columns=['feat_ids', 'feat_vals', 'label'],
-                            num_parallel_workers=8)
+                            num_parallel_workers=2)
     return data_set
 
 
