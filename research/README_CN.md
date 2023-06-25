@@ -165,8 +165,7 @@
 | facedetection              | [YOLOv3: An Incremental Improvement](https://arxiv.org/abs/1804.02767) | [link](https://gitee.com/mindspore/models/tree/master/research/cv/FaceDetection) |
 | maskedfacerecognition      | [Masked Face Recognition with Latent Part Detection](https://dl.acm.org/doi/10.1145/3394171.3413731) | [link](https://gitee.com/mindspore/models/tree/master/research/cv/MaskedFaceRecognition) |
 | facenet                    | [FaceNet: A Unified Embedding for Face Recognition and Clustering](https://arxiv.org/abs/1503.03832) | [link](https://gitee.com/mindspore/models/tree/master/research/cv/FaceNet) |
-| arcface                    | [ArcFace: Additive Angular Margin Loss for Deep Face Recognition](https://arxiv.org/abs/1801.07698) | [link](https://gitee.com/mindspore/models/tree/master/official/cv/Arcface) |
-| facerecognition            | [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385) | [link](https://gitee.com/mindspore/models/tree/master/official/cv/FaceRecognition) |
+| facerecognition            | [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385) | [link](https://gitee.com/mindspore/models/tree/master/research/cv/FaceRecognition) |
 | lresnet100e_ir             | [ArcFace: Additive Angular Margin Loss for Deep Face Recognition](https://arxiv.org/abs/1801.07698v1) | [link](https://gitee.com/mindspore/models/tree/master/research/cv/lresnet100e_ir) |
 | centerface              | [CenterFace: Joint Face Detection and Alignment Using Face as Point](https://arxiv.org/abs/1911.03599) | [link](https://gitee.com/mindspore/models/tree/master/research/cv/centerface) |
 | sphereface              | [SphereFace: Deep Hypersphere Embedding for Face Recognition](https://arxiv.org/abs/1704.08063) | [link](https://gitee.com/mindspore/models/tree/master/research/cv/sphereface) |
