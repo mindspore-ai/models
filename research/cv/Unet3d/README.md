@@ -466,7 +466,7 @@ eval average dice is 0.9502010010453671
 | Speed               | 8pcs: 1795ms/step                                         | 8pcs: 1883ms/step                                    |
 | Total time          | 8pcs: 0.62hours                                           | 8pcs: 0.66hours                                      |
 | Parameters (M)      | 34                                                        | 34                                                   |
-| Scripts             | [unet3d script](https://gitee.com/mindspore/models/tree/r2.0/official/cv/Unet3d) |
+| Scripts             | [unet3d script](https://gitee.com/mindspore/models/tree/r2.0/research/cv/Unet3d) |
 
 #### Inference Performance
 

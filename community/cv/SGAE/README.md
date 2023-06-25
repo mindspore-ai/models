@@ -56,7 +56,7 @@ arXiv:2109.04684, 2021.
 >
 > creditcard:<https://www.kaggle.com/mlg-ulb/creditcardfraud>
 >
-> diabetic:<https://archive.ics.uci.edu/ml/datasets/Diabetes+130+US+hospitals+for+years+1999-2008>
+> diabetic:<https://archive.ics.uci.edu/dataset/296/diabetes+130-us+hospitals+for+years+1999-2008>
 >
 > Donor:<https://www.kaggle.com/c/kdd-cup-2014-predicting-excitement-at-donors-choose>
 >

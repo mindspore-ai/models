@@ -287,7 +287,7 @@ def IC15_TEST_Generator():
 
         img_paths = []
         for _, img_name in enumerate(img_names):
-            img_path = data_dir + img_name
+            img_path = os.path.join(data_dir, img_name)
             img_paths.append(img_path)
 
         all_img_paths.extend(img_paths)
