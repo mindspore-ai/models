@@ -294,7 +294,7 @@ python export.py --config_path=[CONFIG_PATH]
 | Resources         | Ascend 910; 2.60 GHz CPU with 192 cores; 755 GB memory; EulerOS 2.8    |
 | Upload date     | 2021-12-30                                                   |
 | MindSpore version| 1.5.0                                                        |
-| Script         | [ssim-ae script](https://gitee.com/mindspore/models/tree/master/official/cv/SSIM-AE)|
+| Script         | [ssim-ae script](https://gitee.com/mindspore/models/tree/master/research/cv/SSIM-AE)|
 
 | Dataset   | Training Parameters| Speed (single device)| Total Duration| Loss Function| Accuracy| Checkpoint File Size|
 | -------- |------- |----- |----- |-------- |------ |--------------- |

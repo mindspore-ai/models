@@ -467,7 +467,7 @@ eval average dice is 0.9502010010453671
 | 速度              | 8卡：1795毫秒/步                                        | 8卡：1883毫秒/步                                   |
 | 总时长         | 8卡：0.62小时                                          | 8卡：0.66小时                                     |
 | 参数量（M）     | 34                                                       | 34                                                  |
-| 脚本            | [Unet3D](https://gitee.com/mindspore/models/tree/master/official/cv/Unet3d)|
+| 脚本            | [Unet3D](https://gitee.com/mindspore/models/tree/master/research/cv/Unet3d)|
 
 #### 推理性能
 

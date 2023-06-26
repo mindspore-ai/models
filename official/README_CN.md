@@ -211,7 +211,6 @@
 | deeplab v3      |      | [link](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabv3)       |
 | deeplab v3 plus |      | [link](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P)      |
 | unet            |      | [link](https://gitee.com/mindspore/models/tree/master/official/cv/Unet)            |
-| unet3d          |      | [link](https://gitee.com/mindspore/models/tree/master/official/cv/Unet3d)          |
 
 ### OCR
 

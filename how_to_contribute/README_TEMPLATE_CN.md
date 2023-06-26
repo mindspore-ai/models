@@ -174,7 +174,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [LABEL_FILE] [DEVICE_I
 ## 参考模板
 
 此部分不需要出现在你的README中
-[maskrcnn_readme](https://gitee.com/mindspore/models/blob/master/official/cv/ResNeXt/README_CN.md)
+[resnet_readme](https://gitee.com/mindspore/models/blob/master/official/cv/ResNet/README_CN.md)
 
 ## 贡献指南
 

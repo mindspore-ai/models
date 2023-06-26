@@ -293,7 +293,7 @@ python export.py --config_path=[CONFIG_PATH]
 | 资源          | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8     |
 | 上传日期      | 2021-12-30                                                   |
 | MindSpore版本 | 1.5.0                                                        |
-| 脚本          | [ssim-ae脚本](https://gitee.com/mindspore/models/tree/master/official/cv/SSIM-AE) |
+| 脚本          | [ssim-ae脚本](https://gitee.com/mindspore/models/tree/master/research/cv/SSIM-AE) |
 
 | 数据集    | 训练参数 | 速度(单卡) | 总时长 | 损失函数 | 精度 | checkpoint文件大小 |
 | -------- |------- |----- |----- |-------- |------ |--------------- |

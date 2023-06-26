@@ -310,7 +310,7 @@ At precision 0.08: bpip =  1.22112; each frame cost 53100 ms
 | Total Time    | 1P: 3.3h；8P: 0.6h                                           |
 | parameters(M) | 0.34M                                                        |
 | Checkpoint for Fine tuning | 3M (.ckpt file)                                 |
-| Scripts       | [octsqueeze script](https://gitee.com/mindspore/models/tree/master/official/cv/OctSqueeze) |
+| Scripts       | [octsqueeze script](https://gitee.com/mindspore/models/tree/master/research/cv/OctSqueeze) |
 
 ### Inference Performance
 
