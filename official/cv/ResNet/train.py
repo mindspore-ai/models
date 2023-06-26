@@ -107,6 +107,7 @@ def set_parameter():
 
 def init_lr(step_size):
     """init lr"""
+    config.lr_max = config.lr_max / config.device_num * 8
     if config.optimizer == "Thor":
         from src.lr_generator import get_thor_lr
         lr = get_thor_lr(config.start_epoch * step_size, config.lr_init, config.lr_decay, config.lr_end_epoch,
