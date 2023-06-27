@@ -27,8 +27,8 @@ from mindspore.context import ParallelMode
 import mindspore.nn as nn
 from mindspore.train.callback import TimeMonitor, LossMonitor, ModelCheckpoint, CheckpointConfig
 from mindspore.nn.wrap.loss_scale import DynamicLossScaleUpdateCell
-from mindspore.nn.transformer.loss import CrossEntropyLoss
-from mindspore.nn.transformer.transformer import TransformerOpParallelConfig
+from mindspore.parallel._transformer.loss import CrossEntropyLoss
+from mindspore.parallel._transformer import TransformerOpParallelConfig
 import mindspore.common.dtype as mstype
 from mindspore.common import set_seed
 from src.dataset import create_dataset
