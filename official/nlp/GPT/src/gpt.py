@@ -22,8 +22,8 @@ import mindspore.common.dtype as mstype
 from mindspore.common.initializer import TruncatedNormal, initializer
 from mindspore.ops import operations as P
 from mindspore.ops import functional as F
-from mindspore.nn.transformer.layers import _LayerNorm
-from mindspore.nn.transformer.transformer import AttentionMask, TransformerEncoder
+from mindspore.parallel._transformer.layers import _LayerNorm
+from mindspore.parallel._transformer.transformer import AttentionMask, TransformerEncoder
 
 
 class EmbeddingLookup(nn.Cell):
