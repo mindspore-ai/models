@@ -212,11 +212,11 @@ class FeatureSelection(nn.Cell):
         self.batch_size = batch_size
         self.fs1_context = fs1_context
         self.fs2_context = fs2_context
-        if fs1_context:
+        if not fs1_context:
             self.fs1_ctx_bias = initializer('zeros', [1, embedding_dim], mstype.float32)
         else:
             self.fs1_ctx_emb = None
-        if fs2_context:
+        if not fs2_context:
             self.fs2_ctx_bias = initializer('zeros', [1, embedding_dim], mstype.float32)
         else:
             self.fs2_ctx_emb = None
