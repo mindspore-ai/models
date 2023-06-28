@@ -17,7 +17,6 @@ network operations
 """
 import mindspore.nn as nn
 from mindspore.ops import operations as P
-from mindspore.common import dtype as mstype
 
 
 class GlobalAvgPooling(nn.Cell):
@@ -93,7 +92,6 @@ class GroupConv(nn.Cell):
         self.convs = nn.CellList()
         self.op_split = P.Split(axis=1, output_num=self.groups)
         self.op_concat = P.Concat(axis=1)
-        self.cast = P.Cast()
         for _ in range(groups):
             self.convs.append(
                 nn.Conv2d(
@@ -112,6 +110,6 @@ class GroupConv(nn.Cell):
         features = self.op_split(x)
         outputs = ()
         for i in range(self.groups):
-            outputs = outputs + (self.convs[i](self.cast(features[i], mstype.float32)),)
+            outputs = outputs + (self.convs[i](features[i]),)
         out = self.op_concat(outputs)
         return out
