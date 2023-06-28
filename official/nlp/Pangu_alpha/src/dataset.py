@@ -46,25 +46,25 @@ def get_input_data_batch_slice_map(input_ids, eod_id, rank, dis, eod_reset):
     seq_length = input_ids.shape[1] - 1
     # Initialize position_ids and attention_mask
     batch_input_ids = input_ids
-    batch_position_ids = np.ones((dis, seq_length))
-    batch_attention_mask = np.ones((dis, seq_length, seq_length))
+    batch_position_ids = np.ones((dis, seq_length), dtype=np.int32)
+    batch_attention_mask = np.ones((dis, seq_length, seq_length), dtype=np.bool_)
 
     # Loop through batches
     for bs_i, _ in enumerate(range(len(input_ids))):
         # Get normal position_ids and attention_mask
         local_ids = input_ids[bs_i]
-        batch_attention_mask[bs_i] = np.tril(np.ones(shape=(seq_length, seq_length)))
-        batch_position_ids[bs_i] = np.arange(seq_length)
+        batch_attention_mask[bs_i] = np.tril(np.ones(shape=(seq_length, seq_length), dtype=np.bool_))
+        batch_position_ids[bs_i] = np.arange(seq_length, dtype=np.int32)
         # Find eod_of_document
         eod_index = batch_position_ids[bs_i, local_ids[:-1] == eod_id].astype(np.int32)
         prev_index = 0
         for i in range(eod_index.size):
             # Reset position_ids and attention_mask considering EOD
             index = eod_index[i]
-            batch_attention_mask[bs_i, (index + 1):, :(index + 1)] = 0
+            batch_attention_mask[bs_i, (index + 1):, :(index + 1)] = False
             batch_position_ids[bs_i, (index + 1):] -= (index + 1 - prev_index)
             prev_index = index + 1
-    return batch_input_ids, batch_position_ids, batch_attention_mask
+    return batch_input_ids, batch_position_ids, batch_attention_mask.astype(np.float16)
 
 
 def create_dataset(batch_size, data_path, device_num=1, rank=0, drop=True, full_batch=False, data_start_index=0,
@@ -106,7 +106,6 @@ def create_dataset(batch_size, data_path, device_num=1, rank=0, drop=True, full_
     dataset = ds.MindDataset(data[data_start_index:], columns_list=[column_name],
                              shuffle=False, num_samples=num_samples)
     type_cast_op = C.TypeCast(mstype.int32)
-    type_cast_op_float = C.TypeCast(mstype.float16)
 
     if full_batch or is_data_parallel:
         # no need to slice from the inputs
@@ -126,8 +125,6 @@ def create_dataset(batch_size, data_path, device_num=1, rank=0, drop=True, full_
         dataset = dataset.batch(batch_size, drop_remainder=drop)
         dataset = dataset.map(operations=map_func, input_columns=[column_name],
                               output_columns=[column_name, "position_id", "attention_mask"])
-        dataset = dataset.map(input_columns="position_id", operations=type_cast_op)
-        dataset = dataset.map(input_columns="attention_mask", operations=type_cast_op_float)
     else:
         dataset = dataset.map(input_columns=[column_name], operations=type_cast_op)
         dataset = dataset.batch(batch_size, drop_remainder=drop)
