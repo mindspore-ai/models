@@ -105,6 +105,7 @@ def modelarts_pre_process():
 
         print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
 
+
 def eval_func(eval_network, eval_dataloader):
     total_data_num_age, total_data_num_gen, total_data_num_mask = 0, 0, 0
     age_num, gen_num, mask_num = 0, 0, 0
@@ -130,46 +131,45 @@ def eval_func(eval_network, eval_dataloader):
         gen = gen_prob.index(max(gen_prob))
         mask = mask_prob.index(max(mask_prob))
 
-        if gt_age == age:
-            age_num += 1
-        if gt_gen == gen:
-            gen_num += 1
-        if gt_mask == mask:
-            mask_num += 1
+        age_num += (gt_age == age)
+        gen_num += (gt_gen == gen)
+        mask_num += (gt_mask == mask)
 
-        if gen == 1:
-            if gt_gen == 1:
-                gen_tp_num += 1
-            elif gt_gen == 0:
-                gen_fp_num += 1
-        elif gen == 0 and gt_gen == 1:
-            gen_fn_num += 1
+        gen_tp_num += (gen == 1 and gt_gen == 1)
+        gen_fp_num += (gen == 1 and gt_gen == 0)
+        gen_fn_num += (gen == 0 and gt_gen == 1)
 
-        if gt_mask == 1 and mask == 1:
-            mask_tp_num += 1
-        if gt_mask == 0 and mask == 1:
-            mask_fp_num += 1
-        if gt_mask == 1 and mask == 0:
-            mask_fn_num += 1
+        mask_tp_num += (gt_mask == 1 and mask == 1)
+        mask_fp_num += (gt_mask == 0 and mask == 1)
+        mask_fn_num += (gt_mask == 1 and mask == 0)
 
-        if gt_age != -1:
-            total_data_num_age += 1
-        if gt_gen != -1:
-            total_data_num_gen += 1
-        if gt_mask != -1:
-            total_data_num_mask += 1
+        total_data_num_age += (gt_age != -1)
+        total_data_num_gen += (gt_gen != -1)
+        total_data_num_mask += (gt_mask != -1)
 
     age_accuracy = float(age_num) / float(total_data_num_age)
-
-    gen_precision = float(gen_tp_num) / (float(gen_tp_num) + float(gen_fp_num))
-    gen_recall = float(gen_tp_num) / (float(gen_tp_num) + float(gen_fn_num))
+    gen_precision, gen_recall, gen_accuracy = 0, 0, 0
+    if gen_tp_num == 0 and gen_tp_num == 0:
+        gen_precision, gen_recall = 0, 0
+    else:
+        gen_precision = float(gen_tp_num) / (float(gen_tp_num) + float(gen_fp_num))
+        gen_recall = float(gen_tp_num) / (float(gen_tp_num) + float(gen_fn_num))
+    if gen_precision == 0 and gen_recall == 0:
+        gen_f1 = 0
+    else:
+        gen_f1 = 2. * gen_precision * gen_recall / (gen_precision + gen_recall)
     gen_accuracy = float(gen_num) / float(total_data_num_gen)
-    gen_f1 = 2. * gen_precision * gen_recall / (gen_precision + gen_recall)
 
-    mask_precision = float(mask_tp_num) / (float(mask_tp_num) + float(mask_fp_num))
-    mask_recall = float(mask_tp_num) / (float(mask_tp_num) + float(mask_fn_num))
+    if mask_tp_num == 0 and mask_fp_num == 0:
+        mask_precision, mask_recall = 0, 0
+    else:
+        mask_precision = float(mask_tp_num) / (float(mask_tp_num) + float(mask_fp_num))
+        mask_recall = float(mask_tp_num) / (float(mask_tp_num) + float(mask_fn_num))
+    if mask_precision == 0 and mask_recall == 0:
+        mask_f1 = 0
+    else:
+        mask_f1 = 2. * mask_precision * mask_recall / (mask_precision + mask_recall)
     mask_accuracy = float(mask_num) / float(total_data_num_mask)
-    mask_f1 = 2. * mask_precision * mask_recall / (mask_precision + mask_recall)
 
     return total_data_num_age, total_data_num_gen, total_data_num_mask, age_accuracy, \
         gen_accuracy, mask_accuracy, gen_precision, gen_recall, gen_f1, mask_precision, \
