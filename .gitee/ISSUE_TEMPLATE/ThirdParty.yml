@@ -1,0 +1,54 @@
+name: ThirdParty
+description: Use this template for changing third party software
+title: "[ThirdParty][new/upgrade/delete][SoftwareName version]: "
+labels: ["kind/ThirdParty"]
+body:
+  - type: textarea
+    attributes:
+        label: Software Information
+      value: |
+        - Name：<!--grpc-->
+        - Version：<!--1.35-->
+        - License：<!--Apache-2.0, please use the identifier in https://spdx.org/licenses -->
+        - Source code management address： <!--http://github.com/grpc -->
+        - Source code package download address：<!--https://github.com/grpc/grpc/archive/refs/tags/v1.35.0.tar.gz -->
+        - Binary package download address: <!--https://files.pythonhosted.org/packages/d0/08/b9a0d5ae1c205f43cb3ce01ea8dda7a74339aa55f6e43ac37ad71e4de169/grpcio-1.35.0-cp37-cp37m-manylinux2010_x86_64.whl -->
+        - Version release frequency：<!--List the release dates of the latest five versions. Format is yy/mm/dd.-->
+        - Total Code Lines：<!--500K lines -->
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: Vulnerability Information
+      value: |
+        - Reporting Address：<!--If there is no vulnerability declaration address, leave this field blank.-->
+        - Number of Vulnerabilities：<!--Number of vulnerabilities in the last two years, ex. 2. Leave blank if none-->
+        - CVE ID and Score：<!--ID and score of historical CVE vulnerabilities in the past two years. Leave blank if none. The format is CVEID: Score-->
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: Community Information
+      value: |
+        - Number of Stars：<!--500, Leave blank if none-->
+        - Last Code Submission Date：<!--2021/4/26, Leave blank if none-->
+      validations:
+      required: true
+    - type: textarea
+      attributes:
+        label: Change Reason
+      value: |
+        <!--The reason for the change should be clearly stated why the software is needed. -->
+
+        <!--Describe which features of the software are required.-->
+
+        <!--When new software is introduced, assess how much work it takes to develop the required features.-->
+      validations:
+      required: true
+    - type: textarea
+      attributes:
+        label: Change Impact
+      value: |
+        <!--If the version is deleted or updated, specify the code repositories and modules that will be affected, and how to modify them.-->
+      validations:
+      required: true

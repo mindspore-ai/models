@@ -1,0 +1,64 @@
+name: Intern
+description: Use this template for Intern task
+title: "[Intern]: "
+labels: ["intern"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        本issue为面向高校学生的“MindSpore开源实习”项目的任务，非参加该项目的人员勿领。
+        Thanks for sending an issue!  Here are some tips for you:
+        1) If this is your first time, please read our contributor guidelines: https://gitee.com/mindspore/mindspore/blob/master/CONTRIBUTING.md
+        2) If you want to get the answer quickly, please add label `mindspore-assistant`
+        to the issue, we will find it and answer you as soon as possible.
+  - type: textarea
+    attributes:
+        label: 【任务分值 / Task score】
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: 【背景描述 / Background description】  
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: 【需求描述 / Requirements】
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: 【环境要求 / Development environment】
+        description: 硬件 Hardware & 软件 Software
+    validations:
+      required: true
+    - type: textarea
+    attributes:
+        label: 【编程语言 / Programming language】  
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: 【产出标准 / Acceptance criteria】  
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: 【PR提交地址 / PR Submission address】
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: 【期望完成时间 / Expected completion time】 
+    validations:
+      required: true
+    - type: textarea
+    attributes:
+        label: 【开发指导 / Development guide】 
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: 【导师及邮箱 / Tutor & email】   
+    validations:
+      required: true

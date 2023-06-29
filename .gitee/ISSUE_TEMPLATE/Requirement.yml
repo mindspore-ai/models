@@ -1,0 +1,42 @@
+name: Requirement
+description: Use this template for reporting a bug
+title: "[Requirement]: "
+labels: ["kind/feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sending an issue!  Here are some tips for you:
+        1) If this is your first time, please read our contributor guidelines: https://gitee.com/mindspore/mindspore/blob/master/CONTRIBUTING.md
+        2) If you want to get the answer quickly, please add label `mindspore-assistant`
+        to the issue, we will find it and answer you as soon as possible.
+  - type: textarea
+    attributes:
+        label: Background / 背景信息
+        description: Describe/Explain the status of the problem you wish to solve.
+        value: |
+          - Attach relevant issues if there is any.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: Origin / 信息来源
+        description: Explain which department/team made this request so that its priority can be given.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+        label: Benefit & Necessity / 价值&作用
+        description: Describe/Explain the key value by fulfilling the request.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: Design / 设计方案
+        description: Describe/Explain the general idea of the design. Pseudo-code is allowed
+        placeholder: |
+          1. ...
+          2. ...
+          3. ...
+    validations:
+      required: false
