@@ -107,13 +107,13 @@ def set_parameter():
 
 def init_lr(step_size):
     """init lr"""
-    config.lr_max = config.lr_max / 8 * config.device_num
     if config.optimizer == "Thor":
         from src.lr_generator import get_thor_lr
         lr = get_thor_lr(config.start_epoch * step_size, config.lr_init, config.lr_decay, config.lr_end_epoch,
                          step_size, decay_epochs=39)
     else:
         if config.net_name in ("resnet18", "resnet34", "resnet50", "resnet152", "se-resnet50"):
+            config.lr_max = config.lr_max / 8 * config.device_num
             lr = get_lr(lr_init=config.lr_init, lr_end=config.lr_end, lr_max=config.lr_max,
                         warmup_epochs=config.warmup_epochs, total_epochs=config.epoch_size,
                         start_epoch=config.start_epoch, steps_per_epoch=step_size, lr_decay_mode=config.lr_decay_mode)
