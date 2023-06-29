@@ -1,0 +1,7 @@
+__BASE__: [
+  './segformer.base.yaml',
+]
+pretrained_ckpt_path: "./pretrained/ms_pretrained_b0.ckpt"
+base_size: [512, 1024]
+crop_size: [512, 1024]
+backbone: "mit_b0"

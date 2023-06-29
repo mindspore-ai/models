@@ -1,0 +1,50 @@
+
+run_distribute: False
+device_target: "Ascend"
+mode_name: "GRAPH"
+dataset_name: "cityscapes"
+device_num: 1
+rank_id: 0
+rank_size: 1
+data_path: "./data/cityscapes/"
+load_ckpt: True
+pretrained_ckpt_path: "./pretrained/ms_pretrained_b0.ckpt"
+save_checkpoint: True
+save_checkpoint_epoch_interval: 1
+save_best_ckpt: True
+checkpoint_path: "./checkpoint/"
+train_log_interval: 100
+
+epoch_size: 200
+batch_size: 2
+total_batch_size: 2
+backbone: "mit_b0"
+dataset_ignore_label: 255
+dataset_ignore_image: 255
+optimizer: "adamw"
+class_num: 19
+dataset_num_parallel_workers: 8
+dataset_max_rowsize: 50
+momentum: 0.9
+lr: 0.00006
+weight_decay: 0.01
+warmup_steps: 0
+base_size: [512, 1024]
+crop_size: [512, 1024]
+img_norm_mean: [123.675, 116.28, 103.53]
+img_norm_std: [58.395, 57.12, 57.375]
+
+run_eval: True
+eval_start_epoch: 0
+eval_interval: 1
+eval_ckpt_path: ""
+eval_log_interval: 100
+dataset_eval_num_parallel_workers: 4
+
+infer_copy_original_img: True
+infer_save_gray_img: True
+infer_save_color_img: True
+infer_save_overlap_img: True
+infer_log_interval: 100
+infer_ckpt_path: ""
+infer_output_path: "./infer_result/"
