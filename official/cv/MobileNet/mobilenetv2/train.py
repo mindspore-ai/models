@@ -107,7 +107,7 @@ def train_mobilenetv2():
                              metrics=metrics, eval_network=dist_eval_network,
                              amp_level="O2", keep_batchnorm_fp32=False,
                              boost_level=config.boost_mode,
-                             boost_config_dict={"grad_freeze": {"total_steps": epoch_size * step_size}})
+                             boost_config_dict={"boost": {"mode": "manual", "grad_freeze": False}})
 
         else:
             opt = nn.Momentum(net.trainable_params(), lr, config.momentum, config.weight_decay)
