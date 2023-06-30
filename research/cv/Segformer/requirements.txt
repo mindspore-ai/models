@@ -1,0 +1,6 @@
+numpy
+mmcv
+pillow
+mindspore
+torch
+cityscapesscripts
