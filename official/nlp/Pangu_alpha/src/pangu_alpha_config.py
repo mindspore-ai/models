@@ -185,6 +185,9 @@ def set_parse(args_opt):
     r"""
         Set config according to the mode
     """
+    if args_opt.mode == "self_define":
+        return
+
     parse_fn_dict = {"200B": set_parse_200B, "13B": set_parse_13B, "2.6B": set_parse_2_6B, "1.3B": set_parse_1_3B}
     if args_opt.mode not in parse_fn_dict.keys():
         raise ValueError("Invalid mode: {}. Optional mode: 200B, 13B, 2.6B and 1.3B".format(args_opt.mode))
