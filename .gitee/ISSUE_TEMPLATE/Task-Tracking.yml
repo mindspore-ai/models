@@ -1,0 +1,32 @@
+name: Task Tracking
+description: Use this template for task tracking
+title: "[Task]: "
+labels: ["kind/task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sending an issue!  Here are some tips for you:
+        1) If this is your first time, please read our contributor guidelines: https://gitee.com/mindspore/mindspore/blob/master/CONTRIBUTING.md
+        2) If you want to get the answer quickly, please add label `mindspore-assistant`
+        to the issue, we will find it and answer you as soon as possible.
+  - type: textarea
+    attributes:
+        label: Task Description
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: Task Goal
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label:  Sub Task
+        value: |
+          | No. | Task Description | Issue ID |
+          | --- | ---------------- | -------- |
+          | 1   |                  |          |
+          | 2   |                  |          |
+    validations:
+      required: true

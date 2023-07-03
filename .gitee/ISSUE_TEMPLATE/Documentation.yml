@@ -1,0 +1,32 @@
+name: Documentation
+description: Use this template for reporting a document issue
+title: "[Documentation]: "
+labels: ["sig/doc"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sending an issue!  Here are some tips for you:
+        1) If this is your first time, please read our contributor guidelines: https://gitee.com/mindspore/mindspore/blob/master/CONTRIBUTING.md
+        2) If you want to get the answer quickly, please add label `mindspore-assistant`
+        to the issue, we will find it and answer you as soon as possible.
+  - type: textarea
+    attributes:
+        label: 【Document Link】/【文档链接】
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: 【Issues Section】/【问题文档片段】
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: 【Existing Issues】/【存在的问题】
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+        label: 【Expected Result】【预期结果】
+    validations:
+      required: true

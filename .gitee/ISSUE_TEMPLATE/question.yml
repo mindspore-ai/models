@@ -1,0 +1,11 @@
+name: Question
+description: Use this template for reporting a Question
+title: "[Question]: "
+labels: ["mindspore-assistant"]
+body:
+  - type: textarea
+    id: related-problem
+    attributes:
+      label: 请描述您的问题？ / Please describe your question
+    validations:
+      required: true
