@@ -51,7 +51,7 @@
 2. 流水线模型并行
 3. 优化器模型并行
 
-有关上述特性，请点击[此处](https://www.mindspore.cn/tutorials/experts/en/master/parallel/introduction.html)查看详情。
+有关上述特性，请点击[此处](https://www.mindspore.cn/tutorials/experts/en/r2.0/parallel/introduction.html)查看详情。
 更多特性敬请期待。
 
 详细技术报告和检查点文件，可点击[此处](https://git.openi.org.cn/PCL-Platform.Intelligence/PanGu-AIpha)查看。
