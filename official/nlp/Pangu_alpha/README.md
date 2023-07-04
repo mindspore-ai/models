@@ -51,7 +51,7 @@ with our parallel setting. We summarized the training tricks as followings:
 2. Pipeline Model Parallelism
 3. Optimizer Model Parallelism
 
-The above features can be found [here](https://www.mindspore.cn/tutorials/experts/en/master/parallel/introduction.html).
+The above features can be found [here](https://www.mindspore.cn/tutorials/experts/en/master/parallel/overview.html).
 More amazing features are still under developing.
 
 The technical report and checkpoint file can be found [here](https://git.openi.org.cn/PCL-Platform.Intelligence/PanGu-AIpha).
