@@ -75,3 +75,4 @@ models/official/audio/LPCNet/ascend310_infer/src/main.cc:main
 models/research/nlp/gnmt_v2/src/dataset/bi_data_loader.py:_load
 models/research/cv/centerface/dependency/centernet/src/lib/datasets/sample/multi_pose.py:preprocess_train
 models/official/cv/DBNet/src/utils/metric.py:evaluate_image
+models/research/cv/Focus-DETR/models/focus_detr/deformable_transformer.py:construct

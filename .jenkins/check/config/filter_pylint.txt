@@ -4,6 +4,11 @@
 "models/"                                                                                "unused-argument"
 "models/"                                                                                "no-value-for-parameter"
 "models/"                                                                                "import-self"
+"models/"                                                                                "redefined-outer-name"
+"models/"                                                                                "protected-access"
+"models/"                                                                                "broad-except"
+"models/"                                                                                "logging-fstring-interpolation"
+"models/"                                                                                "simplifiable-if-expression"
 
 # official
 "models/official/"                                                                       "missing-docstring"
@@ -17,6 +22,7 @@
 
 # research
 "models/research/"                                                                       "missing-docstring"
+"models/research/"                                                                       "bad-continuation"
 
 # benchmark
 "models/benchmark/"                                                                       "missing-docstring"
