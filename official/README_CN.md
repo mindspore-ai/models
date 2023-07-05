@@ -244,14 +244,26 @@
 
 ### 自然语言处理
 
-| model |  mind_series recipe | vanilla mindspore |
-| :-:     |  :-:            | :-:     |
-| bert          |      | [link](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert/)         |
-| gpt      |      | [link](https://gitee.com/mindspore/models/tree/master/official/nlp/GPT)       |
-| gru |      | [link](https://gitee.com/mindspore/models/tree/master/official/nlp/GRU)      |
-| lstm            |      | [link](https://gitee.com/mindspore/models/tree/master/official/nlp/LSTM)            |
-| pangu_alpha          |      | [link](https://gitee.com/mindspore/models/tree/master/official/nlp/Pangu_alpha)          |
-| transformer          |      | [link](https://gitee.com/mindspore/models/tree/master/official/nlp/Transformer)          |
+### nlp
+
+| model |  mindformer recipe | vanilla mindspore
+| :-:     |  :-:   | :-: |
+| bert_base   | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/t5.md) | [link](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert) |
+| t5_small    | [config](https://github.com/mindspore-lab/mindformers/blob/master/docs/model_cards/bert.md) |  |
+| gpt2_small  | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/gpt2.md) |  |
+| gpt2_13b    | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/gpt2.md) |  |
+| gpt2_52b    | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/gpt2.md) |  |
+| pangu_alpha | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/pangualpha.md) |   |
+| glm_6b       | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/glm.md)  |  |
+| glm_6b_lora  | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/glm.md)  |  |
+| llama_7b     | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/llama.md) |  |
+| llama_13b    | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/llama.md) |  |
+| llama_65b    | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/llama.md) |  |
+| llama_7b_lora | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/llama.md) |  |
+| bloom_560m    | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/bloom.md) |  |
+| bloom_7.1b    | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/bloom.md) |  |
+| bloom_65b     | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/bloom.md) |  |
+| bloom_176b    | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/bloom.md) |  |
 
 MindSpore仅提供下载和预处理公共数据集的脚本。我们不拥有这些数据集，也不对它们的质量负责或维护。请确保您具有在数据集许可下使用该数据集的权限。在这些数据集上训练的模型仅用于非商业研究和教学目的。
 

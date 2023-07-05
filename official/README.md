@@ -244,14 +244,26 @@
 
 ### NLP
 
-| model |  mind_series recipe | vanilla mindspore |
-| :-:     |  :-:            | :-:     |
-| bert          |      | [link](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert/)         |
-| gpt      |      | [link](https://gitee.com/mindspore/models/tree/master/official/nlp/GPT)       |
-| gru |      | [link](https://gitee.com/mindspore/models/tree/master/official/nlp/GRU)      |
-| lstm            |      | [link](https://gitee.com/mindspore/models/tree/master/official/nlp/LSTM)            |
-| pangu_alpha          |      | [link](https://gitee.com/mindspore/models/tree/master/official/nlp/Pangu_alpha)          |
-| transformer          |      | [link](https://gitee.com/mindspore/models/tree/master/official/nlp/Transformer)          |
+### nlp
+
+| model |  mindformer recipe | vanilla mindspore
+| :-:     |  :-:   | :-: |
+| bert_base   | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/t5.md) | [link](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert) |
+| t5_small    | [config](https://github.com/mindspore-lab/mindformers/blob/master/docs/model_cards/bert.md) |  |
+| gpt2_small  | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/gpt2.md) |  |
+| gpt2_13b    | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/gpt2.md) |  |
+| gpt2_52b    | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/gpt2.md) |  |
+| pangu_alpha | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/pangualpha.md) |   |
+| glm_6b       | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/glm.md)  |  |
+| glm_6b_lora  | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/glm.md)  |  |
+| llama_7b     | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/llama.md) |  |
+| llama_13b    | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/llama.md) |  |
+| llama_65b    | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/llama.md) |  |
+| llama_7b_lora | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/llama.md) |  |
+| bloom_560m    | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/bloom.md) |  |
+| bloom_7.1b    | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/bloom.md) |  |
+| bloom_65b     | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/bloom.md) |  |
+| bloom_176b    | [config](https://gitee.com/mindspore/mindformers/blob/dev/docs/model_cards/bloom.md) |  |
 
 ### Recommendation
 
