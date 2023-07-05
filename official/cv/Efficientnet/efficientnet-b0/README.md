@@ -31,9 +31,9 @@ The overall network architecture of EfficientNet-B0 is show below:
 Dataset used:
 
 1. [ImageNet](http://www.image-net.org/)
-- Dataset size: ~125G, 133W colorful images in 1000 classes
-    - Train: 120G, 128W images
-    - Test: 5G, 5W images
+- Dataset size: 146G, 133W colorful images in 1000 classes
+    - Train: 140G, 128W images
+    - Test: 6G, 5W images
 - Data format: RGB images
 
 2. [CIFAR-10](https://www.cs.toronto.edu/~kriz/cifar.html)
@@ -194,15 +194,15 @@ Parameters for both training and evaluating can be set in one of configuration f
 ```bash
 # distributed training example(8p) for GPU
 cd scripts
-bash run_distribute_train_gpu.sh 8 0,1,2,3,4,5,6,7 ImageNet ./dataset
+bash run_distribute_train_gpu.sh 8 0,1,2,3,4,5,6,7 ImageNet ./dataset efficientnet_b0
 
 # standalone training example for GPU
 cd scripts
-bash run_standalone_train_gpu.sh ImageNet ./dataset
+bash run_standalone_train_gpu.sh ImageNet ./dataset efficientnet_b0
 
 # training example for CPU
 cd scripts
-bash run_train_cpu.sh ImageNet ./dataset
+bash run_train_cpu.sh ImageNet ./dataset efficientnet_b0
 ```
 
 You can find checkpoint file together with result in log.
@@ -228,16 +228,16 @@ bash run_eval_gpu.sh [DATASET_TYPE] [DATASET_PATH] [MODEL_NAME] [CHECKPOINT_PATH
 ```bash
 # Evaluation with checkpoint for GPU
 cd scripts
-bash run_eval_gpu.sh ImageNet ./dataset ./checkpoint/efficientnet_b0-600_1251.ckpt
+bash run_eval_gpu.sh ImageNet ./dataset efficientnet_b0 ./checkpoint/efficientnet_b0-600_1251.ckpt
 
 # Evaluation with checkpoint for CPU
 cd scripts
-bash run_eval_cpu.sh ImageNet ./dataset ./checkpoint/efficientnet_b0-600_1251.ckpt
+bash run_eval_cpu.sh ImageNet ./dataset efficientnet_b0 ./checkpoint/efficientnet_b0-600_1251.ckpt
 ```
 
 #### Result
 
-Evaluation result will be stored in the scripts path. Under this, you can find result like the following in log.
+Evaluation result will be stored in the model_path/eval path. Under this, you can find result like the following in log.
 
 ```text
 acc=76.96%(TOP1)
