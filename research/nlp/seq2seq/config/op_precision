@@ -1,0 +1,2 @@
+[ByOpType]
+GatherNd=support_out_of_bound_index
