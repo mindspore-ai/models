@@ -60,6 +60,7 @@ Dataset used: ImageNet
 ```shell
 ├─shufflenetv1
   ├─README.md                              # ShuffleNetV1 description
+  ├─cpp_infer                              # C++ inference
   ├─scripts
     ├─run_standalone_train.sh                 # Script for single-device training in the Ascend environment
     ├─run_standalone_train_gpu.sh             # Script for single-device training in the GPU environment
@@ -67,9 +68,7 @@ Dataset used: ImageNet
     ├─run_distribute_train_gpu.sh             # Script for 8-device training in the GPU environment
     ├─run_eval.sh                             # Script for evaluation in the Ascend environment
     ├─run_eval_gpu.sh                             # Script for evaluation in the GPU environment
-    ├─run_infer_310.sh                        # Shell script for inference on Ascend 310 AI Processors
-    ├─run_transfer.sh                         # Script for transfer training in the CPU environment
-    ├─run_transfer_eval.sh                    # Script for transfer inference in the CPU environment
+    ├─run_infer_cpp.sh                        # Shell script for inference on Ascend 310 AI Processors
     ├─run_onnx.sh                             # Shell script for ONNX inference
   ├─src
     ├─dataset.py                              # Data preprocessing
@@ -91,6 +90,8 @@ Dataset used: ImageNet
   ├─transfer_config.yaml                      # Transfer learning parameter file
   ├─transfer_dataset_process.py               # Transfer learning dataset processing script
   ├─mindspore_quick_start.ipynb               # Transfer learning and inference visualization script
+  ├─infer_shufflenetv1_onnx.py                # Script of ONNX model inference
+  ├─requirements.txt                          # Requirements of third party package
 ```
 
 ## Script Parameters
@@ -100,7 +101,7 @@ The parameters used during model training and evaluation can be set in the **def
 ```default_config.yaml
 'epoch_size': 250,                  # Number of epochs
 'keep_checkpoint_max': 5,           # Maximum number of CKPT files that can be saved
-'save_ckpt_path': "./checkpoint/",       # Path for storing CKPT files
+'save_ckpt_path': "./",       # Path for storing CKPT files
 'save_checkpoint_epochs': 1,        # Number of epochs for saving a CKPT file
 'save_checkpoint': True,            # Specifies whether CKPT files are saved.
 'amp_level': 'O3',                  # Training accuracy
@@ -131,7 +132,7 @@ You can use Python or shell scripts for training.
 
   python:
       Ascend AI Processor-based single-device training: python train.py --train_dataset_path [DATA_DIR]
-      # example: python train.py --train_dataset_path /home/DataSet/ImageNet_Original/train
+      # example: python train.py --train_dataset_path /home/DataSet/ImageNet_Original/train > log.txt 2>&1 &
 
   shell:
       Ascend AI Processor-based 8-device parallel training: bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATA_DIR]
@@ -143,7 +144,7 @@ You can use Python or shell scripts for training.
 - running on GPU with gpu default parameters
 
   python:
-      GPU-based single-device training: python train.py --config_path [CONFIG_PATH] --device_target [DEVICE_TARGET]
+      GPU-based single-device training: python train.py --config_path [CONFIG_PATH] --device_target [DEVICE_TARGET] --train_dataset_path [TRAIN_DATA_DIR]
       Ascend AI Processor-based 8-device training:
           export RANK_SIZE=8
           mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
@@ -159,7 +160,7 @@ You can use Python or shell scripts for training.
 - running transfer learning on CPU with default parameters
 
   python:
-      CPU-based training: python train.py --config_path=./transfer_config.yaml
+      CPU-based training: python train.py --config_path=./transfer_config.yaml > log.txt 2>&1 &
 ```
 
   For distributed training, you need to create an HCCL configuration file in JSON format in advance.
@@ -190,7 +191,7 @@ You can use Python or shell scripts for evaluation.
 # Ascend-based evaluation example
   python:
       python eval.py --eval_dataset_path [DATA_DIR] --ckpt_path [PATH_CHECKPOINT]
-      # example: python eval.py --eval_dataset_path /home/DataSet/ImageNet_Original/validation_preprocess --ckpt_path /home/model/shufflenetv1/ckpt/shufflenetv1-250_1251
+      # example: python eval.py --eval_dataset_path /home/DataSet/ImageNet_Original/validation_preprocess --ckpt_path /home/model/shufflenetv1/ckpt/shufflenetv1-250_1251 > eval_log.txt 2>&1 &
 
   shell:
       bash scripts/run_eval.sh [DEVICE_ID] [DATA_DIR] [PATH_CHECKPOINT]
@@ -205,7 +206,7 @@ You can use Python or shell scripts for evaluation.
 
 # CPU-based transfer training evaluation example
   python:
-      python eval.py --config_path=./transfer_config.yaml
+      python eval.py --config_path=./transfer_config.yaml > eval_log.txt 2>&1 &
 ```
 
 ### Results
