@@ -47,13 +47,14 @@ def get_input_data_batch_slice_map(input_ids, eod_id, rank, dis, eod_reset):
     # Initialize position_ids and attention_mask
     batch_input_ids = input_ids
     batch_position_ids = np.ones((dis, seq_length), dtype=np.int32)
-    batch_attention_mask = np.ones((dis, seq_length, seq_length), dtype=np.bool_)
+    batch_attention_mask = np.ones((dis, seq_length, seq_length), dtype=np.int8)
+    tril_dev = np.tril(np.ones(shape=(seq_length, seq_length), dtype=np.int8))
 
     # Loop through batches
     for bs_i, _ in enumerate(range(len(input_ids))):
         # Get normal position_ids and attention_mask
         local_ids = input_ids[bs_i]
-        batch_attention_mask[bs_i] = np.tril(np.ones(shape=(seq_length, seq_length), dtype=np.bool_))
+        batch_attention_mask[bs_i] = tril_dev
         batch_position_ids[bs_i] = np.arange(seq_length, dtype=np.int32)
         # Find eod_of_document
         eod_index = batch_position_ids[bs_i, local_ids[:-1] == eod_id].astype(np.int32)
@@ -61,10 +62,10 @@ def get_input_data_batch_slice_map(input_ids, eod_id, rank, dis, eod_reset):
         for i in range(eod_index.size):
             # Reset position_ids and attention_mask considering EOD
             index = eod_index[i]
-            batch_attention_mask[bs_i, (index + 1):, :(index + 1)] = False
+            batch_attention_mask[bs_i, (index + 1):, :(index + 1)] = 0
             batch_position_ids[bs_i, (index + 1):] -= (index + 1 - prev_index)
             prev_index = index + 1
-    return batch_input_ids, batch_position_ids, batch_attention_mask.astype(np.float16)
+    return batch_input_ids, batch_position_ids, batch_attention_mask
 
 
 def create_dataset(batch_size, data_path, device_num=1, rank=0, drop=True, full_batch=False, data_start_index=0,
@@ -130,6 +131,5 @@ def create_dataset(batch_size, data_path, device_num=1, rank=0, drop=True, full_
         dataset = dataset.batch(batch_size, drop_remainder=drop)
         dataset = dataset.map(operations=map_func, input_columns=[column_name],
                               output_columns=[column_name])
-    dataset = dataset.map(input_columns=column_name, operations=type_cast_op)
     dataset = dataset.repeat(epoch)
     return dataset

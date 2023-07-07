@@ -442,6 +442,7 @@ class PanGUAlphaWithLoss(Cell):
         r"""Forward process of the pangu alpha model"""
         tokens = self.slice(input_ids, (0, 0), (self.batch_size, -1), (1, 1))
         input_position = self.slice(input_position, (0, 0), (self.batch_size, self.len), (1, 1))
+        attention_mask = P.Cast()(attention_mask, mstype.float16)
         decoder_attention_masks = self.slice2(attention_mask, (0, 0, 0), (self.batch_size, self.len, self.len),
                                               (1, 1, 1))
         input_mask = F.cast(self.not_equal(tokens, self.pad_token),
