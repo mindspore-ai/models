@@ -64,6 +64,7 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
 ```shell
 ├─shufflenetv1
   ├─README_CN.md                              # ShuffleNetV1相关描述
+  ├─cpp_infer                                 # C++推理
   ├─scripts
     ├─run_standalone_train.sh                 # Ascend环境下的单卡训练脚本
     ├─run_standalone_train_gpu.sh             # GPU环境下的单卡训练脚本
@@ -71,9 +72,7 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
     ├─run_distribute_train_gpu.sh             # GPU环境下的八卡并行训练脚本
     ├─run_eval.sh                             # Ascend环境下的评估脚本
     ├─run_eval_gpu.sh                             # GPU环境下的评估脚本
-    ├─run_infer_310.sh                        # Ascend 310 推理shell脚本
-    ├─run_transfer.sh                         # CPU环境下的迁移训练脚本
-    ├─run_transfer_eval.sh                    # CPU环境下的迁移推理脚本
+    ├─run_infer_cpp.sh                        # Ascend 310 推理shell脚本
     ├─run_onnx.sh                             # ONNX推理shell脚本
   ├─src
     ├─dataset.py                              # 数据预处理
@@ -93,8 +92,9 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
   ├─mindspore_hub_conf.py                     # hub配置脚本
   ├─postprogress.py                           # 310推理后处理脚本
   ├─transfer_config.yaml                      # 迁移学习参数文件
-  ├─transfer_dataset_process.py               # 迁移学习数据集处理脚本
   ├─mindspore_quick_start.ipynb               # 迁移学习推理可视化展示脚本
+  ├─infer_shufflenetv1_onnx.py                # ONNX推理脚本
+  ├─requirements.txt                          # 依赖包
 ```
 
 ## 脚本参数
@@ -104,7 +104,7 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
 ```default_config.yaml
 'epoch_size': 250,                  # 模型迭代次数
 'keep_checkpoint_max': 5,           # 保存ckpt文件的最大数量
-'save_ckpt_path': "./checkpoint/",       # 保存ckpt文件的路径
+'save_ckpt_path': "./",       # 保存ckpt文件的路径
 'save_checkpoint_epochs': 1,        # 每迭代相应次数保存一个ckpt文件
 'save_checkpoint': True,            # 是否保存ckpt文件
 'amp_level': 'O3',                  # 训练精度
@@ -135,7 +135,7 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
 
   python:
       Ascend单卡训练示例：python train.py --train_dataset_path [DATA_DIR]
-      # example: python train.py --train_dataset_path /home/DataSet/ImageNet_Original/train
+      # example: python train.py --train_dataset_path /home/DataSet/ImageNet_Original/train > log.txt 2>&1 &
 
   shell:
       Ascend八卡并行训练: bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATA_DIR]
@@ -147,7 +147,7 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
 - running on GPU with gpu default parameters
 
   python:
-      GPU单卡训练示例：python train.py --config_path [CONFIG_PATH] --device_target [DEVICE_TARGET]
+      GPU单卡训练示例：python train.py --config_path [CONFIG_PATH] --device_target [DEVICE_TARGET] --train_dataset_path [TRAIN_DATA_DIR]
       GPU八卡训练示例：
           export RANK_SIZE=8
           mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
@@ -163,7 +163,7 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
 - running transfer learning on CPU with default parameters
 
   python:
-      CPU训练示例: python train.py --config_path=./transfer_config.yaml
+      CPU训练示例: python train.py --config_path=./transfer_config.yaml > log.txt 2>&1 &
 ```
 
   分布式训练需要提前创建JSON格式的HCCL配置文件。
@@ -194,7 +194,7 @@ epoch time: 99864.092, per step time: 79.827, avg loss: 3.442
 # Ascend评估示例
   python:
       python eval.py --eval_dataset_path [DATA_DIR] --ckpt_path [PATH_CHECKPOINT]
-      # example: python eval.py --eval_dataset_path /home/DataSet/ImageNet_Original/validation_preprocess --ckpt_path /home/model/shufflenetv1/ckpt/shufflenetv1-250_1251
+      # example: python eval.py --eval_dataset_path /home/DataSet/ImageNet_Original/validation_preprocess --ckpt_path /home/model/shufflenetv1/ckpt/shufflenetv1-250_1251 > eval_log.txt 2>&1 &
 
   shell:
       bash scripts/run_eval.sh [DEVICE_ID] [DATA_DIR] [PATH_CHECKPOINT]
@@ -209,7 +209,7 @@ epoch time: 99864.092, per step time: 79.827, avg loss: 3.442
 
 # CPU迁移训练评估示例
   python:
-      python eval.py --config_path=./transfer_config.yaml
+      python eval.py --config_path=./transfer_config.yaml > eval_log.txt 2>&1 &
 ```
 
 ### 结果
