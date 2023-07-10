@@ -82,7 +82,8 @@ RetinaFace使用ResNet50骨干提取图像特征进行检测。从ModelZoo获取
   python train.py > train.log 2>&1 &
 
   # 分布式训练示例
-  bash scripts/run_distribute_gpu_train.sh 3 0,1,2
+  bash scripts/run_distribute_gpu_train.sh DEVICE_NUM CUDA_VISIBLE_DEVICES
+  示例：bash scripts/run_distribute_gpu_train.sh 3 0,1,2
 
   # ONNX模型导出示例
   python export.py
@@ -91,7 +92,8 @@ RetinaFace使用ResNet50骨干提取图像特征进行检测。从ModelZoo获取
   export CUDA_VISIBLE_DEVICES=0
   python eval.py > eval.log 2>&1 &  
   OR
-  bash run_standalone_gpu_eval.sh 0
+  bash run_standalone_gpu_eval.sh CUDA_VISIBLE_DEVICES
+  示例：bash run_standalone_gpu_eval.sh 0
 
   # ONNX模型评估示例
   python eval_onnx.py
@@ -106,27 +108,25 @@ RetinaFace使用ResNet50骨干提取图像特征进行检测。从ModelZoo获取
 ```python
 ├── model_zoo
     ├── README.md                          // 所有模型的说明
-    ├── retinaface
+    ├── RetinaFace_ResNet50
         ├── README.md                    // GoogLeNet相关说明
         ├── scripts
         │   ├──run_distribute_gpu_train.sh         // GPU分布式shell脚本
         │   ├──run_standalone_gpu_eval.sh         // GPU评估shell脚本
         │   ├──run_onnx_eval.sh                  // ONNX模型评估shell脚本
         ├── src
+        │   ├── __init__.py            // init文件
         │   ├──dataset.py             // 创建数据集
         │   ├──network.py            // RetinaFace架构
         │   ├──config.py            // 参数配置
         │   ├──augmentation.py     // 数据增强方法
         │   ├──loss.py            // 损失函数
         │   ├──utils.py          // 数据预处理
-        ├── data
-        │   ├──widerface                    // 数据集
-        │   ├──resnet50_pretrain.ckpt      // ResNet50 ImageNet预训练模型
-        │   ├──ground_truth               // 评估标签
         ├── train.py               // 训练脚本
         ├── eval.py               //  评估脚本
         ├── export.py            // ONNX模型导出脚本
         ├── eval_onnx.py        // ONNX模型评估脚本
+        ├── requirements.txt   // requirements文件
 ```
 
 ## 脚本参数
@@ -275,7 +275,8 @@ RetinaFace使用ResNet50骨干提取图像特征进行检测。从ModelZoo获取
   export CUDA_VISIBLE_DEVICES="$1"
   python eval_onnx.py
   or
-  bash scripts/run_onnx_eval.sh 0
+  bash scripts/run_onnx_eval.sh CUDA_VISIBLE_DEVICES
+  示例：bash scripts/run_onnx_eval.sh 0
   ```
 
 可在窗口中查看评估结果：
