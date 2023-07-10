@@ -55,7 +55,7 @@ context.set_context(
     save_graphs=False,
     device_target="Ascend",
     reserve_class_name_in_scope=True)
-context.set_context(ascend_config={"op_precision_mode": "/config/op_precision"})
+context.set_context(ascend_config={"op_precision_mode": "config/op_precision"})
 
 
 def get_config(config):
