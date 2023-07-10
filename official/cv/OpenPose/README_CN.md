@@ -49,7 +49,8 @@ OpenPose网络提出了一种利用部分亲和场（PAF）自下而上的人体
     运行python gen_ignore_mask.py。
 
     ```python
-        python gen_ignore_mask.py --train_ann /home/DataSet/coco/annotations/person_keypoints_train2017.json --val_ann /home/DataSet/coco/annotations/person_keypoints_val2017.json --train_dir /home/DataSet/coco/train2017 --val_dir /home/DataSet/coco/val2017
+        python gen_ignore_mask.py --train_ann=[TRAIN_ANN] --val_ann=[VAL_ANN] --train_dir=[IMGPATH_TRAIN] --val_dir=[IMGPATH_VAL]
+        示例：python gen_ignore_mask.py --train_ann /home/DataSet/coco/annotations/person_keypoints_train2017.json --val_ann /home/DataSet/coco/annotations/person_keypoints_val2017.json --train_dir /home/DataSet/coco/train2017 --val_dir /home/DataSet/coco/val2017
     ```
 
 - 在根目录下生成dataset文件夹，包含以下文件：
@@ -90,17 +91,20 @@ OpenPose网络提出了一种利用部分亲和场（PAF）自下而上的人体
 
   ```python
   # 训练示例
-  python train.py --imgpath_train /home/DataSet/coco/train2017 --jsonpath_train /home/DataSet/coco/annotations/person_keypoints_train2017.json --maskpath_train /home/DataSet/coco/ignore_mask_train --vgg_path /home/model/openpose/vgg19-0-97_5004.ckpt > train.log 2>&1 &
+  python train.py --imgpath_train coco/train2017 --jsonpath_train coco/annotations/person_keypoints_train2017.json --maskpath_train coco/ignore_mask_train --vgg_path vgg19-0-97_5004.ckpt > train.log 2>&1 &
+  OR
+  bash run_standalone_train.sh [IAMGEPATH_TRAIN] [JSONPATH_TRAIN] [MASKPATH_TRAIN] [VGG_PATH] [DEVICE_ID]
+  # example: bash run_standalone_train.sh coco/train2017 coco/annotations/person_keypoints_train2017.json coco/ignore_mask_train vgg19-0-97_5004.ckpt 0
 
   # 运行分布式训练示例
   bash run_distribute_train.sh [RANK_TABLE_FILE] [IMGPATH_TRAIN] [JSONPATH_TRAIN] [MASKPATH_TRAIN] [VGG_PATH]
-  # 示例：bash run_distribute_train.sh ~/hccl_8p.json /home/DataSet/coco/train2017 /home/DataSet/coco/annotations/person_keypoints_train2017.json /home/DataSet/coco/ignore_mask_train /home/model/openpose/vgg19-0-97_5004.ckpt
+  # 示例：bash run_distribute_train.sh ~/hccl_8p.json coco/train2017 coco/annotations/person_keypoints_train2017.json coco/ignore_mask_train vgg19-0-97_5004.ckpt
 
   # 运行评估示例
-  python eval.py --model_path /home/model/openpose/ckpt/0-8_663.ckpt --imgpath_val /home/DataSet/coco/val2017 --ann /home/DataSet/coco/annotations/person_keypoints_val2017.json > eval.log 2>&1 &
+  python eval.py --model_path ckpt/0-8_663.ckpt --imgpath_val coco/val2017 --ann coco/annotations/person_keypoints_val2017.json > eval.log 2>&1 &
   或
   bash scripts/run_eval_ascend.sh [MODEL_PATH] [IMPATH_VAL] [ANN] [DEVICE_ID]
-  # 示例：bash scripts/run_eval_ascend.sh /home/model/openpose/ckpt/0-8_663.ckpt /home/DataSet/coco/val2017 /home/DataSet/coco/annotations/person_keypoints_val2017.json 0
+  # 示例：bash scripts/run_eval_ascend.sh ckpt/0-8_663.ckpt coco/val2017 coco/annotations/person_keypoints_val2017.json 0
   ```
 
 [RANK_table_FILE]为多卡信息配置表在环境中的路径。配置表可以由工具[hccl_tool](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)自动生成。
@@ -167,7 +171,7 @@ OpenPose网络提出了一种利用部分亲和场（PAF）自下而上的人体
 - 在Ascend上运行
 
   ```python
-  python train.py --imgpath_train /home/DataSet/coco/train2017 --jsonpath_train /home/DataSet/coco/annotations/person_keypoints_train2017.json --maskpath_train /home/DataSet/coco/ignore_mask_train --vgg_path /home/model/openpose/vgg19-0-97_5004.ckpt > train.log 2>&1 &
+  python train.py --imgpath_train coco/train2017 --jsonpath_train coco/annotations/person_keypoints_train2017.json --maskpath_train coco/ignore_mask_train --vgg_path vgg19-0-97_5004.ckpt > train.log 2>&1 &
   ```
 
   上述python命令将在后台运行，您可以在`train.log`文件中查看结果。
@@ -251,10 +255,10 @@ OpenPose网络提出了一种利用部分亲和场（PAF）自下而上的人体
 
   ```python
   # 运行评估示例
-  python eval.py --model_path /home/model/openpose/ckpt/0-8_663.ckpt --imgpath_val /home/DataSet/coco/val2017 --ann /home/DataSet/coco/annotations/person_keypoints_val2017.json > eval.log 2>&1 &
+  python eval.py --model_path ckpt/0-8_663.ckpt --imgpath_val coco/val2017 --ann coco/annotations/person_keypoints_val2017.json > eval.log 2>&1 &
   或
   bash scripts/run_eval_ascend.sh [MODEL_PATH] [IMPATH_VAL] [ANN] [DEVICE_ID]
-  # bash scripts/run_eval_ascend.sh /home/model/openpose/ckpt/0-8_663.ckpt /home/DataSet/coco/val2017 /home/DataSet/coco/annotations/person_keypoints_val2017.json 0
+  # bash scripts/run_eval_ascend.sh ckpt/0-8_663.ckpt coco/val2017 coco/annotations/person_keypoints_val2017.json 0
   ```
 
   上述Python命令将在后台运行，您可以通过文件"eval.log"查看结果。测试数据集的准确率如下：
