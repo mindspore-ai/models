@@ -75,7 +75,7 @@ Dataset used: [CIFAR-10](http://www.cs.toronto.edu/~kriz/cifar.html)
 
 ## Features
 
-### Mixed Precision(Ascend)
+### Mixed Precision(Ascend, GPU, CPU)
 
 The [mixed precision](https://www.mindspore.cn/tutorials/en/master/advanced/mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
 For FP16 operators, if the input data type is FP32, the backend of MindSpore will automatically handle it with reduced precision. Users could check the reduced-precision operators by enabling INFO log and then searching ‘reduce precision’.
@@ -246,7 +246,7 @@ You can start training using python or shell scripts. The usage of shell scripts
   # example: bash run_distribute_train.sh cifar10 /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/cifar10/cifar-10-batches-bin/
   # example: bash run_distribute_train.sh imagenet2012 /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/ImageNet_Original/
 
-- CPU: bash run_train_CPU.sh [cifar10|imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH] (optional)
+- CPU: bash run_train_cpu.sh [cifar10|imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH] (optional)
 - GPU(single device)：bash run_standalone_train_gpu.sh [cifar10|imagenet2012] [DATASET_PATH]  [DEVICE_ID][PRETRAINED_CKPT_PATH](optional)
 - GPU(distribute training): bash run_distribute_train_gpu.sh [cifar10|imagenet2012] [CONFIG_PATH] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
 ```
@@ -260,9 +260,9 @@ Please follow the instructions in the link [hccn_tools](https://gitee.com/mindsp
 ```shell
 # training example
   python:
-      Ascend: python train.py --device_target Ascend --dataset_path [TRAIN_DATASET_PATH]
-      CPU: python train.py --device_target CPU --dataset_path [TRAIN_DATASET_PATH]
-      GPU(single device): python train.py --device_target GPU --dateset [DATASET] --dataset_path [TRAIN_DATASET_PATH] --config_path [CONFIG_PATH]
+      Ascend: python train.py --device_target Ascend --dataset_path [TRAIN_DATASET_PATH] > log.txt 2>&1 &
+      CPU: python train.py --device_target CPU --dataset_path [TRAIN_DATASET_PATH] > log.txt 2>&1 &
+      GPU(single device): python train.py --device_target GPU --dateset [DATASET] --dataset_path [TRAIN_DATASET_PATH] --config_path [CONFIG_PATH] > log.txt 2>&1 &
       GPU(distribute training):
       mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
         python train.py --config_path=$2 --dataset=$1 --run_distribute=True \
@@ -273,7 +273,7 @@ Please follow the instructions in the link [hccn_tools](https://gitee.com/mindsp
      # example: bash run_distribute_train.sh cifar10 ~/hccl_8p.json /home/DataSet/cifar10/cifar-10-batches-bin/
      # example: bash run_distribute_train.sh imagenet2012 ~/hccl_8p.json /home/DataSet/ImageNet_Original/
 
-     CPU: bash run_train_CPU.sh [cifar10|imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
+     CPU: bash run_train_cpu.sh [cifar10|imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
      GPU(single device): bash run_standalone_train_gpu.sh [cifar10|imagenet2012] [DATASET_PATH] [DEVICE_ID] [PRETRAINED_CKPT_PATH](optional)
      GPU(distribute training): bash run_distribute_train_gpu.sh [cifar10|imagenet2012] [CONFIG_PATH] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
 ```
@@ -311,7 +311,7 @@ You can start training using python or shell scripts.If the train method is trai
 
 # example: bash run_eval.sh imagenet2012 /home/DataSet/ImageNet_Original/ /home/model/mobilenetv1/ckpt/imagenet2012/mobilenetv1-90_625.ckpt 0
 
-- CPU: bash run_eval_CPU.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
+- CPU: bash run_eval_cpu.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 ### Launch
@@ -328,7 +328,7 @@ You can start training using python or shell scripts.If the train method is trai
       # example: bash run_eval.sh cifar10 /home/DataSet/cifar10/cifar-10-verify-bin/ /home/model/mobilenetv1/ckpt/cifar10/mobilenetv1-90_1562.ckpt 0
       # example: bash run_eval.sh imagenet2012 /home/DataSet/ImageNet_Original/ /home/model/mobilenetv1/ckpt/imagenet2012/mobilenetv1-90_625.ckpt 0
 
-      CPU: bash run_eval_CPU.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
+      CPU: bash run_eval_cpu.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 > checkpoint can be produced in training process.
@@ -366,11 +366,12 @@ Before performing inference, the mindir file must be exported by `export.py` scr
 Current batch_Size for imagenet2012 dataset can only be set to 1.
 
 ```shell
-bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_TYPE] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_TYPE] [DEVICE_ID](optional)
 ```
 
 - `MINDIR_PATH` specifies path of used "MINDIR" OR "AIR" model.
-- `DATASET_PATH` specifies path of cifar10 datasets
+- `DATASET_PATH` specifies path of cifar10/imagenet2012 datasets.
+- `DAVICE_TYPE` is the target device to run, support "Ascend", "GPU" and "CPU".
 - `DEVICE_ID` is optional, default value is 0.
 
 ### Result
@@ -414,3 +415,4 @@ In train.py, we set the seed which is used by numpy.random, mindspore.common.Ini
 ## [ModelZoo Homepage](#contents)
 
 Please check the official [homepage](https://gitee.com/mindspore/models).
+
