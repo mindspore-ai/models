@@ -71,7 +71,7 @@ face-mask-detection (https://www.kaggle.com/datasets/andrewmvd/face-mask-detecti
 
 ## [环境要求](#content)
 
-- 硬件（Ascend）
+- 硬件（Ascend，GPU）
     - 使用Ascend处理器准备硬件环境。
 - 架构
     - [MindSpore](https://www.mindspore.cn/install)
@@ -93,12 +93,13 @@ face-mask-detection (https://www.kaggle.com/datasets/andrewmvd/face-mask-detecti
     ├─run_distribute_train.sh                 # 使用Ascend环境八卡并行训练
     ├─run_distribute_train_gpu.sh             # 使用GPU环境八卡并行训练
     ├─run_single_train_gpu.sh                 # 使用GPU环境单卡训练
-    ├─run_infer_310.sh                        # Ascend推理shell脚本
+    ├─run_infer_cpp.sh                        # Ascend推理shell脚本
     ├─run_eval.sh                             # 使用Ascend环境运行推理脚本
     ├─run_eval_gpu.sh                         # 使用GPU环境运行推理脚本
   ├─config
     ├─finetune_config.yaml                      # 迁移学习参数配置
     └─default_config.yaml                       # 参数配置
+    └─default_config_gpu.yaml                   # GPU参数配置
   ├─src
     ├─dataset.py                              # 数据预处理
     ├─retinanet.py                            # 网络模型定义
@@ -119,8 +120,6 @@ face-mask-detection (https://www.kaggle.com/datasets/andrewmvd/face-mask-detecti
   └─create_data.py                            # 构建Mindrecord数据集脚本
   └─data_split.py                             # 迁移学习数据集划分脚本
   └─quick_start.py                            # 迁移学习可视化脚本
-  └─default_config.yaml                       # 参数配置
-
 ```
 
 ### [脚本参数](#content)
@@ -178,7 +177,7 @@ face-mask-detection (https://www.kaggle.com/datasets/andrewmvd/face-mask-detecti
 "anno_path": "",                                                                                # 标签文件路径
 "save_checkpoint": True,                                                                        # 保存checkpoint
 "save_checkpoint_epochs": 1,                                                                    # 保存checkpoint epoch数
-"keep_checkpoint_max":1,                                                                        # 保存checkpoint的最大数量
+"keep_checkpoint_max":10,                                                                       # 保存checkpoint的最大数量
 "save_checkpoint_path": "./ckpt",                                                              # 保存checkpoint的路径
 "finish_epoch":0,                                                                               # 已经运行完成的 epoch 数
 "checkpoint_path":"/home/hitwh1/1.0/ckpt_0/retinanet-500_458_59.ckpt"                           # 用于验证的checkpoint路径
@@ -349,7 +348,7 @@ bash scripts/run_eval_gpu.sh [DEVICE_ID] [DATASET] [MINDRECORD_DIR] [CHECKPOINT_
 
 #### <span id="outcome">结果</span>
 
-计算结果将存储在示例路径中，您可以在 `eval.log` 查看。
+计算结果将存储在示例路径中，您可以在 `log.txt` 查看。
 
 ```mAP
 Ascend:
@@ -445,7 +444,7 @@ bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
 #### <span id="running">运行</span>
 
 ```运行
- bash run_infer_310.sh ./retinanet.mindir ./dataset/coco2017/val2017 ./image_id.txt 0
+ bash run_infer_cpp.sh ./retinanet.mindir ./dataset/coco2017/val2017 Ascend 0
 ```
 
 #### <span id="outcome">结果</span>
@@ -635,3 +634,4 @@ python quick_start.py --config_path './config/finetune_config.yaml'
 - 蓝色：预测标签的mask_weared_incorrect
 - 绿色：预测标签的with_mask
 - 红色：预测标签的without_mask
+

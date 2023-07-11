@@ -212,6 +212,10 @@ Parameters for training can be set in config.py.
 bash run_train.sh [DATASET_PATH] [DATASET_NAME] [DEVICE_ID](optional)
 ```
 
+- `DATASET_PATH` specifies path of datasets.
+- `DATASET_NAME` choose from cora and citeseer.
+- `DEVICE_ID` is optional, default value is 0.
+
 #### Launch
 
 ```bash
@@ -262,6 +266,7 @@ bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 
 - `DATASET_NAME` must be in ['cora', 'citeseer'].
 - `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'.
+- `DEVICE_TYPE` is the target device to run, support 'Asecnd', 'GPU', 'CPU'.
 - `DEVICE_ID` is optional, default value is 0.
 
 ### result
@@ -301,3 +306,4 @@ Some seeds have already been set in train.py to avoid the randomness of weight i
 ## [ModelZoo Homepage](#contents)
 
 Please check the official [homepage](https://gitee.com/mindspore/models).
+
