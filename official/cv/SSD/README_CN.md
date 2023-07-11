@@ -196,19 +196,21 @@ bash run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID] [CONFIG_PATH]
     ├─ README.md                      ## SSD相关说明
     ├─ ascend310_infer                ## 实现310推理源代码
     ├─ scripts
-      ├─ docker start.sh              ## 容器启动脚本
+      ├─ docker_start.sh              ## 容器启动脚本
       ├─ run_distribute_train.sh      ## Ascend分布式shell脚本
       ├─ run_distribute_train_gpu.sh  ## GPU分布式shell脚本
       ├─ run_download_dataset.sh      ## 下载数据集shell脚本
       ├─ run_eval.sh                  ## Ascend评估shell脚本
+      ├─ run_eval_onnx.sh             ## onnx模型评估shell脚本
       ├─ run_eval_gpu.sh              ## GPU评估shell脚本
       ├─ run_export.sh                ## MINDIR、AIR、ONNX导出脚本
-      └─ run_infer_310.sh             ## 310推理脚本
+      └─ run_infer_cpp.sh             ## C++推理脚本
     ├─ src
       ├─ __init__.py                      ## 初始化文件
       ├─ anchor_generator.py              ## 锚点生成器
       ├─ box_util.py                      ## bbox工具
       ├─ dataset.py                       ## 创建并处理数据集
+      ├─ download_dataset.py              ## 下载数据集
       ├─ eval_callback.py                 ## eval回调方法定义
       ├─ eval_utils.py                    ## eval工具
       ├─ fpn.py                           ## 特征金字塔网络
@@ -219,7 +221,7 @@ bash run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID] [CONFIG_PATH]
       ├─ ssd.py                           ## SSD架构
       └─ vgg16.py                         ## vgg16网络定义
       ├── model_utils
-      │   ├──config.py                     ## 参数配置
+      │   ├──config.py                    ## 参数配置
       │   ├──device_adapter.py            ## 设备配置
       │   ├──local_adapter.py             ## 本地设备配置
       │   ├──moxing_adapter.py            ## modelarts设备配置
@@ -233,6 +235,7 @@ bash run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID] [CONFIG_PATH]
         ├─ ssd_resnet50_fpn_config_gpu.yaml ## GPU参数配置
         ├─ ssd_vgg16_config_gpu.yaml ## GPU参数配置
         ├─ ssd300_config_gpu.yaml ## GPU参数配置
+        └─ ssd_mobilenet_v1_fpn_ONNX_config.yaml ## 参数配置
     ├─ Dockerfile                         ## docker文件
     ├─ download_dataset.py                ## 下载数据集脚本
     ├─ eval.py                            ## 评估脚本
@@ -420,7 +423,7 @@ mAP: 0.2244936111705981
 ### ONNX处理器环境评估
 
 ```shell script
-bash bash run_eval_onnx.sh <DATA_PATH> <COCO_ROOT> <ONNX_MODEL_PATH> [<INSTANCES_SET>] [<DEVICE_TARGET>] [<CONFIG_PATH>]
+bash run_eval_onnx.sh <DATA_PATH> <COCO_ROOT> <ONNX_MODEL_PATH> [<INSTANCES_SET>] [<DEVICE_TARGET>] [<CONFIG_PATH>]
 ```
 
 此脚本需要三个参数。

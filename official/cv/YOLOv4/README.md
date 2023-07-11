@@ -251,11 +251,10 @@ other datasets need to use the same format as MS COCO.
   ├─scripts
     ├─run_standalone_train.sh         # launch standalone training(1p) in ascend
     ├─run_distribute_train.sh         # launch distributed training(8p) in ascend
-    └─run_eval.sh                     # launch evaluating in ascend
-    ├─run_test.sh                     # launch testing in ascend
+    ├─run_eval.sh                     # launch evaluating in ascend
+    └─run_test.sh                     # launch testing in ascend
   ├─src
     ├─__init__.py                     # python init file
-    ├─config.py                       # parameter configuration
     ├─cspdarknet53.py                 # backbone of network
     ├─distributed_sampler.py          # iterator of dataset
     ├─export.py                       # convert mindspore model to air model
@@ -266,9 +265,18 @@ other datasets need to use the same format as MS COCO.
     ├─transforms.py                   # Preprocess data
     ├─util.py                         # util function
     ├─yolo.py                         # yolov4 network
-    ├─yolo_dataset.py                 # create dataset for YOLOV4
+    └─yolo_dataset.py                 # create dataset for YOLOV4
+  ├─cpp_infer                         # C++ infer
+  ├─infer                             # infer
   ├─eval.py                           # evaluate val results
-  ├─test.py#                          # evaluate test results
+  ├─test.py                           # evaluate test results
+  ├─export.py                         # convert mindspore model to air model
+  ├─default_config.yaml               # parameter config in ascend/gpu
+  ├─cpu_default_config.yaml           # parameter config in cpu
+  ├─finetune_cpu_default_config.yaml  # transfer learning parameter config in cpu
+  ├─data_split.py                     # transfer learning dataset partition
+  ├─xml2coco.py                       # dataset processing of transfer learning
+  ├─quick_start.py                    # visual of transfer learning
   └─train.py                          # train net
 ```
 
@@ -372,15 +380,9 @@ After training, you'll get some checkpoint files under the outputs folder by def
 ```text
 
 # grep "loss:" train/log.txt
-2020-10-16 15:00:37,483:INFO:epoch[0], iter[0], loss:8248.610352, 0.03 imgs/sec, lr:2.0466639227834094e-07
-2020-10-16 15:00:52,897:INFO:epoch[0], iter[100], loss:5058.681709, 51.91 imgs/sec, lr:2.067130662908312e-05
-2020-10-16 15:01:08,286:INFO:epoch[0], iter[200], loss:1583.772806, 51.99 imgs/sec, lr:4.1137944208458066e-05
-2020-10-16 15:01:23,457:INFO:epoch[0], iter[300], loss:1229.840823, 52.75 imgs/sec, lr:6.160458724480122e-05
-2020-10-16 15:01:39,046:INFO:epoch[0], iter[400], loss:1155.170310, 51.32 imgs/sec, lr:8.207122300518677e-05
-2020-10-16 15:01:54,138:INFO:epoch[0], iter[500], loss:920.922433, 53.02 imgs/sec, lr:0.00010253786604152992
-2020-10-16 15:02:09,209:INFO:epoch[0], iter[600], loss:808.610681, 53.09 imgs/sec, lr:0.00012300450180191547
-2020-10-16 15:02:24,240:INFO:epoch[0], iter[700], loss:621.931513, 53.23 imgs/sec, lr:0.00014347114483825862
-2020-10-16 15:02:39,280:INFO:epoch[0], iter[800], loss:527.155985, 53.20 imgs/sec, lr:0.00016393778787460178
+2023-07-08 22:54:48,955:INFO:epoch[0], iter[99], loss:5345.083353, per step time: 2190.95ms, fps: 3.65, lr:2.046663939836435e-05
+2023-07-08 22:55:02,290:INFO:epoch[0], iter[199], loss:1875.707974, per step time: 133.32ms, fps: 60.00, lr:4.09332787967287e-05
+2023-07-08 22:55:15,065:INFO:epoch[0], iter[299], loss:1552.410308, per step time: 127.74ms, fps: 62.62, lr:6.139991455711424e-05
 ...
 ```
 
