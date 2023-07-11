@@ -77,7 +77,8 @@ After installing MindSpore via the official website and download the dataset, yo
   python train.py > train.log 2>&1 &
 
   # run distributed training example
-  bash scripts/run_distribute_gpu_train.sh 4 0,1,2,3
+  bash scripts/run_distribute_gpu_train.sh DEVICE_NUM CUDA_VISIBLE_DEVICES
+  example: bash scripts/run_distribute_gpu_train.sh 4 0,1,2,3
 
   # run exporting ONNX model example
   python export.py
@@ -86,7 +87,8 @@ After installing MindSpore via the official website and download the dataset, yo
   export CUDA_VISIBLE_DEVICES=0
   python eval.py > eval.log 2>&1 &
   OR
-  bash run_standalone_gpu_eval.sh 0
+  bash run_standalone_gpu_eval.sh CUDA_VISIBLE_DEVICES
+  example: run_standalone_gpu_eval.sh 0
 
   # run evaluation of ONNX model example
   python eval_onnx.py
@@ -101,13 +103,14 @@ After installing MindSpore via the official website and download the dataset, yo
 ```text
 ├── model_zoo
     ├── README.md                          // descriptions about all the models
-    ├── retinaface
+    ├── RetinaFace_ResNet50
         ├── README.md                    // descriptions about googlenet
         ├── scripts
         │   ├──run_distribute_gpu_train.sh         // shell script for distributed on GPU
         │   ├──run_standalone_gpu_eval.sh         // shell script for evaluation on GPU
         │   ├──run_onnx_eval.sh                  // shell script for ONNX model evaluation on GPU or CPU
         ├── src
+        │   ├── __init__.py            // init file
         │   ├──dataset.py             // creating dataset
         │   ├──network.py            // retinaface architecture
         │   ├──config.py            // parameter configuration
@@ -115,14 +118,11 @@ After installing MindSpore via the official website and download the dataset, yo
         │   ├──loss.py            // loss function
         │   ├──utils.py          // data preprocessing
         │   ├──lr_schedule.py   // learning rate schedule
-        ├── data
-        │   ├──widerface                    // dataset data
-        │   ├──resnet50_pretrain.ckpt      // resnet50 imagenet pretrain model
-        │   ├──ground_truth               // eval label
         ├── train.py               // training script
         ├── eval.py               //  evaluation script
         ├── export.py            // ONNX model exporting script
         ├── eval_onnx.py        // ONNX model evaluation script
+        ├── requirements.txt   // requirements file
 ```
 
 ## [Script Parameters](#contents)
@@ -266,7 +266,8 @@ Parameters for both training and evaluation can be set in config.py
   export CUDA_VISIBLE_DEVICES="$1"
   python eval_onnx.py
   or
-  bash scripts/run_onnx_eval.sh 0
+  bash scripts/run_onnx_eval.sh CUDA_VISIBLE_DEVICES
+  example: bash scripts/run_onnx_eval.sh 0
   ```
 
 The evaluation results can be viewed in the window：
