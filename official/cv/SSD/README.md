@@ -240,7 +240,7 @@ Then you can run everything just like on ascend.
     ├─ README.md                      ## descriptions about SSD
     ├─ ascend310_infer                ## source code of 310 inference
     ├─ scripts
-      ├─ docker start.sh              ## shell script for start docker container
+      ├─ docker_start.sh              ## shell script for start docker container
       ├─ run_distribute_train.sh      ## shell script for distributed on ascend
       ├─ run_distribute_train_gpu.sh  ## shell script for distributed on gpu
       ├─ run_download_dataset.sh      ## shell script for downloading dataset
@@ -248,7 +248,7 @@ Then you can run everything just like on ascend.
       ├─ run_eval_onnx.sh             ## shell script for onnx model evaluation
       ├─ run_eval_gpu.sh              ## shell script for eval on gpu
       ├─ run_export.sh                ## shell script for exporting to MINDIR,AIR,ONNX
-      └─ run_infer_310.sh             ## shell script for 310 inference
+      └─ run_infer_cpp.sh             ## shell script for C++ inference
     ├─ src
       ├─ __init__.py                      ## init file
       ├─ anchor_generator.py              ## anchor generator
@@ -278,6 +278,7 @@ Then you can run everything just like on ascend.
         ├─ ssd_resnet50_fpn_config_gpu.yaml ## GPU parameter configuration
         ├─ ssd_vgg16_config_gpu.yaml ## GPU parameter configuration
         ├─ ssd300_config_gpu.yaml ## GPU parameter configuration
+        └─ ssd_mobilenet_v1_fpn_ONNX_config.yaml ## parameter configuration
     ├─ Dockerfile                         ## docker file
     ├─ download_dataset.py                ## download dataset script
     ├─ eval.py                            ## eval scripts

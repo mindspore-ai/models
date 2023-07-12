@@ -166,7 +166,7 @@ YOLOv4需要CSPDarknet53主干来提取图像特征进行检测。 您可以从[
       --lr_scheduler=cosine_annealing > log.txt 2>&1 &
 
   # 使用shell脚本执行单尺度单机训练示例（1卡）
-  bash run_standalone_train.sh dataset/xxx cspdarknet53_backbone.ckpt
+  bash run_standalone_train.sh dataset/xxx cspdarknet53_backbone.ckpt 0
 
   # 在Ascend设备上，使用shell脚本执行多尺度分布式训练示例（8卡）
   bash run_distribute_train.sh dataset/xxx cspdarknet53_backbone.ckpt rank_table_8p.json
@@ -291,14 +291,12 @@ YOLOv4需要CSPDarknet53主干来提取图像特征进行检测。 您可以从[
   ├─scripts
     ├─run_standalone_train.sh         # 在Ascend中启动单机训练（1卡）
     ├─run_distribute_train.sh         # 在Ascend中启动分布式训练（8卡）
-    └─run_eval.sh                     # 在Ascend中启动评估
-    ├─run_test.sh                     # 在Ascend中启动测试
+    ├─run_eval.sh                     # 在Ascend中启动评估
+    └─run_test.sh                     # 在Ascend中启动测试
   ├─src
     ├─__init__.py                     # Python初始化文件
-    ├─config.py                       # 参数配置
     ├─cspdarknet53.py                 # 网络主干
     ├─distributed_sampler.py          # 数据集迭代器
-    ├─export.py                       # 将MindSpore模型转换为MINDIR,AIR模型
     ├─initializer.py                  # 参数初始化器
     ├─logger.py                       # 日志函数
     ├─loss.py                         # 损失函数
@@ -306,9 +304,14 @@ YOLOv4需要CSPDarknet53主干来提取图像特征进行检测。 您可以从[
     ├─transforms.py                   # 预处理数据
     ├─util.py                         # 工具函数
     ├─yolo.py                         # YOLOv4网络
-    ├─yolo_dataset.py                 # 为YOLOv4创建数据集
+    └─yolo_dataset.py                 # 为YOLOv4创建数据集
+  ├─cpp_infer                         # C++推理
+  ├─infer                             # 推理
   ├─eval.py                           # 评估验证结果
   ├─test.py#                          # 评估测试结果
+  ├─test.py                           # 评估测试结果
+  ├─export.py                         # 将MindSpore模型转换为MINDIR,AIR模型
+  ├─default_config.yaml               # Ascend、gpu运行环境下参数配置
   ├─cpu_default_config.yaml           # cpu运行环境下参数配置
   ├─finetune_cpu_default_config.yaml  # 迁移学习参数配置
   ├─data_split.py                     # 迁移学习数据集划分脚本
@@ -394,7 +397,7 @@ Cspdarknet53是一个分类器，可以在ImageNet(ILSVRC2012)等数据集上训
 在Ascend设备上，使用shell脚本执行单机训练示例（1卡）
 
 ```bash
-bash run_standalone_train.sh dataset/coco2017 cspdarknet53_backbone.ckpt
+bash run_standalone_train.sh dataset/coco2017 cspdarknet53_backbone.ckpt 0
 ```
 
 ```text
@@ -417,15 +420,9 @@ python train.py \
 ```text
 
 # grep "loss:" train/log.txt
-2020-10-16 15:00:37,483:INFO:epoch[0], iter[0], loss:8248.610352, 0.03 imgs/sec, lr:2.0466639227834094e-07
-2020-10-16 15:00:52,897:INFO:epoch[0], iter[100], loss:5058.681709, 51.91 imgs/sec, lr:2.067130662908312e-05
-2020-10-16 15:01:08,286:INFO:epoch[0], iter[200], loss:1583.772806, 51.99 imgs/sec, lr:4.1137944208458066e-05
-2020-10-16 15:01:23,457:INFO:epoch[0], iter[300], loss:1229.840823, 52.75 imgs/sec, lr:6.160458724480122e-05
-2020-10-16 15:01:39,046:INFO:epoch[0], iter[400], loss:1155.170310, 51.32 imgs/sec, lr:8.207122300518677e-05
-2020-10-16 15:01:54,138:INFO:epoch[0], iter[500], loss:920.922433, 53.02 imgs/sec, lr:0.00010253786604152992
-2020-10-16 15:02:09,209:INFO:epoch[0], iter[600], loss:808.610681, 53.09 imgs/sec, lr:0.00012300450180191547
-2020-10-16 15:02:24,240:INFO:epoch[0], iter[700], loss:621.931513, 53.23 imgs/sec, lr:0.00014347114483825862
-2020-10-16 15:02:39,280:INFO:epoch[0], iter[800], loss:527.155985, 53.20 imgs/sec, lr:0.00016393778787460178
+2023-07-08 22:54:48,955:INFO:epoch[0], iter[99], loss:5345.083353, per step time: 2190.95ms, fps: 3.65, lr:2.046663939836435e-05
+2023-07-08 22:55:02,290:INFO:epoch[0], iter[199], loss:1875.707974, per step time: 133.32ms, fps: 60.00, lr:4.09332787967287e-05
+2023-07-08 22:55:15,065:INFO:epoch[0], iter[299], loss:1552.410308, per step time: 127.74ms, fps: 62.62, lr:6.139991455711424e-05
 ...
 ```
 
