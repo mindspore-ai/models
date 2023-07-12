@@ -98,12 +98,13 @@ face-mask-detection (https://www.kaggle.com/datasets/andrewmvd/face-mask-detecti
     ├─run_distribute_train.sh                 # Perform parallel 8-device training in the Ascend environment.
     ├─run_distribute_train_gpu.sh             # Perform parallel 8-device training in the GPU environment.
     ├─run_single_train_gpu.sh                 # Perform single-device training in the GPU environment.
-    ├─run_infer_310.sh                        # Shell script for inference on Ascend AI Processors
+    ├─run_infer_cpp.sh                        # Shell script for inference on Ascend AI Processors
     ├─run_eval.sh                        # Script for inference in the Ascend environment
     ├─run_eval_gpu.sh                         # Script for inference in the GPU environment
   ├─config
     ├─finetune_config.yaml                      # Transfer learning parameter configuration
     └─default_config.yaml                       # Parameter configuration
+    └─default_config_gpu.yaml                    # Parameter configuration of GPU
   ├─src
     ├─dataset.py                              # Data preprocessing
     ├─retinanet.py                            # Network model definition
@@ -124,8 +125,6 @@ face-mask-detection (https://www.kaggle.com/datasets/andrewmvd/face-mask-detecti
   └─create_data.py                            # Script for creating the MindRecord dataset
   └─data_split.py                             # Script for splitting the transfer learning dataset
   └─quick_start.py                            # Transfer learning visualization script
-  └─default_config.yaml                       # Parameter configuration
-
 ```
 
 ### Script Parameters
@@ -183,7 +182,7 @@ The main parameters used in the script are as follows:
 "anno_path": "",                                                                                # Annotation file path
 "save_checkpoint": True,                                                                        # Specifies whether checkpoints are saved.
 "save_checkpoint_epochs": 1,                                                                    # Number of epochs saving checkpoints
-"keep_checkpoint_max":1,                                                                        # Maximum number of checkpoints that can be saved
+"keep_checkpoint_max":10,                                                                       # Maximum number of checkpoints that can be saved
 "save_checkpoint_path": "./ckpt",                                                              # Checkpoint file path
 "finish_epoch":0,                                                                               # Number of epochs that have been finished
 "checkpoint_path":"/home/hitwh1/1.0/ckpt_0/retinanet-500_458_59.ckpt"                           # Checkpoint file path for verification
@@ -354,7 +353,7 @@ bash scripts/run_eval_gpu.sh [DEVICE_ID] [DATASET] [MINDRECORD_DIR] [CHECKPOINT_
 
 #### Results
 
-The calculation results are stored in the sample path. You can view the results in `eval.log`.
+The calculation results are stored in the sample path. You can view the results in `log.txt`.
 
 ```mAP
 Ascend:
@@ -451,7 +450,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
 #### Running
 
 ```Running
- bash run_infer_310.sh ./retinanet.mindir ./dataset/coco2017/val2017 ./image_id.txt 0
+ bash run_infer_cpp.sh ./retinanet.mindir ./dataset/coco2017/val2017 Ascend 0
 ```
 
 #### Results
@@ -642,3 +641,4 @@ The meanings of the colors in the figure are as follows:
 - Blue: prediction label "mask_weared_incorrect"
 - Green:  prediction label "with_mask"
 - Red:  prediction label "without_mask"
+

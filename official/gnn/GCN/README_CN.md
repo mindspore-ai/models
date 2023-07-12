@@ -215,15 +215,20 @@ bash run_train.sh [DATASET_PATH] [DATASET_NAME] [DEVICE_ID](optional)
 #### 启动
 
 ```bash
-# 在Ascend上使用Cora或Citeseer数据集进行训练，DATASET_NAME为Cora或Citeseer, DEVICE_ID为使用的卡号（可选）。
+# 在Ascend上使用Cora或Citeseer数据集进行训练
 bash run_train.sh [DATASET_PATH] [DATASET_NAME] [DEVICE_ID](optional)
 
-# 在GPU上使用Cora或Citeseer数据集进行训练，DATASET_PATH设置为数据集目录，DATASET_NAME为Cora或Citeseer
+# 在GPU上使用Cora或Citeseer数据集进行训练
 bash run_train_gpu.sh [DATASET_PATH] [DATASET_NAME]
 
 # 在GPU上对Cora或Citeseer数据集进行测试
 bash run_eval_gpu.sh [DATASET_PATH] [DATASET_NAME] [CKPT]
 ```
+
+- `DATASET_PATH` 表示数据集路径。
+- `DATASET_NAME` 表示数据集名称，取值范围： ['cora', 'citeseer']。
+- `DEVICE_ID` 可选，默认值为0。
+- `CKPT` 表示CKPT路径。
 
 #### 结果
 
@@ -261,7 +266,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 
 ### 执行推理
 
-在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
+在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用mindir模型执行推理的示例。
 
 ```shell
 bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
@@ -269,6 +274,7 @@ bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 
 - `DATASET_NAME` 表示数据集名称，取值范围： ['cora', 'citeseer']。
 - `NEED_PREPROCESS` 表示数据是否需要预处理，取值范围：'y' 或者 'n'。
+- `DEVICE_TYPE` 表示待运行的目标设备，可选 [Ascend, GPU, CPU]。
 - `DEVICE_ID` 可选，默认值为0。
 
 ### result
@@ -308,3 +314,4 @@ train.py已经设置了一些种子，避免权重初始化的随机性。若需
 ## ModelZoo主页
 
 请浏览官网[主页](https://gitee.com/mindspore/models)。
+

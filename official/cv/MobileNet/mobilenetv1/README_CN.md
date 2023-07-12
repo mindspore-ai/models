@@ -78,7 +78,7 @@ MobileNetV1的整体网络架构如下：
 
 ## 环境要求
 
-- 硬件（Ascend）
+- 硬件（Ascend，GPU，CPU）
     - 使用Ascend处理器来搭建硬件环境。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
@@ -243,7 +243,7 @@ MobileNetV1的整体网络架构如下：
 
   示例：bash run_distribute_train.sh imagenet2012 /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/ImageNet_Original/
 
-- CPU：bash run_train_CPU.sh [cifar10|imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
+- CPU：bash run_train_cpu.sh [cifar10|imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
 - GPU（单卡）：bash run_standalone_train_gpu.sh [cifar10|imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
 - GPU（分布式训练）：bash run_distribute_train_gpu.sh [cifar10|imagenet2012] [CONFIG_PATH] [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
 
@@ -256,9 +256,9 @@ MobileNetV1的整体网络架构如下：
 ```shell
 # 训练示例
   Python：
-      Ascend：python train.py --device_target Ascend --dataset_path [TRAIN_DATASET_PATH]
-      CPU：python train.py --device_target CPU --dataset_path [TRAIN_DATASET_PATH]
-      GPU（单卡）：python train.py --device_target GPU --dateset [DATASET] --dataset_path [TRAIN_DATASET_PATH] --config_path [CONFIG_PATH]
+      Ascend：python train.py --device_target Ascend --dataset_path [TRAIN_DATASET_PATH] > log.txt 2>&1 &
+      CPU：python train.py --device_target CPU --dataset_path [TRAIN_DATASET_PATH] > log.txt 2>&1 &
+      GPU（单卡）：python train.py --device_target GPU --dateset [DATASET] --dataset_path [TRAIN_DATASET_PATH] --config_path [CONFIG_PATH] > log.txt 2>&1 &
       GPU（分布式训练）：
       mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
         python train.py --config_path=$2 --dataset=$1 --run_distribute=True \
@@ -269,7 +269,7 @@ MobileNetV1的整体网络架构如下：
      # 示例：bash run_distribute_train.sh cifar10 ~/hccl_8p.json /home/DataSet/cifar10/cifar-10-batches-bin/
      # 示例：bash run_distribute_train.sh imagenet2012 ~/hccl_8p.json /home/DataSet/ImageNet_Original/
 
-     CPU：bash run_train_CPU.sh [cifar10|imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
+     CPU：bash run_train_cpu.sh [cifar10|imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
      GPU（单卡）：bash run_standalone_train_gpu.sh [cifar10|imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
      GPU（分布式训练）：bash run_distribute_train_gpu.sh [cifar10|imagenet2012] [CONFIG_PATH] [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
 ```
@@ -298,7 +298,7 @@ Epoch time: 320744.265, per step time: 256.390
 
 ### 用法
 
-您可以使用Python或Shell脚本开始训练。如果是训练或微调，则不要设置`[CHECKPOINT_PATH]`Sshell脚本的用法如下：
+您可以使用Python或Shell脚本开始训练。如果是训练或微调，则不要设置`[CHECKPOINT_PATH]` shell脚本的用法如下：
 
 - Ascend：bash run_eval.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID]
 
@@ -306,7 +306,7 @@ Epoch time: 320744.265, per step time: 256.390
 
   示例：bash run_eval.sh imagenet2012 /home/DataSet/ImageNet_Original/ /home/model/mobilenetv1/ckpt/imagenet2012/mobilenetv1-90_625.ckpt 0
 
-- CPU：bash run_eval_CPU.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
+- CPU：bash run_eval_cpu.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
 
 ### 启动
 
@@ -322,7 +322,7 @@ Epoch time: 320744.265, per step time: 256.390
       # 示例：bash run_eval.sh cifar10 /home/DataSet/cifar10/cifar-10-verify-bin/ /home/model/mobilenetv1/ckpt/cifar10/mobilenetv1-90_1562.ckpt 0
       # 示例：bash run_eval.sh imagenet2012 /home/DataSet/ImageNet_Original/ /home/model/mobilenetv1/ckpt/imagenet2012/mobilenetv1-90_625.ckpt 0
 
-      CPU：bash run_eval_CPU.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
+      CPU：bash run_eval_cpu.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 > 训练过程中会生成检查点。
@@ -361,12 +361,13 @@ ImageNet 2012数据集当前的batch size只能设置为1。
 
 ```shell
 # Ascend 310上运行推理
-bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_TYPE] [DEVICE_ID](可选)
 ```
 
-- `MINDIR_PATH`指定MindIR或AIR模型的路径。
-- `DATASET_PATH`指定cifar10数据集的路径。
-- `DEVICE_ID`可选，默认值为0。
+- `MINDIR_PATH` 指定MindIR或AIR模型的路径。
+- `DATASET_PATH` 指定cifar10/imagenet2012数据集的路径。
+- `DEVICE_TYPE` 表示要运行的目标设备，可选['Ascend', 'GPU', 'CPU']。
+- `DEVICE_ID` 可选，默认值为0。
 
 ### 结果
 
@@ -409,3 +410,4 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 ## [ModelZoo主页](#目录)
 
 请浏览官网[主页](https://gitee.com/mindspore/models)。
+
