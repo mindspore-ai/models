@@ -163,7 +163,7 @@ e.g. you can reference the following template
 
 ## Reference Example
 
-[maskrcnn_readme](https://gitee.com/mindspore/models/blob/master/official/cv/ResNeXt/README.md)
+[resnet_readme](https://gitee.com/mindspore/models/blob/master/official/cv/ResNet/README.md)
 
 ## Contributions
 

@@ -140,8 +140,6 @@ Note: *** - it is a data (images or annotations)
 Google Drive:
 [[0]](https://drive.google.com/file/d/19QyGOCqn8K_rc9TXJ8UwLSxCx17e0GoY/view?usp=sharing)
 
-Original dataset webpage: [ETHZ pedestrian dataset](https://data.vision.ee.ethz.ch/cvl/aess/dataset/)
-
 Download dataset and unzip. The structure of the dataset will be the following:
 
 ```text
