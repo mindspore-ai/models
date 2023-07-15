@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 
-#bash run_parameter_server_train_distribute.sh RANK_SIZE EPOCHS DEVICE_TARGET DATASET 
+#bash run_parameter_server_train_distribute.sh RANK_SIZE EPOCHS DEVICE_TARGET DATASET
 #                                              SERVER_NUM SCHED_HOST SCHED_PORT RANK_TABLE_FILE
 #                                              VOCAB_CACHE_SIZE SPARSE
 execute_path=$(pwd)
@@ -69,6 +69,5 @@ do
   export DEVICE_ID=$i
   python -s ${self_path}/../train_and_eval_parameter_server_distribute.py                         \
     --device_target=$DEVICE_TARGET --data_path=$DATASET --epochs=$EPOCH_SIZE --parameter_server=1 \
-    --vocab_cache_size=$VOCAB_CACHE_SIZE --sparse=$SPARSE --dropout_flag=True >worker_$i.log 2>&1 &
+    --vocab_cache_size=$VOCAB_CACHE_SIZE --sparse=$SPARSE --dropout_flag=False >worker_$i.log 2>&1 &
 done
-
