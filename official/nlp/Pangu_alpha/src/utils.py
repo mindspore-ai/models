@@ -411,6 +411,10 @@ def add_training_params(opt):
     opt.add_argument("--recompute_slice_activation",
                      type=int, default=0,
                      help="Enable slice the recompute activation state. default 0")
+    opt.add_argument("--atomic_clean_policy",
+                     type=int, default=0,
+                     help="The policy for cleaning memory occupied by atomic operators in the network,"
+                          "when the memory of the network exceeds the limit, you may try 1. Default 0")
 
 
 def add_context_args_mode(opt):

@@ -116,6 +116,7 @@ def set_parse_13B(args_opt):
     args_opt.num_heads = 40
     args_opt.word_emb_dp = 1
     args_opt.op_level_model_parallel_num = 8
+    args_opt.atomic_clean_policy = 1
     if args_opt.run_type == "train":
         args_opt.start_lr = 5e-5
         args_opt.end_lr = 1e-6

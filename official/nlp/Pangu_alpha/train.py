@@ -551,6 +551,9 @@ if __name__ == "__main__":
     if bool(opt.enable_alltoall) is True and bool(opt.use_moe) is False:
         raise ValueError("The alltoall communication is only effective when applying moe")
     os.environ['HCCL_CONNECT_TIMEOUT'] = str(opt.hccl_connect_time)
+    if opt.atomic_clean_policy == 1:
+        context.set_context(ascend_config={"atomic_clean_policy": 1})
+
     if opt.stage_num > 1:
         run_train_pipeline(opt)
     else:
