@@ -49,7 +49,7 @@ else
     mkdir ${execute_path}/device_$RANK_ID
     cd ${execute_path}/device_$RANK_ID || exit
     if [ $MODE == "host_device_mix" ]; then
-      python -s ${self_path}/../train_and_eval_auto_parallel.py --data_path=$DATASET --epochs=$EPOCH_SIZE --vocab_size=$VOCAB_SIZE --emb_dim=$EMB_DIM --dropout_flag=True --host_device_mix=1 >train_deep$i.log 2>&1 &
+      python -s ${self_path}/../train_and_eval_auto_parallel.py --data_path=$DATASET --epochs=$EPOCH_SIZE --vocab_size=$VOCAB_SIZE --emb_dim=$EMB_DIM --dropout_flag=False --host_device_mix=1 >train_deep$i.log 2>&1 &
     elif [ $MODE == "field_slice_host_device_mix" ]; then
       python -s ${self_path}/../train_and_eval_auto_parallel.py --data_path=$DATASET --epochs=$EPOCH_SIZE --vocab_size=$VOCAB_SIZE --emb_dim=$EMB_DIM --dropout_flag=True --host_device_mix=1 --full_batch=True --field_slice=True >train_deep$i.log 2>&1 &
     else
