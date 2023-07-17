@@ -1,0 +1,9 @@
+imageio==2.22.4
+mindinsight==1.9.0
+mindquantum==0.7.0
+mindspore-gpu==1.9.0
+numpy==1.19.5
+opencv-python==4.5.4
+opencv-python-headless==4.5.4.60
+Pillow==9.3.0
+scipy==1.1.0
