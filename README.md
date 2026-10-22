@@ -50,7 +50,7 @@ For more information about `MindSpore` framework, please refer to [FAQ](https://
 
 - **Q: What is Some *RANK_TBAL_FILE* which mentioned in many models?**
 
-  **A**: *RANK_TABLE_FILE* is the config file of cluster on Ascend while running distributed training. For more information, you could refer to the generator [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) and [Parallel Distributed Training Example](https://mindspore.cn/docs/programming_guide/en/r1.5/distributed_training_ascend.html#configuring-distributed-environment-variables)
+  **A**: *RANK_TABLE_FILE* is the config file of cluster on Huawei Ascend while running distributed training. For more information, you could refer to the generator [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) and [Parallel Distributed Training Example](https://mindspore.cn/docs/programming_guide/en/r1.5/distributed_training_ascend.html#configuring-distributed-environment-variables)
 
 - **Q: How to run the scripts on Windows system?**
 
