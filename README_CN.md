@@ -50,7 +50,7 @@ MindSpore已获得Apache 2.0许可，请参见LICENSE文件。
 
 - **Q: 一些模型描述中提到的*RANK_TABLE_FILE*文件，是什么？**
 
-  **A**: *RANK_TABLE_FILE*是一个Ascend环境上用于指定分布式集群信息的文件，更多信息可以参考生成工具[hccl_toos](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)和[分布式并行训练教程](https://mindspore.cn/docs/programming_guide/zh-CN/r1.5/distributed_training_ascend.html#id4)
+  **A**: *RANK_TABLE_FILE*是一个Huawei Ascend环境上用于指定分布式集群信息的文件，更多信息可以参考生成工具[hccl_toos](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)和[分布式并行训练教程](https://mindspore.cn/docs/programming_guide/zh-CN/r1.5/distributed_training_ascend.html#id4)
 
 - **Q: 在windows环境上要怎么运行网络脚本？**
 
