@@ -1,0 +1,46 @@
+# Runtime. Attention-as-Prompt requires PYNATIVE_MODE.
+device_target: Ascend
+device_id: 0
+seed: 2021
+
+# Dataset. The target column is moved to the final channel internally.
+root_path: ./dataset
+data_path: C5/C5-2.csv
+features: MS
+target: C5
+freq: h
+percent: 100
+num_workers: 1
+
+# Forecasting setup from the PAT-LLM manuscript.
+seq_len: 96
+label_len: 48
+pred_len: 32
+patch_len: 8
+stride: 8
+d_model: 64
+n_heads: 3
+d_ff: 256
+dropout: 0.1
+aap_top_k: 5
+aap_top_m: 3
+aap_recent_fraction: 0.2
+
+# Frozen LLM. Use an existing local MindNLP-compatible model directory.
+llm_model_path: /path/to/llama2-7b
+llm_layers: 6
+llm_dtype: float16
+num_prototypes: 1000
+allow_download: false
+trust_remote_code: false
+description: >-
+  Industrial hydrocracking process data with strongly coupled process
+  variables and delayed light-naphtha quality measurements.
+
+# Optimisation and outputs.
+batch_size: 16
+train_epochs: 10
+learning_rate: 0.0001
+patience: 5
+checkpoint_path: ./checkpoints/pat_llm_c5_32.ckpt
+output_dir: ./results/pat_llm_c5_32

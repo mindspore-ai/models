@@ -369,6 +369,8 @@
 | textrcnn           | [Recurrent Convolutional Neural Networks for Text Classification](https://ojs.aaai.org/index.php/AAAI/article/view/9513) | [link](https://gitee.com/mindspore/models/tree/master/research/nlp/textrcnn) |
 | hypertext          | [HyperText: Endowing FastText with Hyperbolic Geometry](https://arxiv.org/abs/2010.16143) | [link](https://gitee.com/mindspore/models/tree/master/research/nlp/hypertext) |
 
+| pat_llm           | PAT-LLM: Textualized Multi-Patch Attention for Multivariate Time Series Forecasting with LLMs | [link](https://gitee.com/mindspore/models/tree/master/research/nlp/pat_llm) |
+
 ### Graph
 
 | model     | paper                                                        |                      vanilla mindspore                       |
